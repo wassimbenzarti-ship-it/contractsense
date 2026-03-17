@@ -282,10 +282,13 @@ Rules:
   }
 }
 
+let lastResult=null;
 function renderResults(r){
+  lastResult=r;
   document.getElementById('loading').style.display='none';
   const s=r.score||50;
   const color=sc(s);
+  window._lastResult = r;
   let html=`
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #1f2537">
       <div style="font-size:20px;font-weight:800">Rapport d'analyse</div>
@@ -316,9 +319,143 @@ function renderResults(r){
         ${c.rewrite?`<div class="rewrite"><div class="rewrite-lbl">✏ Reformulation suggérée</div>${c.rewrite}</div>`:''}
       </div>
     `).join('')}
+    <button onclick="exportRTF(window._lastResult)" style="display:block;margin:16px auto 0;padding:11px 22px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">⬇ Télécharger avec Track Changes (RTF)</button>
+    <button onclick="exportRTF(r)" style="display:block;margin:16px auto 0;padding:11px 24px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">⬇ Télécharger avec Track Changes (.rtf)</button>
     <button class="btn-reset" onclick="reset()">↩ Nouveau contrat</button>`;
   document.getElementById('results').innerHTML=html;
   document.getElementById('results').style.display='block';
+}
+
+function exportRTF(r){
+  if(!r||!r.clauses)return;
+  const esc = s => {
+    if(!s) return '';
+    let out = '';
+    for(let i=0;i<Math.min(s.length,1500);i++){
+      const cc=s.charCodeAt(i);
+      if(cc>127) out+='\\u'+cc+'?';
+      else if(s[i]==='\\'||s[i]==='{'||s[i]==='}') out+='\\'+s[i];
+      else out+=s[i];
+    }
+    return out;
+  };
+
+  let rtf = '{\\rtf1\\ansi\\deff0\n';
+  rtf += '{\\fonttbl{\\f0 Times New Roman;}}\n';
+  rtf += '{\\colortbl;\\red0\\green0\\blue0;\\red180\\green0\\blue0;\\red0\\green130\\blue0;}\n';
+  rtf += '\\f0\\fs24\n';
+
+  rtf += '{\\b\\fs32 ContractSense - Track Changes\\par}\n';
+  rtf += '{\\fs22 Score: '+r.score+'/100 - '+esc(r.verdict)+'\\par}\n';
+  rtf += esc(r.summary)+'\\par\\par\n';
+
+  (r.clauses||[]).forEach((c,i)=>{
+    const lbl = c.risk==='high'?'RISQUE ELEVE':c.risk==='medium'?'RISQUE MODERE':'FAIBLE RISQUE';
+    rtf += '{\\b\\fs26 '+(i+1)+'. '+esc(c.name)+' ['+lbl+']\\par}\n';
+    rtf += '{\\cf2\\strike '+esc(c.issue)+'\\strike0\\cf1\\par}\n';
+    if(c.rewrite){
+      rtf += '{\\cf3 '+esc(c.rewrite)+'\\cf1\\par}\n';
+    }
+    rtf += '\\par\n';
+  });
+
+  rtf += '}';
+
+  const blob = new Blob([rtf],{type:'application/rtf'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'contractsense-track-changes.rtf';
+  a.click();
+}
+
+function escRTF(str){
+  if(!str)return'';
+  return str
+    .replace(/\\/g,'\\\\')
+    .replace(/\{/g,'\\{')
+    .replace(/\}/g,'\\}')
+    .replace(/é/g,"\\'e9")
+    .replace(/è/g,"\\'e8")
+    .replace(/ê/g,"\\'ea")
+    .replace(/à/g,"\\'e0")
+    .replace(/â/g,"\\'e2")
+    .replace(/ô/g,"\\'f4")
+    .replace(/û/g,"\\'fb")
+    .replace(/ù/g,"\\'f9")
+    .replace(/î/g,"\\'ee")
+    .replace(/ï/g,"\\'ef")
+    .replace(/ç/g,"\\'e7")
+    .replace(/É/g,"\\'c9")
+    .replace(/È/g,"\\'c8")
+    .replace(/À/g,"\\'c0")
+    .replace(/
+/g,'\\par ')
+    .replace(/[^ -]/g, c => {
+      const code = c.charCodeAt(0);
+      return code > 255 ? '\\u'+code+'?' : "\\'"+code.toString(16).padStart(2,'0');
+    });
+}
+
+function exportRTF(r){
+  if(!r||!r.clauses)return;
+
+  // RTF Track Changes header
+  let rtf = '{\\rtf1\\ansi\\deff0
+';
+  rtf += '{\\fonttbl{\\f0 Times New Roman;}}
+';
+  rtf += '{\\colortbl;\\red0\\green0\\blue0;\\red180\\green0\\blue0;\\red0\\green130\\blue0;}
+';
+  rtf += '\\f0\\fs24
+';
+
+  // Title
+  rtf += '{\\b\\fs32 ContractSense — Rapport avec Track Changes\\par}
+';
+  rtf += '{\\fs20 Score: ' + r.score + '/100 — ' + escRTF(r.verdict) + '\\par}
+';
+  rtf += '{\\cf1 ' + escRTF(r.summary) + '\\par}\\par
+';
+
+  // Each clause
+  r.clauses.forEach((c, i) => {
+    const riskLabel = c.risk==='high'?'RISQUE ÉLEVÉ':c.risk==='medium'?'RISQUE MODÉRÉ':'FAIBLE RISQUE';
+    
+    // Clause title
+    rtf += '{\\b\\fs26 ' + (i+1) + '. ' + escRTF(c.name) + ' [' + riskLabel + ']\\par}
+';
+    
+    // Original text struck through in red (deleted)
+    rtf += '{\\insrsid1 \\cf2\\strike ' + escRTF(c.issue) + '\\strike0\\cf1\\par}
+';
+    
+    // New text in green (inserted)  
+    if(c.rewrite){
+      rtf += '{\\insrsid2 \\cf3 ' + escRTF(c.rewrite) + '\\cf1\\par}
+';
+    }
+    rtf += '\\par
+';
+  });
+
+  rtf += '}';
+
+  // Download
+  const blob = new Blob([rtf], {type:'application/rtf'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'contractsense-track-changes.rtf';
+  a.click();
+}
+
+function escRTF(str){
+  if(!str)return '';
+  return str
+    .replace(/\\/g,'\\\\')
+    .replace(/\{/g,'\\{')
+    .replace(/\}/g,'\\}')
+    .replace(/[\u0080-\uFFFF]/g, c=>'\\u'+c.charCodeAt(0)+'?')
+    .substring(0,2000);
 }
 
 function reset(){
