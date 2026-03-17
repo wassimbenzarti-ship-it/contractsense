@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ContractSense</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0a0c12; color: #e2e5f0; font-family: system-ui, sans-serif; min-height: 100vh; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.wrap { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
+.logo { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 19px; margin-bottom: 44px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: #5b7cfa; box-shadow: 0 0 14px #5b7cfa; }
+label { display: block; font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+input, select, textarea { width: 100%; background: #181c2a; border: 1px solid #1f2537; border-radius: 9px; padding: 10px 13px; color: #e2e5f0; font-size: 13px; font-family: inherit; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: #5b7cfa; }
+.card { background: #111420; border: 1px solid #1f2537; border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.btn-blue { padding: 10px 18px; background: #5b7cfa; border: none; border-radius: 9px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-main { width: 100%; padding: 15px; background: linear-gradient(135deg, #5b7cfa, #8b5cf6); border: none; border-radius: 11px; color: #fff; font-size: 15px; font-weight: 800; cursor: pointer; margin-top: 4px; }
+.btn-main:disabled { opacity: 0.4; cursor: not-allowed; }
+.tabs { display: flex; gap: 3px; background: #111420; border: 1px solid #1f2537; border-radius: 10px; padding: 3px; width: fit-content; margin-bottom: 16px; }
+.tab { padding: 7px 16px; border-radius: 8px; border: none; background: none; color: #6b7280; font-size: 13px; cursor: pointer; border-bottom: 2px solid transparent; }
+.tab.active { background: #181c2a; color: #e2e5f0; border-bottom-color: #5b7cfa; }
+.drop { border: 1.5px dashed #1f2537; border-radius: 14px; padding: 38px 24px; text-align: center; cursor: pointer; background: #111420; margin-bottom: 14px; }
+.drop:hover { border-color: #5b7cfa; background: rgba(91,124,250,0.05); }
+.tags { display: flex; gap: 5px; justify-content: center; margin-top: 10px; }
+.tag { padding: 2px 9px; border-radius: 20px; border: 1px solid #1f2537; color: #6b7280; font-size: 11px; }
+.file-ok { display: flex; align-items: center; gap: 9px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 9px; padding: 11px 15px; margin-bottom: 14px; font-size: 13px; }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-bottom: 16px; }
+select { appearance: none; }
+.error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); border-radius: 9px; padding: 11px 15px; color: #ef4444; font-size: 13px; margin-top: 12px; }
+.loading { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 52px 0; }
+.spinner { width: 36px; height: 36px; border: 2px solid #1f2537; border-top-color: #5b7cfa; border-radius: 50%; animation: spin 0.8s linear infinite; }
+.steps { display: flex; flex-direction: column; gap: 8px; }
+.step { font-size: 13px; color: #6b7280; transition: color 0.4s; }
+.step.done { color: #10b981; }
+.key-saved { display: flex; justify-content: space-between; align-items: center; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 9px; padding: 11px 15px; margin-bottom: 20px; font-size: 13px; color: #10b981; }
+h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.05; margin-bottom: 10px; }
+.accent { background: linear-gradient(135deg, #5b7cfa, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.desc { color: #6b7280; font-size: 14px; line-height: 1.65; max-width: 420px; margin-bottom: 28px; }
+.review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; padding-bottom: 18px; border-bottom: 1px solid #1f2537; flex-wrap: wrap; gap: 12px; }
+.review-title { font-size: 20px; font-weight: 800; }
+.review-stats { display: flex; gap: 12px; font-size: 13px; flex-wrap: wrap; }
+.stat { padding: 4px 12px; border-radius: 20px; font-weight: 600; }
+.stat-pending { background: rgba(91,124,250,0.15); color: #5b7cfa; }
+.stat-accepted { background: rgba(16,185,129,0.15); color: #10b981; }
+.stat-rejected { background: rgba(239,68,68,0.15); color: #ef4444; }
+.mod-card { background: #111420; border: 1px solid #1f2537; border-radius: 14px; margin-bottom: 16px; overflow: hidden; transition: border-color 0.2s; }
+.mod-card.accepted { border-color: #10b981; }
+.mod-card.rejected { border-color: #ef4444; opacity: 0.6; }
+.mod-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #1f2537; flex-wrap: wrap; gap: 8px; }
+.mod-name { font-weight: 700; font-size: 15px; }
+.risk-pill { padding: 3px 10px; border-radius: 20px; font-size: 11px; white-space: nowrap; }
+.mod-body { padding: 20px; }
+.mod-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600; }
+.mod-original { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 9px; padding: 14px; font-size: 13px; line-height: 1.65; margin-bottom: 12px; }
+.mod-proposed { background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 9px; padding: 14px; font-size: 13px; line-height: 1.65; margin-bottom: 16px; }
+.mod-reason { color: #6b7280; font-size: 12px; line-height: 1.6; margin-bottom: 16px; }
+.mod-actions { display: flex; gap: 10px; }
+.btn-accept { flex: 1; padding: 10px; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); border-radius: 9px; color: #10b981; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.btn-accept:hover { background: rgba(16,185,129,0.25); }
+.btn-accept.active { background: #10b981; color: #fff; }
+.btn-reject { flex: 1; padding: 10px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 9px; color: #ef4444; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.btn-reject:hover { background: rgba(239,68,68,0.2); }
+.btn-reject.active { background: #ef4444; color: #fff; }
+.mod-status { text-align: center; padding: 8px; font-size: 12px; font-weight: 600; margin-top: 10px; }
+.export-section { background: #111420; border: 1px solid #1f2537; border-radius: 14px; padding: 24px; margin-top: 28px; text-align: center; }
+.export-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.export-desc { color: #6b7280; font-size: 13px; margin-bottom: 20px; }
+.btn-export { display: inline-block; padding: 13px 28px; background: linear-gradient(135deg, #5b7cfa, #8b5cf6); border: none; border-radius: 10px; color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; }
+.btn-new { display: inline-block; padding: 10px 22px; background: none; border: 1px solid #1f2537; border-radius: 9px; color: #6b7280; font-size: 13px; cursor: pointer; margin-top: 12px; }
+.info-box { background: rgba(91,124,250,0.08); border: 1px solid rgba(91,124,250,0.25); border-radius: 9px; padding: 11px 15px; font-size: 13px; color: #5b7cfa; margin-bottom: 16px; }
+@media (max-width: 580px) { .opts { grid-template-columns: 1fr; } .mod-actions { flex-direction: column; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo"><div class="dot"></div>ContractSense</div>
+
+  <div class="card" id="key-card">
+    <label>Clé API Anthropic</label>
+    <div class="row">
+      <input type="password" id="api-key" placeholder="sk-ant-..."/>
+      <button class="btn-blue" onclick="saveKey()">Sauver</button>
+    </div>
+    <div style="font-size:11px;color:#6b7280;margin-top:8px">Obtiens ta clé sur <a href="https://console.anthropic.com" target="_blank" style="color:#5b7cfa">console.anthropic.com</a></div>
+  </div>
+  <div class="key-saved" id="key-saved" style="display:none">
+    ✅ Clé API connectée
+    <button style="background:none;border:none;color:#6b7280;font-size:12px;cursor:pointer" onclick="changeKey()">Changer</button>
+  </div>
+
+  <div id="form-section">
+    <h1>Révisez vos contrats<br/><span class="accent">avec l'IA.</span></h1>
+    <p class="desc">Uploadez votre contrat. L'IA propose des modifications clause par clause. Acceptez ou refusez chaque modification. Le document final est généré avec Track Changes.</p>
+
+    <div class="tabs">
+      <button class="tab active" onclick="setMode('upload',this)">📄 Uploader</button>
+      <button class="tab" onclick="setMode('text',this)">✏️ Coller du texte</button>
+    </div>
+
+    <div id="upload-zone">
+      <div class="drop" onclick="document.getElementById('fi').click()"
+        ondragover="event.preventDefault();this.style.borderColor='#5b7cfa'"
+        ondragleave="this.style.borderColor='#1f2537'"
+        ondrop="event.preventDefault();this.style.borderColor='#1f2537';handleFile(event.dataTransfer.files[0])">
+        <div style="font-size:30px;margin-bottom:10px">📄</div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:5px">Déposez votre contrat ici</div>
+        <div style="color:#6b7280;font-size:13px">ou cliquez pour sélectionner</div>
+        <div class="tags"><span class="tag">PDF</span><span class="tag">DOCX</span><span class="tag">TXT</span></div>
+      </div>
+      <input type="file" id="fi" accept=".pdf,.docx,.txt,.doc" style="display:none" onchange="handleFile(this.files[0])"/>
+      <div class="file-ok" id="file-ok" style="display:none">
+        <span>✅</span>
+        <span style="color:#10b981;font-size:13px" id="fname"></span>
+        <span style="color:#6b7280;font-size:11px;margin-left:auto" id="fsize"></span>
+      </div>
+    </div>
+
+    <div id="text-zone" style="display:none">
+      <textarea id="ct" placeholder="Collez le texte de votre contrat ici…" style="min-height:160px;resize:vertical;line-height:1.6;margin-bottom:14px"></textarea>
+    </div>
+
+    <div class="opts">
+      <div>
+        <label>Langue</label>
+        <select id="clang"><option value="fr">Français</option><option value="en">Anglais</option></select>
+      </div>
+      <div>
+        <label>Type</label>
+        <select id="ctype">
+          <option value="generic">Générique</option>
+          <option value="nda">NDA</option>
+          <option value="saas">SaaS</option>
+          <option value="purchase">Achat/Vente</option>
+          <option value="employment">RH</option>
+          <option value="partnership">Partenariat</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-main" onclick="analyze()">⚡ Analyser et proposer des modifications</button>
+    <div class="error" id="err" style="display:none"></div>
+  </div>
+
+  <div class="loading" id="loading" style="display:none">
+    <div class="spinner"></div>
+    <div class="steps">
+      <div class="step" id="s0">→ Lecture du document…</div>
+      <div class="step" id="s1">→ Identification des clauses…</div>
+      <div class="step" id="s2">→ Analyse des risques…</div>
+      <div class="step" id="s3">→ Rédaction des modifications…</div>
+    </div>
+  </div>
+
+  <div id="review-section" style="display:none"></div>
+</div>
+
+<script>
+const WORKER_URL = 'https://shrill-lake-b7feddcontractsense-api.wassim-benzarti.workers.dev/';
+let apiKey = '';
+let curFile = null;
+let curMode = 'upload';
+let contractText = '';
+let fileType = 'text';
+let modifications = [];
+let decisions = {};
+
+window.addEventListener('DOMContentLoaded', function() {
+  var saved = localStorage.getItem('cs_apikey');
+  if (saved && saved.indexOf('sk-') === 0) {
+    apiKey = saved;
+    document.getElementById('key-card').style.display = 'none';
+    document.getElementById('key-saved').style.display = 'flex';
+  }
+});
+
+function saveKey() {
+  var k = document.getElementById('api-key').value.trim();
+  if (k.indexOf('sk-') !== 0) { showErr('Clé invalide — doit commencer par sk-'); return; }
+  apiKey = k;
+  localStorage.setItem('cs_apikey', k);
+  document.getElementById('key-card').style.display = 'none';
+  document.getElementById('key-saved').style.display = 'flex';
+}
+
+function changeKey() {
+  apiKey = '';
+  localStorage.removeItem('cs_apikey');
+  document.getElementById('api-key').value = '';
+  document.getElementById('key-card').style.display = 'block';
+  document.getElementById('key-saved').style.display = 'none';
+}
+
+function setMode(m, btn) {
+  curMode = m;
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('upload-zone').style.display = m === 'upload' ? 'block' : 'none';
+  document.getElementById('text-zone').style.display = m === 'text' ? 'block' : 'none';
+}
+
+function handleFile(f) {
+  if (!f) return;
+  curFile = f;
+  document.getElementById('file-ok').style.display = 'flex';
+  document.getElementById('fname').textContent = f.name;
+  document.getElementById('fsize').textContent = (f.size / 1024).toFixed(0) + ' KB';
+}
+
+function showErr(msg) {
+  var e = document.getElementById('err');
+  e.textContent = msg;
+  e.style.display = 'block';
+}
+
+function readFile(f) {
+  return new Promise(function(res, rej) {
+    var r = new FileReader();
+    if (f.name.endsWith('.pdf')) {
+      r.onload = function(e) { res({ type: 'pdf', data: e.target.result.split(',')[1] }); };
+      r.onerror = rej;
+      r.readAsDataURL(f);
+    } else if (f.name.endsWith('.docx') || f.name.endsWith('.doc')) {
+      r.onload = function(e) {
+        mammoth.extractRawText({ arrayBuffer: e.target.result })
+          .then(function(result) {
+            if (!result.value || result.value.trim().length < 10) {
+              rej(new Error('Fichier Word vide ou illisible. Convertis-le en PDF.'));
+            } else {
+              res({ type: 'text', data: result.value });
+            }
+          })
+          .catch(function() { rej(new Error('Impossible de lire ce fichier Word. Utilise un PDF.')); });
+      };
+      r.onerror = rej;
+      r.readAsArrayBuffer(f);
+    } else {
+      r.onload = function(e) { res({ type: 'text', data: e.target.result }); };
+      r.onerror = rej;
+      r.readAsText(f);
+    }
+  });
+}
+
+async function analyze() {
+  if (!apiKey) { showErr("Entre ta clé API d'abord."); return; }
+  var txt = document.getElementById('ct').value;
+  if (curMode === 'upload' && !curFile) { showErr('Uploade un fichier.'); return; }
+  if (curMode === 'text' && txt.trim().length < 50) { showErr('Colle au moins 50 caractères.'); return; }
+
+  document.getElementById('err').style.display = 'none';
+  document.getElementById('form-section').style.display = 'none';
+  document.getElementById('loading').style.display = 'flex';
+  document.getElementById('review-section').style.display = 'none';
+
+  var stepLabels = ['Lecture du document…', 'Identification des clauses…', 'Analyse des risques…', 'Rédaction des modifications…'];
+  [0,1,2,3].forEach(function(i) {
+    setTimeout(function() {
+      var el = document.getElementById('s' + i);
+      if (el) { el.classList.add('done'); el.textContent = '✓ ' + stepLabels[i]; }
+    }, i * 1400);
+  });
+
+  try {
+    var messages;
+    if (curMode === 'upload') {
+      var fc = await readFile(curFile);
+      fileType = fc.type;
+      if (fc.type === 'pdf') {
+        contractText = '';
+        messages = [{ role: 'user', content: [
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: fc.data } },
+          { type: 'text', text: 'Analyze this contract and propose modifications. Return JSON only.' }
+        ]}];
+      } else {
+        contractText = fc.data;
+        messages = [{ role: 'user', content: 'Contract:\n\n' + fc.data.slice(0, 40000) + '\n\nAnalyze and propose modifications. Return JSON only.' }];
+      }
+    } else {
+      contractText = txt;
+      fileType = 'text';
+      messages = [{ role: 'user', content: 'Contract:\n\n' + txt.slice(0, 40000) + '\n\nAnalyze and propose modifications. Return JSON only.' }];
+    }
+
+    var lang = document.getElementById('clang').value;
+    var type = document.getElementById('ctype').value;
+
+    var sys = 'You are an expert legal AI. Analyze the contract and propose modifications to protect the receiving party.\n' +
+      'Respond in ' + (lang === 'en' ? 'English' : 'French') + '.\n' +
+      'Contract type: ' + type + '\n\n' +
+      'IMPORTANT: For the "original" field, copy the EXACT text from the contract verbatim.\n\n' +
+      'Return ONLY valid JSON, no markdown:\n' +
+      '{"modifications":[{"id":1,"clause_name":"Clause name","risk":"high|medium|low","reason":"Why risky (2 sentences)","original":"EXACT original text from contract","proposed":"Complete improved replacement text"}]}\n\n' +
+      'Rules:\n' +
+      '- Find 4-8 modifications\n' +
+      '- original: EXACT verbatim copy from contract\n' +
+      '- proposed: complete improved clause\n' +
+      '- Each text max 3 sentences\n' +
+      '- Focus: liability, termination, IP, penalties, confidentiality, payment, governing law';
+
+    var resp = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apiKey: apiKey, model: 'claude-haiku-4-5-20251001', max_tokens: 2000, system: sys, messages: messages })
+    });
+
+    var data = await resp.json();
+    if (!resp.ok) throw new Error((data.error && data.error.message) || 'API error');
+    var raw = data.content.map(function(b) { return b.text || ''; }).join('');
+    var match = raw.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('Réponse invalide');
+    var result = JSON.parse(match[0]);
+    modifications = result.modifications || [];
+    decisions = {};
+    modifications.forEach(function(m) { decisions[m.id] = 'pending'; });
+
+    document.getElementById('loading').style.display = 'none';
+    renderReview();
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('form-section').style.display = 'block';
+    showErr('⚠ ' + (e.message || 'Erreur inattendue.'));
+  }
+}
+
+function rc(r) { return r === 'high' ? '#ef4444' : r === 'medium' ? '#f59e0b' : '#10b981'; }
+function rLabel(r) { return r === 'high' ? 'Risque élevé' : r === 'medium' ? 'Risque modéré' : 'Faible risque'; }
+
+function decide(id, decision) {
+  decisions[id] = decision;
+  var card = document.getElementById('card-' + id);
+  var btnA = document.getElementById('btn-accept-' + id);
+  var btnR = document.getElementById('btn-reject-' + id);
+  var status = document.getElementById('status-' + id);
+  card.classList.remove('accepted', 'rejected');
+  btnA.classList.remove('active');
+  btnR.classList.remove('active');
+  if (decision === 'accepted') {
+    card.classList.add('accepted');
+    btnA.classList.add('active');
+    status.textContent = '✅ Modification acceptée';
+    status.style.color = '#10b981';
+  } else {
+    card.classList.add('rejected');
+    btnR.classList.add('active');
+    status.textContent = '❌ Texte original conservé';
+    status.style.color = '#ef4444';
+  }
+  updateStats();
+}
+
+function updateStats() {
+  var accepted = Object.values(decisions).filter(function(d) { return d === 'accepted'; }).length;
+  var rejected = Object.values(decisions).filter(function(d) { return d === 'rejected'; }).length;
+  var pending = Object.values(decisions).filter(function(d) { return d === 'pending'; }).length;
+  var el = document.getElementById('review-stats');
+  if (el) {
+    el.innerHTML =
+      '<span class="stat stat-pending">' + pending + ' en attente</span>' +
+      '<span class="stat stat-accepted">' + accepted + ' acceptées</span>' +
+      '<span class="stat stat-rejected">' + rejected + ' refusées</span>';
+  }
+}
+
+function renderReview() {
+  var hasText = fileType !== 'pdf' && contractText.length > 0;
+  var exportLabel = hasText
+    ? '⬇ Télécharger le contrat complet avec Track Changes (.rtf)'
+    : '⬇ Télécharger le rapport des modifications (.rtf)';
+  var exportNote = hasText
+    ? 'Le document RTF contiendra <strong>tout le contrat</strong> avec les modifications acceptées en Track Changes (rouge barré = supprimé, vert = ajouté).'
+    : 'Le document PDF ne permet pas l\'extraction complète du texte. Le RTF contiendra un <strong>rapport des modifications acceptées</strong> avec Track Changes.';
+
+  var html = '<div class="review-header">' +
+    '<div class="review-title">Révision du contrat</div>' +
+    '<div class="review-stats" id="review-stats"></div>' +
+    '</div>';
+
+  if (hasText) {
+    html += '<div class="info-box">📄 Document Word/TXT détecté — le RTF final contiendra le contrat complet avec Track Changes intégrés.</div>';
+  } else {
+    html += '<div class="info-box" style="background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.25);color:#f59e0b;">📄 PDF détecté — le RTF final contiendra un rapport des modifications acceptées.</div>';
+  }
+
+  modifications.forEach(function(m) {
+    html += '<div class="mod-card" id="card-' + m.id + '">' +
+      '<div class="mod-header">' +
+      '<div class="mod-name">' + m.clause_name + '</div>' +
+      '<span class="risk-pill" style="background:' + rc(m.risk) + '20;color:' + rc(m.risk) + '">' + rLabel(m.risk) + '</span>' +
+      '</div>' +
+      '<div class="mod-body">' +
+      '<div class="mod-reason">💡 ' + m.reason + '</div>' +
+      '<div class="mod-label" style="color:#ef4444">📄 Texte original</div>' +
+      '<div class="mod-original">' + m.original + '</div>' +
+      '<div class="mod-label" style="color:#10b981">✏ Modification proposée</div>' +
+      '<div class="mod-proposed">' + m.proposed + '</div>' +
+      '<div class="mod-actions">' +
+      '<button class="btn-accept" id="btn-accept-' + m.id + '" onclick="decide(' + m.id + ',\'accepted\')">✅ Accepter</button>' +
+      '<button class="btn-reject" id="btn-reject-' + m.id + '" onclick="decide(' + m.id + ',\'rejected\')">❌ Refuser</button>' +
+      '</div>' +
+      '<div class="mod-status" id="status-' + m.id + '"></div>' +
+      '</div></div>';
+  });
+
+  html += '<div class="export-section">' +
+    '<div class="export-title">Générer le document final</div>' +
+    '<div class="export-desc">' + exportNote + '</div>' +
+    '<button class="btn-export" onclick="exportRTF()">' + exportLabel + '</button><br/>' +
+    '<button class="btn-new" onclick="reset()">↩ Analyser un autre contrat</button>' +
+    '</div>';
+
+  document.getElementById('review-section').innerHTML = html;
+  document.getElementById('review-section').style.display = 'block';
+  updateStats();
+}
+
+function esc(str) {
+  if (!str) return '';
+  var out = '';
+  var s = str.substring(0, 3000);
+  for (var i = 0; i < s.length; i++) {
+    var cc = s.charCodeAt(i);
+    if (cc > 127) { out += '\\u' + cc + '?'; }
+    else if (s[i] === '\\') { out += '\\\\'; }
+    else if (s[i] === '{') { out += '\\{'; }
+    else if (s[i] === '}') { out += '\\}'; }
+    else if (s[i] === '\n') { out += '\\par '; }
+    else if (s[i] === '\r') { /* skip */ }
+    else { out += s[i]; }
+  }
+  return out;
+}
+
+function exportRTF() {
+  var hasText = fileType !== 'pdf' && contractText.length > 0;
+  var rtf = '{\\rtf1\\ansi\\deff0\n';
+  rtf += '{\\fonttbl{\\f0 Times New Roman;}{\\f1 Arial;}}\n';
+  rtf += '{\\colortbl;\\red0\\green0\\blue0;\\red180\\green0\\blue0;\\red0\\green130\\blue0;\\red91\\green124\\blue250;}\n';
+  rtf += '\\f0\\fs24\\sl360\\slmult1\n';
+
+  if (hasText) {
+    // Full contract with track changes embedded
+    rtf += '{\\f1\\b\\fs32\\cf4 ContractSense - Contrat Révisé\\par}\n';
+    rtf += '{\\f1\\fs18\\cf1 Généré le ' + new Date().toLocaleDateString('fr-FR') + ' | ';
+    var accepted = modifications.filter(function(m) { return decisions[m.id] === 'accepted'; }).length;
+    rtf += accepted + ' modification(s) acceptée(s)\\par\\par}\n';
+
+    // Build full contract text with track changes
+    var fullText = contractText;
+
+    // Apply accepted modifications: replace original with track change markup
+    modifications.forEach(function(m) {
+      if (decisions[m.id] === 'accepted' && m.original && m.proposed) {
+        // Find and replace in full text
+        var idx = fullText.indexOf(m.original);
+        if (idx !== -1) {
+          var before = fullText.substring(0, idx);
+          var after = fullText.substring(idx + m.original.length);
+          fullText = before + '\x00DEL\x00' + m.original + '\x00/DEL\x00\x00INS\x00' + m.proposed + '\x00/INS\x00' + after;
+        }
+      }
+    });
+
+    // Convert to RTF with track change styling
+    var parts = fullText.split(/\x00(DEL|\/DEL|INS|\/INS)\x00/);
+    var inDel = false, inIns = false;
+    parts.forEach(function(part) {
+      if (part === 'DEL') { inDel = true; rtf += '{\\cf2\\strike '; }
+      else if (part === '/DEL') { inDel = false; rtf += '\\strike0\\cf1}'; }
+      else if (part === 'INS') { inIns = true; rtf += '{\\cf3 '; }
+      else if (part === '/INS') { inIns = false; rtf += '\\cf1}'; }
+      else { rtf += esc(part); }
+    });
+
+  } else {
+    // PDF mode: rapport only
+    rtf += '{\\f1\\b\\fs32\\cf4 ContractSense - Rapport des Modifications\\par}\n';
+    rtf += '{\\f1\\fs18\\cf1 Généré le ' + new Date().toLocaleDateString('fr-FR') + '\\par\\par}\n';
+
+    var acceptedMods = modifications.filter(function(m) { return decisions[m.id] === 'accepted'; });
+    var rejectedMods = modifications.filter(function(m) { return decisions[m.id] === 'rejected'; });
+
+    rtf += '{\\f1\\b\\fs24 Modifications acceptées: \\cf3 ' + acceptedMods.length + '\\cf1 | Refusées: \\cf2 ' + rejectedMods.length + '\\cf1\\par\\par}\n';
+
+    if (acceptedMods.length > 0) {
+      rtf += '{\\f1\\b\\fs26\\cf3 MODIFICATIONS ACCEPTÉES\\cf1\\par\\par}\n';
+      acceptedMods.forEach(function(m, i) {
+        rtf += '{\\f1\\b\\fs22 ' + (i+1) + '. ' + esc(m.clause_name) + '\\par}\n';
+        rtf += '{\\f0\\cf2\\strike ' + esc(m.original) + '\\strike0\\cf1\\par}\n';
+        rtf += '{\\f0\\cf3 ' + esc(m.proposed) + '\\cf1\\par\\par}\n';
+      });
+    }
+
+    if (rejectedMods.length > 0) {
+      rtf += '{\\f1\\b\\fs26\\cf2 MODIFICATIONS REFUSÉES\\cf1\\par\\par}\n';
+      rejectedMods.forEach(function(m, i) {
+        rtf += '{\\f1\\b\\fs22 ' + (i+1) + '. ' + esc(m.clause_name) + '\\par}\n';
+        rtf += '{\\f0\\cf1 ' + esc(m.original) + '\\par\\par}\n';
+      });
+    }
+  }
+
+  rtf += '}';
+
+  var blob = new Blob([rtf], { type: 'application/rtf' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = hasText ? 'contrat-track-changes.rtf' : 'rapport-modifications.rtf';
+  a.click();
+}
+
+function reset() {
+  curFile = null;
+  contractText = '';
+  fileType = 'text';
+  modifications = [];
+  decisions = {};
+  document.getElementById('form-section').style.display = 'block';
+  document.getElementById('review-section').style.display = 'none';
+  document.getElementById('file-ok').style.display = 'none';
+  document.getElementById('ct').value = '';
+  document.getElementById('err').style.display = 'none';
+  var stepLabels = ['Lecture du document…', 'Identification des clauses…', 'Analyse des risques…', 'Rédaction des modifications…'];
+  [0,1,2,3].forEach(function(i) {
+    var el = document.getElementById('s' + i);
+    if (el) { el.classList.remove('done'); el.textContent = '→ ' + stepLabels[i]; }
+  });
+}
+</script>
+</body>
+</html>
