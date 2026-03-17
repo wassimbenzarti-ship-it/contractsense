@@ -143,10 +143,26 @@ function saveKey(){
   const k=document.getElementById('api-key').value.trim();
   if(!k.startsWith('sk-')){showErr('Clé invalide — doit commencer par sk-');return;}
   apiKey=k;
+  localStorage.setItem('cs_apikey', k);
   document.getElementById('key-card').style.display='none';
   document.getElementById('key-saved').style.display='flex';
 }
-function changeKey(){apiKey='';document.getElementById('key-card').style.display='block';document.getElementById('key-saved').style.display='none';}
+function changeKey(){
+  apiKey='';
+  localStorage.removeItem('cs_apikey');
+  document.getElementById('api-key').value='';
+  document.getElementById('key-card').style.display='block';
+  document.getElementById('key-saved').style.display='none';
+}
+// Auto-load saved key
+window.addEventListener('DOMContentLoaded', ()=>{
+  const saved = localStorage.getItem('cs_apikey');
+  if(saved && saved.startsWith('sk-')){
+    apiKey = saved;
+    document.getElementById('key-card').style.display='none';
+    document.getElementById('key-saved').style.display='flex';
+  }
+});
 function setMode(m,btn){
   curMode=m;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
@@ -173,16 +189,27 @@ function readFile(f){
       r.readAsDataURL(f);
     }else if(f.name.endsWith('.docx')||f.name.endsWith('.doc')){
       r.onload=e=>{
-        mammoth.extractRawText({arrayBuffer:e.target.result})
-          .then(result=>res({type:'text',data:result.value}))
-          .catch(rej);
+        try {
+          mammoth.extractRawText({arrayBuffer:e.target.result})
+            .then(result=>{
+              if(!result.value||result.value.trim().length<10){
+                rej(new Error('Le fichier Word semble vide ou corrompu. Convertis-le en PDF.'));
+              } else {
+                res({type:'text',data:result.value});
+              }
+            })
+            .catch(()=>rej(new Error('Impossible de lire ce fichier Word. Convertis-le en PDF depuis Word.')));
+        } catch(e) {
+          rej(new Error('Erreur lecture DOCX. Utilise un PDF à la place.'));
+        }
       };
+      r.onerror=rej;
       r.readAsArrayBuffer(f);
     }else{
       r.onload=e=>res({type:'text',data:e.target.result});
+      r.onerror=rej;
       r.readAsText(f);
     }
-    r.onerror=rej;
   });
 }
 
