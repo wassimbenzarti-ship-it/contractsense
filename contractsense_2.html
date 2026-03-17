@@ -390,7 +390,7 @@ function escRTF(str){
     .replace(/À/g,"\\'c0")
     .replace(/
 /g,'\\par ')
-    .replace(/[^ -]/g, c => {
+    .replace(/[^-]/g, c => {
       const code = c.charCodeAt(0);
       return code > 255 ? '\\u'+code+'?' : "\\'"+code.toString(16).padStart(2,'0');
     });
