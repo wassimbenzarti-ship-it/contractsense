@@ -4,6 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>ContractSense</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #0a0c12; color: #e2e5f0; font-family: system-ui, sans-serif; min-height: 100vh; }
@@ -169,6 +171,13 @@ function readFile(f){
     if(f.name.endsWith('.pdf')){
       r.onload=e=>res({type:'pdf',data:e.target.result.split(',')[1]});
       r.readAsDataURL(f);
+    }else if(f.name.endsWith('.docx')||f.name.endsWith('.doc')){
+      r.onload=e=>{
+        mammoth.extractRawText({arrayBuffer:e.target.result})
+          .then(result=>res({type:'text',data:result.value}))
+          .catch(rej);
+      };
+      r.readAsArrayBuffer(f);
     }else{
       r.onload=e=>res({type:'text',data:e.target.result});
       r.readAsText(f);
