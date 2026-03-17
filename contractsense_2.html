@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ContractSense</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0a0c12; color: #e2e5f0; font-family: system-ui, sans-serif; min-height: 100vh; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+.wrap { max-width: 820px; margin: 0 auto; padding: 36px 20px 80px; }
+.logo { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 19px; margin-bottom: 44px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: #5b7cfa; box-shadow: 0 0 14px #5b7cfa; }
+.card { background: #111420; border: 1px solid #1f2537; border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+label { display: block; font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+input, select, textarea { width: 100%; background: #181c2a; border: 1px solid #1f2537; border-radius: 9px; padding: 10px 13px; color: #e2e5f0; font-size: 13px; font-family: inherit; transition: border-color 0.2s; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: #5b7cfa; }
+textarea { min-height: 160px; resize: vertical; line-height: 1.6; }
+.row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.btn { padding: 10px 18px; background: #5b7cfa; border: none; border-radius: 9px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-main { width: 100%; padding: 15px; background: linear-gradient(135deg, #5b7cfa, #8b5cf6); border: none; border-radius: 11px; color: #fff; font-size: 15px; font-weight: 800; cursor: pointer; margin-top: 4px; }
+.btn-main:hover:not(:disabled) { opacity: 0.9; }
+.btn-main:disabled { opacity: 0.4; cursor: not-allowed; }
+.tabs { display: flex; gap: 3px; background: #111420; border: 1px solid #1f2537; border-radius: 10px; padding: 3px; width: fit-content; margin-bottom: 16px; }
+.tab { padding: 7px 16px; border-radius: 8px; border: none; background: none; color: #6b7280; font-size: 13px; cursor: pointer; border-bottom: 2px solid transparent; }
+.tab.active { background: #181c2a; color: #e2e5f0; border-bottom-color: #5b7cfa; }
+.drop { border: 1.5px dashed #1f2537; border-radius: 14px; padding: 38px 24px; text-align: center; cursor: pointer; background: #111420; margin-bottom: 14px; }
+.drop:hover { border-color: #5b7cfa; background: rgba(91,124,250,0.05); }
+.tags { display: flex; gap: 5px; justify-content: center; margin-top: 10px; }
+.tag { padding: 2px 9px; border-radius: 20px; border: 1px solid #1f2537; color: #6b7280; font-size: 11px; }
+.file-ok { display: flex; align-items: center; gap: 9px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 9px; padding: 11px 15px; margin-bottom: 14px; font-size: 13px; }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-bottom: 16px; }
+select { appearance: none; }
+.error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); border-radius: 9px; padding: 11px 15px; color: #ef4444; font-size: 13px; margin-top: 12px; }
+.loading { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 52px 0; }
+.spinner { width: 36px; height: 36px; border: 2px solid #1f2537; border-top-color: #5b7cfa; border-radius: 50%; animation: spin 0.8s linear infinite; }
+.steps { display: flex; flex-direction: column; gap: 8px; }
+.step { font-size: 13px; color: #6b7280; transition: color 0.4s; }
+.step.done { color: #10b981; }
+.score-card { background: #111420; border: 1px solid #1f2537; border-radius: 14px; padding: 24px; margin-bottom: 20px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+.score-circle { width: 80px; height: 80px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+.clause { background: #111420; border: 1px solid #1f2537; border-radius: 12px; padding: 18px; margin-bottom: 10px; border-left: 3px solid; }
+.clause-top { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.risk-pill { padding: 3px 9px; border-radius: 20px; font-size: 11px; white-space: nowrap; }
+.rewrite { background: #181c2a; border-radius: 8px; padding: 12px; font-size: 13px; line-height: 1.65; border-left: 2px solid #5b7cfa; margin-top: 11px; }
+.rewrite-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #5b7cfa; margin-bottom: 4px; }
+.btn-reset { display: block; margin: 24px auto 0; padding: 10px 22px; background: none; border: 1px solid #1f2537; border-radius: 9px; color: #6b7280; font-size: 13px; cursor: pointer; }
+.key-saved { display: flex; justify-content: space-between; align-items: center; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 9px; padding: 11px 15px; margin-bottom: 20px; font-size: 13px; color: #10b981; }
+h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.05; margin-bottom: 10px; }
+.accent { background: linear-gradient(135deg, #5b7cfa, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.desc { color: #6b7280; font-size: 14px; line-height: 1.65; max-width: 420px; margin-bottom: 28px; }
+@media (max-width: 580px) { .opts { grid-template-columns: 1fr; } .score-card { flex-direction: column; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo"><div class="dot"></div>ContractSense</div>
+
+  <div class="card" id="key-card">
+    <label>Clé API Anthropic</label>
+    <div class="row">
+      <input type="password" id="api-key" placeholder="sk-ant-..."/>
+      <button class="btn" onclick="saveKey()">Sauver</button>
+    </div>
+    <div style="font-size:11px;color:#6b7280;margin-top:8px">Obtiens ta clé sur <a href="https://console.anthropic.com" target="_blank" style="color:#5b7cfa">console.anthropic.com</a></div>
+  </div>
+  <div class="key-saved" id="key-saved" style="display:none">
+    ✅ Clé API connectée
+    <button style="background:none;border:none;color:#6b7280;font-size:12px;cursor:pointer" onclick="changeKey()">Changer</button>
+  </div>
+
+  <div id="form-section">
+    <h1>Analysez vos contrats<br/><span class="accent">en quelques secondes.</span></h1>
+    <p class="desc">L'IA identifie les clauses à risque, propose des reformulations et génère un rapport complet.</p>
+
+    <div class="tabs">
+      <button class="tab active" onclick="setMode('upload',this)">📄 Uploader</button>
+      <button class="tab" onclick="setMode('text',this)">✏️ Coller du texte</button>
+    </div>
+
+    <div id="upload-zone">
+      <div class="drop" onclick="document.getElementById('fi').click()"
+        ondragover="event.preventDefault();this.style.borderColor='#5b7cfa'"
+        ondragleave="this.style.borderColor='#1f2537'"
+        ondrop="event.preventDefault();this.style.borderColor='#1f2537';handleFile(event.dataTransfer.files[0])">
+        <div style="font-size:30px;margin-bottom:10px">📄</div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:5px">Déposez votre contrat ici</div>
+        <div style="color:#6b7280;font-size:13px">ou cliquez pour sélectionner</div>
+        <div class="tags"><span class="tag">PDF</span><span class="tag">DOCX</span><span class="tag">TXT</span></div>
+      </div>
+      <input type="file" id="fi" accept=".pdf,.docx,.txt,.doc" style="display:none" onchange="handleFile(this.files[0])"/>
+      <div class="file-ok" id="file-ok" style="display:none">
+        <span>✅</span>
+        <span style="color:#10b981;font-size:13px" id="fname"></span>
+        <span style="color:#6b7280;font-size:11px;margin-left:auto" id="fsize"></span>
+      </div>
+    </div>
+
+    <div id="text-zone" style="display:none">
+      <textarea id="ct" placeholder="Collez le texte de votre contrat ici…"></textarea>
+    </div>
+
+    <div class="opts">
+      <div>
+        <label>Langue</label>
+        <select id="clang"><option value="fr">Français</option><option value="en">Anglais</option></select>
+      </div>
+      <div>
+        <label>Type</label>
+        <select id="ctype">
+          <option value="generic">Générique</option>
+          <option value="nda">NDA</option>
+          <option value="saas">SaaS</option>
+          <option value="purchase">Achat/Vente</option>
+          <option value="employment">RH</option>
+          <option value="partnership">Partenariat</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-main" onclick="analyze()">⚡ Analyser le contrat</button>
+    <div class="error" id="err" style="display:none"></div>
+  </div>
+
+  <div class="loading" id="loading" style="display:none">
+    <div class="spinner"></div>
+    <div class="steps">
+      <div class="step" id="s0">→ Lecture du document…</div>
+      <div class="step" id="s1">→ Identification des clauses…</div>
+      <div class="step" id="s2">→ Évaluation des risques…</div>
+      <div class="step" id="s3">→ Génération des reformulations…</div>
+    </div>
+  </div>
+
+  <div id="results" style="display:none"></div>
+</div>
+
+<script>
+let apiKey='', curFile=null, curMode='upload';
+
+function saveKey(){
+  const k=document.getElementById('api-key').value.trim();
+  if(!k.startsWith('sk-')){showErr('Clé invalide — doit commencer par sk-');return;}
+  apiKey=k;
+  document.getElementById('key-card').style.display='none';
+  document.getElementById('key-saved').style.display='flex';
+}
+function changeKey(){apiKey='';document.getElementById('key-card').style.display='block';document.getElementById('key-saved').style.display='none';}
+function setMode(m,btn){
+  curMode=m;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('upload-zone').style.display=m==='upload'?'block':'none';
+  document.getElementById('text-zone').style.display=m==='text'?'block':'none';
+}
+function handleFile(f){
+  if(!f)return;
+  curFile=f;
+  document.getElementById('file-ok').style.display='flex';
+  document.getElementById('fname').textContent=f.name;
+  document.getElementById('fsize').textContent=(f.size/1024).toFixed(0)+' KB';
+}
+function showErr(msg){const e=document.getElementById('err');e.textContent=msg;e.style.display='block';}
+function sc(s){return s>=70?'#10b981':s>=40?'#f59e0b':'#ef4444';}
+function rc(r){return r==='high'?'#ef4444':r==='medium'?'#f59e0b':'#10b981';}
+
+function readFile(f){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    if(f.name.endsWith('.pdf')){
+      r.onload=e=>res({type:'pdf',data:e.target.result.split(',')[1]});
+      r.readAsDataURL(f);
+    }else{
+      r.onload=e=>res({type:'text',data:e.target.result});
+      r.readAsText(f);
+    }
+    r.onerror=rej;
+  });
+}
+
+async function analyze(){
+  if(!apiKey){showErr('Entre ta clé API d\'abord.');return;}
+  const txt=document.getElementById('ct').value;
+  if(curMode==='upload'&&!curFile){showErr('Uploade un fichier.');return;}
+  if(curMode==='text'&&txt.trim().length<50){showErr('Colle au moins 50 caractères.');return;}
+
+  document.getElementById('err').style.display='none';
+  document.getElementById('form-section').style.display='none';
+  document.getElementById('loading').style.display='flex';
+  document.getElementById('results').style.display='none';
+  [0,1,2,3].forEach(i=>setTimeout(()=>{
+    const el=document.getElementById('s'+i);
+    const labels=['Lecture du document…','Identification des clauses…','Évaluation des risques…','Génération des reformulations…'];
+    if(el){el.classList.add('done');el.textContent='✓ '+labels[i];}
+  },i*1400));
+
+  try{
+    let messages;
+    if(curMode==='upload'){
+      const fc=await readFile(curFile);
+      // Limit file size to avoid token overflow
+      if(fc.type==='pdf'){
+        messages=[{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/pdf',data:fc.data}},{type:'text',text:'Analyze this contract. Return JSON only.'}]}];
+      }else{
+        messages=[{role:'user',content:'Contract:\n\n'+fc.data.slice(0,40000)+'\n\nReturn JSON only.'}];
+      }
+    }else{
+      messages=[{role:'user',content:'Contract:\n\n'+txt.slice(0,40000)+'\n\nReturn JSON only.'}];
+    }
+
+    const lang=document.getElementById('clang').value;
+    const type=document.getElementById('ctype').value;
+
+    // Compact system prompt to reduce output size
+    const sys=`You are a legal AI. Analyze the contract and return ONLY this JSON (no markdown, no extra text):
+{"score":75,"verdict":"...","summary":"...","badges":["...","...","..."],"clauses":[{"name":"...","risk":"high","issue":"...","rewrite":"..."}]}
+Rules:
+- score: 0-100 (100=very favorable)
+- verdict: max 8 words
+- summary: max 2 short sentences
+- badges: exactly 3 short tags
+- clauses: 4-6 items max, each field max 2 sentences
+- risk: only "high", "medium", or "low"
+- Respond in ${lang==='en'?'English':'French'}
+- Contract type: ${type}`;
+
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1500,system:sys,messages})
+    });
+
+    const data=await resp.json();
+    if(!resp.ok)throw new Error(data.error?.message||'API error');
+    
+    let raw=data.content.map(b=>b.text||'').join('');
+    // Extract JSON robustly
+    const match=raw.match(/\{[\s\S]*\}/);
+    if(!match)throw new Error('Réponse invalide de l\'API');
+    const result=JSON.parse(match[0]);
+    renderResults(result);
+  }catch(e){
+    document.getElementById('loading').style.display='none';
+    document.getElementById('form-section').style.display='block';
+    showErr('⚠ '+(e.message||'Erreur inattendue.'));
+  }
+}
+
+function renderResults(r){
+  document.getElementById('loading').style.display='none';
+  const s=r.score||50;
+  const color=sc(s);
+  let html=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #1f2537">
+      <div style="font-size:20px;font-weight:800">Rapport d'analyse</div>
+    </div>
+    <div class="score-card">
+      <div class="score-circle" style="border:4px solid ${color};box-shadow:0 0 20px ${color}33">
+        <div style="font-size:24px;font-weight:800;color:${color};line-height:1">${s}</div>
+        <div style="font-size:9px;color:#6b7280">/ 100</div>
+      </div>
+      <div style="flex:1;min-width:180px">
+        <div style="font-size:16px;font-weight:700;margin-bottom:4px">${r.verdict||''}</div>
+        <div style="color:#6b7280;font-size:13px;line-height:1.6">${r.summary||''}</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:10px">
+          ${(r.badges||[]).map(b=>`<span style="padding:3px 9px;border-radius:20px;font-size:11px;background:${s<40?'rgba(239,68,68,0.12)':s<70?'rgba(245,158,11,0.12)':'rgba(16,185,129,0.12)'};color:${color}">${b}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div style="font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">
+      Clauses identifiées <span style="font-size:11px;padding:2px 7px;background:#181c2a;border-radius:20px;color:#6b7280;font-weight:400">${(r.clauses||[]).length}</span>
+    </div>
+    ${(r.clauses||[]).map(c=>`
+      <div class="clause" style="border-left-color:${rc(c.risk)}">
+        <div class="clause-top">
+          <div style="font-weight:700;font-size:14px">${c.name}</div>
+          <span class="risk-pill" style="background:${rc(c.risk)}20;color:${rc(c.risk)}">${c.risk==='high'?'Risque élevé':c.risk==='medium'?'Risque modéré':'Faible risque'}</span>
+        </div>
+        <div style="color:#6b7280;font-size:13px;line-height:1.65">${c.issue}</div>
+        ${c.rewrite?`<div class="rewrite"><div class="rewrite-lbl">✏ Reformulation suggérée</div>${c.rewrite}</div>`:''}
+      </div>
+    `).join('')}
+    <button class="btn-reset" onclick="reset()">↩ Nouveau contrat</button>`;
+  document.getElementById('results').innerHTML=html;
+  document.getElementById('results').style.display='block';
+}
+
+function reset(){
+  curFile=null;
+  document.getElementById('form-section').style.display='block';
+  document.getElementById('results').style.display='none';
+  document.getElementById('file-ok').style.display='none';
+  document.getElementById('ct').value='';
+  document.getElementById('err').style.display='none';
+  [0,1,2,3].forEach(i=>{
+    const el=document.getElementById('s'+i);
+    const labels=['Lecture du document…','Identification des clauses…','Évaluation des risques…','Génération des reformulations…'];
+    if(el){el.classList.remove('done');el.textContent='→ '+labels[i];}
+  });
+}
+</script>
+</body>
+</html>
