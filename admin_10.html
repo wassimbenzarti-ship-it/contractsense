@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ContractSense — Admin</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0a0c12; color: #e2e5f0; font-family: system-ui, sans-serif; min-height: 100vh; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.wrap { max-width: 900px; margin: 0 auto; padding: 36px 20px 80px; }
+.logo { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 19px; margin-bottom: 6px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: #5b7cfa; box-shadow: 0 0 14px #5b7cfa; }
+.subtitle { color: #6b7280; font-size: 13px; margin-bottom: 32px; }
+.tabs-main { display: flex; gap: 4px; background: #111420; border: 1px solid #1f2537; border-radius: 11px; padding: 4px; margin-bottom: 28px; }
+.tab-main { flex: 1; padding: 10px; border-radius: 8px; border: none; background: none; color: #6b7280; font-size: 13px; cursor: pointer; text-align: center; transition: all 0.2s; }
+.tab-main.active { background: #181c2a; color: #e2e5f0; border-bottom: 2px solid #5b7cfa; }
+.card { background: #111420; border: 1px solid #1f2537; border-radius: 14px; padding: 24px; margin-bottom: 16px; }
+.card-title { font-weight: 700; font-size: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+label { display: block; font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+input, select { width: 100%; background: #181c2a; border: 1px solid #1f2537; border-radius: 9px; padding: 10px 13px; color: #e2e5f0; font-size: 13px; font-family: inherit; margin-bottom: 14px; }
+input:focus, select:focus { outline: none; border-color: #5b7cfa; }
+select { appearance: none; }
+.btn { padding: 10px 20px; background: #5b7cfa; border: none; border-radius: 9px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-success { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); color: #10b981; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-success:hover { background: #10b981; color: #fff; }
+.btn-danger { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+.btn-danger:hover { background: #ef4444; color: #fff; }
+.drop { border: 1.5px dashed #1f2537; border-radius: 12px; padding: 32px 24px; text-align: center; cursor: pointer; background: #111420; margin-bottom: 14px; }
+.drop:hover { border-color: #5b7cfa; background: rgba(91,124,250,0.05); }
+.file-ok { display: flex; align-items: center; gap: 9px; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 9px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; }
+.success { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 9px; padding: 12px 16px; color: #10b981; font-size: 13px; }
+.error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); border-radius: 9px; padding: 12px 16px; color: #ef4444; font-size: 13px; }
+.spinner-sm { width: 16px; height: 16px; border: 2px solid #1f2537; border-top-color: #5b7cfa; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; margin-right: 8px; vertical-align: middle; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+.stat-box { background: #181c2a; border-radius: 10px; padding: 16px; text-align: center; }
+.stat-box .num { font-size: 24px; font-weight: 800; color: #5b7cfa; }
+.stat-box .lbl { font-size: 12px; color: #6b7280; margin-top: 4px; }
+.empty { text-align: center; color: #6b7280; padding: 32px; font-size: 14px; }
+.badge { padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-law { background: rgba(91,124,250,0.15); color: #5b7cfa; }
+.badge-contract { background: rgba(16,185,129,0.15); color: #10b981; }
+.badge-clause { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+.badge-other { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.score-bar { height: 6px; background: #1f2537; border-radius: 3px; margin-top: 6px; }
+.score-fill { height: 6px; border-radius: 3px; transition: width 0.3s; }
+.queue-card { background: #111420; border: 1px solid #1f2537; border-radius: 14px; padding: 20px; margin-bottom: 14px; }
+.queue-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; gap: 12px; flex-wrap: wrap; }
+.queue-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+.queue-meta { color: #6b7280; font-size: 12px; }
+.queue-score { text-align: center; min-width: 70px; }
+.queue-score .score-num { font-size: 28px; font-weight: 800; }
+.queue-body { font-size: 13px; color: #6b7280; line-height: 1.6; margin-bottom: 14px; }
+.clause-preview { background: #181c2a; border-radius: 8px; padding: 10px 14px; font-size: 12px; margin-bottom: 8px; border-left: 3px solid #5b7cfa; }
+.queue-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.doc-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: #181c2a; border-radius: 10px; margin-bottom: 8px; }
+.doc-info .name { font-weight: 600; font-size: 14px; margin-bottom: 3px; }
+.doc-info .meta { color: #6b7280; font-size: 12px; }
+.key-saved { display: flex; justify-content: space-between; align-items: center; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); border-radius: 9px; padding: 11px 15px; margin-bottom: 20px; font-size: 13px; color: #10b981; }
+@media (max-width: 600px) { .stats { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo"><div class="dot"></div>ContractSense</div>
+  <div class="subtitle">⚙️ Administration — Base de connaissances</div>
+
+  <!-- API Key -->
+  <div class="card" id="key-card">
+    <div class="card-title">🔑 Clé API</div>
+    <label>Clé API Anthropic</label>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
+      <input type="password" id="api-key" placeholder="sk-ant-..."/>
+      <button class="btn" id="btn-save-key">Sauver</button>
+    </div>
+  </div>
+  <div class="key-saved" id="key-saved-bar" style="display:none">
+    ✅ Clé connectée
+    <button onclick="changeKey()" style="background:none;border:none;color:#6b7280;font-size:12px;cursor:pointer">Changer</button>
+  </div>
+
+  <div id="main-content" style="display:none">
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-box"><div class="num" id="stat-queue">0</div><div class="lbl">En attente</div></div>
+      <div class="stat-box"><div class="num" id="stat-rag">0</div><div class="lbl">Dans le RAG</div></div>
+      <div class="stat-box"><div class="num" id="stat-docs">0</div><div class="lbl">Documents uniques</div></div>
+      <div class="stat-box"><div class="num" id="stat-status">✅</div><div class="lbl">Statut</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-main">
+      <button class="tab-main active" onclick="showTab('queue', this)">📥 File de validation <span id="queue-badge"></span></button>
+      <button class="tab-main" onclick="showTab('rag', this)">📚 Base RAG</button>
+      <button class="tab-main" onclick="showTab('upload', this)">➕ Ajouter document</button>
+    </div>
+
+    <!-- Queue tab -->
+    <div id="tab-queue">
+      <div id="queue-list"><div class="empty">Chargement…</div></div>
+    </div>
+
+    <!-- RAG tab -->
+    <div id="tab-rag" style="display:none">
+      <div id="rag-list"><div class="empty">Chargement…</div></div>
+    </div>
+
+    <!-- Upload tab -->
+    <div id="tab-upload" style="display:none">
+      <div class="card">
+        <div class="card-title">📄 Ajouter un document manuellement</div>
+        <label>Type de document</label>
+        <select id="doc-type">
+          <option value="law">📚 Code de loi / Texte législatif</option>
+          <option value="contract">📝 Modèle de contrat</option>
+          <option value="jurisprudence">⚖️ Jurisprudence</option>
+          <option value="doctrine">📖 Doctrine</option>
+        </select>
+        <label>Nom / Référence</label>
+        <input type="text" id="source-name" placeholder="Ex: Code des Obligations et Contrats — Art. 230-350"/>
+        <label>Favorable à (optionnel)</label>
+        <input type="text" id="party-label" placeholder="Ex: favorable prestataire, favorable client..."/>
+        <div class="drop" id="drop-area" onclick="document.getElementById('file-input').click()">
+          <div style="font-size:24px;margin-bottom:8px">📄</div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:4px">Déposez votre document ici</div>
+          <div style="color:#6b7280;font-size:13px">DOCX ou TXT uniquement</div>
+        </div>
+        <input type="file" id="file-input" accept=".docx,.txt,.doc" style="display:none" onchange="setFile(this.files[0])"/>
+        <div id="file-ok" style="display:none" class="file-ok">
+          <span>✅</span><span id="file-name" style="color:#10b981;font-size:13px"></span>
+        </div>
+        <button class="btn" id="btn-upload" style="width:100%">⬆ Indexer le document</button>
+        <div id="upload-msg" style="display:none;margin-top:12px"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="text-align:center;margin-top:24px">
+    <a href="contractsense_25.html" style="color:#6b7280;font-size:13px;text-decoration:none">← Retour à ContractSense</a>
+  </div>
+</div>
+
+<script>
+var BACKEND = 'https://web-production-f96f7.up.railway.app';
+var apiKey = '';
+var curFile = null;
+
+var SCORE_COLOR = function(s) { return s >= 70 ? '#10b981' : s >= 40 ? '#f59e0b' : '#ef4444'; };
+var CAT_LABELS = { law: 'Code de loi', contract: 'Contrat', jurisprudence: 'Jurisprudence', doctrine: 'Doctrine', validated_clause: 'Clause validée', generic: 'Générique', nda: 'NDA', saas: 'SaaS', purchase: 'Achat/Vente', employment: 'RH', partnership: 'Partenariat', service: 'Service' };
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Admin password protection
+  var adminPass = localStorage.getItem('admin_pass');
+  if (adminPass !== 'westfield2026') {
+    var pass = prompt('🔐 Accès administrateur — Mot de passe requis:');
+    if (pass !== 'westfield2026') {
+      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#e2e5f0;background:#0a0c12;font-size:18px">⛔ Accès refusé</div>';
+      return;
+    }
+    localStorage.setItem('admin_pass', pass);
+  }
+
+  var saved = localStorage.getItem('cs_key');
+  if (saved && saved.indexOf('sk-') === 0) {
+    apiKey = saved;
+    document.getElementById('api-key').value = saved;
+    showMain();
+  }
+  document.getElementById('btn-save-key').addEventListener('click', saveKey);
+  document.getElementById('api-key').addEventListener('keydown', function(e) { if (e.key === 'Enter') saveKey(); });
+
+  var drop = document.getElementById('drop-area');
+  drop.addEventListener('dragover', function(e) { e.preventDefault(); drop.style.borderColor = '#5b7cfa'; });
+  drop.addEventListener('dragleave', function() { drop.style.borderColor = '#1f2537'; });
+  drop.addEventListener('drop', function(e) { e.preventDefault(); drop.style.borderColor = '#1f2537'; setFile(e.dataTransfer.files[0]); });
+  document.getElementById('btn-upload').addEventListener('click', uploadDoc);
+});
+
+function saveKey() {
+  var k = document.getElementById('api-key').value.trim();
+  if (!k || k.indexOf('sk-') !== 0) { alert('Clé invalide'); return; }
+  apiKey = k;
+  localStorage.setItem('cs_key', k);
+  showMain();
+}
+
+function changeKey() {
+  apiKey = ''; localStorage.removeItem('cs_key');
+  document.getElementById('key-saved-bar').style.display = 'none';
+  document.getElementById('key-card').style.display = 'block';
+  document.getElementById('main-content').style.display = 'none';
+}
+
+function showMain() {
+  document.getElementById('key-card').style.display = 'none';
+  document.getElementById('key-saved-bar').style.display = 'flex';
+  document.getElementById('main-content').style.display = 'block';
+  loadAll();
+}
+
+function showTab(tab, btn) {
+  ['queue','rag','upload'].forEach(function(t) {
+    document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab-main').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
+function loadAll() { loadStats(); loadQueue(); loadRag(); }
+
+async function loadStats() {
+  try {
+    var r1 = await fetch(BACKEND + '/health');
+    var d1 = await r1.json();
+    document.getElementById('stat-rag').textContent = d1.rag_docs || 0;
+  } catch(e) { document.getElementById('stat-status').textContent = '❌'; }
+  try {
+    var r2 = await fetch(BACKEND + '/queue/list');
+    var d2 = await r2.json();
+    var n = (d2.pending || []).length;
+    document.getElementById('stat-queue').textContent = n;
+    document.getElementById('queue-badge').textContent = n > 0 ? ' (' + n + ')' : '';
+  } catch(e) {}
+  try {
+    var r3 = await fetch(BACKEND + '/rag/list');
+    var d3 = await r3.json();
+    document.getElementById('stat-docs').textContent = (d3.documents || []).length;
+  } catch(e) {}
+}
+
+async function loadQueue() {
+  var list = document.getElementById('queue-list');
+  try {
+    var resp = await fetch(BACKEND + '/queue/list');
+    var data = await resp.json();
+    var pending = data.pending || [];
+
+    if (pending.length === 0) {
+      list.innerHTML = '<div class="empty">✅ Aucun contrat en attente de validation.</div>';
+      return;
+    }
+
+    // Sort by score desc
+    pending.sort(function(a,b) { return (b.score||0) - (a.score||0); });
+
+    list.innerHTML = '';
+    pending.forEach(function(item) {
+      var scoreColor = SCORE_COLOR(item.score || 50);
+      var catLabel = CAT_LABELS[item.category] || item.category || 'Générique';
+
+      // Parse accepted_modifications if it's a JSON string
+      var acceptedMods = item.accepted_modifications || [];
+      if (typeof acceptedMods === 'string') {
+        try { acceptedMods = JSON.parse(acceptedMods); } catch(e) { acceptedMods = []; }
+      }
+
+      // Parse key_clauses if string
+      var keyClauses = item.key_clauses || [];
+      if (typeof keyClauses === 'string') {
+        try { keyClauses = JSON.parse(keyClauses); } catch(e) { keyClauses = []; }
+      }
+
+      var clausePreviews = '';
+      if (acceptedMods.length > 0) {
+        acceptedMods.forEach(function(mod, idx) {
+          var riskColor = mod.risk === 'high' ? '#ef4444' : mod.risk === 'medium' ? '#f59e0b' : '#10b981';
+          clausePreviews +=
+            '<div style="background:#111420;border:1px solid #1f2537;border-radius:10px;padding:14px;margin-bottom:10px;">' +
+              '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+                '<strong style="font-size:14px">' + (idx+1) + '. ' + mod.clause_name + '</strong>' +
+                '<span style="padding:2px 8px;border-radius:20px;font-size:11px;background:' + riskColor + '20;color:' + riskColor + '">' + (mod.risk || 'medium') + '</span>' +
+              '</div>' +
+              '<div style="font-size:11px;color:#6b7280;margin-bottom:6px">💡 ' + (mod.reason || '') + '</div>' +
+              '<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Texte original</div>' +
+              '<div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:7px;padding:10px;font-size:13px;line-height:1.6;margin-bottom:8px;color:#e2e5f0">' + (mod.original || '') + '</div>' +
+              '<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Modification proposée</div>' +
+              '<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:7px;padding:10px;font-size:13px;line-height:1.6;color:#e2e5f0">' + (mod.proposed || '') + '</div>' +
+            '</div>';
+        });
+      }
+
+      var div = document.createElement('div');
+      div.className = 'queue-card';
+      div.id = 'qcard-' + item.id;
+      div.innerHTML =
+        '<div class="queue-header">' +
+          '<div style="flex:1">' +
+            '<div class="queue-title">' +
+              '<span class="badge badge-contract" style="margin-right:8px">' + catLabel + '</span>' +
+              (item.party_label || '') +
+            '</div>' +
+            '<div class="queue-meta">' +
+              '📅 ' + new Date(item.submitted_at).toLocaleDateString('fr-FR') +
+              ' · ✅ ' + (item.accepted_count||0) + ' clauses acceptées' +
+              ' · ❌ ' + (item.rejected_count||0) + ' refusées' +
+            '</div>' +
+          '</div>' +
+          '<div class="queue-score">' +
+            '<div class="score-num" style="color:' + scoreColor + '">' + (item.score||0) + '</div>' +
+            '<div style="font-size:10px;color:#6b7280">/ 100</div>' +
+            '<div class="score-bar"><div class="score-fill" style="width:' + (item.score||0) + '%;background:' + scoreColor + '"></div></div>' +
+          '</div>' +
+        '</div>' +
+        (item.quality_reason ? '<div class="queue-body">💡 ' + item.quality_reason + '</div>' : '') +
+        (clausePreviews ? '<div style="margin-bottom:12px">' + clausePreviews + '</div>' : '') +
+        '<div class="queue-actions">' +
+          '<div style="flex:1">' +
+            '<select id="cat-' + item.id + '" style="margin:0;padding:7px 10px;font-size:12px">' +
+              Object.entries(CAT_LABELS).map(function(e) {
+                return '<option value="' + e[0] + '"' + (e[0] === item.category ? ' selected' : '') + '>' + e[1] + '</option>';
+              }).join('') +
+            '</select>' +
+          '</div>' +
+          '<button class="btn-success" onclick="validateContract(\'' + item.id + '\')">✅ Valider → RAG</button>' +
+          '<button class="btn-danger" onclick="rejectContract(\'' + item.id + '\')">❌ Rejeter</button>' +
+        '</div>';
+      list.appendChild(div);
+    });
+  } catch(e) {
+    list.innerHTML = '<div class="empty" style="color:#ef4444">⚠ Erreur de connexion</div>';
+  }
+}
+
+async function validateContract(id) {
+  var category = document.getElementById('cat-' + id).value;
+  var card = document.getElementById('qcard-' + id);
+  card.style.opacity = '0.5';
+  try {
+    var resp = await fetch(BACKEND + '/queue/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id, category: category })
+    });
+    var data = await resp.json();
+    if (!resp.ok) throw new Error(data.error);
+    card.remove();
+    loadStats();
+    loadRag();
+  } catch(e) {
+    alert('Erreur: ' + e.message);
+    card.style.opacity = '1';
+  }
+}
+
+async function rejectContract(id) {
+  if (!confirm('Rejeter ce contrat ?')) return;
+  var card = document.getElementById('qcard-' + id);
+  card.style.opacity = '0.5';
+  try {
+    var resp = await fetch(BACKEND + '/queue/reject', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id })
+    });
+    if (!resp.ok) throw new Error('Erreur');
+    card.remove();
+    loadStats();
+  } catch(e) {
+    alert('Erreur: ' + e.message);
+    card.style.opacity = '1';
+  }
+}
+
+async function loadRag() {
+  var list = document.getElementById('rag-list');
+  try {
+    var resp = await fetch(BACKEND + '/rag/list');
+    var data = await resp.json();
+    var docs = data.documents || [];
+    if (docs.length === 0) {
+      list.innerHTML = '<div class="empty">Aucun document dans le RAG.</div>';
+      return;
+    }
+    list.innerHTML = '';
+    docs.forEach(function(doc) {
+      var catLabel = CAT_LABELS[doc.type] || doc.type || 'Document';
+      var div = document.createElement('div');
+      div.className = 'doc-item';
+      div.innerHTML =
+        '<div class="doc-info">' +
+          '<div class="name"><span class="badge badge-contract" style="margin-right:6px">' + catLabel + '</span>' + doc.source + '</div>' +
+          '<div class="meta">' + doc.chunks + ' chunks · ' + (doc.party_label || '') + '</div>' +
+        '</div>' +
+        '<button class="btn-danger" onclick="deleteDoc(\'' + doc.source.replace(/'/g,"\\'") + '\', this)">🗑</button>';
+      list.appendChild(div);
+    });
+  } catch(e) {
+    list.innerHTML = '<div class="empty" style="color:#ef4444">⚠ Erreur de connexion</div>';
+  }
+}
+
+function setFile(f) {
+  if (!f) return;
+  curFile = f;
+  document.getElementById('file-name').textContent = f.name + ' (' + (f.size/1024).toFixed(0) + ' KB)';
+  document.getElementById('file-ok').style.display = 'flex';
+  if (!document.getElementById('source-name').value)
+    document.getElementById('source-name').value = f.name.replace(/\.[^.]+$/, '');
+}
+
+async function uploadDoc() {
+  if (!curFile) { alert('Sélectionne un fichier.'); return; }
+  var sourceName = document.getElementById('source-name').value.trim();
+  if (!sourceName) { alert('Donne un nom au document.'); return; }
+  var btn = document.getElementById('btn-upload');
+  var msg = document.getElementById('upload-msg');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-sm"></span>Indexation…';
+  msg.style.display = 'none';
+  try {
+    var fd = new FormData();
+    fd.append('file', curFile);
+    fd.append('doc_type', document.getElementById('doc-type').value);
+    fd.append('source_name', sourceName);
+    fd.append('api_key', apiKey);
+    var resp = await fetch(BACKEND + '/rag/upload', { method: 'POST', body: fd });
+    var data = await resp.json();
+    if (!resp.ok) throw new Error(data.error);
+    msg.className = 'success';
+    msg.textContent = '✅ ' + data.chunks + ' chunks indexés pour "' + data.source + '"';
+    msg.style.display = 'block';
+    curFile = null;
+    document.getElementById('file-ok').style.display = 'none';
+    document.getElementById('source-name').value = '';
+    document.getElementById('file-input').value = '';
+    loadStats(); loadRag();
+  } catch(e) {
+    msg.className = 'error';
+    msg.textContent = '⚠ ' + (e.message || 'Erreur');
+    msg.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⬆ Indexer le document';
+  }
+}
+
+async function deleteDoc(source, btn) {
+  if (!confirm('Supprimer "' + source + '" ?')) return;
+  btn.disabled = true;
+  try {
+    var resp = await fetch(BACKEND + '/rag/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source: source })
+    });
+    if (!resp.ok) throw new Error('Erreur');
+    loadStats(); loadRag();
+  } catch(e) {
+    alert('Erreur: ' + e.message);
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
