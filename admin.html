@@ -267,17 +267,23 @@ async function loadQueue() {
       if (acceptedMods.length > 0) {
         acceptedMods.forEach(function(mod, idx) {
           var riskColor = mod.risk === 'high' ? '#ef4444' : mod.risk === 'medium' ? '#f59e0b' : '#10b981';
+          var modId = mod.id || idx;
           clausePreviews +=
             '<div style="background:#111420;border:1px solid #1f2537;border-radius:10px;padding:14px;margin-bottom:10px;">' +
               '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
-                '<strong style="font-size:14px">' + (idx+1) + '. ' + mod.clause_name + '</strong>' +
-                '<span style="padding:2px 8px;border-radius:20px;font-size:11px;background:' + riskColor + '20;color:' + riskColor + '">' + (mod.risk || 'medium') + '</span>' +
+                '<input id="clause-name-' + modId + '" value="' + (mod.clause_name || '').replace(/"/g,"&quot;") + '" style="background:#181c2a;border:1px solid #1f2537;border-radius:6px;padding:4px 10px;color:#e2e5f0;font-size:14px;font-weight:600;flex:1;margin-right:10px"/>' +
+                '<select id="mod-risk-' + modId + '" style="background:#181c2a;border:1px solid #1f2537;border-radius:6px;padding:4px 8px;color:' + riskColor + ';font-size:11px">' +
+                  '<option value="high"' + (mod.risk==="high"?" selected":"") + '>Élevé</option>' +
+                  '<option value="medium"' + (mod.risk==="medium"?" selected":"") + '>Modéré</option>' +
+                  '<option value="low"' + (mod.risk==="low"?" selected":"") + '>Faible</option>' +
+                '</select>' +
               '</div>' +
-              '<div style="font-size:11px;color:#6b7280;margin-bottom:6px">💡 ' + (mod.reason || '') + '</div>' +
+              '<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">💡 Justification</div>' +
+              '<input id="mod-reason-' + modId + '" value="' + (mod.reason || '').replace(/"/g,"&quot;") + '" style="width:100%;background:#181c2a;border:1px solid #1f2537;border-radius:6px;padding:6px 10px;color:#6b7280;font-size:12px;margin-bottom:10px"/>' +
               '<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Texte original</div>' +
-              '<div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:7px;padding:10px;font-size:13px;line-height:1.6;margin-bottom:8px;color:#e2e5f0">' + (mod.original || '') + '</div>' +
-              '<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Modification proposée</div>' +
-              '<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:7px;padding:10px;font-size:13px;line-height:1.6;color:#e2e5f0">' + (mod.proposed || '') + '</div>' +
+              '<textarea id="mod-orig-' + modId + '" rows="2" style="width:100%;background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.2);border-radius:7px;padding:10px;font-size:12px;line-height:1.6;color:#e2e5f0;resize:vertical;font-family:inherit">' + (mod.original || '') + '</textarea>' +
+              '<div style="font-size:11px;color:#10b981;text-transform:uppercase;letter-spacing:1px;margin:8px 0 4px">✏️ Modification — éditable avant validation</div>' +
+              '<textarea class="mod-edit-area" data-modid="' + modId + '" rows="3" style="width:100%;background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.3);border-radius:7px;padding:10px;font-size:12px;line-height:1.6;color:#e2e5f0;resize:vertical;font-family:inherit">' + (mod.proposed || '') + '</textarea>' +
             '</div>';
         });
       }
@@ -327,12 +333,27 @@ async function loadQueue() {
 async function validateContract(id) {
   var category = document.getElementById('cat-' + id).value;
   var card = document.getElementById('qcard-' + id);
+
+  // Collect edited modifications
+  var editedMods = [];
+  card.querySelectorAll('.mod-edit-area').forEach(function(el) {
+    var modId = el.dataset.modid;
+    editedMods.push({
+      id: parseInt(modId),
+      clause_name: card.querySelector('#clause-name-' + modId) ? card.querySelector('#clause-name-' + modId).value : '',
+      original: card.querySelector('#mod-orig-' + modId) ? card.querySelector('#mod-orig-' + modId).value : '',
+      proposed: el.value,
+      reason: card.querySelector('#mod-reason-' + modId) ? card.querySelector('#mod-reason-' + modId).value : '',
+      risk: card.querySelector('#mod-risk-' + modId) ? card.querySelector('#mod-risk-' + modId).value : 'medium'
+    });
+  });
+
   card.style.opacity = '0.5';
   try {
     var resp = await fetch(BACKEND + '/queue/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: id, category: category })
+      body: JSON.stringify({ id: id, category: category, edited_modifications: editedMods })
     });
     var data = await resp.json();
     if (!resp.ok) throw new Error(data.error);
