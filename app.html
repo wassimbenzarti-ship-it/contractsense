@@ -164,7 +164,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 
 <script>
 var BACKEND = 'https://web-production-f96f7.up.railway.app';
-var apiKey = '';
+var apiKey = 'ok';  // Clé gérée côté serveur Railway
 var curFile = null;
 var curMode = 'upload';
 var modifications = [];
@@ -268,7 +268,6 @@ function saveKey() {
     showErr('key-error', '⚠ Clé invalide — doit commencer par sk-');
     return;
   }
-  apiKey = k;
   localStorage.setItem('cs_key', k);
   hideErr('key-error');
   showKeyBar();
@@ -296,7 +295,6 @@ function buildFormData() {
   var fd = new FormData();
   fd.append('lang', 'auto');
   fd.append('type', document.getElementById('type').value);
-  fd.append('api_key', apiKey);
   if (curMode === 'upload' && curFile) {
     fd.append('file', curFile);
   } else {
