@@ -283,6 +283,7 @@ async function loadQueue() {
               '<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Texte original</div>' +
               '<textarea id="mod-orig-' + modId + '" rows="2" style="width:100%;background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.2);border-radius:7px;padding:10px;font-size:12px;line-height:1.6;color:#e2e5f0;resize:vertical;font-family:inherit">' + (mod.original || '') + '</textarea>' +
               '<div style="font-size:11px;color:#10b981;text-transform:uppercase;letter-spacing:1px;margin:8px 0 4px">✏️ Modification — éditable avant validation</div>' +
+              (mod.rag_source ? '<div style="font-size:10px;color:#7c5cfc;margin-bottom:6px;display:flex;align-items:center;gap:4px"><span>🧠</span> Basé sur : ' + mod.rag_source + '</div>' : '<div style="font-size:10px;color:#4a5470;margin-bottom:6px">⚪ Aucune source RAG — modification IA pure</div>') +
               '<textarea class="mod-edit-area" data-modid="' + modId + '" rows="3" style="width:100%;background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.3);border-radius:7px;padding:10px;font-size:12px;line-height:1.6;color:#e2e5f0;resize:vertical;font-family:inherit">' + (mod.proposed || '') + '</textarea>' +
             '</div>';
         });
