@@ -125,12 +125,23 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
     <button class="btn-main" id="btn-analyze">⚡ Analyser le contrat</button>
     <div id="usage-counter" style="text-align:center;font-size:12px;color:#6b7280;margin-top:10px"></div>
     <div id="access-code-section" style="display:none;margin-top:16px;background:rgba(91,124,250,0.06);border:1px solid rgba(91,124,250,0.2);border-radius:10px;padding:16px">
-      <div style="font-size:12px;color:#6b7280;margin-bottom:8px">Vous avez un code d'accès ?</div>
+      <div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:12px">🔒 Limite de 3 analyses atteinte</div>
+      <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="display:block;text-align:center;padding:12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border-radius:8px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:14px">
+        💳 Souscrire à l'accès illimité →
+      </a>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="flex:1;height:1px;background:#1f2537"></div>
+        <div style="font-size:11px;color:#6b7280">ou entrez votre code d'accès</div>
+        <div style="flex:1;height:1px;background:#1f2537"></div>
+      </div>
       <div style="display:flex;gap:8px">
-        <input type="text" id="access-code-input" placeholder="Entrez votre code..." style="flex:1;background:#181c2a;border:1px solid #1f2537;border-radius:8px;padding:9px 12px;color:#e2e5f0;font-size:13px"/>
+        <input type="text" id="access-code-input" placeholder="Code WF-XXXXX..." style="flex:1;background:#181c2a;border:1px solid #1f2537;border-radius:8px;padding:9px 12px;color:#e2e5f0;font-size:13px"/>
         <button onclick="applyAccessCode()" style="padding:9px 18px;background:#5b7cfa;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Activer</button>
       </div>
       <div id="access-code-error" style="display:none;color:#ef4444;font-size:12px;margin-top:6px"></div>
+      <div style="margin-top:12px;font-size:11px;color:#6b7280;text-align:center">
+        📧 contact@westfieldavocats.com · 📞 +212 6 34 39 44 90
+      </div>
     </div>
     <div id="form-error" style="display:none" class="error"></div>
   </div>
