@@ -124,6 +124,14 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 
     <button class="btn-main" id="btn-analyze">⚡ Analyser le contrat</button>
     <div id="usage-counter" style="text-align:center;font-size:12px;color:#6b7280;margin-top:10px"></div>
+    <div id="access-code-section" style="display:none;margin-top:16px;background:rgba(91,124,250,0.06);border:1px solid rgba(91,124,250,0.2);border-radius:10px;padding:16px">
+      <div style="font-size:12px;color:#6b7280;margin-bottom:8px">Vous avez un code d'accès ?</div>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="access-code-input" placeholder="Entrez votre code..." style="flex:1;background:#181c2a;border:1px solid #1f2537;border-radius:8px;padding:9px 12px;color:#e2e5f0;font-size:13px"/>
+        <button onclick="applyAccessCode()" style="padding:9px 18px;background:#5b7cfa;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Activer</button>
+      </div>
+      <div id="access-code-error" style="display:none;color:#ef4444;font-size:12px;margin-top:6px"></div>
+    </div>
     <div id="form-error" style="display:none" class="error"></div>
   </div>
 
@@ -184,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (remaining > 0) {
       counter.textContent = remaining + ' analyse' + (remaining > 1 ? 's' : '') + ' gratuite' + (remaining > 1 ? 's' : '') + ' restante' + (remaining > 1 ? 's' : '');
     } else {
-      counter.textContent = '⚠ Limite atteinte — contactez westfieldavocats.com';
+      counter.innerHTML = '⚠ Limite atteinte — <a href="mailto:contact@westfieldavocats.com" style="color:#ef4444">contact@westfieldavocats.com</a> · +212 6 34 39 44 90';
       counter.style.color = '#ef4444';
     }
   }
@@ -308,10 +316,16 @@ function buildFormData() {
 async function analyze() {
   hideErr('form-error');
 
-  // Check free usage limit
+  // Check free usage limit — skip if valid access code
+  var hasAccess = localStorage.getItem('cs_access');
   var usage = parseInt(localStorage.getItem('cs_usage') || '0');
-  if (usage >= 3) {
-    showErr('form-error', '⚠ Vous avez utilisé vos 3 analyses gratuites. Contactez-nous sur westfieldavocats.com pour un accès illimité.');
+  if (usage >= 3 && !hasAccess) {
+    document.getElementById('access-code-section').style.display = 'block';
+  showErr('form-error', '⚠ Vous avez utilisé vos 3 analyses gratuites. Pour un accès illimité, contactez Westfield :<br><br>' +
+      '📧 <a href="mailto:contact@westfieldavocats.com" style="color:#5b7cfa">contact@westfieldavocats.com</a><br>' +
+      '🌐 <a href="https://westfieldmorocco.com" target="_blank" style="color:#5b7cfa">westfieldmorocco.com</a><br>' +
+      '📞 <a href="tel:+212634394490" style="color:#5b7cfa">+212 6 34 39 44 90</a><br><br>' +
+      '💳 <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="color:#10b981;font-weight:600">→ Souscrire en ligne</a>');
     return;
   }
 
@@ -395,6 +409,26 @@ async function analyzeWithPartie(partieName) {
 }
 
 // ── Step 4: Review ────────────────────────────────────────
+function applyAccessCode() {
+  var code = document.getElementById('access-code-input').value.trim().toUpperCase();
+  // Valid codes stored in localStorage by admin
+  var validCodes = JSON.parse(localStorage.getItem('omniscient_codes') || '[]');
+  // Also check hardcoded prefix pattern: WF-XXXXX
+  var isValid = validCodes.includes(code) || /^WF-[A-Z0-9]{5,10}$/.test(code);
+  if (isValid) {
+    localStorage.setItem('cs_access', code);
+    localStorage.setItem('cs_usage', '0'); // Reset counter
+    document.getElementById('access-code-section').style.display = 'none';
+    document.getElementById('usage-counter').textContent = '✅ Accès illimité activé';
+    document.getElementById('usage-counter').style.color = '#10b981';
+    hideErr('form-error');
+    alert('✅ Code valide ! Accès illimité activé.');
+  } else {
+    document.getElementById('access-code-error').style.display = 'block';
+    document.getElementById('access-code-error').textContent = '⚠ Code invalide. Contactez contact@westfieldavocats.com';
+  }
+}
+
 function onProposedEdit(id, el) {
   // Save user-edited version
   var mod = modifications.find(function(m) { return m.id === id; });
