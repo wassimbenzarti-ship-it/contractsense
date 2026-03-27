@@ -227,18 +227,9 @@ document.addEventListener('DOMContentLoaded', function() {
     show('text-zone');
   });
 
-  // Drop zone — use label trick for Chrome/Edge compatibility
+  // Drop zone - label handles click natively
   var drop = document.getElementById('drop-area');
   var fileInput = document.getElementById('file-input');
-  // Wrap file input in a label that covers the drop zone
-  var label = document.createElement('label');
-  label.setAttribute('for', 'file-input');
-  label.style.cssText = 'position:absolute;inset:0;cursor:pointer;z-index:10';
-  drop.style.position = 'relative';
-  drop.appendChild(label);
-  drop.addEventListener('click', function(e) {
-    if (e.target !== label) fileInput.click();
-  });
   drop.addEventListener('dragover', function(e) { e.preventDefault(); drop.style.borderColor = '#5b7cfa'; });
   drop.addEventListener('dragleave', function() { drop.style.borderColor = '#1f2537'; });
   drop.addEventListener('drop', function(e) {
