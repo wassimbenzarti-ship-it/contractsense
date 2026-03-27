@@ -81,38 +81,38 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 
   <!-- STEP 2: Upload form -->
   <div id="step-form">
-    <h1 class="fadein">Révisez vos contrats<br/><span class="accent">avec l'IA.</span></h1>
-    <p class="desc">Uploadez votre contrat. L'IA identifie les parties, vous choisissez laquelle protéger, puis propose des modifications avec Track Changes.</p>
+    <h1 class="fadein">RÃ©visez vos contrats<br/><span class="accent">avec l'IA.</span></h1>
+    <p class="desc">Uploadez votre contrat. L'IA identifie les parties, vous choisissez laquelle protÃ©ger, puis propose des modifications avec Track Changes.</p>
 
     <div class="tabs">
-      <button class="tab active" id="tab-upload">📄 Uploader</button>
-      <button class="tab" id="tab-text">✏️ Coller du texte</button>
+      <button class="tab active" id="tab-upload">ð Uploader</button>
+      <button class="tab" id="tab-text">âï¸ Coller du texte</button>
     </div>
 
     <div id="upload-zone">
       <label class="drop" id="drop-area" for="file-input" style="cursor:pointer;display:block">
-        <div style="font-size:30px;margin-bottom:10px">📄</div>
-        <div style="font-weight:700;font-size:15px;margin-bottom:5px">Déposez votre contrat ici</div>
-        <div style="color:#6b7280;font-size:13px">ou cliquez pour sélectionner</div>
+        <div style="font-size:30px;margin-bottom:10px">ð</div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:5px">DÃ©posez votre contrat ici</div>
+        <div style="color:#6b7280;font-size:13px">ou cliquez pour sÃ©lectionner</div>
         <div class="tags"><span class="tag">PDF</span><span class="tag">DOCX</span><span class="tag">TXT</span></div>
       </label>
       <input type="file" id="file-input" accept=".pdf,.docx,.txt,.doc" style="display:none"/>
       <div id="file-ok" style="display:none" class="file-ok">
-        <span>✅</span>
+        <span>â</span>
         <span id="file-name" style="color:#10b981;font-size:13px"></span>
         <span id="file-size" style="color:#6b7280;font-size:11px;margin-left:auto"></span>
       </div>
     </div>
 
     <div id="text-zone" style="display:none">
-      <textarea id="contract-text" placeholder="Collez le texte de votre contrat ici…" style="margin-bottom:14px"></textarea>
+      <textarea id="contract-text" placeholder="Collez le texte de votre contrat iciâ¦" style="margin-bottom:14px"></textarea>
     </div>
 
     <div class="opts">
       <div>
         <label>Type</label>
         <select id="type">
-          <option value="generic">Générique</option>
+          <option value="generic">GÃ©nÃ©rique</option>
           <option value="nda">NDA</option>
           <option value="saas">SaaS</option>
           <option value="purchase">Achat/Vente</option>
@@ -122,16 +122,16 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       </div>
     </div>
 
-    <button class="btn-main" id="btn-analyze">⚡ Analyser le contrat</button>
+    <button class="btn-main" id="btn-analyze">â¡ Analyser le contrat</button>
     <div id="usage-counter" style="text-align:center;font-size:12px;color:#6b7280;margin-top:10px"></div>
     <div id="access-code-section" style="display:none;margin-top:16px;background:rgba(91,124,250,0.06);border:1px solid rgba(91,124,250,0.2);border-radius:10px;padding:16px">
-      <div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:12px">🔒 Limite de 3 analyses atteinte</div>
+      <div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:12px">ð Limite de 3 analyses atteinte</div>
       <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="display:block;text-align:center;padding:12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border-radius:8px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:14px">
-        💳 Souscrire à l'accès illimité →
+        ð³ Souscrire Ã  l'accÃ¨s illimitÃ© â
       </a>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
         <div style="flex:1;height:1px;background:#1f2537"></div>
-        <div style="font-size:11px;color:#6b7280">ou entrez votre code d'accès</div>
+        <div style="font-size:11px;color:#6b7280">ou entrez votre code d'accÃ¨s</div>
         <div style="flex:1;height:1px;background:#1f2537"></div>
       </div>
       <div style="display:flex;gap:8px">
@@ -140,7 +140,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       </div>
       <div id="access-code-error" style="display:none;color:#ef4444;font-size:12px;margin-top:6px"></div>
       <div style="margin-top:12px;font-size:11px;color:#6b7280;text-align:center">
-        📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0c6f6362786d6f784c7b697f786a656960686d7a636f6d787f226f6361">[email&#160;protected]</a> · 📞 +212 6 34 39 44 90
+        ð§ <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0c6f6362786d6f784c7b697f786a656960686d7a636f6d787f226f6361">[email&#160;protected]</a> Â· ð +212 6 34 39 44 90
       </div>
     </div>
     <div id="form-error" style="display:none" class="error"></div>
@@ -150,40 +150,40 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
   <div id="step-loading" style="display:none" class="loading">
     <div class="spinner"></div>
     <div class="steps">
-      <div class="step" id="s0">→ Lecture du document…</div>
-      <div class="step" id="s1">→ Identification des parties…</div>
-      <div class="step" id="s2">→ Analyse des risques…</div>
-      <div class="step" id="s3">→ Rédaction des modifications…</div>
+      <div class="step" id="s0">â Lecture du documentâ¦</div>
+      <div class="step" id="s1">â Identification des partiesâ¦</div>
+      <div class="step" id="s2">â Analyse des risquesâ¦</div>
+      <div class="step" id="s3">â RÃ©daction des modificationsâ¦</div>
     </div>
   </div>
 
   <!-- STEP 4: Choose partie -->
   <div id="step-parties" style="display:none" class="fadein">
-    <h2 style="font-size:20px;font-weight:800;margin-bottom:8px">Quelle partie représentez-vous ?</h2>
-    <p style="color:#6b7280;font-size:14px;margin-bottom:24px">L'IA adaptera ses modifications pour protéger vos intérêts.</p>
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:8px">Quelle partie reprÃ©sentez-vous ?</h2>
+    <p style="color:#6b7280;font-size:14px;margin-bottom:24px">L'IA adaptera ses modifications pour protÃ©ger vos intÃ©rÃªts.</p>
     <div id="parties-list"></div>
-    <button id="btn-back" style="display:block;margin:16px auto 0;padding:9px 20px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:13px;cursor:pointer">↩ Retour</button>
+    <button id="btn-back" style="display:block;margin:16px auto 0;padding:9px 20px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:13px;cursor:pointer">â© Retour</button>
   </div>
 
   <!-- STEP 5: Review modifications -->
   <div id="step-review" style="display:none" class="fadein">
     <div class="review-header">
-      <div style="font-size:20px;font-weight:800">Révision du contrat</div>
+      <div style="font-size:20px;font-weight:800">RÃ©vision du contrat</div>
       <div class="review-stats" id="review-stats"></div>
     </div>
     <div id="mods-list"></div>
     <div class="export-section">
-      <div style="font-size:16px;font-weight:700;margin-bottom:8px">Générer le document final</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">GÃ©nÃ©rer le document final</div>
       <div id="export-desc" style="color:#6b7280;font-size:13px;margin-bottom:20px;line-height:1.6"></div>
-      <button class="btn-export" id="btn-export">⬇ Télécharger avec Track Changes</button>
-      <button class="btn-new" id="btn-new">↩ Analyser un autre contrat</button>
+      <button class="btn-export" id="btn-export">â¬ TÃ©lÃ©charger avec Track Changes</button>
+      <button class="btn-new" id="btn-new">â© Analyser un autre contrat</button>
     </div>
   </div>
 </div>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 var BACKEND = 'https://web-production-f96f7.up.railway.app';
-var apiKey = 'ok';  // Clé gérée côté serveur Railway
+var apiKey = 'ok';  // ClÃ© gÃ©rÃ©e cÃ´tÃ© serveur Railway
 var curFile = null;
 var curMode = 'upload';
 var modifications = [];
@@ -193,7 +193,7 @@ var savedLang = "fr";
 var savedType = "generic";
 var savedText = "";
 
-// ── Init ──────────────────────────────────────────────────
+// ââ Init ââââââââââââââââââââââââââââââââââââââââââââââââââ
 document.addEventListener('DOMContentLoaded', function() {
   // Show usage counter
   var usage = parseInt(localStorage.getItem('cs_usage') || '0');
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (remaining > 0) {
       counter.textContent = remaining + ' analyse' + (remaining > 1 ? 's' : '') + ' gratuite' + (remaining > 1 ? 's' : '') + ' restante' + (remaining > 1 ? 's' : '');
     } else {
-      counter.innerHTML = '⚠ Limite atteinte — <a href="mailto:contact@westfieldavocats.com" style="color:#ef4444">contact@westfieldavocats.com</a> · +212 6 34 39 44 90';
+      counter.innerHTML = 'â  Limite atteinte â <a href="mailto:contact@westfieldavocats.com" style="color:#ef4444">contact@westfieldavocats.com</a> Â· +212 6 34 39 44 90';
       counter.style.color = '#ef4444';
     }
   }
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('file-input').addEventListener('change', function() {
     var f = this.files[0];
     if (f && f.name.toLowerCase().endsWith('.doc') && !f.name.toLowerCase().endsWith('.docx')) {
-      showErr("form-error", "⚠️ Format .doc detecte. Convertissez en .docx pour les Track Changes complets. L'analyse reste possible mais l'export sera limite.");
+      showErr("form-error", "â ï¸ Format .doc detecte. Convertissez en .docx pour les Track Changes complets. L'analyse reste possible mais l'export sera limite.");
     } else {
       hideErr('form-error');
     }
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('btn-new').addEventListener('click', reset);
 });
 
-// ── Helpers ───────────────────────────────────────────────
+// ââ Helpers âââââââââââââââââââââââââââââââââââââââââââââââ
 function show(id) { document.getElementById(id).style.display = 'block'; }
 function hide(id) { document.getElementById(id).style.display = 'none'; }
 function showFlex(id) { document.getElementById(id).style.display = 'flex'; }
@@ -284,7 +284,7 @@ function setFile(f) {
 function saveKey() {
   var k = document.getElementById('api-key').value.trim();
   if (!k || k.indexOf('sk-') !== 0) {
-    showErr('key-error', '⚠ Clé invalide — doit commencer par sk-');
+    showErr('key-error', 'â  ClÃ© invalide â doit commencer par sk-');
     return;
   }
   localStorage.setItem('cs_key', k);
@@ -295,20 +295,20 @@ function saveKey() {
 
 function stepDone(i) {
   var el = document.getElementById('s' + i);
-  var labels = ['Lecture du document…','Identification des parties…','Analyse des risques…','Rédaction des modifications…'];
-  if (el) { el.classList.add('done'); el.textContent = '✓ ' + labels[i]; }
+  var labels = ['Lecture du documentâ¦','Identification des partiesâ¦','Analyse des risquesâ¦','RÃ©daction des modificationsâ¦'];
+  if (el) { el.classList.add('done'); el.textContent = 'â ' + labels[i]; }
 }
 
 function stepReset() {
-  var labels = ['Lecture du document…','Identification des parties…','Analyse des risques…','Rédaction des modifications…'];
+  var labels = ['Lecture du documentâ¦','Identification des partiesâ¦','Analyse des risquesâ¦','RÃ©daction des modificationsâ¦'];
   for (var i = 0; i < 4; i++) {
     var el = document.getElementById('s' + i);
-    if (el) { el.classList.remove('done'); el.textContent = '→ ' + labels[i]; }
+    if (el) { el.classList.remove('done'); el.textContent = 'â ' + labels[i]; }
   }
 }
 
 function rc(r) { return r === 'high' ? '#ef4444' : r === 'medium' ? '#f59e0b' : '#10b981'; }
-function rl(r) { return r === 'high' ? 'Risque élevé' : r === 'medium' ? 'Risque modéré' : 'Faible risque'; }
+function rl(r) { return r === 'high' ? 'Risque Ã©levÃ©' : r === 'medium' ? 'Risque modÃ©rÃ©' : 'Faible risque'; }
 
 function buildFormData() {
   var fd = new FormData();
@@ -323,26 +323,26 @@ function buildFormData() {
   return fd;
 }
 
-// ── Step 1: Analyze → identify parties ───────────────────
+// ââ Step 1: Analyze â identify parties âââââââââââââââââââ
 async function analyze() {
   hideErr('form-error');
 
-  // Check free usage limit — skip if valid access code
+  // Check free usage limit â skip if valid access code
   var hasAccess = localStorage.getItem('cs_access');
   var usage = parseInt(localStorage.getItem('cs_usage') || '0');
   if (usage >= 3 && !hasAccess) {
     document.getElementById('access-code-section').style.display = 'block';
-  showErr('form-error', '⚠ Vous avez utilisé vos 3 analyses gratuites. Pour un accès illimité, contactez Westfield :<br><br>' +
-      '📧 <a href="mailto:contact@westfieldavocats.com" style="color:#5b7cfa">contact@westfieldavocats.com</a><br>' +
-      '🌐 <a href="https://westfieldmorocco.com" target="_blank" style="color:#5b7cfa">westfieldmorocco.com</a><br>' +
-      '📞 <a href="tel:+212634394490" style="color:#5b7cfa">+212 6 34 39 44 90</a><br><br>' +
-      '💳 <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="color:#10b981;font-weight:600">→ Souscrire en ligne</a>');
+  showErr('form-error', 'â  Vous avez utilisÃ© vos 3 analyses gratuites. Pour un accÃ¨s illimitÃ©, contactez Westfield :<br><br>' +
+      'ð§ <a href="mailto:contact@westfieldavocats.com" style="color:#5b7cfa">contact@westfieldavocats.com</a><br>' +
+      'ð <a href="https://westfieldmorocco.com" target="_blank" style="color:#5b7cfa">westfieldmorocco.com</a><br>' +
+      'ð <a href="tel:+212634394490" style="color:#5b7cfa">+212 6 34 39 44 90</a><br><br>' +
+      'ð³ <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="color:#10b981;font-weight:600">â Souscrire en ligne</a>');
     return;
   }
 
   var txt = document.getElementById('contract-text').value;
-  if (curMode === 'upload' && !curFile) { showErr('form-error', '⚠ Uploade un fichier.'); return; }
-  if (curMode === 'text' && txt.trim().length < 50) { showErr('form-error', '⚠ Colle au moins 50 caractères.'); return; }
+  if (curMode === 'upload' && !curFile) { showErr('form-error', 'â  Uploade un fichier.'); return; }
+  if (curMode === 'text' && txt.trim().length < 50) { showErr('form-error', 'â  Colle au moins 50 caractÃ¨res.'); return; }
 
   hide('step-form');
   showFlex('step-loading');
@@ -366,11 +366,11 @@ async function analyze() {
   } catch(e) {
     hide('step-loading');
     show('step-form');
-    showErr('form-error', '⚠ ' + (e.message || 'Erreur inattendue.'));
+    showErr('form-error', 'â  ' + (e.message || 'Erreur inattendue.'));
   }
 }
 
-// ── Step 2: Show parties ──────────────────────────────────
+// ââ Step 2: Show parties ââââââââââââââââââââââââââââââââââ
 function renderParties(parties) {
   var list = document.getElementById('parties-list');
   list.innerHTML = '';
@@ -390,7 +390,7 @@ function renderParties(parties) {
   show('step-parties');
 }
 
-// ── Step 3: Analyze with selected partie ─────────────────
+// ââ Step 3: Analyze with selected partie âââââââââââââââââ
 async function analyzeWithPartie(partieName) {
   selectedPartie = partieName;
   hide('step-parties');
@@ -415,11 +415,11 @@ async function analyzeWithPartie(partieName) {
   } catch(e) {
     hide('step-loading');
     show('step-form');
-    showErr('form-error', '⚠ ' + (e.message || 'Erreur inattendue.'));
+    showErr('form-error', 'â  ' + (e.message || 'Erreur inattendue.'));
   }
 }
 
-// ── Step 4: Review ────────────────────────────────────────
+// ââ Step 4: Review ââââââââââââââââââââââââââââââââââââââââ
 function applyAccessCode() {
   var code = document.getElementById('access-code-input').value.trim().toUpperCase();
   // Valid codes stored in localStorage by admin
@@ -430,13 +430,13 @@ function applyAccessCode() {
     localStorage.setItem('cs_access', code);
     localStorage.setItem('cs_usage', '0'); // Reset counter
     document.getElementById('access-code-section').style.display = 'none';
-    document.getElementById('usage-counter').textContent = '✅ Accès illimité activé';
+    document.getElementById('usage-counter').textContent = 'â AccÃ¨s illimitÃ© activÃ©';
     document.getElementById('usage-counter').style.color = '#10b981';
     hideErr('form-error');
-    alert('✅ Code valide ! Accès illimité activé.');
+    alert('â Code valide ! AccÃ¨s illimitÃ© activÃ©.');
   } else {
     document.getElementById('access-code-error').style.display = 'block';
-    document.getElementById('access-code-error').textContent = '⚠ Code invalide. Contactez contact@westfieldavocats.com';
+    document.getElementById('access-code-error').textContent = 'â  Code invalide. Contactez contact@westfieldavocats.com';
   }
 }
 
@@ -475,12 +475,12 @@ function decide(id, decision) {
   if (decision === 'accepted') {
     card.classList.add('accepted');
     btnA.classList.add('active');
-    status.textContent = '✅ Modification acceptée';
+    status.textContent = 'â Modification acceptÃ©e';
     status.style.color = '#10b981';
   } else {
     card.classList.add('rejected');
     btnR.classList.add('active');
-    status.textContent = '❌ Texte original conservé';
+    status.textContent = 'â Texte original conservÃ©';
     status.style.color = '#ef4444';
   }
   updateStats();
@@ -492,8 +492,8 @@ function updateStats() {
   var p = Object.values(decisions).filter(function(d){return d==='pending';}).length;
   document.getElementById('review-stats').innerHTML =
     '<span class="stat stat-pending">' + p + ' en attente</span>' +
-    '<span class="stat stat-accepted">' + a + ' acceptées</span>' +
-    '<span class="stat stat-rejected">' + r + ' refusées</span>';
+    '<span class="stat stat-accepted">' + a + ' acceptÃ©es</span>' +
+    '<span class="stat stat-rejected">' + r + ' refusÃ©es</span>';
 }
 
 function renderReview() {
@@ -510,15 +510,15 @@ function renderReview() {
         '<span class="risk-pill" style="background:' + color + '20;color:' + color + '">' + rl(m.risk) + '</span>' +
       '</div>' +
       '<div class="mod-body">' +
-        (m.rag_source ? '<div style="background:rgba(91,124,250,0.08);border:1px solid rgba(91,124,250,0.2);border-radius:7px;padding:5px 10px;font-size:11px;color:#5b7cfa;margin-bottom:10px;">🧠 Basé sur: ' + m.rag_source + '</div>' : '') +
-        '<div class="mod-reason">💡 ' + m.reason + '</div>' +
-        '<div class="mod-label" style="color:#ef4444">📄 Texte original</div>' +
+        (m.rag_source ? '<div style="background:rgba(91,124,250,0.08);border:1px solid rgba(91,124,250,0.2);border-radius:7px;padding:5px 10px;font-size:11px;color:#5b7cfa;margin-bottom:10px;">ð§  BasÃ© sur: ' + m.rag_source + '</div>' : '') +
+        '<div class="mod-reason">ð¡ ' + m.reason + '</div>' +
+        '<div class="mod-label" style="color:#ef4444">ð Texte original</div>' +
         '<div class="mod-original">' + m.original + '</div>' +
-        '<div class="mod-label" style="color:#10b981">✏ Modification proposée <span style="color:#6b7280;font-size:10px;font-weight:400">(éditable)</span></div>' +
+        '<div class="mod-label" style="color:#10b981">â Modification proposÃ©e <span style="color:#6b7280;font-size:10px;font-weight:400">(Ã©ditable)</span></div>' +
         '<div class="mod-proposed" id="proposed-' + m.id + '" contenteditable="true" spellcheck="true" style="cursor:text;outline:none;" oninput="onProposedEdit(' + m.id + ', this)">' + m.proposed + '</div>' +
         '<div class="mod-actions">' +
-          '<button class="btn-accept" id="ba-' + m.id + '" onclick="decide(' + m.id + ',\'accepted\')">✅ Accepter</button>' +
-          '<button class="btn-reject" id="br-' + m.id + '" onclick="decide(' + m.id + ',\'rejected\')">❌ Refuser</button>' +
+          '<button class="btn-accept" id="ba-' + m.id + '" onclick="decide(' + m.id + ',\'accepted\')">â Accepter</button>' +
+          '<button class="btn-reject" id="br-' + m.id + '" onclick="decide(' + m.id + ',\'rejected\')">â Refuser</button>' +
         '</div>' +
         '<div class="mod-status" id="st-' + m.id + '"></div>' +
       '</div>';
@@ -527,17 +527,17 @@ function renderReview() {
 
   var isDocx = curFile && (curFile.name.endsWith('.docx') || curFile.name.endsWith('.doc'));
   document.getElementById('export-desc').innerHTML = isDocx
-    ? 'Le fichier DOCX original sera téléchargé avec les <strong>vraies Track Changes Word</strong> — mise en forme préservée.'
-    : 'Un document Word sera généré avec les modifications acceptées en Track Changes.';
+    ? 'Le fichier DOCX original sera tÃ©lÃ©chargÃ© avec les <strong>vraies Track Changes Word</strong> â mise en forme prÃ©servÃ©e.'
+    : 'Un document Word sera gÃ©nÃ©rÃ© avec les modifications acceptÃ©es en Track Changes.';
 
   updateStats();
   show('step-review');
 }
 
-// ── Export ────────────────────────────────────────────────
+// ââ Export ââââââââââââââââââââââââââââââââââââââââââââââââ
 async function exportDoc() {
   var btn = document.getElementById('btn-export');
-  btn.textContent = '⏳ Génération en cours…';
+  btn.textContent = 'â³ GÃ©nÃ©ration en coursâ¦';
   btn.disabled = true;
   try {
     var fd = buildFormData();
@@ -550,10 +550,10 @@ async function exportDoc() {
     a.href = URL.createObjectURL(blob);
     a.download = 'contrat-track-changes.docx';
     a.click();
-    btn.textContent = '✅ Téléchargé !';
+    btn.textContent = 'â TÃ©lÃ©chargÃ© !';
     btn.style.background = '#10b981';
     setTimeout(function() {
-      btn.textContent = '⬇ Télécharger avec Track Changes';
+      btn.textContent = 'â¬ TÃ©lÃ©charger avec Track Changes';
       btn.style.background = '';
       btn.disabled = false;
     }, 3000);
@@ -561,13 +561,13 @@ async function exportDoc() {
     // Silent auto-contribute full contract to queue
     contributeToQueue();
   } catch(e) {
-    alert('⚠ ' + e.message);
+    alert('â  ' + e.message);
     btn.disabled = false;
-    btn.textContent = '⬇ Télécharger avec Track Changes';
+    btn.textContent = 'â¬ TÃ©lÃ©charger avec Track Changes';
   }
 }
 
-// ── Reset ─────────────────────────────────────────────────
+// ââ Reset âââââââââââââââââââââââââââââââââââââââââââââââââ
 async function contributeToQueue() {
   try {
     console.log('contributeToQueue: start', {
