@@ -81,38 +81,38 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 
   <!-- STEP 2: Upload form -->
   <div id="step-form">
-    <h1 class="fadein">RÃ©visez vos contrats<br/><span class="accent">avec l'IA.</span></h1>
-    <p class="desc">Uploadez votre contrat. L'IA identifie les parties, vous choisissez laquelle protÃ©ger, puis propose des modifications avec Track Changes.</p>
+    <h1 class="fadein">RÃÂ©visez vos contrats<br/><span class="accent">avec l'IA.</span></h1>
+    <p class="desc">Uploadez votre contrat. L'IA identifie les parties, vous choisissez laquelle protÃÂ©ger, puis propose des modifications avec Track Changes.</p>
 
     <div class="tabs">
-      <button class="tab active" id="tab-upload">ð Uploader</button>
-      <button class="tab" id="tab-text">âï¸ Coller du texte</button>
+      <button class="tab active" id="tab-upload">Ã°ÂÂÂ Uploader</button>
+      <button class="tab" id="tab-text">Ã¢ÂÂÃ¯Â¸Â Coller du texte</button>
     </div>
 
     <div id="upload-zone">
       <label class="drop" id="drop-area" for="file-input" style="cursor:pointer;display:block">
-        <div style="font-size:30px;margin-bottom:10px">ð</div>
-        <div style="font-weight:700;font-size:15px;margin-bottom:5px">DÃ©posez votre contrat ici</div>
-        <div style="color:#6b7280;font-size:13px">ou cliquez pour sÃ©lectionner</div>
+        <div style="font-size:30px;margin-bottom:10px">Ã°ÂÂÂ</div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:5px">DÃÂ©posez votre contrat ici</div>
+        <div style="color:#6b7280;font-size:13px">ou cliquez pour sÃÂ©lectionner</div>
         <div class="tags"><span class="tag">PDF</span><span class="tag">DOCX</span><span class="tag">TXT</span></div>
       </label>
       <input type="file" id="file-input" accept=".pdf,.docx,.txt,.doc" style="display:none"/>
       <div id="file-ok" style="display:none" class="file-ok">
-        <span>â</span>
+        <span>Ã¢ÂÂ</span>
         <span id="file-name" style="color:#10b981;font-size:13px"></span>
         <span id="file-size" style="color:#6b7280;font-size:11px;margin-left:auto"></span>
       </div>
     </div>
 
     <div id="text-zone" style="display:none">
-      <textarea id="contract-text" placeholder="Collez le texte de votre contrat iciâ¦" style="margin-bottom:14px"></textarea>
+      <textarea id="contract-text" placeholder="Collez le texte de votre contrat iciÃ¢ÂÂ¦" style="margin-bottom:14px"></textarea>
     </div>
 
     <div class="opts">
       <div>
         <label>Type</label>
         <select id="type">
-          <option value="generic">GÃ©nÃ©rique</option>
+          <option value="generic">GÃÂ©nÃÂ©rique</option>
           <option value="nda">NDA</option>
           <option value="saas">SaaS</option>
           <option value="purchase">Achat/Vente</option>
@@ -122,16 +122,16 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       </div>
     </div>
 
-    <button class="btn-main" id="btn-analyze">â¡ Analyser le contrat</button>
+    <button class="btn-main" id="btn-analyze">Ã¢ÂÂ¡ Analyser le contrat</button>
     <div id="usage-counter" style="text-align:center;font-size:12px;color:#6b7280;margin-top:10px"></div>
     <div id="access-code-section" style="display:none;margin-top:16px;background:rgba(91,124,250,0.06);border:1px solid rgba(91,124,250,0.2);border-radius:10px;padding:16px">
-      <div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:12px">ð Limite de 3 analyses atteinte</div>
+      <div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:12px">Ã°ÂÂÂ Limite de 3 analyses atteinte</div>
       <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="display:block;text-align:center;padding:12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border-radius:8px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:14px">
-        ð³ Souscrire Ã  l'accÃ¨s illimitÃ© â
+        Ã°ÂÂÂ³ Souscrire ÃÂ  l'accÃÂ¨s illimitÃÂ© Ã¢ÂÂ
       </a>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
         <div style="flex:1;height:1px;background:#1f2537"></div>
-        <div style="font-size:11px;color:#6b7280">ou entrez votre code d'accÃ¨s</div>
+        <div style="font-size:11px;color:#6b7280">ou entrez votre code d'accÃÂ¨s</div>
         <div style="flex:1;height:1px;background:#1f2537"></div>
       </div>
       <div style="display:flex;gap:8px">
@@ -140,7 +140,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       </div>
       <div id="access-code-error" style="display:none;color:#ef4444;font-size:12px;margin-top:6px"></div>
       <div style="margin-top:12px;font-size:11px;color:#6b7280;text-align:center">
-        ð§ <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0c6f6362786d6f784c7b697f786a656960686d7a636f6d787f226f6361">[email&#160;protected]</a> Â· ð +212 6 34 39 44 90
+        Ã°ÂÂÂ§ <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0c6f6362786d6f784c7b697f786a656960686d7a636f6d787f226f6361">[email&#160;protected]</a> ÃÂ· Ã°ÂÂÂ +212 6 34 39 44 90
       </div>
     </div>
     <div id="form-error" style="display:none" class="error"></div>
@@ -150,40 +150,40 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
   <div id="step-loading" style="display:none" class="loading">
     <div class="spinner"></div>
     <div class="steps">
-      <div class="step" id="s0">â Lecture du documentâ¦</div>
-      <div class="step" id="s1">â Identification des partiesâ¦</div>
-      <div class="step" id="s2">â Analyse des risquesâ¦</div>
-      <div class="step" id="s3">â RÃ©daction des modificationsâ¦</div>
+      <div class="step" id="s0">Ã¢ÂÂ Lecture du documentÃ¢ÂÂ¦</div>
+      <div class="step" id="s1">Ã¢ÂÂ Identification des partiesÃ¢ÂÂ¦</div>
+      <div class="step" id="s2">Ã¢ÂÂ Analyse des risquesÃ¢ÂÂ¦</div>
+      <div class="step" id="s3">Ã¢ÂÂ RÃÂ©daction des modificationsÃ¢ÂÂ¦</div>
     </div>
   </div>
 
   <!-- STEP 4: Choose partie -->
   <div id="step-parties" style="display:none" class="fadein">
-    <h2 style="font-size:20px;font-weight:800;margin-bottom:8px">Quelle partie reprÃ©sentez-vous ?</h2>
-    <p style="color:#6b7280;font-size:14px;margin-bottom:24px">L'IA adaptera ses modifications pour protÃ©ger vos intÃ©rÃªts.</p>
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:8px">Quelle partie reprÃÂ©sentez-vous ?</h2>
+    <p style="color:#6b7280;font-size:14px;margin-bottom:24px">L'IA adaptera ses modifications pour protÃÂ©ger vos intÃÂ©rÃÂªts.</p>
     <div id="parties-list"></div>
-    <button id="btn-back" style="display:block;margin:16px auto 0;padding:9px 20px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:13px;cursor:pointer">â© Retour</button>
+    <button id="btn-back" style="display:block;margin:16px auto 0;padding:9px 20px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:13px;cursor:pointer">Ã¢ÂÂ© Retour</button>
   </div>
 
   <!-- STEP 5: Review modifications -->
   <div id="step-review" style="display:none" class="fadein">
     <div class="review-header">
-      <div style="font-size:20px;font-weight:800">RÃ©vision du contrat</div>
+      <div style="font-size:20px;font-weight:800">RÃÂ©vision du contrat</div>
       <div class="review-stats" id="review-stats"></div>
     </div>
     <div id="mods-list"></div>
     <div class="export-section">
-      <div style="font-size:16px;font-weight:700;margin-bottom:8px">GÃ©nÃ©rer le document final</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">GÃÂ©nÃÂ©rer le document final</div>
       <div id="export-desc" style="color:#6b7280;font-size:13px;margin-bottom:20px;line-height:1.6"></div>
-      <button class="btn-export" id="btn-export">â¬ TÃ©lÃ©charger avec Track Changes</button>
-      <button class="btn-new" id="btn-new">â© Analyser un autre contrat</button>
+      <button class="btn-export" id="btn-export">Ã¢Â¬Â TÃÂ©lÃÂ©charger avec Track Changes</button>
+      <button class="btn-new" id="btn-new">Ã¢ÂÂ© Analyser un autre contrat</button>
     </div>
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 var BACKEND = 'https://web-production-f96f7.up.railway.app';
-var apiKey = 'ok';  // ClÃ© gÃ©rÃ©e cÃ´tÃ© serveur Railway
+var apiKey = 'ok';  // ClÃÂ© gÃÂ©rÃÂ©e cÃÂ´tÃÂ© serveur Railway
 var curFile = null;
 var curMode = 'upload';
 var modifications = [];
@@ -193,7 +193,7 @@ var savedLang = "fr";
 var savedType = "generic";
 var savedText = "";
 
-// ââ Init ââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ Init Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 document.addEventListener('DOMContentLoaded', function() {
   // Show usage counter
   var usage = parseInt(localStorage.getItem('cs_usage') || '0');
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (remaining > 0) {
       counter.textContent = remaining + ' analyse' + (remaining > 1 ? 's' : '') + ' gratuite' + (remaining > 1 ? 's' : '') + ' restante' + (remaining > 1 ? 's' : '');
     } else {
-      counter.innerHTML = 'â  Limite atteinte â <a href="mailto:contact&#64;westfieldavocats.com" style="color:#ef4444">contact&#64;westfieldavocats.com</a> Â· +212 6 34 39 44 90';
+      counter.innerHTML = 'Ã¢ÂÂ  Limite atteinte Ã¢ÂÂ <a href="mailto:contact&#64;westfieldavocats.com" style="color:#ef4444">contact&#64;westfieldavocats.com</a> ÃÂ· +212 6 34 39 44 90';
       counter.style.color = '#ef4444';
     }
   }
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('file-input').addEventListener('change', function() {
     var f = this.files[0];
     if (f && f.name.toLowerCase().endsWith('.doc') && !f.name.toLowerCase().endsWith('.docx')) {
-      showErr("form-error", "â ï¸ Format .doc detecte. Convertissez en .docx pour les Track Changes complets. L'analyse reste possible mais l'export sera limite.");
+      showErr("form-error", "Ã¢ÂÂ Ã¯Â¸Â Format .doc detecte. Convertissez en .docx pour les Track Changes complets. L'analyse reste possible mais l'export sera limite.");
     } else {
       hideErr('form-error');
     }
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('btn-new').addEventListener('click', reset);
 });
 
-// ââ Helpers âââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ Helpers Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function show(id) { document.getElementById(id).style.display = 'block'; }
 function hide(id) { document.getElementById(id).style.display = 'none'; }
 function showFlex(id) { document.getElementById(id).style.display = 'flex'; }
@@ -284,7 +284,7 @@ function setFile(f) {
 function saveKey() {
   var k = document.getElementById('api-key').value.trim();
   if (!k || k.indexOf('sk-') !== 0) {
-    showErr('key-error', 'â  ClÃ© invalide â doit commencer par sk-');
+    showErr('key-error', 'Ã¢ÂÂ  ClÃÂ© invalide Ã¢ÂÂ doit commencer par sk-');
     return;
   }
   localStorage.setItem('cs_key', k);
@@ -295,20 +295,20 @@ function saveKey() {
 
 function stepDone(i) {
   var el = document.getElementById('s' + i);
-  var labels = ['Lecture du documentâ¦','Identification des partiesâ¦','Analyse des risquesâ¦','RÃ©daction des modificationsâ¦'];
-  if (el) { el.classList.add('done'); el.textContent = 'â ' + labels[i]; }
+  var labels = ['Lecture du documentÃ¢ÂÂ¦','Identification des partiesÃ¢ÂÂ¦','Analyse des risquesÃ¢ÂÂ¦','RÃÂ©daction des modificationsÃ¢ÂÂ¦'];
+  if (el) { el.classList.add('done'); el.textContent = 'Ã¢ÂÂ ' + labels[i]; }
 }
 
 function stepReset() {
-  var labels = ['Lecture du documentâ¦','Identification des partiesâ¦','Analyse des risquesâ¦','RÃ©daction des modificationsâ¦'];
+  var labels = ['Lecture du documentÃ¢ÂÂ¦','Identification des partiesÃ¢ÂÂ¦','Analyse des risquesÃ¢ÂÂ¦','RÃÂ©daction des modificationsÃ¢ÂÂ¦'];
   for (var i = 0; i < 4; i++) {
     var el = document.getElementById('s' + i);
-    if (el) { el.classList.remove('done'); el.textContent = 'â ' + labels[i]; }
+    if (el) { el.classList.remove('done'); el.textContent = 'Ã¢ÂÂ ' + labels[i]; }
   }
 }
 
 function rc(r) { return r === 'high' ? '#ef4444' : r === 'medium' ? '#f59e0b' : '#10b981'; }
-function rl(r) { return r === 'high' ? 'Risque Ã©levÃ©' : r === 'medium' ? 'Risque modÃ©rÃ©' : 'Faible risque'; }
+function rl(r) { return r === 'high' ? 'Risque ÃÂ©levÃÂ©' : r === 'medium' ? 'Risque modÃÂ©rÃÂ©' : 'Faible risque'; }
 
 function buildFormData() {
   var fd = new FormData();
@@ -323,26 +323,26 @@ function buildFormData() {
   return fd;
 }
 
-// ââ Step 1: Analyze â identify parties âââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ Step 1: Analyze Ã¢ÂÂ identify parties Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 async function analyze() {
   hideErr('form-error');
 
-  // Check free usage limit â skip if valid access code
+  // Check free usage limit Ã¢ÂÂ skip if valid access code
   var hasAccess = localStorage.getItem('cs_access');
   var usage = parseInt(localStorage.getItem('cs_usage') || '0');
   if (usage >= 3 && !hasAccess) {
     document.getElementById('access-code-section').style.display = 'block';
-  showErr('form-error', 'â  Vous avez utilisÃ© vos 3 analyses gratuites. Pour un accÃ¨s illimitÃ©, contactez Westfield :<br><br>' +
-      'ð§ <a href="mailto:contact&#64;westfieldavocats.com" style="color:#5b7cfa">contact&#64;westfieldavocats.com</a><br>' +
-      'ð <a href="https://westfieldmorocco.com" target="_blank" style="color:#5b7cfa">westfieldmorocco.com</a><br>' +
-      'ð <a href="tel:+212634394490" style="color:#5b7cfa">+212 6 34 39 44 90</a><br><br>' +
-      'ð³ <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="color:#10b981;font-weight:600">â Souscrire en ligne</a>');
+  showErr('form-error', 'Ã¢ÂÂ  Vous avez utilisÃÂ© vos 3 analyses gratuites. Pour un accÃÂ¨s illimitÃÂ©, contactez Westfield :<br><br>' +
+      'Ã°ÂÂÂ§ <a href="mailto:contact&#64;westfieldavocats.com" style="color:#5b7cfa">contact&#64;westfieldavocats.com</a><br>' +
+      'Ã°ÂÂÂ <a href="https://westfieldmorocco.com" target="_blank" style="color:#5b7cfa">westfieldmorocco.com</a><br>' +
+      'Ã°ÂÂÂ <a href="tel:+212634394490" style="color:#5b7cfa">+212 6 34 39 44 90</a><br><br>' +
+      'Ã°ÂÂÂ³ <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="color:#10b981;font-weight:600">Ã¢ÂÂ Souscrire en ligne</a>');
     return;
   }
 
   var txt = document.getElementById('contract-text').value;
-  if (curMode === 'upload' && !curFile) { showErr('form-error', 'â  Uploade un fichier.'); return; }
-  if (curMode === 'text' && txt.trim().length < 50) { showErr('form-error', 'â  Colle au moins 50 caractÃ¨res.'); return; }
+  if (curMode === 'upload' && !curFile) { showErr('form-error', 'Ã¢ÂÂ  Uploade un fichier.'); return; }
+  if (curMode === 'text' && txt.trim().length < 50) { showErr('form-error', 'Ã¢ÂÂ  Colle au moins 50 caractÃÂ¨res.'); return; }
 
   hide('step-form');
   showFlex('step-loading');
@@ -366,11 +366,11 @@ async function analyze() {
   } catch(e) {
     hide('step-loading');
     show('step-form');
-    showErr('form-error', 'â  ' + (e.message || 'Erreur inattendue.'));
+    showErr('form-error', 'Ã¢ÂÂ  ' + (e.message || 'Erreur inattendue.'));
   }
 }
 
-// ââ Step 2: Show parties ââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ Step 2: Show parties Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function renderParties(parties) {
   var list = document.getElementById('parties-list');
   list.innerHTML = '';
@@ -390,7 +390,7 @@ function renderParties(parties) {
   show('step-parties');
 }
 
-// ââ Step 3: Analyze with selected partie âââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ Step 3: Analyze with selected partie Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 async function analyzeWithPartie(partieName) {
   selectedPartie = partieName;
   hide('step-parties');
@@ -415,11 +415,11 @@ async function analyzeWithPartie(partieName) {
   } catch(e) {
     hide('step-loading');
     show('step-form');
-    showErr('form-error', 'â  ' + (e.message || 'Erreur inattendue.'));
+    showErr('form-error', 'Ã¢ÂÂ  ' + (e.message || 'Erreur inattendue.'));
   }
 }
 
-// ââ Step 4: Review ââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ Step 4: Review Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function applyAccessCode() {
   var code = document.getElementById('access-code-input').value.trim().toUpperCase();
   // Valid codes stored in localStorage by admin
@@ -430,13 +430,13 @@ function applyAccessCode() {
     localStorage.setItem('cs_access', code);
     localStorage.setItem('cs_usage', '0'); // Reset counter
     document.getElementById('access-code-section').style.display = 'none';
-    document.getElementById('usage-counter').textContent = 'â AccÃ¨s illimitÃ© activÃ©';
+    document.getElementById('usage-counter').textContent = 'Ã¢ÂÂ AccÃÂ¨s illimitÃÂ© activÃÂ©';
     document.getElementById('usage-counter').style.color = '#10b981';
     hideErr('form-error');
-    alert('â Code valide ! AccÃ¨s illimitÃ© activÃ©.');
+    alert('Ã¢ÂÂ Code valide ! AccÃÂ¨s illimitÃÂ© activÃÂ©.');
   } else {
     document.getElementById('access-code-error').style.display = 'block';
-    document.getElementById('access-code-error').textContent = 'â  Code invalide. Contactez contact&#64;westfieldavocats.com';
+    document.getElementById('access-code-error').textContent = 'Ã¢ÂÂ  Code invalide. Contactez contact&#64;westfieldavocats.com';
   }
 }
 
@@ -475,12 +475,12 @@ function decide(id, decision) {
   if (decision === 'accepted') {
     card.classList.add('accepted');
     btnA.classList.add('active');
-    status.textContent = 'â Modification acceptÃ©e';
+    status.textContent = 'Ã¢ÂÂ Modification acceptÃÂ©e';
     status.style.color = '#10b981';
   } else {
     card.classList.add('rejected');
     btnR.classList.add('active');
-    status.textContent = 'â Texte original conservÃ©';
+    status.textContent = 'Ã¢ÂÂ Texte original conservÃÂ©';
     status.style.color = '#ef4444';
   }
   updateStats();
@@ -492,8 +492,8 @@ function updateStats() {
   var p = Object.values(decisions).filter(function(d){return d==='pending';}).length;
   document.getElementById('review-stats').innerHTML =
     '<span class="stat stat-pending">' + p + ' en attente</span>' +
-    '<span class="stat stat-accepted">' + a + ' acceptÃ©es</span>' +
-    '<span class="stat stat-rejected">' + r + ' refusÃ©es</span>';
+    '<span class="stat stat-accepted">' + a + ' acceptÃÂ©es</span>' +
+    '<span class="stat stat-rejected">' + r + ' refusÃÂ©es</span>';
 }
 
 function renderReview() {
@@ -510,15 +510,15 @@ function renderReview() {
         '<span class="risk-pill" style="background:' + color + '20;color:' + color + '">' + rl(m.risk) + '</span>' +
       '</div>' +
       '<div class="mod-body">' +
-        (m.rag_source ? '<div style="background:rgba(91,124,250,0.08);border:1px solid rgba(91,124,250,0.2);border-radius:7px;padding:5px 10px;font-size:11px;color:#5b7cfa;margin-bottom:10px;">ð§  BasÃ© sur: ' + m.rag_source + '</div>' : '') +
-        '<div class="mod-reason">ð¡ ' + m.reason + '</div>' +
-        '<div class="mod-label" style="color:#ef4444">ð Texte original</div>' +
+        (m.rag_source ? '<div style="background:rgba(91,124,250,0.08);border:1px solid rgba(91,124,250,0.2);border-radius:7px;padding:5px 10px;font-size:11px;color:#5b7cfa;margin-bottom:10px;">Ã°ÂÂ§Â  BasÃÂ© sur: ' + m.rag_source + '</div>' : '') +
+        '<div class="mod-reason">Ã°ÂÂÂ¡ ' + m.reason + '</div>' +
+        '<div class="mod-label" style="color:#ef4444">Ã°ÂÂÂ Texte original</div>' +
         '<div class="mod-original">' + m.original + '</div>' +
-        '<div class="mod-label" style="color:#10b981">â Modification proposÃ©e <span style="color:#6b7280;font-size:10px;font-weight:400">(Ã©ditable)</span></div>' +
+        '<div class="mod-label" style="color:#10b981">Ã¢ÂÂ Modification proposÃÂ©e <span style="color:#6b7280;font-size:10px;font-weight:400">(ÃÂ©ditable)</span></div>' +
         '<div class="mod-proposed" id="proposed-' + m.id + '" contenteditable="true" spellcheck="true" style="cursor:text;outline:none;" oninput="onProposedEdit(' + m.id + ', this)">' + m.proposed + '</div>' +
         '<div class="mod-actions">' +
-          '<button class="btn-accept" id="ba-' + m.id + '" onclick="decide(' + m.id + ',\'accepted\')">â Accepter</button>' +
-          '<button class="btn-reject" id="br-' + m.id + '" onclick="decide(' + m.id + ',\'rejected\')">â Refuser</button>' +
+          '<button class="btn-accept" id="ba-' + m.id + '" onclick="decide(' + m.id + ',\'accepted\')">Ã¢ÂÂ Accepter</button>' +
+          '<button class="btn-reject" id="br-' + m.id + '" onclick="decide(' + m.id + ',\'rejected\')">Ã¢ÂÂ Refuser</button>' +
         '</div>' +
         '<div class="mod-status" id="st-' + m.id + '"></div>' +
       '</div>';
@@ -527,17 +527,17 @@ function renderReview() {
 
   var isDocx = curFile && (curFile.name.endsWith('.docx') || curFile.name.endsWith('.doc'));
   document.getElementById('export-desc').innerHTML = isDocx
-    ? 'Le fichier DOCX original sera tÃ©lÃ©chargÃ© avec les <strong>vraies Track Changes Word</strong> â mise en forme prÃ©servÃ©e.'
-    : 'Un document Word sera gÃ©nÃ©rÃ© avec les modifications acceptÃ©es en Track Changes.';
+    ? 'Le fichier DOCX original sera tÃÂ©lÃÂ©chargÃÂ© avec les <strong>vraies Track Changes Word</strong> Ã¢ÂÂ mise en forme prÃÂ©servÃÂ©e.'
+    : 'Un document Word sera gÃÂ©nÃÂ©rÃÂ© avec les modifications acceptÃÂ©es en Track Changes.';
 
   updateStats();
   show('step-review');
 }
 
-// ââ Export ââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ Export Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 async function exportDoc() {
   var btn = document.getElementById('btn-export');
-  btn.textContent = 'â³ GÃ©nÃ©ration en coursâ¦';
+  btn.textContent = 'Ã¢ÂÂ³ GÃÂ©nÃÂ©ration en coursÃ¢ÂÂ¦';
   btn.disabled = true;
   try {
     var fd = buildFormData();
@@ -550,10 +550,10 @@ async function exportDoc() {
     a.href = URL.createObjectURL(blob);
     a.download = 'contrat-track-changes.docx';
     a.click();
-    btn.textContent = 'â TÃ©lÃ©chargÃ© !';
+    btn.textContent = 'Ã¢ÂÂ TÃÂ©lÃÂ©chargÃÂ© !';
     btn.style.background = '#10b981';
     setTimeout(function() {
-      btn.textContent = 'â¬ TÃ©lÃ©charger avec Track Changes';
+      btn.textContent = 'Ã¢Â¬Â TÃÂ©lÃÂ©charger avec Track Changes';
       btn.style.background = '';
       btn.disabled = false;
     }, 3000);
@@ -561,13 +561,13 @@ async function exportDoc() {
     // Silent auto-contribute full contract to queue
     contributeToQueue();
   } catch(e) {
-    alert('â  ' + e.message);
+    alert('Ã¢ÂÂ  ' + e.message);
     btn.disabled = false;
-    btn.textContent = 'â¬ TÃ©lÃ©charger avec Track Changes';
+    btn.textContent = 'Ã¢Â¬Â TÃÂ©lÃÂ©charger avec Track Changes';
   }
 }
 
-// ââ Reset âââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ Reset Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 async function contributeToQueue() {
   try {
     console.log('contributeToQueue: start', {
