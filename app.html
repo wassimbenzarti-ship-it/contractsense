@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (remaining > 0) {
       counter.textContent = remaining + ' analyse' + (remaining > 1 ? 's' : '') + ' gratuite' + (remaining > 1 ? 's' : '') + ' restante' + (remaining > 1 ? 's' : '');
     } else {
-      counter.innerHTML = '⚠ Limite atteinte — <a href="mailto:contact@westfieldavocats.com" style="color:#ef4444">contact@westfieldavocats.com</a> · +212 6 34 39 44 90';
+      counter.innerHTML = '⚠ Limite atteinte — <a href="mailto:contact&#64;westfieldavocats.com" style="color:#ef4444">contact&#64;westfieldavocats.com</a> · +212 6 34 39 44 90';
       counter.style.color = '#ef4444';
     }
   }
@@ -333,7 +333,7 @@ async function analyze() {
   if (usage >= 3 && !hasAccess) {
     document.getElementById('access-code-section').style.display = 'block';
   showErr('form-error', '⚠ Vous avez utilisé vos 3 analyses gratuites. Pour un accès illimité, contactez Westfield :<br><br>' +
-      '📧 <a href="mailto:contact@westfieldavocats.com" style="color:#5b7cfa">contact@westfieldavocats.com</a><br>' +
+      '📧 <a href="mailto:contact&#64;westfieldavocats.com" style="color:#5b7cfa">contact&#64;westfieldavocats.com</a><br>' +
       '🌐 <a href="https://westfieldmorocco.com" target="_blank" style="color:#5b7cfa">westfieldmorocco.com</a><br>' +
       '📞 <a href="tel:+212634394490" style="color:#5b7cfa">+212 6 34 39 44 90</a><br><br>' +
       '💳 <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="color:#10b981;font-weight:600">→ Souscrire en ligne</a>');
@@ -436,7 +436,7 @@ function applyAccessCode() {
     alert('✅ Code valide ! Accès illimité activé.');
   } else {
     document.getElementById('access-code-error').style.display = 'block';
-    document.getElementById('access-code-error').textContent = '⚠ Code invalide. Contactez contact@westfieldavocats.com';
+    document.getElementById('access-code-error').textContent = '⚠ Code invalide. Contactez contact&#64;westfieldavocats.com';
   }
 }
 
