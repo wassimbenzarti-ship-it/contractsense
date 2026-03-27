@@ -81,38 +81,38 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 
   <!-- STEP 2: Upload form -->
   <div id="step-form">
-    <h1 class="fadein">RÃÂÃÂ©visez vos contrats<br/><span class="accent">avec l'IA.</span></h1>
-    <p class="desc">Uploadez votre contrat. L'IA identifie les parties, vous choisissez laquelle protÃÂÃÂ©ger, puis propose des modifications avec Track Changes.</p>
+    <h1 class="fadein">Révisez vos contrats<br/><span class="accent">avec l'IA.</span></h1>
+    <p class="desc">Uploadez votre contrat. L'IA identifie les parties, vous choisissez laquelle protéger, puis propose des modifications avec Track Changes.</p>
 
     <div class="tabs">
-      <button class="tab active" id="tab-upload">ÃÂ°ÃÂÃÂÃÂ Uploader</button>
-      <button class="tab" id="tab-text">ÃÂ¢ÃÂÃÂÃÂ¯ÃÂ¸ÃÂ Coller du texte</button>
+      <button class="tab active" id="tab-upload">📄 Uploader</button>
+      <button class="tab" id="tab-text">✏️ Coller du texte</button>
     </div>
 
     <div id="upload-zone">
-      <label class="drop" id="drop-area" for="file-input" style="cursor:pointer;display:block">
-        <div style="font-size:30px;margin-bottom:10px">ÃÂ°ÃÂÃÂÃÂ</div>
-        <div style="font-weight:700;font-size:15px;margin-bottom:5px">DÃÂÃÂ©posez votre contrat ici</div>
-        <div style="color:#6b7280;font-size:13px">ou cliquez pour sÃÂÃÂ©lectionner</div>
+      <div class="drop" id="drop-area" style="position:relative">
+        <div style="font-size:30px;margin-bottom:10px">📄</div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:5px">Déposez votre contrat ici</div>
+        <div style="color:#6b7280;font-size:13px">ou cliquez pour sélectionner</div>
         <div class="tags"><span class="tag">PDF</span><span class="tag">DOCX</span><span class="tag">TXT</span></div>
-      </label>
-      <input type="file" id="file-input" accept=".pdf,.docx,.txt,.doc" style="display:none"/>
+      </div>
+      <input type="file" id="file-input" accept=".pdf,.docx,.txt,.doc" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2"/>
       <div id="file-ok" style="display:none" class="file-ok">
-        <span>ÃÂ¢ÃÂÃÂ</span>
+        <span>✅</span>
         <span id="file-name" style="color:#10b981;font-size:13px"></span>
         <span id="file-size" style="color:#6b7280;font-size:11px;margin-left:auto"></span>
       </div>
     </div>
 
     <div id="text-zone" style="display:none">
-      <textarea id="contract-text" placeholder="Collez le texte de votre contrat iciÃÂ¢ÃÂÃÂ¦" style="margin-bottom:14px"></textarea>
+      <textarea id="contract-text" placeholder="Collez le texte de votre contrat ici…" style="margin-bottom:14px"></textarea>
     </div>
 
     <div class="opts">
       <div>
         <label>Type</label>
         <select id="type">
-          <option value="generic">GÃÂÃÂ©nÃÂÃÂ©rique</option>
+          <option value="generic">Générique</option>
           <option value="nda">NDA</option>
           <option value="saas">SaaS</option>
           <option value="purchase">Achat/Vente</option>
@@ -122,16 +122,16 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       </div>
     </div>
 
-    <button class="btn-main" id="btn-analyze">ÃÂ¢ÃÂÃÂ¡ Analyser le contrat</button>
+    <button class="btn-main" id="btn-analyze">⚡ Analyser le contrat</button>
     <div id="usage-counter" style="text-align:center;font-size:12px;color:#6b7280;margin-top:10px"></div>
     <div id="access-code-section" style="display:none;margin-top:16px;background:rgba(91,124,250,0.06);border:1px solid rgba(91,124,250,0.2);border-radius:10px;padding:16px">
-      <div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:12px">ÃÂ°ÃÂÃÂÃÂ Limite de 3 analyses atteinte</div>
+      <div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:12px">🔒 Limite de 3 analyses atteinte</div>
       <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="display:block;text-align:center;padding:12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border-radius:8px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:14px">
-        ÃÂ°ÃÂÃÂÃÂ³ Souscrire ÃÂÃÂ  l'accÃÂÃÂ¨s illimitÃÂÃÂ© ÃÂ¢ÃÂÃÂ
+        💳 Souscrire à l'accès illimité →
       </a>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
         <div style="flex:1;height:1px;background:#1f2537"></div>
-        <div style="font-size:11px;color:#6b7280">ou entrez votre code d'accÃÂÃÂ¨s</div>
+        <div style="font-size:11px;color:#6b7280">ou entrez votre code d'accès</div>
         <div style="flex:1;height:1px;background:#1f2537"></div>
       </div>
       <div style="display:flex;gap:8px">
@@ -140,7 +140,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       </div>
       <div id="access-code-error" style="display:none;color:#ef4444;font-size:12px;margin-top:6px"></div>
       <div style="margin-top:12px;font-size:11px;color:#6b7280;text-align:center">
-        ÃÂ°ÃÂÃÂÃÂ§ <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0c6f6362786d6f784c7b697f786a656960686d7a636f6d787f226f6361">[email&#160;protected]</a> ÃÂÃÂ· ÃÂ°ÃÂÃÂÃÂ +212 6 34 39 44 90
+        📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0c6f6362786d6f784c7b697f786a656960686d7a636f6d787f226f6361">[email&#160;protected]</a> · 📞 +212 6 34 39 44 90
       </div>
     </div>
     <div id="form-error" style="display:none" class="error"></div>
@@ -150,35 +150,35 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
   <div id="step-loading" style="display:none" class="loading">
     <div class="spinner"></div>
     <div class="steps">
-      <div class="step" id="s0">ÃÂ¢ÃÂÃÂ Lecture du documentÃÂ¢ÃÂÃÂ¦</div>
-      <div class="step" id="s1">ÃÂ¢ÃÂÃÂ Identification des partiesÃÂ¢ÃÂÃÂ¦</div>
-      <div class="step" id="s2">ÃÂ¢ÃÂÃÂ Analyse des risquesÃÂ¢ÃÂÃÂ¦</div>
-      <div class="step" id="s3">ÃÂ¢ÃÂÃÂ RÃÂÃÂ©daction des modificationsÃÂ¢ÃÂÃÂ¦</div>
+      <div class="step" id="s0">→ Lecture du document…</div>
+      <div class="step" id="s1">→ Identification des parties…</div>
+      <div class="step" id="s2">→ Analyse des risques…</div>
+      <div class="step" id="s3">→ Rédaction des modifications…</div>
     </div>
   </div>
 
   <!-- STEP 4: Choose partie -->
   <div id="step-parties" style="display:none" class="fadein">
-    <h2 style="font-size:20px;font-weight:800;margin-bottom:8px">Quelle partie reprÃÂÃÂ©sentez-vous ?</h2>
-    <p style="color:#6b7280;font-size:14px;margin-bottom:24px">L'IA adaptera ses modifications pour protÃÂÃÂ©ger vos intÃÂÃÂ©rÃÂÃÂªts.</p>
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:8px">Quelle partie représentez-vous ?</h2>
+    <p style="color:#6b7280;font-size:14px;margin-bottom:24px">L'IA adaptera ses modifications pour protéger vos intérêts.</p>
     <div id="parties-list"></div>
-    <button id="btn-back" style="display:block;margin:16px auto 0;padding:9px 20px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:13px;cursor:pointer">ÃÂ¢ÃÂÃÂ© Retour</button>
+    <button id="btn-back" style="display:block;margin:16px auto 0;padding:9px 20px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:13px;cursor:pointer">↩ Retour</button>
   </div>
 
   <!-- STEP 5: Review modifications -->
   <div id="step-review" style="display:none" class="fadein">
     <div class="review-header">
-      <div style="font-size:20px;font-weight:800">RÃÂÃÂ©vision du contrat</div>
+      <div style="font-size:20px;font-weight:800">Révision du contrat</div>
       <div class="review-stats" id="review-stats"></div>
     </div>
     <div id="mods-list"></div>
     <div class="export-section">
-      <div style="font-size:16px;font-weight:700;margin-bottom:8px">GÃÂÃÂ©nÃÂÃÂ©rer le document final</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">Générer le document final</div>
       <div id="export-desc" style="color:#6b7280;font-size:13px;margin-bottom:20px;line-height:1.6"></div>
-      <button class="btn-export" id="btn-export">ÃÂ¢ÃÂ¬ÃÂ TÃÂÃÂ©lÃÂÃÂ©charger avec Track Changes</button>
-      <button class="btn-new" id="btn-new">ÃÂ¢ÃÂÃÂ© Analyser un autre contrat</button>
+      <button class="btn-export" id="btn-export">⬇ Télécharger avec Track Changes</button>
+      <button class="btn-new" id="btn-new">↩ Analyser un autre contrat</button>
     </div>
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
