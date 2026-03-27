@@ -90,13 +90,13 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
     </div>
 
     <div id="upload-zone">
-      <div class="drop" id="drop-area" style="position:relative">
+      <label class="drop" id="drop-area" for="file-input" style="cursor:pointer;display:block">
         <div style="font-size:30px;margin-bottom:10px">📄</div>
         <div style="font-weight:700;font-size:15px;margin-bottom:5px">Déposez votre contrat ici</div>
         <div style="color:#6b7280;font-size:13px">ou cliquez pour sélectionner</div>
         <div class="tags"><span class="tag">PDF</span><span class="tag">DOCX</span><span class="tag">TXT</span></div>
-      </div>
-      <input type="file" id="file-input" accept=".pdf,.docx,.txt,.doc" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2"/>
+      </label>
+      <input type="file" id="file-input" accept=".pdf,.docx,.txt,.doc" style="display:none"/>
       <div id="file-ok" style="display:none" class="file-ok">
         <span>✅</span>
         <span id="file-name" style="color:#10b981;font-size:13px"></span>
@@ -140,9 +140,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       </div>
       <div id="access-code-error" style="display:none;color:#ef4444;font-size:12px;margin-top:6px"></div>
       <div style="margin-top:12px;font-size:11px;color:#6b7280;text-align:center">
-        📧 <a href="mailto:contact@westfieldavocats.com" style="color:#5b7cfa;text-decoration:none">
-  contact@westfieldavocats.com
-</a> · 📞 +212 6 34 39 44 90
+        📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0c6f6362786d6f784c7b697f786a656960686d7a636f6d787f226f6361">[email&#160;protected]</a> · 📞 +212 6 34 39 44 90
       </div>
     </div>
     <div id="form-error" style="display:none" class="error"></div>
@@ -183,7 +181,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
   </div>
 </div>
 
-
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 var BACKEND = 'https://web-production-f96f7.up.railway.app';
 var apiKey = 'ok';  // Clé gérée côté serveur Railway
 var curFile = null;
@@ -229,14 +227,9 @@ document.addEventListener('DOMContentLoaded', function() {
     show('text-zone');
   });
 
-  // Drop zone — Chrome/Edge require direct user interaction on file input
+  // Drop zone - label handles click natively
   var drop = document.getElementById('drop-area');
-  drop.addEventListener('click', function(e) {
-    // Only trigger if click is directly on drop area, not on file input
-    if (e.target !== document.getElementById('file-input')) {
-      document.getElementById('file-input').click();
-    }
-  });
+  var fileInput = document.getElementById('file-input');
   drop.addEventListener('dragover', function(e) { e.preventDefault(); drop.style.borderColor = '#5b7cfa'; });
   drop.addEventListener('dragleave', function() { drop.style.borderColor = '#1f2537'; });
   drop.addEventListener('drop', function(e) {
