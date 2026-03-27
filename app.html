@@ -140,7 +140,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       </div>
       <div id="access-code-error" style="display:none;color:#ef4444;font-size:12px;margin-top:6px"></div>
       <div style="margin-top:12px;font-size:11px;color:#6b7280;text-align:center">
-        📧 contact@westfieldavocats.com · 📞 +212 6 34 39 44 90
+        📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0c6f6362786d6f784c7b697f786a656960686d7a636f6d787f226f6361">[email&#160;protected]</a> · 📞 +212 6 34 39 44 90
       </div>
     </div>
     <div id="form-error" style="display:none" class="error"></div>
@@ -181,7 +181,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 var BACKEND = 'https://web-production-f96f7.up.railway.app';
 var apiKey = 'ok';  // Clé gérée côté serveur Railway
 var curFile = null;
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function show(id) { document.getElementById(id).style.display = 'block'; }
 function hide(id) { document.getElementById(id).style.display = 'none'; }
 function showFlex(id) { document.getElementById(id).style.display = 'flex'; }
-function showErr(id, msg) { var el = document.getElementById(id); el.textContent = msg; el.style.display = 'block'; }
+function showErr(id, msg) { var el = document.getElementById(id); el.innerHTML = msg; el.style.display = 'block'; }
 function hideErr(id) { document.getElementById(id).style.display = 'none'; }
 
 function showKeyBar() {
@@ -613,14 +613,3 @@ function reset() {
   hide('step-review');
   hide('step-parties');
   hide('step-loading');
-  hide('file-ok');
-  document.getElementById('contract-text').value = '';
-  document.getElementById('file-input').value = '';
-  hideErr('form-error');
-  stepReset();
-  show('step-form');
-  window.scrollTo(0, 0);
-}
-</script>
-</body>
-</html>
