@@ -653,6 +653,13 @@ async function exportDoc() {
 
 // ââ Reset âââââââââââââââââââââââââââââââââââââââââââââââââ
 async function contributeToQueue() {
+  // Save to user account when downloading
+  try {
+    var _fn = curFile ? curFile.name : 'Contrat';
+    var _ct = document.getElementById('contract-type') ? document.getElementById('contract-type').value : '';
+    var _pa = document.getElementById('partie-select') ? document.getElementById('partie-select').value : '';
+    await saveAna(_fn, _ct, _pa, modifications);
+  } catch(e) { console.log('saveAna:', e); }
   try {
     console.log('contributeToQueue: start', {
       curFile: curFile ? curFile.name : null,
