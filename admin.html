@@ -95,6 +95,7 @@ select { appearance: none; }
       <button class="tab-main active" onclick="showTab('queue', this)">📥 File de validation <span id="queue-badge"></span></button>
       <button class="tab-main" onclick="showTab('rag', this)">📚 Base RAG</button>
       <button class="tab-main" onclick="showTab('upload', this)">➕ Ajouter document</button>
+      <button class="tab-main" onclick="showTab('suggestions', this)">💡 Suggestions</button>
     </div>
 
     <!-- Queue tab -->
@@ -140,7 +141,14 @@ select { appearance: none; }
 
   <div style="text-align:center;margin-top:24px">
     <a href="app.html" style="color:#6b7280;font-size:13px;text-decoration:none">← Retour à Omniscient</a>
-  </div>
+  
+    <!-- Suggestions -->
+    <div id="tab-suggestions" class="tab-content" style="display:none">
+      <h3 style="color:#e2e5f0;margin-bottom:8px">Modeles suggeres par les utilisateurs</h3>
+      <p style="color:#6b7280;font-size:13px;margin-bottom:16px">Validez pour integrer dans le RAG ou rejetez.</p>
+      <div id="suggestions-list" style="color:#6b7280;font-size:13px">Chargement...</div>
+    </div>
+</div>
 </div>
 
 <script>
@@ -489,6 +497,51 @@ async function deleteDoc(source, btn) {
     alert('Erreur: ' + e.message);
     btn.disabled = false;
   }
+}
+
+async function loadSuggestions() {
+  document.getElementById('suggestions-list').textContent = 'Chargement...';
+  try {
+    var r = await fetch(BACKEND + '/suggestions/list');
+    var data = await r.json();
+    var list = data.suggestions || [];
+    if(!list.length) {
+      document.getElementById('suggestions-list').innerHTML = '<p style="color:#6b7280">Aucune suggestion en attente.</p>';
+      return;
+    }
+    document.getElementById('suggestions-list').innerHTML = list.map(function(s) {
+      var date = new Date(s.submitted_at).toLocaleDateString('fr-FR');
+      var statusColor = s.status === 'approved' ? '#10b981' : s.status === 'rejected' ? '#ef4444' : '#f59e0b';
+      return '<div style="background:#111420;border:1px solid #1f2537;border-radius:10px;padding:16px;margin-bottom:10px">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">'
+        + '<div>'
+        + '<strong style="color:#e2e5f0;font-size:14px">' + s.filename + '</strong>'
+        + '<span style="font-size:11px;color:#6b7280;margin-left:8px">' + (s.category||'') + '</span>'
+        + '</div>'
+        + '<span style="font-size:11px;color:' + statusColor + ';font-weight:600;text-transform:uppercase">' + (s.status||'pending') + '</span>'
+        + '</div>'
+        + '<div style="font-size:12px;color:#6b7280;margin-bottom:12px">Par : ' + (s.suggested_by||'anonyme') + ' &mdash; ' + date + '</div>'
+        + (s.status === 'pending' ? '<div style="display:flex;gap:8px">'
+        + '<button onclick="approveSugg('' + s.id + '')" style="padding:8px 16px;background:#10b981;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">Valider RAG</button>'
+        + '<button onclick="rejectSugg('' + s.id + '')" style="padding:8px 16px;background:#ef4444;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">Rejeter</button>'
+        + '</div>' : '')
+        + '</div>';
+    }).join('');
+  } catch(e) {
+    document.getElementById('suggestions-list').innerHTML = '<p style="color:#ef4444">Erreur: ' + e.message + '</p>';
+  }
+}
+
+async function approveSugg(id) {
+  var r = await fetch(BACKEND + '/suggestions/approve/' + id, {method:'POST'});
+  if(r.ok) { alert('Approuve et ajoute au RAG !'); loadSuggestions(); }
+  else { var d = await r.json(); alert('Erreur: ' + (d.error||r.status)); }
+}
+
+function rejectSugg(id) {
+  if(!confirm('Rejeter cette suggestion ?')) return;
+  alert('Rejete.');
+  loadSuggestions();
 }
 </script>
 </body>
