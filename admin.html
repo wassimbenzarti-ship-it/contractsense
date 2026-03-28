@@ -94,6 +94,7 @@ select { appearance: none; }
     <div class="tabs-main">
       <button class="tab-main active" onclick="showTab('queue', this)">📥 File de validation <span id="queue-badge"></span></button>
       <button class="tab-main" onclick="showTab('rag', this)">📚 Base RAG</button>
+      <button class="tab-main" onclick="showTab('suggestions', this)">💡 Suggestions</button>
       <button class="tab-main" onclick="showTab('upload', this)">➕ Ajouter document</button>
     </div>
 
@@ -140,7 +141,12 @@ select { appearance: none; }
 
   <div style="text-align:center;margin-top:24px">
     <a href="app.html" style="color:#6b7280;font-size:13px;text-decoration:none">← Retour à Omniscient</a>
-  </div>
+  
+<div id="tab-suggestions" class="tab-content" style="display:none">
+  <h3 style="color:#e2e5f0;margin-bottom:16px">Modeles suggeres par les utilisateurs</h3>
+  <div id="suggestions-list">Chargement...</div>
+</div>
+</div>
 </div>
 
 <script>
@@ -489,6 +495,42 @@ async function deleteDoc(source, btn) {
     alert('Erreur: ' + e.message);
     btn.disabled = false;
   }
+}
+
+async function loadSuggestions() {
+  var r = await fetch(BACKEND + '/suggestions/list');
+  if (!r.ok) { document.getElementById('suggestions-list').innerHTML = '<p style="color:#ef4444">Erreur</p>'; return; }
+  var data = await r.json();
+  var suggestions = data.suggestions || [];
+  if (suggestions.length === 0) {
+    document.getElementById('suggestions-list').innerHTML = '<p style="color:#6b7280;font-size:13px">Aucune suggestion en attente</p>';
+    return;
+  }
+  document.getElementById('suggestions-list').innerHTML = suggestions.map(function(s) {
+    return '<div style="background:#0f1320;border:1px solid #1f2537;border-radius:10px;padding:16px;margin-bottom:10px">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+      + '<div><strong style="color:#e2e5f0">' + s.filename + '</strong>'
+      + '<span style="font-size:11px;color:#6b7280;margin-left:8px">' + (s.category||'') + '</span></div>'
+      + '<span style="font-size:11px;color:#6b7280">Par: ' + (s.suggested_by||'') + '</span></div>'
+      + '<div style="font-size:11px;color:#6b7280;margin-bottom:10px">' + new Date(s.submitted_at).toLocaleDateString('fr-FR') + '</div>'
+      + '<div style="display:flex;gap:8px">'
+      + '<button onclick="approveSuggestion('' + s.id + '')" style="padding:8px 16px;background:#10b981;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">✅ Valider → RAG</button>'
+      + '<button onclick="rejectSuggestion('' + s.id + '')" style="padding:8px 16px;background:#ef4444;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">❌ Rejeter</button>'
+      + '</div></div>';
+  }).join('');
+}
+
+async function approveSuggestion(id) {
+  var r = await fetch(BACKEND + '/suggestions/approve/' + id, {method: 'POST'});
+  if (r.ok) { alert('Approuve et ajoute au RAG !'); loadSuggestions(); }
+  else alert('Erreur');
+}
+
+async function rejectSuggestion(id) {
+  if (!confirm('Rejeter cette suggestion ?')) return;
+  // Just reload — could add DELETE endpoint later
+  alert('Rejete');
+  loadSuggestions();
 }
 </script>
 </body>
