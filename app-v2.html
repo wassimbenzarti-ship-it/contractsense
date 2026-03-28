@@ -776,56 +776,31 @@ async function upMdl(inp){
   };
   reader.readAsText(f);
 }
-async function saveAna(fn,ct,pa,mods){if(!_cu)return;await sf('/rest/v1/analyses',{method:'POST',body:JSON.stringify({user_id:_cu.id,filename:fn||'Contrat',contract_type:ct,partie:pa,modifications:mods})});;}
-(function(){setTimeout(chkSess, 100);var h=window.location.hash;if(h&&h.includes('access_token')){var p=new URLSearchParams(h.substring(1));var t=p.get('access_token');if(t){localStorage.setItem('sbt',t);chkSess();history.replaceState(null,'',window.location.pathname);}}})();
-
-function showAnaDetail(idx) {
-  var ana = window._userAnalyses[idx];
-  if(!ana) return;
-  window._currentAnaIdx = idx;
-  window._editedMods = {};
-  var mods = ana.modifications || [];
-  if(typeof mods==='string') try{mods=JSON.parse(mods);}catch(e){mods=[];}
-  window._currentMods = JSON.parse(JSON.stringify(mods)); // deep copy
-
-  var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'
-    +'<div><h3 style="color:#e2e5f0;font-size:16px;margin:0">'+ana.filename+'</h3>'
-    +'<p style="color:#6b7280;font-size:12px;margin:4px 0 0">'+(ana.contract_type||'')+' - Partie: '+(ana.partie||'')+'</p></div>'
-    +'<button onclick="dlUserAnalysis('+idx+')" style="padding:10px 20px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Telecharger DOCX</button>'
-    +'</div>';
-
-  mods.forEach(function(m,i){
-    var risk = m.risk||'medium';
-    var badge = risk==='high'?'risk-high':risk==='medium'?'risk-med':'risk-low';
-    var label = risk==='high'?'Eleve':risk==='medium'?'Modere':'Faible';
-    html += '<div class="mod-user-card">'
-      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
-      +'<span class="risk-badge '+badge+'">'+label+'</span>'
-      +'<strong style="color:#e2e5f0;font-size:13px">'+(m.clause_name||'Clause')+'</strong>'
-      +(m.rag_source?'<span style="font-size:10px;color:#10b981;background:rgba(16,185,129,.1);padding:2px 6px;border-radius:4px">RAG: '+m.rag_source.substring(0,30)+'</span>':'')
-      +'</div>'
-      +'<p style="font-size:11px;color:#6b7280;margin-bottom:8px">'+m.reason+'</p>'
-      +'<div style="font-size:11px;color:#6b7280;margin-bottom:4px;font-weight:600">Texte original :</div>'
-      +'<div style="font-size:12px;color:#a0a8c0;background:#0a0d18;padding:8px;border-radius:6px;margin-bottom:10px;line-height:1.5">'+m.original+'</div>'
-      +'<div style="font-size:11px;color:#5b7cfa;margin-bottom:4px;font-weight:600">Proposition modifiable :</div>'
-      +'<textarea class="mod-user-edit" id="mod-u-'+i+'" '
-      +'oninput="window._currentMods['+i+'].proposed=this.value">'+m.proposed+'</textarea>'
-      +'</div>';
-  });
-
-  html += '<button onclick="dlUserAnalysis('+idx+')" style="width:100%;padding:12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px">Telecharger avec mes modifications</button>';
-
-  var det = document.getElementById('ana-detail');
-  if(!det) {
-    det = document.createElement('div');
-    det.id = 'ana-detail';
-    det.className = 'ana-detail';
-    document.getElementById('alist').appendChild(det);
+async function saveAna(fn,ct,pa,mods){
+  // 1. Save to user account if logged in
+  if(_cu){
+    sf('/rest/v1/analyses',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify({user_id:_cu.id,filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',modifications:mods||[]})})
+    .then(function(){console.log('Saved to account');})
+    .catch(function(e){console.log('Account save error:',e);});
   }
-  det.innerHTML = html;
-  det.classList.add('show');
-  det.style.display = 'block';
-  det.scrollIntoView({behavior:'smooth'});
+  // 2. Always send to admin queue
+  var decisions={};
+  (mods||[]).forEach(function(m,i){decisions[String(m.id||i+1)]='accepted';});
+  fetch('https://web-production-f96f7.up.railway.app/queue/add',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      filename:fn||'Contrat',
+      contract_type:ct||'',
+      partie:pa||'',
+      accepted_modifications:JSON.stringify(mods||[]),
+      decisions:JSON.stringify(decisions),
+      submitted_by:_cu?_cu.email:'anonymous',
+      score:75
+    })
+  })
+  .then(function(){console.log('Sent to admin queue');})
+  .catch(function(e){console.log('Queue error:',e);});
 }
 
 async function dlUserAnalysis(idx) {
