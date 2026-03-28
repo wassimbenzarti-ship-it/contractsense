@@ -75,9 +75,9 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 @media (max-width: 580px) { .opts { grid-template-columns: 1fr; } .mod-actions { flex-direction: column; } }
 
 <style>
-#auth-ov{display:none;position:fixed;inset:0;background:rgba(8,10,18,.93);z-index:1000;align-items:center;justify-content:center}
+#auth-ov{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(8,10,18,.93);z-index:9999;align-items:center;justify-content:center}
 #auth-ov.show{display:flex}
-#auth-box{background:#0f1320;border:1px solid #1f2537;border-radius:16px;padding:32px;width:100%;max-width:380px;position:relative}
+#auth-box{background:#0f1320;border:1px solid #1f2537;border-radius:16px;padding:32px;width:90%;max-width:380px;position:relative;margin:auto}
 #auth-box h2{color:#e2e5f0;font-size:20px;margin-bottom:20px}
 .ai{width:100%;background:#181c2a;border:1px solid #1f2537;border-radius:8px;padding:10px 14px;color:#e2e5f0;font-size:14px;margin-bottom:10px;box-sizing:border-box}
 .ab{width:100%;padding:11px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px}
@@ -716,8 +716,8 @@ async function doLogin(){var e=document.getElementById('ae1').value.trim(),p=doc
 async function doReg(){var e=document.getElementById('ae2').value.trim(),p=document.getElementById('ap2').value,err=document.getElementById('aerr2'),ok=document.getElementById('aok2');err.style.display='none';ok.style.display='none';if(!e||p.length<6){err.textContent='Email + mdp 6+ requis';err.style.display='block';return;}var r=await sf('/auth/v1/signup',{method:'POST',body:JSON.stringify({email:e,password:p})});var d=await r.json();if(d.id||d.user){ok.textContent='Compte cree - verifiez votre email';ok.style.display='block';}else{err.textContent=d.error_description||'Erreur';err.style.display='block';}}
 function doGoogle(){window.location.href=_su+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(window.location.href);}
 async function doOut(){await sf('/auth/v1/logout',{method:'POST'});localStorage.removeItem('sbt');_cu=null;document.getElementById('ubar').classList.remove('show');var b=document.getElementById('nlbtn');if(b)b.style.display='';}
-function showAuth(){document.getElementById('auth-ov').classList.add('show');}
-function closeAuth(){document.getElementById('auth-ov').classList.remove('show');}
+function showAuth(){var o=document.getElementById('auth-ov');o.classList.add('show');o.style.display='flex';}
+function closeAuth(){var o=document.getElementById('auth-ov');o.classList.remove('show');o.style.display='none';}
 function showReg(){document.getElementById('afl').style.display='none';document.getElementById('afr').style.display='block';document.getElementById('atitle').textContent='Creer un compte';}
 function showLogin(){document.getElementById('afr').style.display='none';document.getElementById('afl').style.display='block';document.getElementById('atitle').textContent='Connexion';}
 function showDash(){document.getElementById('dash-ov').classList.add('show');loadDash();}
