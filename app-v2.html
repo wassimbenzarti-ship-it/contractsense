@@ -283,7 +283,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       </div>
       <div id="access-code-error" style="display:none;color:#ef4444;font-size:12px;margin-top:6px"></div>
       <div style="margin-top:12px;font-size:11px;color:#6b7280;text-align:center">
-        ð§ contact@westfieldavocats.com Â· ð +212 6 34 39 44 90
+        ð§ contact&#64;westfieldavocats.com Â· ð +212 6 34 39 44 90
       </div>
     </div>
     <div id="form-error" style="display:none" class="error"></div>
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (remaining > 0) {
       counter.textContent = remaining + ' analyse' + (remaining > 1 ? 's' : '') + ' gratuite' + (remaining > 1 ? 's' : '') + ' restante' + (remaining > 1 ? 's' : '');
     } else {
-      counter.innerHTML = 'â  Limite atteinte â <a href="mailto:contact@westfieldavocats.com" style="color:#ef4444">contact@westfieldavocats.com</a> Â· +212 6 34 39 44 90';
+      counter.innerHTML = 'â  Limite atteinte â <a href="mailto:contact&#64;westfieldavocats.com" style="color:#ef4444">contact&#64;westfieldavocats.com</a> Â· +212 6 34 39 44 90';
       counter.style.color = '#ef4444';
     }
   }
@@ -476,7 +476,7 @@ async function analyze() {
   if (usage >= 3 && !hasAccess) {
     document.getElementById('access-code-section').style.display = 'block';
   showErr('form-error', 'â  Vous avez utilisÃ© vos 3 analyses gratuites. Pour un accÃ¨s illimitÃ©, contactez Westfield :<br><br>' +
-      'ð§ <a href="mailto:contact@westfieldavocats.com" style="color:#5b7cfa">contact@westfieldavocats.com</a><br>' +
+      'ð§ <a href="mailto:contact&#64;westfieldavocats.com" style="color:#5b7cfa">contact&#64;westfieldavocats.com</a><br>' +
       'ð <a href="https://westfieldmorocco.com" target="_blank" style="color:#5b7cfa">westfieldmorocco.com</a><br>' +
       'ð <a href="tel:+212634394490" style="color:#5b7cfa">+212 6 34 39 44 90</a><br><br>' +
       'ð³ <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="color:#10b981;font-weight:600">â Souscrire en ligne</a>');
@@ -579,7 +579,7 @@ function applyAccessCode() {
     alert('â Code valide ! AccÃ¨s illimitÃ© activÃ©.');
   } else {
     document.getElementById('access-code-error').style.display = 'block';
-    document.getElementById('access-code-error').textContent = 'â  Code invalide. Contactez contact@westfieldavocats.com';
+    document.getElementById('access-code-error').textContent = 'â  Code invalide. Contactez contact&#64;westfieldavocats.com';
   }
 }
 
@@ -857,7 +857,7 @@ async function dlUserAnalysis(idx) {
   try{
     var btn = event ? event.target : null;
     if(btn){ btn.textContent = 'Generation...'; btn.disabled = true; }
-    var r = await fetch('https://web-production-f96f7.up.railway.app/download-text', {
+    var r = await fetch('https://web-production-f96f7.up.railway.app/export', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
@@ -937,7 +937,7 @@ async function dlUserAnalysis(){
   var decisions={};
   mods.forEach(function(m,i){decisions[String(m.id||i+1)]='accepted';});
   try{
-    var r=await fetch('https://web-production-f96f7.up.railway.app/download-text',{
+    var r=await fetch('https://web-production-f96f7.up.railway.app/export',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({modifications:mods,decisions:decisions,original_text:ana.original_text||'',filename:ana.filename})
     });
