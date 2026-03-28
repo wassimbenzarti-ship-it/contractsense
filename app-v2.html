@@ -816,7 +816,16 @@ function showAnaDetail(idx) {
   html += '<button onclick="dlUserAnalysis('+idx+')" style="width:100%;padding:12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px">Telecharger avec mes modifications</button>';
 
   var det = document.getElementById('ana-detail');
-  if(det){ det.innerHTML=html; det.classList.add('show'); det.scrollIntoView({behavior:'smooth'}); }
+  if(!det) {
+    det = document.createElement('div');
+    det.id = 'ana-detail';
+    det.className = 'ana-detail';
+    document.getElementById('alist').appendChild(det);
+  }
+  det.innerHTML = html;
+  det.classList.add('show');
+  det.style.display = 'block';
+  det.scrollIntoView({behavior:'smooth'});
 }
 
 async function dlUserAnalysis(idx) {
