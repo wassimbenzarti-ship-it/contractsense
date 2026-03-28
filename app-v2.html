@@ -789,7 +789,7 @@ function showLogin(){document.getElementById('afr').style.display='none';documen
 function showDash(){document.getElementById('dash-ov').classList.add('show');loadDash();}
 function closeDash(){document.getElementById('dash-ov').classList.remove('show');}
 function dtab(t){document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',['analyses','models'][i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');}
-async function loadDash(){if(!_cu)return;var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at');var a=r1.ok?await r1.json():[];document.getElementById('sta').textContent=a.length;window._userAnalyses = a;
+async function loadDash(){if(!_cu)return;var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at,modifications');var a=r1.ok?await r1.json():[];document.getElementById('sta').textContent=a.length;window._userAnalyses = a;
     document.getElementById('alist').innerHTML=a.length===0
       ?'<p style="color:#6b7280;font-size:13px">Aucune analyse</p>'
       :a.map(function(x,i){return '<div class="ac" style="cursor:pointer" onclick="showAnaDetail('+i+')">'
