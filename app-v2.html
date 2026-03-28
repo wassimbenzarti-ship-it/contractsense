@@ -1,3 +1,51 @@
+function showAnaDetail(idx) {
+  var ana = window._userAnalyses[idx];
+  if(!ana) return;
+  window._currentAnaIdx = idx;
+  var mods = ana.modifications || [];
+  if(typeof mods==='string') try{mods=JSON.parse(mods);}catch(e){mods=[];}
+  window._currentMods = JSON.parse(JSON.stringify(mods));
+
+  var html = '<div style="border-top:1px solid #1f2537;margin-top:20px;padding-top:20px">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'
+    +'<div><h3 style="color:#e2e5f0;font-size:16px;margin:0">'+ana.filename+'</h3>'
+    +'<p style="color:#6b7280;font-size:12px;margin:4px 0 0">'+(ana.contract_type||'')+' - Partie: '+(ana.partie||'')+'</p></div>'
+    +'<button onclick="dlUserAnalysis()" style="padding:10px 20px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Telecharger DOCX</button>'
+    +'</div>';
+
+  if(mods.length === 0) {
+    html += '<p style="color:#6b7280">Aucune modification disponible</p>';
+  }
+
+  mods.forEach(function(m,i){
+    var risk = m.risk||'medium';
+    var color = risk==='high'?'#ef4444':risk==='medium'?'#f59e0b':'#10b981';
+    var label = risk==='high'?'Eleve':risk==='medium'?'Modere':'Faible';
+    html += '<div style="background:#181c2a;border:1px solid #1f2537;border-radius:8px;padding:12px;margin-bottom:10px">'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+      +'<span style="background:rgba('+( risk==='high'?'239,68,68':risk==='medium'?'245,158,11':'16,185,129')+',.15);color:'+color+';padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">'+label+'</span>'
+      +'<strong style="color:#e2e5f0;font-size:13px">'+(m.clause_name||'Clause')+'</strong>'
+      +'</div>'
+      +'<p style="font-size:11px;color:#6b7280;margin-bottom:8px">'+m.reason+'</p>'
+      +'<div style="font-size:11px;color:#6b7280;margin-bottom:4px;font-weight:600">Original :</div>'
+      +'<div style="font-size:12px;color:#a0a8c0;background:#0a0d18;padding:8px;border-radius:6px;margin-bottom:8px;line-height:1.5">'+(m.original||'')+'</div>'
+      +'<div style="font-size:11px;color:#5b7cfa;margin-bottom:4px;font-weight:600">Proposition (modifiable) :</div>'
+      +'<textarea id="mu'+i+'" style="width:100%;background:#0a0d18;border:1px solid #1f2537;border-radius:6px;padding:8px;color:#e2e5f0;font-size:12px;min-height:80px;resize:vertical;box-sizing:border-box" oninput="window._currentMods['+i+'].proposed=this.value">'+m.proposed+'</textarea>'
+      +'</div>';
+  });
+
+  html += '<button onclick="dlUserAnalysis()" style="width:100%;padding:12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px">Telecharger avec mes modifications</button>'
+    +'</div>';
+
+  // Insert into dashboard overlay
+  var container = document.getElementById('d-analyses');
+  if(container) {
+    var det = document.getElementById('ana-detail-view');
+    if(!det) { det = document.createElement('div'); det.id='ana-detail-view'; container.appendChild(det); }
+    det.innerHTML = html;
+    det.scrollIntoView({behavior:'smooth'});
+  }
+}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -747,35 +795,30 @@ async function loadDash(){if(!_cu)return;var r1=await sf('/rest/v1/analyses?user
       :a.map(function(x,i){return '<div class="ac" style="cursor:pointer" onclick="showAnaDetail('+i+')">'
         +'<h4>'+x.filename+'</h4>'
         +'<p>'+(x.contract_type||'')+' - '+(x.partie||'')+' - '+new Date(x.created_at).toLocaleDateString()+'</p>'
-        +'<span style="font-size:11px;color:#5b7cfa">Voir et modifier ></span>'
+        +'<span style="font-size:11px;color:#5b7cfa">Voir et modifier &gt;</span>'
         +'</div>';}).join('')
       +'<div id="ana-detail" class="ana-detail"></div>';var r2=await sf('/rest/v1/user_models?user_id=eq.'+_cu.id+'&order=created_at.desc&select=id,filename,created_at');var m=r2.ok?await r2.json():[];document.getElementById('stm').textContent=m.length;document.getElementById('mlist').innerHTML=m.length===0?'<p style="color:#6b7280;font-size:13px">Aucun modele</p>':m.map(function(x){return '<div class="ac"><h4>'+x.filename+'</h4><p>'+new Date(x.created_at).toLocaleDateString()+'</p></div>';}).join('');}
 async function upMdl(inp){
   if(!_cu){showAuth();return;}
   var f=inp.files[0];if(!f)return;
-  // Read file content
-  var reader=new FileReader();
-  reader.onload=async function(e){
-    var content=e.target.result||'';
-    // Save to user models
-    var r=await sf('/rest/v1/user_models',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify({user_id:_cu.id,filename:f.name,category:'contract',is_public:false})});
-    if(r.ok){
-      // Also send to backend as RAG suggestion for admin
-      try{
-        var fd=new FormData();
-        fd.append('file',f);
-        fd.append('source',f.name);
-        fd.append('category','contract');
-        fd.append('suggested_by',_cu.email);
-        fd.append('is_suggestion','true');
-        await fetch('https://web-production-f96f7.up.railway.app/rag/suggest',{method:'POST',body:fd});
-      }catch(e2){console.log('suggestion send error:',e2);}
-      alert('Modele uploade et soumis pour validation RAG');
-      loadDash();
-    }else alert('Erreur upload');
-  };
-  reader.readAsText(f);
+  // Save to user_models
+  var r=await sf('/rest/v1/user_models',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify({user_id:_cu.id,filename:f.name,category:'contract',is_public:false})});
+  if(r.ok){
+    // Send to pending_suggestions for admin
+    try{
+      var fd=new FormData();
+      fd.append('file',f);
+      fd.append('source',f.name);
+      fd.append('category','contract');
+      fd.append('suggested_by',_cu.email);
+      var r2=await fetch('https://web-production-f96f7.up.railway.app/rag/suggest',{method:'POST',body:fd});
+      if(r2.ok) console.log('Sent to admin suggestions');
+    }catch(e2){console.log('Suggest error:',e2);}
+    alert('Modele uploade et soumis pour validation admin');
+    loadDash();
+  }else alert('Erreur upload');
 }
+
 async function saveAna(fn,ct,pa,mods){
   // 1. Save to user account if logged in
   if(_cu){
