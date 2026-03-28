@@ -503,7 +503,7 @@ async function loadSuggestions() {
   var data = await r.json();
   var suggestions = data.suggestions || [];
   if (suggestions.length === 0) {
-    document.getElementById('suggestions-list').innerHTML = '<p style="color:#6b7280;font-size:13px">Aucune suggestion en attente</p>';
+    document.getElementById('suggestions-list').innerHTML = '<p style="color:#6b7280;font-size:13px">Aucune suggestion</p>';
     return;
   }
   document.getElementById('suggestions-list').innerHTML = suggestions.map(function(s) {
