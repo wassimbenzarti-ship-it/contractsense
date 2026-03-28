@@ -522,7 +522,7 @@ async function loadSuggestions() {
         + '</div>'
         + '<div style="font-size:12px;color:#6b7280;margin-bottom:12px">Par : ' + (s.suggested_by||'anonyme') + ' &mdash; ' + date + '</div>'
         + (s.status === 'pending' ? '<div style="display:flex;gap:8px">'
-        + '<button onclick="approveSugg('' + s.id + '')" style="padding:8px 16px;background:#10b981;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">Valider RAG</button>'
++ `<button onclick="approveSugg('${s.id}')" style="padding:8px 16px;background:#10b981;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">Valider RAG</button>`
         + '<button onclick="rejectSugg('' + s.id + '')" style="padding:8px 16px;background:#ef4444;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">Rejeter</button>'
         + '</div>' : '')
         + '</div>';
