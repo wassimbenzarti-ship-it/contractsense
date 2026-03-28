@@ -857,7 +857,7 @@ async function dlUserAnalysis(idx) {
   try{
     var btn = event ? event.target : null;
     if(btn){ btn.textContent = 'Generation...'; btn.disabled = true; }
-    var r = await fetch('https://web-production-f96f7.up.railway.app/export', {
+    var r = await fetch('https://web-production-f96f7.up.railway.app/export-mods', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
