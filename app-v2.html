@@ -763,7 +763,14 @@ async function upMdl(inp){
       fd.append('source',f.name);
       fd.append('category','contract');
       fd.append('suggested_by',_cu.email);
-      var r2=await fetch('https://web-production-f96f7.up.railway.app/rag/suggest',{method:'POST',body:fd});
+ var r2 = await fetch('https://web-production-f96f7.up.railway.app/rag/suggest', {
+  method: 'POST',
+  body: fd
+});
+
+var data = await r2.json();
+
+console.log(data);
       if(r2.ok) console.log('Sent to admin suggestions');
     }catch(e2){console.log('Suggest error:',e2);}
     alert('Modele uploade et soumis pour validation admin');
