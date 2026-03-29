@@ -210,11 +210,12 @@ function showMain() {
 }
 
 function showTab(tab, btn) {
-  ['queue','rag','upload'].forEach(function(t) {
+  ['queue','rag','upload','suggestions'].forEach(function(t) {
     document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
   });
   document.querySelectorAll('.tab-main').forEach(function(b) { b.classList.remove('active'); });
   btn.classList.add('active');
+    if (tab === 'suggestions') loadSuggestions();
 }
 
 function loadAll() { loadStats(); loadQueue(); loadRag(); }
@@ -538,11 +539,12 @@ async function approveSugg(id) {
   else { var d = await r.json(); alert('Erreur: ' + (d.error||r.status)); }
 }
 
-function rejectSugg(id) {
-  if(!confirm('Rejeter cette suggestion ?')) return;
-  alert('Rejete.');
-  loadSuggestions();
-}
+async function rejectSugg(id) {
+    if(!confirm('Rejeter cette suggestion ?')) return;
+    var r = await fetch(BACKEND + '/suggestions/reject/' + id, {method:'POST'});
+    if(r.ok) { alert('Suggestion rejetée.'); loadSuggestions(); }
+    else { var d = await r.json(); alert('Erreur: ' + (d.error||r.status)); }
+  
 </script>
 </body>
 </html>
