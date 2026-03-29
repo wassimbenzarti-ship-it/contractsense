@@ -540,11 +540,11 @@ async function approveSugg(id) {
 }
 
 async function rejectSugg(id) {
-    if(!confirm('Rejeter cette suggestion ?')) return;
-    var r = await fetch(BACKEND + '/suggestions/reject/' + id, {method:'POST'});
-    if(r.ok) { alert('Suggestion rejetée.'); loadSuggestions(); }
-    else { var d = await r.json(); alert('Erreur: ' + (d.error||r.status)); }
-  
+  if(!confirm('Rejeter cette suggestion ?')) return;
+  var r = await fetch(BACKEND + '/suggestions/reject/' + id, {method:'POST'});
+  if(r.ok) { alert('Suggestion rejetée.'); loadSuggestions(); }
+  else { var d = await r.json(); alert('Erreur: ' + (d.error||r.status)); }
+}
 </script>
 </body>
 </html>
