@@ -763,10 +763,25 @@ async function upMdl(inp){
       fd.append('source',f.name);
       fd.append('category','contract');
       fd.append('suggested_by',_cu.email);
- var r2 = await fetch('https://web-production-f96f7.up.railway.app/rag/suggest', {
-  method: 'POST',
-  body: fd
-});
+try {
+  const r2 = await fetch('https://web-production-f96f7.up.railway.app/rag/suggest', {
+    method: 'POST',
+    body: fd
+  });
+
+  const data = await r2.json();
+
+  if (!r2.ok) {
+    console.error("Erreur API:", data);
+    return;
+  }
+
+  console.log("Succès:", data);
+
+} catch (e) {
+  console.error("Erreur réseau:", e);
+}
+
 
 var data = await r2.json();
 
