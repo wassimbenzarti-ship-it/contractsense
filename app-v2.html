@@ -176,38 +176,38 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 
   <!-- STEP 2: Upload form -->
   <div id="step-form">
-    <h1 class="fadein">Révisez vos contrats<br/><span class="accent">avec l'IA.</span></h1>
-    <p class="desc">Uploadez votre contrat. L'IA identifie les parties, vous choisissez laquelle protéger, puis propose des modifications avec Track Changes.</p>
+    <h1 class="fadein">R�visez vos contrats<br/><span class="accent">avec l'IA.</span></h1>
+    <p class="desc">Uploadez votre contrat. L'IA identifie les parties, vous choisissez laquelle prot�ger, puis propose des modifications avec Track Changes.</p>
 
     <div class="tabs">
-      <button class="tab active" id="tab-upload">📄 Uploader</button>
-      <button class="tab" id="tab-text">✏️ Coller du texte</button>
+      <button class="tab active" id="tab-upload">=� Uploader</button>
+      <button class="tab" id="tab-text"> Coller du texte</button>
     </div>
 
     <div id="ubar" style="display:none;align-items:center;gap:10px;background:#0f1320;border:1px solid #1f2537;border-radius:10px;padding:8px 14px;margin-bottom:14px"><span id="ueml"></span><button style="padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid #1f2537;background:#1a2035;color:#e2e5f0" onclick="showDash()">Mon espace</button><button style="padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid #3a1f1f;background:#2a1515;color:#ef4444" onclick="doOut()">Deconnexion</button></div><div id="upload-zone">
       <div class="drop" id="drop-area">
-        <div style="font-size:30px;margin-bottom:10px">📄</div>
-        <div style="font-weight:700;font-size:15px;margin-bottom:5px">Déposez votre contrat ici</div>
-        <div style="color:#6b7280;font-size:13px">ou cliquez pour sélectionner</div>
+        <div style="font-size:30px;margin-bottom:10px">=�</div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:5px">D�posez votre contrat ici</div>
+        <div style="color:#6b7280;font-size:13px">ou cliquez pour s�lectionner</div>
         <div class="tags"><span class="tag">PDF</span><span class="tag">DOCX</span><span class="tag">TXT</span></div>
       </div>
       <input type="file" id="file-input" accept=".pdf,.docx,.txt,.doc" style="display:none"/>
       <div id="file-ok" style="display:none" class="file-ok">
-        <span>✅</span>
+        <span></span>
         <span id="file-name" style="color:#10b981;font-size:13px"></span>
         <span id="file-size" style="color:#6b7280;font-size:11px;margin-left:auto"></span>
       </div>
     </div>
 
     <div id="text-zone" style="display:none">
-      <textarea id="contract-text" placeholder="Collez le texte de votre contrat ici…" style="margin-bottom:14px"></textarea>
+      <textarea id="contract-text" placeholder="Collez le texte de votre contrat ici&" style="margin-bottom:14px"></textarea>
     </div>
 
     <div class="opts">
       <div>
         <label>Type</label>
         <select id="type">
-          <option value="generic">Générique</option>
+          <option value="generic">G�n�rique</option>
           <option value="nda">NDA</option>
           <option value="saas">SaaS</option>
           <option value="purchase">Achat/Vente</option>
@@ -217,16 +217,16 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       </div>
     </div>
 
-    <button class="btn-main" id="btn-analyze">⚡ Analyser le contrat</button>
+    <button class="btn-main" id="btn-analyze">� Analyser le contrat</button>
     <div id="usage-counter" style="text-align:center;font-size:12px;color:#6b7280;margin-top:10px"></div>
     <div id="access-code-section" style="display:none;margin-top:16px;background:rgba(91,124,250,0.06);border:1px solid rgba(91,124,250,0.2);border-radius:10px;padding:16px">
-      <div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:12px">🔒 Limite de 3 analyses atteinte</div>
+      <div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:12px">= Limite de 3 analyses atteinte</div>
       <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="display:block;text-align:center;padding:12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border-radius:8px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:14px">
-        💳 Souscrire à l'accès illimité →
+        =� Souscrire � l'acc�s illimit� �
       </a>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
         <div style="flex:1;height:1px;background:#1f2537"></div>
-        <div style="font-size:11px;color:#6b7280">ou entrez votre code d'accès</div>
+        <div style="font-size:11px;color:#6b7280">ou entrez votre code d'acc�s</div>
         <div style="flex:1;height:1px;background:#1f2537"></div>
       </div>
       <div style="display:flex;gap:8px">
@@ -235,7 +235,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       </div>
       <div id="access-code-error" style="display:none;color:#ef4444;font-size:12px;margin-top:6px"></div>
       <div style="margin-top:12px;font-size:11px;color:#6b7280;text-align:center">
-        📧 contact&#64;westfieldavocats.com · 📞 +212 6 34 39 44 90
+        =� contact&#64;westfieldavocats.com � =� +212 6 34 39 44 90
       </div>
     </div>
     <div id="form-error" style="display:none" class="error"></div>
@@ -245,40 +245,40 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
   <div id="step-loading" style="display:none" class="loading">
     <div class="spinner"></div>
     <div class="steps">
-      <div class="step" id="s0">→ Lecture du document…</div>
-      <div class="step" id="s1">→ Identification des parties…</div>
-      <div class="step" id="s2">→ Analyse des risques…</div>
-      <div class="step" id="s3">→ Rédaction des modifications…</div>
+      <div class="step" id="s0">� Lecture du document&</div>
+      <div class="step" id="s1">� Identification des parties&</div>
+      <div class="step" id="s2">� Analyse des risques&</div>
+      <div class="step" id="s3">� R�daction des modifications&</div>
     </div>
   </div>
 
   <!-- STEP 4: Choose partie -->
   <div id="step-parties" style="display:none" class="fadein">
-    <h2 style="font-size:20px;font-weight:800;margin-bottom:8px">Quelle partie représentez-vous ?</h2>
-    <p style="color:#6b7280;font-size:14px;margin-bottom:24px">L'IA adaptera ses modifications pour protéger vos intérêts.</p>
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:8px">Quelle partie repr�sentez-vous ?</h2>
+    <p style="color:#6b7280;font-size:14px;margin-bottom:24px">L'IA adaptera ses modifications pour prot�ger vos int�r�ts.</p>
     <div id="parties-list"></div>
-    <button id="btn-back" style="display:block;margin:16px auto 0;padding:9px 20px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:13px;cursor:pointer">↩ Retour</button>
+    <button id="btn-back" style="display:block;margin:16px auto 0;padding:9px 20px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:13px;cursor:pointer">� Retour</button>
   </div>
 
   <!-- STEP 5: Review modifications -->
   <div id="step-review" style="display:none" class="fadein">
     <div class="review-header">
-      <div style="font-size:20px;font-weight:800">Révision du contrat</div>
+      <div style="font-size:20px;font-weight:800">R�vision du contrat</div>
       <div class="review-stats" id="review-stats"></div>
     </div>
     <div id="mods-list"></div>
     <div class="export-section">
-      <div style="font-size:16px;font-weight:700;margin-bottom:8px">Générer le document final</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">G�n�rer le document final</div>
       <div id="export-desc" style="color:#6b7280;font-size:13px;margin-bottom:20px;line-height:1.6"></div>
-      <button class="btn-export" id="btn-export">⬇ Télécharger avec Track Changes</button>
-      <button class="btn-new" id="btn-new">↩ Analyser un autre contrat</button>
+      <button class="btn-export" id="btn-export"> T�l�charger avec Track Changes</button>
+      <button class="btn-new" id="btn-new">� Analyser un autre contrat</button>
     </div>
   </div>
 </div>
 
 <script>
 var BACKEND = 'https://web-production-f96f7.up.railway.app';
-var apiKey = 'ok';  // Clé gérée côté serveur Railway
+var apiKey = 'ok';  // Cl� g�r�e c�t� serveur Railway
 var curFile = null;
 var curMode = 'upload';
 var modifications = [];
@@ -288,7 +288,7 @@ var savedLang = "fr";
 var savedType = "generic";
 var savedText = "";
 
-// ── Init ──────────────────────────────────────────────────
+//    Init                                                   
 document.addEventListener('DOMContentLoaded', function() {
   // Show usage counter
   var usage = parseInt(localStorage.getItem('cs_usage') || '0');
@@ -298,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (remaining > 0) {
       counter.textContent = remaining + ' analyse' + (remaining > 1 ? 's' : '') + ' gratuite' + (remaining > 1 ? 's' : '') + ' restante' + (remaining > 1 ? 's' : '');
     } else {
-      counter.innerHTML = '⚠ Limite atteinte — <a href="mailto:contact&#64;westfieldavocats.com" style="color:#ef4444">contact&#64;westfieldavocats.com</a> · +212 6 34 39 44 90';
+      counter.innerHTML = '� Limite atteinte  <a href="mailto:contact&#64;westfieldavocats.com" style="color:#ef4444">contact&#64;westfieldavocats.com</a> � +212 6 34 39 44 90';
       counter.style.color = '#ef4444';
     }
   }
@@ -335,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('file-input').addEventListener('change', function() {
     var f = this.files[0];
     if (f && f.name.toLowerCase().endsWith('.doc') && !f.name.toLowerCase().endsWith('.docx')) {
-      showErr("form-error", "⚠️ Format .doc detecte. Convertissez en .docx pour les Track Changes complets. L'analyse reste possible mais l'export sera limite.");
+      showErr("form-error", "� Format .doc detecte. Convertissez en .docx pour les Track Changes complets. L'analyse reste possible mais l'export sera limite.");
     } else {
       hideErr('form-error');
     }
@@ -356,7 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('btn-new').addEventListener('click', reset);
 });
 
-// ── Helpers ───────────────────────────────────────────────
+//    Helpers                                                
 function show(id) { document.getElementById(id).style.display = 'block'; }
 function hide(id) { document.getElementById(id).style.display = 'none'; }
 function showFlex(id) { document.getElementById(id).style.display = 'flex'; }
@@ -379,7 +379,7 @@ function setFile(f) {
 function saveKey() {
   var k = document.getElementById('api-key').value.trim();
   if (!k || k.indexOf('sk-') !== 0) {
-    showErr('key-error', '⚠ Clé invalide — doit commencer par sk-');
+    showErr('key-error', '� Cl� invalide  doit commencer par sk-');
     return;
   }
   localStorage.setItem('cs_key', k);
@@ -390,20 +390,20 @@ function saveKey() {
 
 function stepDone(i) {
   var el = document.getElementById('s' + i);
-  var labels = ['Lecture du document…','Identification des parties…','Analyse des risques…','Rédaction des modifications…'];
-  if (el) { el.classList.add('done'); el.textContent = '✓ ' + labels[i]; }
+  var labels = ['Lecture du document&','Identification des parties&','Analyse des risques&','R�daction des modifications&'];
+  if (el) { el.classList.add('done'); el.textContent = ' ' + labels[i]; }
 }
 
 function stepReset() {
-  var labels = ['Lecture du document…','Identification des parties…','Analyse des risques…','Rédaction des modifications…'];
+  var labels = ['Lecture du document&','Identification des parties&','Analyse des risques&','R�daction des modifications&'];
   for (var i = 0; i < 4; i++) {
     var el = document.getElementById('s' + i);
-    if (el) { el.classList.remove('done'); el.textContent = '→ ' + labels[i]; }
+    if (el) { el.classList.remove('done'); el.textContent = '� ' + labels[i]; }
   }
 }
 
 function rc(r) { return r === 'high' ? '#ef4444' : r === 'medium' ? '#f59e0b' : '#10b981'; }
-function rl(r) { return r === 'high' ? 'Risque élevé' : r === 'medium' ? 'Risque modéré' : 'Faible risque'; }
+function rl(r) { return r === 'high' ? 'Risque �lev�' : r === 'medium' ? 'Risque mod�r�' : 'Faible risque'; }
 
 function buildFormData() {
   var fd = new FormData();
@@ -418,26 +418,26 @@ function buildFormData() {
   return fd;
 }
 
-// ── Step 1: Analyze → identify parties ───────────────────
+//    Step 1: Analyze � identify parties                    
 async function analyze() {
   hideErr('form-error');
 
-  // Check free usage limit — skip if valid access code
+  // Check free usage limit  skip if valid access code
   var hasAccess = localStorage.getItem('cs_access');
   var usage = parseInt(localStorage.getItem('cs_usage') || '0');
   if (usage >= 3 && !hasAccess) {
     document.getElementById('access-code-section').style.display = 'block';
-  showErr('form-error', '⚠ Vous avez utilisé vos 3 analyses gratuites. Pour un accès illimité, contactez Westfield :<br><br>' +
-      '📧 <a href="mailto:contact&#64;westfieldavocats.com" style="color:#5b7cfa">contact&#64;westfieldavocats.com</a><br>' +
-      '🌐 <a href="https://westfieldmorocco.com" target="_blank" style="color:#5b7cfa">westfieldmorocco.com</a><br>' +
-      '📞 <a href="tel:+212634394490" style="color:#5b7cfa">+212 6 34 39 44 90</a><br><br>' +
-      '💳 <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="color:#10b981;font-weight:600">→ Souscrire en ligne</a>');
+  showErr('form-error', '� Vous avez utilis� vos 3 analyses gratuites. Pour un acc�s illimit�, contactez Westfield :<br><br>' +
+      '=� <a href="mailto:contact&#64;westfieldavocats.com" style="color:#5b7cfa">contact&#64;westfieldavocats.com</a><br>' +
+      '< <a href="https://westfieldmorocco.com" target="_blank" style="color:#5b7cfa">westfieldmorocco.com</a><br>' +
+      '=� <a href="tel:+212634394490" style="color:#5b7cfa">+212 6 34 39 44 90</a><br><br>' +
+      '=� <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="color:#10b981;font-weight:600">� Souscrire en ligne</a>');
     return;
   }
 
   var txt = document.getElementById('contract-text').value;
-  if (curMode === 'upload' && !curFile) { showErr('form-error', '⚠ Uploade un fichier.'); return; }
-  if (curMode === 'text' && txt.trim().length < 50) { showErr('form-error', '⚠ Colle au moins 50 caractères.'); return; }
+  if (curMode === 'upload' && !curFile) { showErr('form-error', '� Uploade un fichier.'); return; }
+  if (curMode === 'text' && txt.trim().length < 50) { showErr('form-error', '� Colle au moins 50 caract�res.'); return; }
 
   hide('step-form');
   showFlex('step-loading');
@@ -461,11 +461,11 @@ async function analyze() {
   } catch(e) {
     hide('step-loading');
     show('step-form');
-    showErr('form-error', '⚠ ' + (e.message || 'Erreur inattendue.'));
+    showErr('form-error', '� ' + (e.message || 'Erreur inattendue.'));
   }
 }
 
-// ── Step 2: Show parties ──────────────────────────────────
+//    Step 2: Show parties                                   
 function renderParties(parties) {
   var list = document.getElementById('parties-list');
   list.innerHTML = '';
@@ -485,7 +485,7 @@ function renderParties(parties) {
   show('step-parties');
 }
 
-// ── Step 3: Analyze with selected partie ─────────────────
+//    Step 3: Analyze with selected partie                  
 async function analyzeWithPartie(partieName) {
   selectedPartie = partieName;
   hide('step-parties');
@@ -510,11 +510,11 @@ async function analyzeWithPartie(partieName) {
   } catch(e) {
     hide('step-loading');
     show('step-form');
-    showErr('form-error', '⚠ ' + (e.message || 'Erreur inattendue.'));
+    showErr('form-error', '� ' + (e.message || 'Erreur inattendue.'));
   }
 }
 
-// ── Step 4: Review ────────────────────────────────────────
+//    Step 4: Review                                         
 function applyAccessCode() {
   var code = document.getElementById('access-code-input').value.trim().toUpperCase();
   // Valid codes stored in localStorage by admin
@@ -525,13 +525,13 @@ function applyAccessCode() {
     localStorage.setItem('cs_access', code);
     localStorage.setItem('cs_usage', '0'); // Reset counter
     document.getElementById('access-code-section').style.display = 'none';
-    document.getElementById('usage-counter').textContent = '✅ Accès illimité activé';
+    document.getElementById('usage-counter').textContent = ' Acc�s illimit� activ�';
     document.getElementById('usage-counter').style.color = '#10b981';
     hideErr('form-error');
-    alert('✅ Code valide ! Accès illimité activé.');
+    alert(' Code valide ! Acc�s illimit� activ�.');
   } else {
     document.getElementById('access-code-error').style.display = 'block';
-    document.getElementById('access-code-error').textContent = '⚠ Code invalide. Contactez contact&#64;westfieldavocats.com';
+    document.getElementById('access-code-error').textContent = '� Code invalide. Contactez contact&#64;westfieldavocats.com';
   }
 }
 
@@ -570,12 +570,12 @@ function decide(id, decision) {
   if (decision === 'accepted') {
     card.classList.add('accepted');
     btnA.classList.add('active');
-    status.textContent = '✅ Modification acceptée';
+    status.textContent = ' Modification accept�e';
     status.style.color = '#10b981';
   } else {
     card.classList.add('rejected');
     btnR.classList.add('active');
-    status.textContent = '❌ Texte original conservé';
+    status.textContent = 'L Texte original conserv�';
     status.style.color = '#ef4444';
   }
   updateStats();
@@ -587,8 +587,8 @@ function updateStats() {
   var p = Object.values(decisions).filter(function(d){return d==='pending';}).length;
   document.getElementById('review-stats').innerHTML =
     '<span class="stat stat-pending">' + p + ' en attente</span>' +
-    '<span class="stat stat-accepted">' + a + ' acceptées</span>' +
-    '<span class="stat stat-rejected">' + r + ' refusées</span>';
+    '<span class="stat stat-accepted">' + a + ' accept�es</span>' +
+    '<span class="stat stat-rejected">' + r + ' refus�es</span>';
 }
 
 function renderReview() {
@@ -605,15 +605,15 @@ function renderReview() {
         '<span class="risk-pill" style="background:' + color + '20;color:' + color + '">' + rl(m.risk) + '</span>' +
       '</div>' +
       '<div class="mod-body">' +
-        (m.rag_source ? '<div style="background:rgba(91,124,250,0.08);border:1px solid rgba(91,124,250,0.2);border-radius:7px;padding:5px 10px;font-size:11px;color:#5b7cfa;margin-bottom:10px;">🧠 Basé sur: ' + m.rag_source + '</div>' : '') +
-        '<div class="mod-reason">💡 ' + m.reason + '</div>' +
-        '<div class="mod-label" style="color:#ef4444">📄 Texte original</div>' +
+        (m.rag_source ? '<div style="background:rgba(91,124,250,0.08);border:1px solid rgba(91,124,250,0.2);border-radius:7px;padding:5px 10px;font-size:11px;color:#5b7cfa;margin-bottom:10px;">>� Bas� sur: ' + m.rag_source + '</div>' : '') +
+        '<div class="mod-reason">=� ' + m.reason + '</div>' +
+        '<div class="mod-label" style="color:#ef4444">=� Texte original</div>' +
         '<div class="mod-original">' + m.original + '</div>' +
-        '<div class="mod-label" style="color:#10b981">✏ Modification proposée <span style="color:#6b7280;font-size:10px;font-weight:400">(éditable)</span></div>' +
+        '<div class="mod-label" style="color:#10b981"> Modification propos�e <span style="color:#6b7280;font-size:10px;font-weight:400">(�ditable)</span></div>' +
         '<div class="mod-proposed" id="proposed-' + m.id + '" contenteditable="true" spellcheck="true" style="cursor:text;outline:none;" oninput="onProposedEdit(' + m.id + ', this)">' + m.proposed + '</div>' +
         '<div class="mod-actions">' +
-          '<button class="btn-accept" id="ba-' + m.id + '" onclick="decide(' + m.id + ',\'accepted\')">✅ Accepter</button>' +
-          '<button class="btn-reject" id="br-' + m.id + '" onclick="decide(' + m.id + ',\'rejected\')">❌ Refuser</button>' +
+          '<button class="btn-accept" id="ba-' + m.id + '" onclick="decide(' + m.id + ',\'accepted\')"> Accepter</button>' +
+          '<button class="btn-reject" id="br-' + m.id + '" onclick="decide(' + m.id + ',\'rejected\')">L Refuser</button>' +
         '</div>' +
         '<div class="mod-status" id="st-' + m.id + '"></div>' +
       '</div>';
@@ -622,17 +622,17 @@ function renderReview() {
 
   var isDocx = curFile && (curFile.name.endsWith('.docx') || curFile.name.endsWith('.doc'));
   document.getElementById('export-desc').innerHTML = isDocx
-    ? 'Le fichier DOCX original sera téléchargé avec les <strong>vraies Track Changes Word</strong> — mise en forme préservée.'
-    : 'Un document Word sera généré avec les modifications acceptées en Track Changes.';
+    ? 'Le fichier DOCX original sera t�l�charg� avec les <strong>vraies Track Changes Word</strong>  mise en forme pr�serv�e.'
+    : 'Un document Word sera g�n�r� avec les modifications accept�es en Track Changes.';
 
   updateStats();
   show('step-review');
 }
 
-// ── Export ────────────────────────────────────────────────
+//    Export                                                 
 async function exportDoc() {
   var btn = document.getElementById('btn-export');
-  btn.textContent = '⏳ Génération en cours…';
+  btn.textContent = '� G�n�ration en cours&';
   btn.disabled = true;
   try {
     var fd = buildFormData();
@@ -645,10 +645,10 @@ async function exportDoc() {
     a.href = URL.createObjectURL(blob);
     a.download = 'contrat-track-changes.docx';
     a.click();
-    btn.textContent = '✅ Téléchargé !';
+    btn.textContent = ' T�l�charg� !';
     btn.style.background = '#10b981';
     setTimeout(function() {
-      btn.textContent = '⬇ Télécharger avec Track Changes';
+      btn.textContent = ' T�l�charger avec Track Changes';
       btn.style.background = '';
       btn.disabled = false;
     }, 3000);
@@ -656,13 +656,13 @@ async function exportDoc() {
     // Silent auto-contribute full contract to queue
     contributeToQueue();
   } catch(e) {
-    alert('⚠ ' + e.message);
+    alert('� ' + e.message);
     btn.disabled = false;
-    btn.textContent = '⬇ Télécharger avec Track Changes';
+    btn.textContent = ' T�l�charger avec Track Changes';
   }
 }
 
-// ── Reset ─────────────────────────────────────────────────
+//    Reset                                                  
 async function contributeToQueue() {
   // Save to user account when downloading
   try {
@@ -749,7 +749,7 @@ async function loadDash(){if(!_cu)return;var r1=await sf('/rest/v1/analyses?user
         +'<p>'+(x.contract_type||'')+' - '+(x.partie||'')+' - '+new Date(x.created_at).toLocaleDateString()+'</p>'
         +'<span style="font-size:11px;color:#5b7cfa">Voir et modifier &gt;</span>'
         +'</div>';}).join('')
-      +'<div id="ana-detail" class="ana-detail"></div>';var r2=await sf('/rest/v1/user_models?user_id=eq.'+_cu.id+'&order=created_at.desc&select=id,filename,created_at');var m=r2.ok?await r2.json():[];document.getElementById('stm').textContent=m.length;document.getElementById('mlist').innerHTML=m.length===0?'<p style="color:#6b7280;font-size:13px">Aucun modele</p>':m.map(function(x){return '<div class="ac" style="display:flex;justify-content:space-between;align-items:center">'+'<div><h4>'+x.filename+'</h4><p>'+new Date(x.created_at).toLocaleDateString()+'</p></div>'+'<button onclick="deleteModel(\''+x.id+'\', this)" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;flex-shrink:0">🗑 Supprimer</button>'+'</div>';}).join('');}
+      +'<div id="ana-detail" class="ana-detail"></div>';var r2=await sf('/rest/v1/user_models?user_id=eq.'+_cu.id+'&order=created_at.desc&select=id,filename,created_at');var m=r2.ok?await r2.json():[];document.getElementById('stm').textContent=m.length;document.getElementById('mlist').innerHTML=m.length===0?'<p style="color:#6b7280;font-size:13px">Aucun modele</p>':m.map(function(x){return '<div class="ac" style="display:flex;justify-content:space-between;align-items:center">'+'<div><h4>'+x.filename+'</h4><p>'+new Date(x.created_at).toLocaleDateString()+'</p></div>'+'<button onclick="deleteModel(\''+x.id+'\', this)" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;flex-shrink:0">=� Supprimer</button>'+'</div>';}).join('');}
 async function upMdl(inp){
   if(!_cu){showAuth();return;}
   var f=inp.files[0];if(!f)return;
@@ -766,7 +766,7 @@ async function upMdl(inp){
       if(!r2.ok){ console.error('Erreur API suggest:', suggestData); }
       else { console.log('Sent to admin suggestions:', suggestData); }
     }catch(e2){console.log('Suggest error:',e2);}
-    alert('Modèle uploadé et soumis pour validation admin');
+    alert('Modele uploade et soumis pour validation admin');
     loadDash();
   }else alert('Erreur upload');
 }
@@ -800,7 +800,7 @@ async function saveAna(fn,ct,pa,mods){
 
 
 async function deleteModel(modelId, btn) {
-  if(!confirm('Supprimer ce modèle ? Cette action est irréversible.')) return;
+  if(!confirm('Supprimer ce modele ? Cette action est irreversible.')) return;
   btn.disabled = true; btn.textContent = '...';
   try {
     var r = await sf('/rest/v1/user_models?id=eq.' + modelId, {method:'DELETE'});
@@ -808,8 +808,14 @@ async function deleteModel(modelId, btn) {
       btn.closest('.ac').remove();
       var stm = document.getElementById('stm');
       if(stm) stm.textContent = Math.max(0, parseInt(stm.textContent||'0') - 1);
-    } else { alert('Erreur lors de la suppression'); btn.disabled=false; btn.textContent='🗑 Supprimer'; }
-  } catch(e) { alert('Erreur : '+e.message); btn.disabled=false; btn.textContent='🗑 Supprimer'; }
+    } else {
+      alert('Erreur lors de la suppression');
+      btn.disabled = false; btn.textContent = 'Supprimer';
+    }
+  } catch(e) {
+    alert('Erreur : ' + e.message);
+    btn.disabled = false; btn.textContent = 'Supprimer';
+  }
 }
 
 async function getUserModelRAG(){
@@ -872,24 +878,23 @@ function showAnaDetail(idx) {
 async function dlUserAnalysis() {
   var ana = (window._userAnalyses||[])[window._anaIdx||0] || {};
   var mods = window._currentMods || [];
-  var btn = document.getElementById('user-ana-detail') ?
-    document.getElementById('user-ana-detail').querySelector('button[onclick*="dlUserAnalysis"]') : null;
-  if(btn) { btn.textContent = '⏳ Génération en cours…'; btn.disabled = true; }
+  var det = document.getElementById('user-ana-detail');
+  var btn = det ? det.querySelector('button[onclick*="dlUserAnalysis"]') : null;
+  if(btn) { btn.textContent = 'Generation en cours...'; btn.disabled = true; }
   try {
     var fd = new FormData();
-    var contractText = mods.map(function(m){ return (m.clause_name||'Clause')+'
-'+(m.original||''); }).join('
-
-');
-    if(!contractText.trim()) contractText = 'Contrat - '+(ana.filename||'document');
-    fd.append('file', new Blob([contractText],{type:'text/plain'}), ana.filename||'contrat.txt');
-    fd.append('lang','auto');
+    var contractText = mods.map(function(m){
+      return (m.clause_name||'Clause') + ' - ' + (m.original||'');
+    }).join(' | ');
+    if(!contractText.trim()) contractText = 'Contrat - ' + (ana.filename||'document');
+    fd.append('file', new Blob([contractText], {type:'text/plain'}), ana.filename||'contrat.txt');
+    fd.append('lang', 'auto');
     fd.append('type', ana.contract_type||'generic');
-    var decisions={};
-    mods.forEach(function(m){ decisions[String(m.id)]='accepted'; });
+    var decs = {};
+    mods.forEach(function(m){ decs[String(m.id)] = 'accepted'; });
     fd.append('modifications', JSON.stringify(mods));
-    fd.append('decisions', JSON.stringify(decisions));
-    var resp = await fetch('https://web-production-f96f7.up.railway.app/export', {method:'POST',body:fd});
+    fd.append('decisions', JSON.stringify(decs));
+    var resp = await fetch('https://web-production-f96f7.up.railway.app/export', {method:'POST', body:fd});
     if(resp.ok) {
       var blob = await resp.blob();
       var url = URL.createObjectURL(blob);
@@ -898,14 +903,22 @@ async function dlUserAnalysis() {
       a.download = (ana.filename||'contrat').replace(/.[^.]+$/, '') + '-modifie.docx';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      if(btn) { btn.textContent='✅ Téléchargé !'; btn.style.background='#10b981';
-        setTimeout(function(){ btn.textContent='⬇ Télécharger avec mes modifications'; btn.style.background=''; btn.disabled=false; },3000); }
+      if(btn) {
+        btn.textContent = 'Telecharge !';
+        btn.style.background = '#10b981';
+        setTimeout(function(){
+          btn.textContent = 'Telecharger avec mes modifications';
+          btn.style.background = '';
+          btn.disabled = false;
+        }, 3000);
+      }
     } else {
-      throw new Error('Erreur ' + resp.status + ' : ' + await resp.text());
+      var errText = await resp.text();
+      throw new Error('Erreur ' + resp.status + ' : ' + errText);
     }
   } catch(e) {
     alert('Erreur : ' + e.message);
-    if(btn) { btn.disabled=false; btn.textContent='⬇ Télécharger avec mes modifications'; }
+    if(btn) { btn.disabled = false; btn.textContent = 'Telecharger avec mes modifications'; }
   }
 }</script>
 </body>
