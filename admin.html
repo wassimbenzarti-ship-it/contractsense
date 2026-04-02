@@ -630,7 +630,7 @@ async function loadSousComptes() {
         + (acc.parent_email ? '<span style="color:#6b7280;font-size:10px;margin-left:8px">→ ' + acc.parent_email + '</span>' : '')
         + '</div>'
         + '</div>'
-        + '<button onclick="deleteAccount('' + acc.id + '', this)" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">🗑</button>'
+        + '<button onclick="deleteAccount(\'' + acc.id + '\', this)" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">🗑</button>'
         + '</div>';
     }).join('');
   } catch(e) {
