@@ -96,6 +96,7 @@ select { appearance: none; }
       <button class="tab-main" onclick="showTab('rag', this)">📚 Base RAG</button>
       <button class="tab-main" onclick="showTab('upload', this)">➕ Ajouter document</button>
       <button class="tab-main" onclick="showTab('suggestions', this)">💡 Suggestions</button>
+      <button class="tab-main" onclick="showTab('souscomptes', this)">👥 Sous-comptes</button>
     </div>
 
     <!-- Queue tab -->
@@ -146,7 +147,60 @@ select { appearance: none; }
     <div id="tab-suggestions" class="tab-content" style="display:none">
       <h3 style="color:#e2e5f0;margin-bottom:8px">Modeles suggeres par les utilisateurs</h3>
       <p style="color:#6b7280;font-size:13px;margin-bottom:16px">Validez pour integrer dans le RAG ou rejetez.</p>
-      <div id="suggestions-list" style="color:#6b7280;font-size:13px">Chargement...</div>
+      <div id="suggestions-list" style="color:#6b7280;font-size:13px">Chargement...  <div id="tab-souscomptes" class="tab-content" style="display:none">
+    <div style="max-width:900px;margin:0 auto">
+      <h2 style="font-size:20px;font-weight:700;color:#e2e5f0;margin-bottom:4px">👥 Gestion des sous-comptes</h2>
+      <p style="color:#6b7280;font-size:13px;margin-bottom:20px">Créez des comptes pour les directeurs juridiques (appv2) et leurs juristes.</p>
+      
+      <!-- Hierarchy info -->
+      <div style="background:#111420;border:1px solid #5b7cfa;border-radius:10px;padding:14px;margin-bottom:20px;font-size:12px;color:#a0a8c0;line-height:1.7">
+        <strong style="color:#5b7cfa">Architecture des rôles :</strong><br>
+        ⚙️ <strong>Admin</strong> = Vous (accès complet)<br>
+        🏢 <strong>Directeur Juridique</strong> = Compte appv2 - voit ses analyses + celles de ses juristes, peut suggérer des modèles<br>
+        ⚖️ <strong>Juriste</strong> = Sous-compte - voit uniquement ses propres analyses, peut suggérer des modèles au directeur
+      </div>
+      
+      <!-- Create account form -->
+      <div style="background:#111420;border:1px solid #1f2537;border-radius:12px;padding:20px;margin-bottom:24px">
+        <h3 style="font-size:15px;font-weight:600;color:#e2e5f0;margin-bottom:14px">+ Créer un compte</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div>
+            <label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Email</label>
+            <input id="sc-email" type="email" placeholder="juriste@cabinet.ma" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box">
+          </div>
+          <div>
+            <label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Mot de passe</label>
+            <input id="sc-pwd" type="password" placeholder="Mot de passe" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+          <div>
+            <label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Rôle</label>
+            <select id="sc-role" onchange="document.getElementById('sc-parent-row').style.display=this.value==='juriste'?'block':'none'" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px">
+              <option value="directeur">🏢 Directeur Juridique (appv2)</option>
+              <option value="juriste">⚖️ Juriste (sous-compte)</option>
+            </select>
+          </div>
+          <div id="sc-parent-row" style="display:none">
+            <label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Directeur parent (email)</label>
+            <input id="sc-parent" type="email" placeholder="directeur@cabinet.ma" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box">
+          </div>
+        </div>
+        <button id="sc-create-btn" onclick="createSubAccount()" style="background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer">+ Créer le compte</button>
+        <p style="font-size:11px;color:#f59e0b;margin-top:10px">⚠️ La création d'utilisateurs nécessite un service_role key Supabase. Configurez-le dans les variables d'environnement du backend ou créez les comptes directement depuis le tableau de bord Supabase.</p>
+      </div>
+      
+      <!-- Account list -->
+      <div style="background:#111420;border:1px solid #1f2537;border-radius:12px;padding:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h3 style="font-size:15px;font-weight:600;color:#e2e5f0">Comptes existants</h3>
+          <span id="sc-stats" style="font-size:12px;color:#6b7280">Chargement...</span>
+        </div>
+        <div id="sc-list">Chargement...</div>
+      </div>
+    </div>
+  </div>
+</div>
     </div>
 </div>
 </div>
@@ -210,12 +264,13 @@ function showMain() {
 }
 
 function showTab(tab, btn) {
-  ['queue','rag','upload','suggestions'].forEach(function(t) {
+  ['queue','rag','upload','suggestions','souscomptes'].forEach(function(t) {
     document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
   });
   document.querySelectorAll('.tab-main').forEach(function(b) { b.classList.remove('active'); });
   btn.classList.add('active');
     if (tab === 'suggestions') loadSuggestions();
+    if (tab === 'souscomptes') loadSousComptes();
 }
 
 function loadAll() { loadStats(); loadQueue(); loadRag(); }
@@ -513,20 +568,24 @@ async function loadSuggestions() {
     document.getElementById('suggestions-list').innerHTML = list.map(function(s) {
       var date = new Date(s.submitted_at).toLocaleDateString('fr-FR');
       var statusColor = s.status === 'approved' ? '#10b981' : s.status === 'rejected' ? '#ef4444' : '#f59e0b';
+      var previewUrl = BACKEND + '/suggestions/preview/' + s.id;
       return '<div style="background:#111420;border:1px solid #1f2537;border-radius:10px;padding:16px;margin-bottom:10px">'
         + '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">'
         + '<div>'
-        + '<strong style="color:#e2e5f0;font-size:14px">' + s.filename + '</strong>'
+        + '<strong style="color:#e2e5f0;font-size:14px">' + (s.filename && s.filename !== 'inconnu' ? s.filename : 'Modele suggere') + '</strong>'
         + '<span style="font-size:11px;color:#6b7280;margin-left:8px">' + (s.category||'') + '</span>'
         + '</div>'
         + '<span style="font-size:11px;color:' + statusColor + ';font-weight:600;text-transform:uppercase">' + (s.status||'pending') + '</span>'
         + '</div>'
-        + '<div style="font-size:12px;color:#6b7280;margin-bottom:12px">Par : ' + (s.suggested_by||'anonyme') + ' &mdash; ' + date + '</div>'
+        + '<div style="font-size:12px;color:#6b7280;margin-bottom:10px">Par : <strong style="color:#5b7cfa">' + (s.suggested_by||'anonyme') + '</strong> &mdash; ' + date + '</div>'
+        + '<div style="margin-bottom:12px">'
+        + '<a href="' + previewUrl + '" target="_blank" style="font-size:12px;color:#5b7cfa;text-decoration:none;border:1px solid #5b7cfa33;padding:4px 12px;border-radius:6px;display:inline-block;margin-right:8px">📄 Voir le fichier</a>'
+        + '</div>'
         + (s.status === 'pending' ? '<div style="display:flex;gap:8px">'
-+ `<button onclick="approveSugg('${s.id}')" style="padding:8px 16px;background:#10b981;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">Valider RAG</button>`
-+ `<button onclick="rejectSugg('${s.id}')" style="padding:8px 16px;background:#ef4444;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">Rejeter</button>`
-+ '</div>' : '')
-+ '</div>';
+          + '<button onclick="approveSugg('' + s.id + '')" style="padding:8px 16px;background:#10b981;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">✅ Valider RAG</button>'
+          + '<button onclick="rejectSugg('' + s.id + '')" style="padding:8px 16px;background:#ef4444;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">❌ Rejeter</button>'
+          + '</div>' : '')
+        + '</div>';
     }).join('');
   } catch(e) {
     document.getElementById('suggestions-list').innerHTML = '<p style="color:#ef4444">Erreur: ' + e.message + '</p>';
@@ -545,6 +604,85 @@ async function rejectSugg(id) {
   if(r.ok) { alert('Suggestion rejetée.'); loadSuggestions(); }
   else { var d = await r.json(); alert('Erreur: ' + (d.error||r.status)); }
 }
+
+// ===== SOUS-COMPTES =====
+async function loadSousComptes() {
+  var list = document.getElementById('sc-list');
+  if(!list) return;
+  list.innerHTML = '<div style="color:#6b7280;font-size:13px">Chargement...</div>';
+  try {
+    var r = await fetch('https://nezxohrkikgjegnhgpyn.supabase.co/rest/v1/user_accounts?order=created_at.desc&select=*', {
+      headers: {'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lenhvaHJraWtnamVnbmhncHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MTQxNzYsImV4cCI6MjA4OTM5MDE3Nn0.zhBCacGGmIX-rVE9E9MUcbY2RpMomfq33lyq6DNU2kI', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lenhvaHJraWtnamVnbmhncHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MTQxNzYsImV4cCI6MjA4OTM5MDE3Nn0.zhBCacGGmIX-rVE9E9MUcbY2RpMomfq33lyq6DNU2kI'}
+    });
+    var accounts = r.ok ? await r.json() : [];
+    if(document.getElementById('sc-stats')) document.getElementById('sc-stats').textContent = accounts.length + ' compte(s)';
+    if(!accounts.length) {
+      list.innerHTML = '<div style="color:#6b7280;font-size:13px;padding:20px 0">Aucun sous-compte. Créez-en depuis Supabase Dashboard > Table user_accounts.</div>';
+      return;
+    }
+    list.innerHTML = accounts.map(function(acc) {
+      var roleColor = acc.role === 'directeur' ? '#5b7cfa' : acc.role === 'admin' ? '#f59e0b' : '#10b981';
+      var roleLabel = acc.role === 'directeur' ? '🏢 Directeur Juridique' : acc.role === 'admin' ? '⚙️ Admin' : '⚖️ Juriste';
+      return '<div style="background:#0d1017;border:1px solid #1f2537;border-radius:8px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'
+        + '<div>'
+        + '<div style="font-size:13px;font-weight:600;color:#e2e5f0">' + (acc.email||'') + '</div>'
+        + '<div style="margin-top:4px"><span style="background:' + roleColor + '22;color:' + roleColor + ';padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600">' + roleLabel + '</span>'
+        + (acc.parent_email ? '<span style="color:#6b7280;font-size:10px;margin-left:8px">→ ' + acc.parent_email + '</span>' : '')
+        + '</div>'
+        + '</div>'
+        + '<button onclick="deleteAccount('' + acc.id + '', this)" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">🗑</button>'
+        + '</div>';
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="color:#ef4444;font-size:13px">Erreur: ' + e.message + '<br><small>Assurez-vous que la table user_accounts existe dans Supabase.</small></div>';
+  }
+}
+
+async function createSubAccount() {
+  var email = document.getElementById('sc-email').value.trim();
+  var role = document.getElementById('sc-role').value;
+  var parentEmail = document.getElementById('sc-parent').value.trim();
+  var password = document.getElementById('sc-pwd').value;
+  if(!email || !password) { alert('Email et mot de passe requis'); return; }
+  if(role === 'juriste' && !parentEmail) { alert('Email du directeur parent requis pour un juriste'); return; }
+  var btn = document.getElementById('sc-create-btn');
+  btn.disabled = true; btn.textContent = 'Création...';
+  try {
+    var metaResp = await fetch('https://nezxohrkikgjegnhgpyn.supabase.co/rest/v1/user_accounts', {
+      method: 'POST',
+      headers: {'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lenhvaHJraWtnamVnbmhncHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MTQxNzYsImV4cCI6MjA4OTM5MDE3Nn0.zhBCacGGmIX-rVE9E9MUcbY2RpMomfq33lyq6DNU2kI', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lenhvaHJraWtnamVnbmhncHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MTQxNzYsImV4cCI6MjA4OTM5MDE3Nn0.zhBCacGGmIX-rVE9E9MUcbY2RpMomfq33lyq6DNU2kI', 'Content-Type': 'application/json', 'Prefer': 'return=representation'},
+      body: JSON.stringify({email: email, role: role, parent_email: role === 'juriste' ? parentEmail : null, temp_password: password})
+    });
+    if(metaResp.ok) {
+      alert('✅ Compte enregistré: ' + email + '\n\nNote: Créez aussi le compte Auth dans Supabase Dashboard > Authentication > Users avec le même email.');
+      document.getElementById('sc-email').value = '';
+      document.getElementById('sc-pwd').value = '';
+      document.getElementById('sc-parent').value = '';
+      loadSousComptes();
+    } else {
+      var err = await metaResp.json();
+      throw new Error(err.message || JSON.stringify(err));
+    }
+  } catch(e) {
+    alert('Erreur: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '+ Créer le compte';
+  }
+}
+
+async function deleteAccount(id, btn) {
+  if(!confirm('Supprimer ce compte ?')) return;
+  btn.disabled = true;
+  try {
+    var r = await fetch('https://nezxohrkikgjegnhgpyn.supabase.co/rest/v1/user_accounts?id=eq.' + id, {
+      method: 'DELETE',
+      headers: {'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lenhvaHJraWtnamVnbmhncHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MTQxNzYsImV4cCI6MjA4OTM5MDE3Nn0.zhBCacGGmIX-rVE9E9MUcbY2RpMomfq33lyq6DNU2kI', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lenhvaHJraWtnamVnbmhncHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MTQxNzYsImV4cCI6MjA4OTM5MDE3Nn0.zhBCacGGmIX-rVE9E9MUcbY2RpMomfq33lyq6DNU2kI'}
+    });
+    if(r.ok || r.status === 204) btn.closest('div[style]').remove();
+    else alert('Erreur suppression');
+  } catch(e) { alert('Erreur: ' + e.message); }
+}
+
 </script>
 </body>
 </html>
