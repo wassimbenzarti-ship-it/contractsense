@@ -799,7 +799,7 @@ async function loadDash(){
   try{
     if(_userRole==='juriste'){
       // Juriste: only own analyses
-      var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at,modifications,user_id');
+      var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at,modifications,user_id,status,director_notes,director_email');
       a=r1.ok?await r1.json():[];
     } else {
       // Directeur: own analyses + juristes' analyses
