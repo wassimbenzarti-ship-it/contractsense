@@ -144,21 +144,31 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <div id="dash-ov">
 <button class="dclose" onclick="closeDash()">x Fermer</button>
 <div id="dash-in">
-<h2>Mon espace</h2>
+<div id="dash-role-badge" style="display:inline-flex;align-items:center;gap:6px;background:rgba(91,124,250,0.12);border:1px solid rgba(91,124,250,0.3);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:#5b7cfa;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px"></div>
+<h2 id="dash-title">Mon espace</h2>
 <p id="deml" style="color:#6b7280;font-size:13px;margin-bottom:12px"></p>
 <div class="sg">
-<div class="sb"><div class="sn" id="sta">0</div><div class="sl">Analyses</div></div>
+<div class="sb"><div class="sn" id="sta">0</div><div class="sl" id="sl-analyses">Analyses</div></div>
 <div class="sb"><div class="sn" id="stm">0</div><div class="sl">Modeles</div></div>
+<div class="sb" id="sb-juristes" style="display:none"><div class="sn" id="stj">0</div><div class="sl">Juristes</div></div>
 <div class="sb"><div class="sn" id="stc">0</div><div class="sl">Clauses</div></div>
 </div>
 <div class="dt">
-<div class="dtb active" onclick="dtab('analyses')">Mes analyses</div>
-<div class="dtb" onclick="dtab('models')">Mes modeles</div>
-<div class="dtb" id="dtb-juristes" onclick="dtab('juristes')" style="display:none">Mes juristes</div>
+<div class="dtb active" id="dtb-analyses" onclick="dtab('analyses')">Analyses</div>
+<div class="dtb" onclick="dtab('models')">Modeles</div>
+<div class="dtb" id="dtb-juristes" onclick="dtab('juristes')" style="display:none">Equipe</div>
 </div>
-<div id="d-analyses" class="ds active"><div id="alist"></div></div>
+<div id="d-analyses" class="ds active">
+<div id="juriste-filter-bar" style="display:none;margin-bottom:10px">
+  <select id="juriste-filter" onchange="filterAnalysesByJuriste(this.value)" style="background:#1a2035;border:1px solid #1f2537;border-radius:6px;padding:6px 10px;color:#e2e5f0;font-size:12px;width:100%">
+    <option value="">Tous les juristes</option>
+  </select>
+</div>
+<div id="alist"></div>
+</div>
 <div id="d-models" class="ds">
-<label class="mz" for="minp">+ Uploader un modele (PDF, DOCX, TXT)</label>
+<div id="model-upload-info" style="display:none;background:rgba(91,124,250,0.08);border:1px solid rgba(91,124,250,0.2);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#a0a8c0;line-height:1.6"></div>
+<label class="mz" for="minp">+ Soumettre un modele de contrat</label>
 <input type="file" id="minp" accept=".pdf,.docx,.txt" style="display:none" onchange="upMdl(this)"/>
 <div id="mlist"></div>
 </div>
@@ -204,7 +214,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
     </div>
 
     <div id="text-zone" style="display:none">
-      <textarea id="contract-text" placeholder="Collez le texte de votre contrat ici&" style="margin-bottom:14px"></textarea>
+      <textarea id="contract-text" placeholder="Collez le texte de votre contrat ici..." style="margin-bottom:14px"></textarea>
     </div>
 
     <div class="opts">
@@ -249,10 +259,10 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
   <div id="step-loading" style="display:none" class="loading">
     <div class="spinner"></div>
     <div class="steps">
-      <div class="step" id="s0">⏳ Lecture du document&</div>
-      <div class="step" id="s1">⏳ Identification des parties&</div>
-      <div class="step" id="s2">⏳ Analyse des risques&</div>
-      <div class="step" id="s3">⏳ Rédaction des modifications&</div>
+      <div class="step" id="s0">⏳ Lecture du document...</div>
+      <div class="step" id="s1">⏳ Identification des parties...</div>
+      <div class="step" id="s2">⏳ Analyse des risques...</div>
+      <div class="step" id="s3">⏳ Rédaction des modifications...</div>
     </div>
   </div>
 
@@ -394,12 +404,12 @@ function saveKey() {
 
 function stepDone(i) {
   var el = document.getElementById('s' + i);
-  var labels = ['Lecture du document&','Identification des parties&','Analyse des risques&','Rédaction des modifications&'];
+  var labels = ['Lecture du document','Identification des parties','Analyse des risques','Rédaction des modifications'];
   if (el) { el.classList.add('done'); el.textContent = ' ' + labels[i]; }
 }
 
 function stepReset() {
-  var labels = ['Lecture du document&','Identification des parties&','Analyse des risques&','Rédaction des modifications&'];
+  var labels = ['Lecture du document','Identification des parties','Analyse des risques','Rédaction des modifications'];
   for (var i = 0; i < 4; i++) {
     var el = document.getElementById('s' + i);
     if (el) { el.classList.remove('done'); el.textContent = '✅ ' + labels[i]; }
@@ -636,7 +646,7 @@ function renderReview() {
 //    Export                                                 
 async function exportDoc() {
   var btn = document.getElementById('btn-export');
-  btn.textContent = '⏳ Génération en cours&';
+  btn.textContent = '⏳ Génération en cours...';
   btn.disabled = true;
   try {
     var fd = buildFormData();
@@ -756,9 +766,26 @@ async function checkRole(){
       if(d[0]){_userRole=d[0].role;_userParentEmail=d[0].parent_email;}
       else _userRole='directeur';
     }
+    // Update UI for role
+    var badge=document.getElementById('dash-role-badge');
+    var title=document.getElementById('dash-title');
+    var slAna=document.getElementById('sl-analyses');
+    var modelInfo=document.getElementById('model-upload-info');
     if(_userRole==='directeur'){
       var jBtn=document.getElementById('dtb-juristes');
       if(jBtn)jBtn.style.display='';
+      var sbJ=document.getElementById('sb-juristes');
+      if(sbJ)sbJ.style.display='';
+      if(badge)badge.textContent='Direction Juridique';
+      if(title)title.textContent='Tableau de bord Direction';
+      if(slAna)slAna.textContent='Analyses equipe';
+      if(modelInfo)modelInfo.innerHTML='<strong style="color:#5b7cfa">Soumission de modele :</strong> Les modeles que vous soumettez sont transmis a l\'admin pour integration dans la base RAG partagee.';
+      if(modelInfo)modelInfo.style.display='';
+    } else if(_userRole==='juriste'){
+      if(badge)badge.textContent='Juriste';
+      if(title)title.textContent='Mon espace';
+      if(modelInfo)modelInfo.innerHTML='<strong style="color:#5b7cfa">Soumission de modele :</strong> Les modeles que vous soumettez sont d\'abord examines par votre directeur juridique avant integration.';
+      if(modelInfo)modelInfo.style.display='';
     }
   }catch(e){console.log('checkRole error:',e);_userRole='directeur';}
 }
@@ -777,8 +804,8 @@ async function loadDash(){
       // Directeur: own analyses + juristes' analyses
       var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at,modifications,user_id');
       a=r1.ok?await r1.json():[];
-      // Also load juristes analyses
-      var rj=await sf('/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email');
+      // Also load juristes analyses (use anon key to bypass user-level RLS)
+      var rj=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
       if(rj.ok){
         var juristes=await rj.json();
         window._juristesData=juristes;
@@ -791,16 +818,56 @@ async function loadDash(){
   }catch(e){console.log('loadDash error:',e);}
   document.getElementById('sta').textContent=a.length;
   window._userAnalyses=a;
-  document.getElementById('alist').innerHTML=a.length===0
-    ?'<p style="color:#6b7280;font-size:13px">Aucune analyse</p>'
-    :a.map(function(x,i){
-      var tag=x._juristeEmail?'<span style="font-size:10px;background:#5b7cfa22;color:#5b7cfa;padding:2px 6px;border-radius:10px;margin-left:6px">' + String.fromCharCode(9878) + ' '+x._juristeEmail+'</span>':'';
-      return '<div class="ac" style="cursor:pointer" onclick="showAnaDetail('+i+')">'+'<h4>'+x.filename+tag+'</h4>'+'<p>'+(x.contract_type||'')+' - '+(x.partie||'')+' - '+new Date(x.created_at).toLocaleDateString()+'</p>'+'<span style="font-size:11px;color:#5b7cfa">Voir et modifier &gt;</span>'+'</div>';
-    }).join('')+'<div id="ana-detail" class="ana-detail"></div>';
+  // Populate juriste filter and count for directeur
+  if(_userRole==='directeur'){
+    var juristes=window._juristesData||[];
+    var stj=document.getElementById('stj');
+    if(stj)stj.textContent=juristes.length;
+    var filterBar=document.getElementById('juriste-filter-bar');
+    var filterSel=document.getElementById('juriste-filter');
+    if(juristes.length>0&&filterBar&&filterSel){
+      filterSel.innerHTML='<option value="">Toute l\'equipe ('+a.length+')</option>';
+      juristes.forEach(function(j){
+        var cnt=a.filter(function(x){return x._juristeEmail===j.email;}).length;
+        var opt=document.createElement('option');opt.value=j.email;opt.textContent=j.email+' ('+cnt+' analyses)';filterSel.appendChild(opt);
+      });
+      var ownCnt=a.filter(function(x){return !x._juristeEmail;}).length;
+      var optOwn=document.createElement('option');optOwn.value='__own__';optOwn.textContent='Mes propres analyses ('+ownCnt+')';filterSel.appendChild(optOwn);
+      filterBar.style.display='';
+    }
+  }
+  window._renderAnalyses=function(list){
+    document.getElementById('alist').innerHTML=list.length===0
+      ?'<p style="color:#6b7280;font-size:13px;padding:20px 0">Aucune analyse</p>'
+      :list.map(function(x,i){
+        var realIdx=window._userAnalyses.indexOf(x);
+        var tag=x._juristeEmail?'<span style="font-size:10px;background:#5b7cfa22;color:#5b7cfa;padding:2px 6px;border-radius:10px;margin-left:6px">⚖ '+x._juristeEmail+'</span>':'';
+        var ct=x.contract_type?'<span style="background:#1f2537;color:#a0a8c0;padding:1px 6px;border-radius:4px;font-size:10px;margin-right:4px">'+x.contract_type+'</span>':'';
+        var pa=x.partie?'<span style="background:rgba(16,185,129,0.1);color:#10b981;padding:1px 6px;border-radius:4px;font-size:10px">'+x.partie+'</span>':'';
+        return '<div class="ac" style="cursor:pointer" onclick="showAnaDetail('+realIdx+')">'
+          +'<h4>'+x.filename+tag+'</h4>'
+          +'<p style="margin-top:4px">'+ct+pa+'<span style="color:#4a5470;font-size:11px;margin-left:4px">'+new Date(x.created_at).toLocaleDateString('fr-FR')+'</span></p>'
+          +'<span style="font-size:11px;color:#5b7cfa;margin-top:4px;display:block">Consulter et modifier →</span>'
+          +'</div>';
+      }).join('')+'<div id="user-ana-detail"></div>';
+  };
+  window._renderAnalyses(a);
+  window.filterAnalysesByJuriste=function(val){
+    if(!val) return window._renderAnalyses(window._userAnalyses);
+    if(val==='__own__') return window._renderAnalyses(window._userAnalyses.filter(function(x){return !x._juristeEmail;}));
+    window._renderAnalyses(window._userAnalyses.filter(function(x){return x._juristeEmail===val;}));
+  };
   var r2=await sf('/rest/v1/user_models?user_id=eq.'+_cu.id+'&order=created_at.desc&select=id,filename,created_at');
   var m=r2.ok?await r2.json():[];
   document.getElementById('stm').textContent=m.length;
-  document.getElementById('mlist').innerHTML=m.length===0?'<p style="color:#6b7280;font-size:13px">Aucun modele</p>':m.map(function(x){return '<div class="ac" style="display:flex;justify-content:space-between;align-items:center">'+'<div><h4>'+x.filename+'</h4><p>'+new Date(x.created_at).toLocaleDateString()+'</p></div>'+'<button onclick="deleteModel(\''+x.id+'\', this)" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;flex-shrink:0">' + String.fromCharCode(128465) + ' Supprimer</button>'+'</div>';}).join('');
+  document.getElementById('mlist').innerHTML=m.length===0
+    ?'<p style="color:#6b7280;font-size:13px">Aucun modele soumis</p>'
+    :m.map(function(x){
+      return '<div class="ac" style="display:flex;justify-content:space-between;align-items:center">'
+        +'<div><h4>'+x.filename+'</h4><p>Soumis le '+new Date(x.created_at).toLocaleDateString('fr-FR')+'</p></div>'
+        +'<button onclick="deleteModel(\''+x.id+'\', this)" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;flex-shrink:0">Supprimer</button>'
+        +'</div>';
+    }).join('');
   // Load juristes tab if directeur
   if(_userRole==='directeur')loadJuristes();
 }
@@ -809,28 +876,39 @@ async function upMdl(inp){
   var f=inp.files[0];if(!f)return;
   var r=await sf('/rest/v1/user_models',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify({user_id:_cu.id,user_email:_cu.email,filename:f.name,category:'contract',is_public:false})});
   if(r.ok){
+    var alertMsg='Modele uploade';
     try{
       var fd=new FormData();
       fd.append('file',f);
       fd.append('source',f.name);
       fd.append('category','contract');
       fd.append('suggested_by',_cu.email);
-      // Route: juriste -> suggest to directeur, directeur -> suggest to admin
-      var endpoint, alertMsg;
       if(_userRole==='juriste' && _userParentEmail){
+        // Juriste -> soumet au directeur pour validation
         fd.append('target_email',_userParentEmail);
-        endpoint='https://web-production-f96f7.up.railway.app/rag/suggest-to-director';
+        var r2=await fetch(BACKEND+'/rag/suggest-to-director',{method:'POST',body:fd});
+        var sd=await r2.json();
+        if(!r2.ok) throw new Error(sd.error||'Erreur');
         alertMsg='Modele soumis au directeur juridique pour validation';
       } else {
-        endpoint='https://web-production-f96f7.up.railway.app/rag/suggest';
-        alertMsg='Modele soumis pour validation admin';
+        // Directeur -> crée la suggestion puis la transmet directement à l'admin
+        fd.append('target_email',_cu.email);
+        var r2=await fetch(BACKEND+'/rag/suggest-to-director',{method:'POST',body:fd});
+        var sd=await r2.json();
+        if(r2.ok && (sd.id||sd.suggestion_id)){
+          var sid=sd.id||sd.suggestion_id;
+          await fetch(BACKEND+'/suggestions/forward-to-admin/'+sid,{method:'POST'});
+          alertMsg='Modele soumis a l\'admin pour validation — il apparaitra dans les suggestions';
+        } else {
+          // Fallback si la réponse ne contient pas d'ID
+          var fd2=new FormData();
+          fd2.append('file',f);fd2.append('source',f.name);fd2.append('category','contract');fd2.append('suggested_by',_cu.email);
+          await fetch(BACKEND+'/rag/suggest',{method:'POST',body:fd2});
+          alertMsg='Modele soumis pour validation admin';
+        }
       }
-      var r2=await fetch(endpoint,{method:'POST',body:fd});
-      var suggestData=await r2.json();
-      if(!r2.ok){console.error('Erreur suggest:',suggestData);}
-      else{console.log('Suggestion envoyee:',suggestData);}
-    }catch(e2){console.log('Suggest error:',e2);alertMsg='Modele uploade (suggestion non envoyee)';}
-    alert(alertMsg||'Modele uploade');
+    }catch(e2){console.log('Suggest error:',e2);alertMsg='Modele uploade (erreur soumission: '+e2.message+')';}
+    alert(alertMsg);
     loadDash();
   }else alert('Erreur upload');
 }
@@ -951,7 +1029,7 @@ async function dlUserAnalysis() {
       return (m.clause_name||'Clause') + ' - ' + (m.original||'');
     }).join(' | ');
     if(!contractText.trim()) contractText = 'Contrat - ' + (ana.filename||'document');
-    fd.append('file', new Blob([contractText], {type:'text/plain'}), ana.filename||'contrat.txt');
+    fd.append('file', new Blob([contractText], {type:'text/plain'}), 'contrat.txt');
     fd.append('lang', 'auto');
     fd.append('type', ana.contract_type||'generic');
     var decs = {};
@@ -991,29 +1069,49 @@ async function loadJuristes(){
   if(!el||!_cu)return;
   el.innerHTML='<div style="color:#6b7280;font-size:13px">Chargement...</div>';
   try{
-    var r=await sf('/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email,role,created_at');
+    var r=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email,role,created_at',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
     var juristes=r.ok?await r.json():[];
     var rp=await fetch('https://web-production-f96f7.up.railway.app/suggestions/list-for-director?director_email='+encodeURIComponent(_cu.email));
     var pending=[];
     if(rp.ok){var pd=await rp.json();pending=pd.suggestions||[];}
+    var allAna=window._userAnalyses||[];
     var html='';
     if(!juristes.length){
-      html='<p style="color:#6b7280;font-size:13px;padding:12px 0">Aucun juriste rattaché. Les juristes sont créés par l\'admin.</p>';
+      html='<div style="text-align:center;padding:30px 0">'
+        +'<div style="font-size:32px;margin-bottom:10px">⚖</div>'
+        +'<div style="font-size:14px;font-weight:600;color:#e2e5f0;margin-bottom:6px">Aucun juriste rattaché</div>'
+        +'<div style="font-size:12px;color:#6b7280">Demandez a l\'admin de créer des comptes juristes associés a votre email.</div>'
+        +'</div>';
     } else {
-      html='<div style="margin-bottom:16px"><div style="font-size:12px;color:#6b7280;margin-bottom:8px">'+juristes.length+' juriste(s) rattaché(s)</div>';
+      html='<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+juristes.length+' juriste(s) dans votre equipe</div>';
       html+=juristes.map(function(j){
-        return '<div style="background:#111420;border:1px solid #1f2537;border-radius:8px;padding:10px 14px;margin-bottom:6px">'
-          +'<div style="font-size:13px;font-weight:600;color:#e2e5f0">'+j.email+'</div>'
-          +'<div style="font-size:11px;color:#6b7280;margin-top:2px">Juriste - Depuis '+new Date(j.created_at).toLocaleDateString('fr-FR')+'</div>'
+        var juristeAna=allAna.filter(function(x){return x._juristeEmail===j.email;});
+        var lastAna=juristeAna[0];
+        var lastDate=lastAna?new Date(lastAna.created_at).toLocaleDateString('fr-FR'):'Jamais';
+        return '<div style="background:#111420;border:1px solid #1f2537;border-radius:10px;padding:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">'
+          +'<div>'
+          +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+          +'<span style="font-size:16px">⚖</span>'
+          +'<span style="font-size:13px;font-weight:600;color:#e2e5f0">'+j.email+'</span>'
+          +'</div>'
+          +'<div style="font-size:11px;color:#6b7280">Membre depuis '+new Date(j.created_at).toLocaleDateString('fr-FR')+' &bull; Derniere analyse : '+lastDate+'</div>'
+          +'</div>'
+          +'<div style="display:flex;align-items:center;gap:10px">'
+          +'<div style="text-align:center">'
+          +'<div style="font-size:20px;font-weight:800;color:#5b7cfa">'+juristeAna.length+'</div>'
+          +'<div style="font-size:10px;color:#6b7280">analyses</div>'
+          +'</div>'
+          +(juristeAna.length>0?'<button onclick="filterAndShowAnalyses(\''+j.email+'\')" style="background:#5b7cfa22;border:1px solid #5b7cfa44;color:#5b7cfa;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap">Voir analyses →</button>':'')
+          +'</div>'
           +'</div>';
-      }).join('')+'</div>';
+      }).join('')+'<div style="margin-top:4px"></div>';
     }
     if(pending.length){
-      html+='<div><div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:8px">Suggestions en attente ('+pending.length+')</div>';
+      html+='<div style="margin-top:20px"><div style="font-size:12px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Modeles en attente de validation ('+pending.length+')</div>';
       html+=pending.map(function(s){
-        return '<div data-sid="'+s.id+'" style="background:#111420;border:1px solid #1f2537;border-radius:8px;padding:12px;margin-bottom:8px">'
+        return '<div data-sid="'+s.id+'" style="background:#111420;border:1px solid #f59e0b33;border-radius:8px;padding:12px;margin-bottom:8px">'
           +'<div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:4px">'+(s.filename||'Modele')+'</div>'
-          +'<div style="font-size:11px;color:#6b7280;margin-bottom:8px">Par: '+(s.suggested_by||'')+'</div>'
+          +'<div style="font-size:11px;color:#6b7280;margin-bottom:8px">Soumis par: <strong style="color:#f59e0b">'+(s.suggested_by||'')+'</strong></div>'
           +'<div style="display:flex;gap:8px">'
           +'<button class="fwd-sugg-btn" style="background:#10b98122;border:1px solid #10b981;color:#10b981;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer">Transmettre admin</button>'
           +'<button class="rej-sugg-btn" style="background:#ef444422;border:1px solid #ef4444;color:#ef4444;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer">Rejeter</button>'
@@ -1037,16 +1135,23 @@ async function loadJuristes(){
   }catch(e){el.innerHTML='<p style="color:#ef4444;font-size:12px">Erreur: '+e.message+'</p>';}
 }
 
+function filterAndShowAnalyses(juristeEmail){
+  // Switch to analyses tab and filter by juriste
+  dtab('analyses');
+  var sel=document.getElementById('juriste-filter');
+  if(sel){sel.value=juristeEmail;if(window.filterAnalysesByJuriste)window.filterAnalysesByJuriste(juristeEmail);}
+}
+
 async function forwardSugg(id){
   if(!confirm('Transmettre cette suggestion a l\'admin ?'))return;
-  var r=await fetch('https://web-production-f96f7.up.railway.app/suggestions/forward-to-admin/'+id,{method:'POST'});
+  var r=await fetch(BACKEND+'/suggestions/forward-to-admin/'+id,{method:'POST'});
   if(r.ok){alert('Suggestion transmise a l\'admin !');loadJuristes();}
   else alert('Erreur');
 }
 
 async function rejectSuggDir(id){
   if(!confirm('Rejeter cette suggestion ?'))return;
-  var r=await fetch('https://web-production-f96f7.up.railway.app/suggestions/reject-director/'+id,{method:'POST'});
+  var r=await fetch(BACKEND+'/suggestions/reject-director/'+id,{method:'POST'});
   if(r.ok){alert('Suggestion rejetee.');loadJuristes();}
   else alert('Erreur');
 }
