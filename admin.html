@@ -175,8 +175,8 @@ select { appearance: none; }
         </div>
         <!-- Rattacher un compte Auth existant -->
         <div style="background:#111420;border:1px solid #f59e0b44;border-radius:12px;padding:20px;margin-bottom:24px">
-          <h3 style="font-size:14px;font-weight:600;color:#f59e0b;margin-bottom:6px">Rattacher un compte existant</h3>
-          <p style="font-size:12px;color:#6b7280;margin-bottom:14px">Si un compte Auth existe déjà mais que la fiche de rôle a été supprimée, utilisez ce formulaire pour recréer uniquement la ligne de metadata sans toucher à l'Auth.</p>
+          <h3 style="font-size:14px;font-weight:600;color:#f59e0b;margin-bottom:6px">Rattacher / Corriger un compte existant</h3>
+          <p style="font-size:12px;color:#6b7280;margin-bottom:14px">Utilisez ce formulaire pour créer ou corriger la fiche de rôle d'un compte (role, parent_email) sans toucher au compte Auth Supabase. Fonctionne même si la ligne existe déjà.</p>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
             <div><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Email du compte existant</label><input id="link-email" type="email" placeholder="contact@cabinet.ma" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box"></div>
             <div><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Rôle</label><select id="link-role" onchange="document.getElementById('link-parent-row').style.display=this.value==='juriste'?'block':'none'" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px"><option value="directeur">Directeur Juridique</option><option value="juriste">⚖ Juriste</option></select></div>
@@ -693,7 +693,9 @@ async function linkExistingAccount() {
   var headers = {'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation'};
   try {
     var payload = {email: email, role: role, parent_email: role === 'juriste' ? parentEmail : ''};
-    var r = await fetch(SB_URL + '/rest/v1/user_accounts', {method: 'POST', headers: headers, body: JSON.stringify(payload)});
+    // Upsert : insère ou met à jour si l'email existe déjà
+    var upsertHeaders = Object.assign({}, headers, {'Prefer': 'resolution=merge-duplicates,return=representation'});
+    var r = await fetch(SB_URL + '/rest/v1/user_accounts?on_conflict=email', {method: 'POST', headers: upsertHeaders, body: JSON.stringify(payload)});
     if(r.ok || r.status === 201) {
       msg.textContent = '✅ Compte ' + email + ' rattaché comme ' + role + (parentEmail ? ' → ' + parentEmail : '');
       msg.style.color = '#10b981'; msg.style.display = 'inline';
