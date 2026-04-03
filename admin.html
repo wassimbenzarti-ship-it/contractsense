@@ -147,64 +147,44 @@ select { appearance: none; }
     <div id="tab-suggestions" class="tab-content" style="display:none">
       <h3 style="color:#e2e5f0;margin-bottom:8px">Modeles suggeres par les utilisateurs</h3>
       <p style="color:#6b7280;font-size:13px;margin-bottom:16px">Validez pour integrer dans le RAG ou rejetez.</p>
-      <div id="suggestions-list" style="color:#6b7280;font-size:13px">Chargement...  <div id="tab-souscomptes" class="tab-content" style="display:none">
-    <div style="max-width:900px;margin:0 auto">
-      <h2 style="font-size:20px;font-weight:700;color:#e2e5f0;margin-bottom:4px">👥 Gestion des sous-comptes</h2>
-      <p style="color:#6b7280;font-size:13px;margin-bottom:20px">Créez des comptes pour les directeurs juridiques (appv2) et leurs juristes.</p>
-      
-      <!-- Hierarchy info -->
-      <div style="background:#111420;border:1px solid #5b7cfa;border-radius:10px;padding:14px;margin-bottom:20px;font-size:12px;color:#a0a8c0;line-height:1.7">
-        <strong style="color:#5b7cfa">Architecture des rôles :</strong><br>
-        ⚙️ <strong>Admin</strong> = Vous (accès complet)<br>
-        🏢 <strong>Directeur Juridique</strong> = Compte appv2 - voit ses analyses + celles de ses juristes, peut suggérer des modèles<br>
-        ⚖️ <strong>Juriste</strong> = Sous-compte - voit uniquement ses propres analyses, peut suggérer des modèles au directeur
-      </div>
-      
-      <!-- Create account form -->
-      <div style="background:#111420;border:1px solid #1f2537;border-radius:12px;padding:20px;margin-bottom:24px">
-        <h3 style="font-size:15px;font-weight:600;color:#e2e5f0;margin-bottom:14px">+ Créer un compte</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-          <div>
-            <label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Email</label>
-            <input id="sc-email" type="email" placeholder="juriste@cabinet.ma" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box">
-          </div>
-          <div>
-            <label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Mot de passe</label>
-            <input id="sc-pwd" type="password" placeholder="Mot de passe" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box">
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-          <div>
-            <label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Rôle</label>
-            <select id="sc-role" onchange="document.getElementById('sc-parent-row').style.display=this.value==='juriste'?'block':'none'" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px">
-              <option value="directeur">🏢 Directeur Juridique (appv2)</option>
-              <option value="juriste">⚖️ Juriste (sous-compte)</option>
-            </select>
-          </div>
-          <div id="sc-parent-row" style="display:none">
-            <label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Directeur parent (email)</label>
-            <input id="sc-parent" type="email" placeholder="directeur@cabinet.ma" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box">
-          </div>
-        </div>
-        <button id="sc-create-btn" onclick="createSubAccount()" style="background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer">+ Créer le compte</button>
-        <p style="font-size:11px;color:#f59e0b;margin-top:10px">⚠️ La création d'utilisateurs nécessite un service_role key Supabase. Configurez-le dans les variables d'environnement du backend ou créez les comptes directement depuis le tableau de bord Supabase.</p>
-      </div>
-      
-      <!-- Account list -->
-      <div style="background:#111420;border:1px solid #1f2537;border-radius:12px;padding:20px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-          <h3 style="font-size:15px;font-weight:600;color:#e2e5f0">Comptes existants</h3>
-          <span id="sc-stats" style="font-size:12px;color:#6b7280">Chargement...</span>
-        </div>
-        <div id="sc-list">Chargement...</div>
-      </div>
+      <div id="suggestions-list"><div style="color:#6b7280;font-size:13px">Chargement...</div></div>
     </div>
-  </div>
-</div>
-    </div>
-</div>
-</div>
 
+    <!-- Sous-comptes tab -->
+    <div id="tab-souscomptes" style="display:none">
+      <div style="max-width:900px;margin:0 auto">
+        <h2 style="font-size:20px;font-weight:700;color:#e2e5f0;margin-bottom:4px"> Gestion des sous-comptes</h2>
+        <p style="color:#6b7280;font-size:13px;margin-bottom:20px">Créez des comptes pour les directeurs juridiques (appv2) et leurs juristes.</p>
+        <div style="background:#111420;border:1px solid #5b7cfa;border-radius:10px;padding:14px;margin-bottom:20px;font-size:12px;color:#a0a8c0;line-height:1.7">
+          <strong style="color:#5b7cfa">Architecture des rôles :</strong><br>
+          ⚙ <strong>Admin</strong> = Vous (accès complet, voit tous les comptes)<br>
+           <strong>Directeur Juridique</strong> = Compte appv2 - voit ses analyses + celles de ses juristes<br>
+          ⚖ <strong>Juriste</strong> = Sous-compte - voit uniquement ses propres analyses
+        </div>
+        <div style="background:#111420;border:1px solid #1f2537;border-radius:12px;padding:20px;margin-bottom:24px">
+          <h3 style="font-size:15px;font-weight:600;color:#e2e5f0;margin-bottom:14px">+ Créer un compte</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Email</label><input id="sc-email" type="email" placeholder="juriste@cabinet.ma" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box"></div>
+            <div><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Mot de passe</label><input id="sc-pwd" type="password" placeholder="Mot de passe" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Rôle</label><select id="sc-role" onchange="document.getElementById('sc-parent-row').style.display=this.value==='juriste'?'block':'none'" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px"><option value="directeur"> Directeur Juridique (appv2)</option><option value="juriste">⚖ Juriste (sous-compte)</option></select></div>
+            <div id="sc-parent-row" style="display:none"><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Directeur parent (email)</label><input id="sc-parent" type="email" placeholder="directeur@cabinet.ma" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box"></div>
+          </div>
+          <button id="sc-create-btn" onclick="createSubAccount()" style="background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer">+ Créer le compte</button>
+          <p style="font-size:11px;color:#f59e0b;margin-top:10px">Note: Le compte est enregistré dans user_accounts. Créez aussi l'authentification dans Supabase Dashboard > Authentication > Users.</p>
+        </div>
+        <div style="background:#111420;border:1px solid #1f2537;border-radius:12px;padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <h3 style="font-size:15px;font-weight:600;color:#e2e5f0">Tous les comptes</h3>
+            <span id="sc-stats" style="font-size:12px;color:#6b7280">Chargement...</span>
+          </div>
+          <div id="sc-list">Chargement...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 <script>
 var BACKEND = 'https://web-production-f96f7.up.railway.app';
 var apiKey = '';
@@ -387,8 +367,8 @@ async function loadQueue() {
               }).join('') +
             '</select>' +
           '</div>' +
-          '<button class="btn-success" onclick="validateContract(\'' + item.id + '\')">✅ Valider → RAG</button>' +
-          '<button class="btn-danger" onclick="rejectContract(\'' + item.id + '\')">❌ Rejeter</button>' +
+          '<button class="btn-success" onclick="validateContract(\' + item.id + \')">✅ Valider → RAG</button>' +
+          '<button class="btn-danger" onclick="rejectContract(\' + item.id + \')">❌ Rejeter</button>' +
         '</div>';
       list.appendChild(div);
     });
@@ -485,7 +465,7 @@ async function loadRag() {
           '</div>' +
           '<div class="meta">' + doc.chunks + ' chunks' + partyHtml + '</div>' +
         '</div>' +
-        '<button class="btn-danger" onclick="deleteDoc(\'' + doc.source.replace(/'/g,"\\'") + '\', this)">🗑</button>';
+        '<button class="btn-danger" onclick="deleteDoc(\' + doc.source.replace(/'/g,"\\'") + \', this)">🗑</button>';
       list.appendChild(div);
     });
   } catch(e) {
@@ -582,8 +562,8 @@ async function loadSuggestions() {
         + '<a href="' + previewUrl + '" target="_blank" style="font-size:12px;color:#5b7cfa;text-decoration:none;border:1px solid #5b7cfa33;padding:4px 12px;border-radius:6px;display:inline-block;margin-right:8px">📄 Voir le fichier</a>'
         + '</div>'
         + (s.status === 'pending' ? '<div style="display:flex;gap:8px">'
-+ '<button onclick="approveSugg(\'' + s.id + '\')" style="padding:8px 16px;background:#10b981;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">✅ Valider RAG</button>'
-+ '<button onclick="rejectSugg(\'' + s.id + '\')" style="padding:8px 16px;background:#ef4444;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">❌ Rejeter</button>'
++ '<button onclick="approveSugg(\' + s.id + \')" style="padding:8px 16px;background:#10b981;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">✅ Valider RAG</button>'
++ '<button onclick="rejectSugg(\' + s.id + \')" style="padding:8px 16px;background:#ef4444;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">❌ Rejeter</button>'
           + '</div>' : '')
         + '</div>';
     }).join('');
@@ -630,7 +610,7 @@ async function loadSousComptes() {
         + (acc.parent_email ? '<span style="color:#6b7280;font-size:10px;margin-left:8px">→ ' + acc.parent_email + '</span>' : '')
         + '</div>'
         + '</div>'
-        + '<button onclick="deleteAccount(\'' + acc.id + '\', this)" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">🗑</button>'
+        + '<button onclick="deleteAccount(\' + acc.id + \', this)" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">🗑</button>'
         + '</div>';
     }).join('');
   } catch(e) {
