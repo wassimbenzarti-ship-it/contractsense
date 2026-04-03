@@ -1090,22 +1090,77 @@ function showAnaDetail(idx) {
 async function analyzeAdverse(anaId, contractType, partie){
   var inp=document.getElementById('adverse-file-inp');
   var file=inp?inp.files[0]:null;
-  if(!file){alert('Sélectionnez un fichier');return;}
+  if(!file) return;
   var res=document.getElementById('adverse-result');
-  if(res)res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Analyse des markups en cours...</div>';
+  if(res)res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Lecture du document...</div>';
   try{
+    // Étape 1 : extraire le texte du document adverse
+    // Pour DOCX, on passe d'abord par le backend pour obtenir le texte brut
+    var adverseText='';
+    if(file.name.match(/\.docx$/i)){
+      // Envoyer le DOCX au backend pour extraction texte via /analyze
+      // On récupère juste le texte extrait en lui envoyant un document neutre
+      var fdExtract=new FormData();
+      fdExtract.append('file',file);
+      fdExtract.append('type','general');
+      fdExtract.append('partie','');
+      fdExtract.append('lang','auto');
+      var rExt=await fetch(BACKEND+'/analyze',{method:'POST',body:fdExtract});
+      var dExt=await rExt.json();
+      // Reconstituer le texte depuis les modifications retournées
+      if(dExt.modifications&&dExt.modifications.length){
+        adverseText=dExt.modifications.map(function(m){
+          return (m.clause_name?m.clause_name+' : ':'')+( m.original||'');
+        }).join('\n\n');
+      }
+      if(!adverseText) throw new Error('Impossible d\'extraire le texte du DOCX. Exportez-le en TXT et réessayez.');
+    } else {
+      adverseText=await new Promise(function(resolve,reject){
+        var fr=new FileReader();
+        fr.onload=function(e){resolve(e.target.result||'');};
+        fr.onerror=function(){reject(new Error('Erreur lecture fichier'));};
+        fr.readAsText(file,'utf-8');
+      });
+    }
+
+    // Étape 2 : assembler notre version validée depuis les clauses proposées
+    var ourMods=window._currentMods||[];
+    if(!ourMods.length){
+      if(res)res.innerHTML='<div style="color:#f59e0b;font-size:12px;padding:10px 0">Ouvrez d\'abord l\'analyse validée pour charger les clauses de référence.</div>';
+      return;
+    }
+    var ourVersion=ourMods.map(function(m){
+      return (m.clause_name||'Clause')+' :\n'+(m.proposed||m.original||'');
+    }).join('\n\n---\n\n');
+
+    // Étape 3 : construire un document de diff structuré
+    // Le backend verra UNIQUEMENT les écarts — chaque bloc compare explicitement
+    // notre clause proposée vs la clause modifiée par l'adversaire
+    var diffDoc='INSTRUCTION: Analyser UNIQUEMENT les différences entre VERSION_A et VERSION_B ci-dessous.'
+      +' Pour chaque clause différente, identifier la modification adverse, évaluer son risque juridique,'
+      +' et proposer une contre-rédaction favorable à la partie '+( partie||'mandant')+'.'
+      +' Ignorer les clauses identiques ou absentes dans l\'une des versions.\n\n'
+      +'=== VERSION_A — NOTRE VERSION VALIDÉE ===\n\n'
+      +ourVersion
+      +'\n\n=== VERSION_B — VERSION REÇUE DE LA PARTIE ADVERSE ===\n\n'
+      +adverseText;
+
+    // Étape 4 : envoyer le diff au backend pour analyse
+    if(res)res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Analyse des écarts...</div>';
     var fd=new FormData();
-    fd.append('file',file);
+    fd.append('file',new Blob([diffDoc],{type:'text/plain'}),'diff_versions.txt');
     fd.append('type',contractType||'general');
     fd.append('partie',partie||'');
     fd.append('lang','auto');
-    fd.append('mode','adverse_markup');
     var r=await fetch(BACKEND+'/analyze',{method:'POST',body:fd});
     var data=await r.json();
     if(!r.ok)throw new Error(data.error||'Erreur serveur');
     var mods=data.modifications||[];
-    if(!mods.length){if(res)res.innerHTML='<div style="color:#6b7280;font-size:13px;padding:10px 0">Aucun markup détecté dans ce document.</div>';return;}
-    var html='<div style="font-size:11px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+mods.length+' markup(s) détecté(s) — propositions de contre-rédaction</div>';
+    if(!mods.length){
+      if(res)res.innerHTML='<div style="color:#6b7280;font-size:13px;padding:10px 0">Aucune différence significative détectée entre les deux versions.</div>';
+      return;
+    }
+    var html='<div style="font-size:11px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+mods.length+' différence(s) détectée(s) — contre-propositions</div>';
     mods.forEach(function(m,i){
       var risk=m.risk||'medium';
       var col=risk==='high'?'#ef4444':risk==='low'?'#10b981':'#f59e0b';
@@ -1113,16 +1168,16 @@ async function analyzeAdverse(anaId, contractType, partie){
       html+='<div style="background:#0d1017;border:1px solid #2a3040;border-left:3px solid #8b5cf6;border-radius:8px;padding:14px;margin-bottom:10px">'
         +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
         +'<span style="padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:'+col+'22;color:'+col+'">'+lbl+'</span>'
-        +'<strong style="color:#e2e5f0;font-size:13px">'+( m.clause_name||'Clause')+'</strong>'
+        +'<strong style="color:#e2e5f0;font-size:13px">'+(m.clause_name||'Clause')+'</strong>'
         +'</div>'
-        +'<div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:4px;text-transform:uppercase">Markup adverse</div>'
-        +'<div style="background:#0a0c12;border-radius:6px;padding:8px;font-size:12px;color:#ef9a9a;margin-bottom:10px;white-space:pre-wrap">'+( m.original||'—')+'</div>'
-        +'<div style="font-size:11px;font-weight:600;color:#8b5cf6;margin-bottom:4px;text-transform:uppercase">Contre-proposition (modifiable)</div>'
-        +'<textarea id="adv-mod-'+i+'" style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:8px;font-size:12px;color:#e2e5f0;min-height:70px;resize:vertical;box-sizing:border-box">'+( m.proposed||m.original||'')+'</textarea>'
-        +'<div style="font-size:11px;color:#6b7280;margin-top:6px;line-height:1.4">'+( m.reason||'')+'</div>'
+        +'<div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:4px;text-transform:uppercase">Version adverse</div>'
+        +'<div style="background:#0a0c12;border-radius:6px;padding:8px;font-size:12px;color:#ef9a9a;margin-bottom:10px;white-space:pre-wrap">'+(m.original||'—')+'</div>'
+        +'<div style="font-size:11px;font-weight:600;color:#8b5cf6;margin-bottom:4px;text-transform:uppercase">Notre contre-proposition (modifiable)</div>'
+        +'<textarea id="adv-mod-'+i+'" style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:8px;font-size:12px;color:#e2e5f0;min-height:70px;resize:vertical;box-sizing:border-box">'+(m.proposed||m.original||'')+'</textarea>'
+        +'<div style="font-size:11px;color:#6b7280;margin-top:6px;line-height:1.4">'+(m.reason||'')+'</div>'
         +'</div>';
     });
-    html+='<button onclick="saveAdverseResponse(\''+anaId+'\','+mods.length+')" style="margin-top:8px;padding:10px 20px;background:#8b5cf6;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Sauvegarder mes contre-propositions</button>';
+    html+='<button onclick="saveAdverseResponse(\''+anaId+'\','+mods.length+')" style="margin-top:8px;padding:10px 20px;background:#8b5cf6;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Sauvegarder les contre-propositions</button>';
     if(res)res.innerHTML=html;
     window._adverseMods=mods;
   }catch(e){
