@@ -840,10 +840,21 @@ async function loadDash(){
   var STATUS_LABELS={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision','validated':'Validé par directeur','final_validated':'Validé — dans le RAG'};
   var STATUS_COLORS={'draft':'#4a5470','pending_review':'#f59e0b','in_review':'#5b7cfa','revision_requested':'#ef4444','validated':'#10b981','final_validated':'#10b981'};
   window._renderAnalyses=function(list){
-    document.getElementById('alist').innerHTML=list.length===0
+    // Trier : analyses normales par date, [ADVERSE] insérées juste après leur originale
+    var sorted=[];
+    var normals=list.filter(function(x){return !x.filename||x.filename.indexOf('[ADVERSE]')<0;});
+    normals.forEach(function(x){
+      sorted.push(x);
+      var base=x.filename||'';
+      list.filter(function(a){return a.filename&&a.filename.indexOf('[ADVERSE] '+base)===0;}).forEach(function(a){sorted.push(a);});
+    });
+    // Ajouter les [ADVERSE] orphelines non encore insérées
+    list.filter(function(x){return x.filename&&x.filename.indexOf('[ADVERSE]')===0&&sorted.indexOf(x)<0;}).forEach(function(x){sorted.push(x);});
+    document.getElementById('alist').innerHTML=sorted.length===0
       ?'<p style="color:#6b7280;font-size:13px;padding:20px 0">Aucune analyse</p>'
-      :list.map(function(x){
+      :sorted.map(function(x){
         var realIdx=window._userAnalyses.indexOf(x);
+        var isAdverse=x.filename&&x.filename.indexOf('[ADVERSE]')===0;
         var tag=x._juristeEmail?'<span style="font-size:10px;background:#5b7cfa22;color:#5b7cfa;padding:2px 6px;border-radius:10px;margin-left:6px">⚖ '+x._juristeEmail+'</span>':'';
         var ct=x.contract_type?'<span style="background:#1f2537;color:#a0a8c0;padding:1px 6px;border-radius:4px;font-size:10px;margin-right:4px">'+x.contract_type+'</span>':'';
         var pa=x.partie?'<span style="background:rgba(16,185,129,0.1);color:#10b981;padding:1px 6px;border-radius:4px;font-size:10px">'+x.partie+'</span>':'';
@@ -853,8 +864,10 @@ async function loadDash(){
         var stBadge='<span style="font-size:10px;background:'+stColor+'22;color:'+stColor+';padding:2px 7px;border-radius:10px;font-weight:600;margin-left:6px">'+stLabel+'</span>';
         var needsAttention=((_userRole==='juriste'&&st==='revision_requested')||(_userRole==='directeur'&&(st==='pending_review'||st==='validated')));
         var border=needsAttention?'border-color:#f59e0b':'';
-        return '<div class="ac" style="cursor:pointer;'+border+'" onclick="showAnaDetail('+realIdx+')">'
-          +'<h4>'+x.filename+tag+stBadge+'</h4>'
+        var adverseStyle=isAdverse?'margin-left:20px;border-left:3px solid #8b5cf6;':'';
+        var displayName=isAdverse?'↳ '+x.filename:x.filename;
+        return '<div class="ac" style="cursor:pointer;'+border+adverseStyle+'" onclick="showAnaDetail('+realIdx+')">'
+          +'<h4>'+displayName+tag+stBadge+'</h4>'
           +'<p style="margin-top:4px">'+ct+pa+'<span style="color:#4a5470;font-size:11px;margin-left:4px">'+new Date(x.created_at).toLocaleDateString('fr-FR')+'</span></p>'
           +(x.director_notes&&st==='revision_requested'?'<p style="font-size:11px;color:#ef4444;margin-top:4px;background:rgba(239,68,68,0.06);padding:4px 8px;border-radius:4px">Note: '+x.director_notes+'</p>':'')
           +'<span style="font-size:11px;color:#5b7cfa;margin-top:4px;display:block">Consulter et modifier →</span>'
@@ -1184,13 +1197,19 @@ async function saveAdverseResponse(originalAnaId, modCount){
   };
   var r=await fetch(_su+'/rest/v1/analyses',{
     method:'POST',
-    headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json','Prefer':'return=minimal'},
+    headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json','Prefer':'return=representation'},
     body:JSON.stringify(payload)
   });
-  if(r.ok||r.status===201||r.status===204){
-    alert('Contre-propositions sauvegardées comme nouvelle analyse. Vous pouvez la soumettre au directeur pour validation.');
+  if(r.ok||r.status===201){
+    var saved=await r.json().catch(function(){return[];});
+    var newId=saved[0]?saved[0].id:null;
     window._juristesData=null;
-    loadDash();
+    await loadDash();
+    // Auto-ouvrir la nouvelle analyse pour que le juriste puisse soumettre immédiatement
+    if(newId){
+      var newIdx=(window._userAnalyses||[]).findIndex(function(x){return x.id===newId;});
+      if(newIdx>=0)showAnaDetail(newIdx);
+    }
   } else { alert('Erreur sauvegarde ('+r.status+')'); }
 }
 
@@ -1370,7 +1389,7 @@ async function validateByDirector(id){
     mods.forEach(function(m,i){decisions[String(m.id||i+1)]='accepted';});
     await fetch(BACKEND+'/queue/add',{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({filename:ana.filename||'Contrat',contract_type:ana.contract_type||'',partie:ana.partie||'',accepted_modifications:JSON.stringify(mods),decisions:JSON.stringify(decisions),submitted_by:_cu.email,score:80})
+      body:JSON.stringify({filename:ana.filename||'Contrat',contract_type:ana.contract_type||'',partie:ana.partie||'',accepted_modifications:JSON.stringify(mods),decisions:JSON.stringify(decisions),submitted_by:_cu.email,score:80,analysis_id:id,juriste_email:ana.user_email||''})
     });
     alert('Analyse validée et transmise à l\'admin pour intégration dans le RAG.');
     window._juristesData=null;

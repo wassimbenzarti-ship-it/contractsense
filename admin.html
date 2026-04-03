@@ -349,6 +349,7 @@ async function loadQueue() {
       var div = document.createElement('div');
       div.className = 'queue-card';
       div.id = 'qcard-' + item.id;
+      div.dataset.analysisId = item.analysis_id || '';
       div.innerHTML =
         '<div class="queue-header">' +
           '<div style="flex:1">' +
@@ -415,9 +416,16 @@ async function validateContract(id) {
     });
     var data = await resp.json();
     if (!resp.ok) throw new Error(data.error);
+    var analysisId = card.dataset.analysisId;
     card.remove();
     loadStats();
     loadRag();
+    // Marquer l'analyse comme final_validated dans Supabase
+    if(analysisId){
+      var SB_URL='https://nezxohrkikgjegnhgpyn.supabase.co';
+      var SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lenhvaHJraWtnamVnbmhncHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MTQxNzYsImV4cCI6MjA4OTM5MDE3Nn0.zhBCacGGmIX-rVE9E9MUcbY2RpMomfq33lyq6DNU2kI';
+      fetch(SB_URL+'/rest/v1/analyses?id=eq.'+analysisId,{method:'PATCH',headers:{'apikey':SK,'Authorization':'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify({status:'final_validated'})}).catch(function(){});
+    }
   } catch(e) {
     alert('Erreur: ' + e.message);
     card.style.opacity = '1';
