@@ -154,12 +154,16 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <div class="dt">
 <div class="dtb active" onclick="dtab('analyses')">Mes analyses</div>
 <div class="dtb" onclick="dtab('models')">Mes modeles</div>
+<div class="dtb" id="dtb-juristes" onclick="dtab('juristes')" style="display:none">Mes juristes</div>
 </div>
 <div id="d-analyses" class="ds active"><div id="alist"></div></div>
 <div id="d-models" class="ds">
 <label class="mz" for="minp">+ Uploader un modele (PDF, DOCX, TXT)</label>
 <input type="file" id="minp" accept=".pdf,.docx,.txt" style="display:none" onchange="upMdl(this)"/>
 <div id="mlist"></div>
+</div>
+<div id="d-juristes" class="ds" style="display:none">
+<div id="juristes-list"><div style="color:#6b7280;font-size:13px;padding:20px 0">Chargement...</div></div>
 </div>
 </div>
 </div>
@@ -727,9 +731,11 @@ function reset() {
 var _su='https://nezxohrkikgjegnhgpyn.supabase.co';
 var _sk='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lenhvaHJraWtnamVnbmhncHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MTQxNzYsImV4cCI6MjA4OTM5MDE3Nn0.zhBCacGGmIX-rVE9E9MUcbY2RpMomfq33lyq6DNU2kI';
 var _cu=null;
+var _userRole=null;
+var _userParentEmail=null;
 async function sf(p,o){o=o||{};var t=localStorage.getItem('sbt')||_sk;var h={'apikey':_sk,'Authorization':'Bearer '+t,'Content-Type':'application/json'};if(o.headers)Object.assign(h,o.headers);return fetch(_su+p,Object.assign({},o,{headers:h}));}
 async function chkSess(){var t=localStorage.getItem('sbt');if(!t)return;var r=await sf('/auth/v1/user');if(r.ok)setU(await r.json());else localStorage.removeItem('sbt');}
-function setU(u){_cu=u;document.getElementById('ubar').classList.add('show');var emailDisplay=(u.email||'').replace('@','[at]'); document.getElementById('ueml').textContent='>> '+emailDisplay;document.getElementById('deml').textContent=(u.email||'').replace('@','[at]');var b=document.getElementById('nlbtn');if(b)b.style.display='none';closeAuth();}
+function setU(u){_cu=u;document.getElementById('ubar').classList.add('show');var emailDisplay=(u.email||'').replace('@','[at]'); document.getElementById('ueml').textContent='>> '+emailDisplay;document.getElementById('deml').textContent=(u.email||'').replace('@','[at]');var b=document.getElementById('nlbtn');if(b)b.style.display='none';closeAuth();checkRole();}
 async function doLogin(){var e=document.getElementById('ae1').value.trim(),p=document.getElementById('ap1').value,err=document.getElementById('aerr');err.style.display='none';if(!e||!p){err.textContent='Champs requis';err.style.display='block';return;}var r=await sf('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:e,password:p})});var d=await r.json();if(d.access_token){localStorage.setItem('sbt',d.access_token);setU(d.user);}else{err.textContent=d.error_description||'Erreur';err.style.display='block';}}
 async function doReg(){var e=document.getElementById('ae2').value.trim(),p=document.getElementById('ap2').value,err=document.getElementById('aerr2'),ok=document.getElementById('aok2');err.style.display='none';ok.style.display='none';if(!e||p.length<6){err.textContent='Email + mdp 6+ requis';err.style.display='block';return;}var r=await sf('/auth/v1/signup',{method:'POST',body:JSON.stringify({email:e,password:p})});var d=await r.json();if(d.id||d.user){ok.textContent='Compte cree - verifiez votre email';ok.style.display='block';}else{err.textContent=d.error_description||'Erreur';err.style.display='block';}}
 function doGoogle(){window.location.href=_su+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(window.location.href);}
@@ -740,16 +746,64 @@ function showReg(){document.getElementById('afl').style.display='none';document.
 function showLogin(){document.getElementById('afr').style.display='none';document.getElementById('afl').style.display='block';document.getElementById('atitle').textContent='Connexion';}
 function showDash(){document.getElementById('dash-ov').classList.add('show');loadDash();}
 function closeDash(){document.getElementById('dash-ov').classList.remove('show');}
-function dtab(t){document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',['analyses','models'][i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');}
-async function loadDash(){if(!_cu)return;var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at,modifications');var a=r1.ok?await r1.json():[];document.getElementById('sta').textContent=a.length;window._userAnalyses = a;
-    document.getElementById('alist').innerHTML=a.length===0
-      ?'<p style="color:#6b7280;font-size:13px">Aucune analyse</p>'
-      :a.map(function(x,i){return '<div class="ac" style="cursor:pointer" onclick="showAnaDetail('+i+')">'
-        +'<h4>'+x.filename+'</h4>'
-        +'<p>'+(x.contract_type||'')+' - '+(x.partie||'')+' - '+new Date(x.created_at).toLocaleDateString()+'</p>'
-        +'<span style="font-size:11px;color:#5b7cfa">Voir et modifier &gt;</span>'
-        +'</div>';}).join('')
-      +'<div id="ana-detail" class="ana-detail"></div>';var r2=await sf('/rest/v1/user_models?user_id=eq.'+_cu.id+'&order=created_at.desc&select=id,filename,created_at');var m=r2.ok?await r2.json():[];document.getElementById('stm').textContent=m.length;document.getElementById('mlist').innerHTML=m.length===0?'<p style="color:#6b7280;font-size:13px">Aucun modele</p>':m.map(function(x){return '<div class="ac" style="display:flex;justify-content:space-between;align-items:center">'+'<div><h4>'+x.filename+'</h4><p>'+new Date(x.created_at).toLocaleDateString()+'</p></div>'+'<button onclick="deleteModel(\''+x.id+'\', this)" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;flex-shrink:0">🗑 Supprimer</button>'+'</div>';}).join('');}
+function dtab(t){var names=['analyses','models','juristes'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');}
+async function checkRole(){
+  if(!_cu)return;
+  try{
+    var r=await sf('/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=role,parent_email');
+    if(r.ok){
+      var d=await r.json();
+      if(d[0]){_userRole=d[0].role;_userParentEmail=d[0].parent_email;}
+      else _userRole='directeur';
+    }
+    if(_userRole==='directeur'){
+      var jBtn=document.getElementById('dtb-juristes');
+      if(jBtn)jBtn.style.display='';
+    }
+  }catch(e){console.log('checkRole error:',e);_userRole='directeur';}
+}
+
+async function loadDash(){
+  if(!_cu)return;
+  if(!_userRole)await checkRole();
+  // Load analyses based on role
+  var a=[];
+  try{
+    if(_userRole==='juriste'){
+      // Juriste: only own analyses
+      var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at,modifications,user_id');
+      a=r1.ok?await r1.json():[];
+    } else {
+      // Directeur: own analyses + juristes' analyses
+      var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at,modifications,user_id');
+      a=r1.ok?await r1.json():[];
+      // Also load juristes analyses
+      var rj=await sf('/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email');
+      if(rj.ok){
+        var juristes=await rj.json();
+        window._juristesData=juristes;
+        for(var i=0;i<juristes.length;i++){
+          var rja=await sf('/rest/v1/analyses?user_email=eq.'+encodeURIComponent(juristes[i].email)+'&order=created_at.desc&limit=20&select=id,filename,contract_type,partie,created_at,modifications,user_id');
+          if(rja.ok){var ja=await rja.json();a=a.concat(ja.map(function(x){x._juristeEmail=juristes[i].email;return x;}));}
+        }
+      }
+    }
+  }catch(e){console.log('loadDash error:',e);}
+  document.getElementById('sta').textContent=a.length;
+  window._userAnalyses=a;
+  document.getElementById('alist').innerHTML=a.length===0
+    ?'<p style="color:#6b7280;font-size:13px">Aucune analyse</p>'
+    :a.map(function(x,i){
+      var tag=x._juristeEmail?'<span style="font-size:10px;background:#5b7cfa22;color:#5b7cfa;padding:2px 6px;border-radius:10px;margin-left:6px">' + String.fromCharCode(9878) + ' '+x._juristeEmail+'</span>':'';
+      return '<div class="ac" style="cursor:pointer" onclick="showAnaDetail('+i+')">'+'<h4>'+x.filename+tag+'</h4>'+'<p>'+(x.contract_type||'')+' - '+(x.partie||'')+' - '+new Date(x.created_at).toLocaleDateString()+'</p>'+'<span style="font-size:11px;color:#5b7cfa">Voir et modifier &gt;</span>'+'</div>';
+    }).join('')+'<div id="ana-detail" class="ana-detail"></div>';
+  var r2=await sf('/rest/v1/user_models?user_id=eq.'+_cu.id+'&order=created_at.desc&select=id,filename,created_at');
+  var m=r2.ok?await r2.json():[];
+  document.getElementById('stm').textContent=m.length;
+  document.getElementById('mlist').innerHTML=m.length===0?'<p style="color:#6b7280;font-size:13px">Aucun modele</p>':m.map(function(x){return '<div class="ac" style="display:flex;justify-content:space-between;align-items:center">'+'<div><h4>'+x.filename+'</h4><p>'+new Date(x.created_at).toLocaleDateString()+'</p></div>'+'<button onclick="deleteModel(\''+x.id+'\', this)" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;flex-shrink:0">' + String.fromCharCode(128465) + ' Supprimer</button>'+'</div>';}).join('');
+  // Load juristes tab if directeur
+  if(_userRole==='directeur')loadJuristes();
+}
 async function upMdl(inp){
   if(!_cu){showAuth();return;}
   var f=inp.files[0];if(!f)return;
@@ -761,12 +815,22 @@ async function upMdl(inp){
       fd.append('source',f.name);
       fd.append('category','contract');
       fd.append('suggested_by',_cu.email);
-      var r2 = await fetch('https://web-production-f96f7.up.railway.app/rag/suggest', {method:'POST',body:fd});
-      var suggestData = await r2.json();
-      if(!r2.ok){ console.error('Erreur API suggest:', suggestData); }
-      else { console.log('Sent to admin suggestions:', suggestData); }
-    }catch(e2){console.log('Suggest error:',e2);}
-    alert('Modele uploade et soumis pour validation admin');
+      // Route: juriste -> suggest to directeur, directeur -> suggest to admin
+      var endpoint, alertMsg;
+      if(_userRole==='juriste' && _userParentEmail){
+        fd.append('target_email',_userParentEmail);
+        endpoint='https://web-production-f96f7.up.railway.app/rag/suggest-to-director';
+        alertMsg='Modele soumis au directeur juridique pour validation';
+      } else {
+        endpoint='https://web-production-f96f7.up.railway.app/rag/suggest';
+        alertMsg='Modele soumis pour validation admin';
+      }
+      var r2=await fetch(endpoint,{method:'POST',body:fd});
+      var suggestData=await r2.json();
+      if(!r2.ok){console.error('Erreur suggest:',suggestData);}
+      else{console.log('Suggestion envoyee:',suggestData);}
+    }catch(e2){console.log('Suggest error:',e2);alertMsg='Modele uploade (suggestion non envoyee)';}
+    alert(alertMsg||'Modele uploade');
     loadDash();
   }else alert('Erreur upload');
 }
@@ -920,6 +984,72 @@ async function dlUserAnalysis() {
     alert('Erreur : ' + e.message);
     if(btn) { btn.disabled = false; btn.textContent = 'Telecharger avec mes modifications'; }
   }
-}</script>
+}
+
+async function loadJuristes(){
+  var el=document.getElementById('juristes-list');
+  if(!el||!_cu)return;
+  el.innerHTML='<div style="color:#6b7280;font-size:13px">Chargement...</div>';
+  try{
+    var r=await sf('/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email,role,created_at');
+    var juristes=r.ok?await r.json():[];
+    var rp=await fetch('https://web-production-f96f7.up.railway.app/suggestions/list-for-director?director_email='+encodeURIComponent(_cu.email));
+    var pending=[];
+    if(rp.ok){var pd=await rp.json();pending=pd.suggestions||[];}
+    var html='';
+    if(!juristes.length){
+      html='<p style="color:#6b7280;font-size:13px;padding:12px 0">Aucun juriste rattaché. Les juristes sont créés par l\'admin.</p>';
+    } else {
+      html='<div style="margin-bottom:16px"><div style="font-size:12px;color:#6b7280;margin-bottom:8px">'+juristes.length+' juriste(s) rattaché(s)</div>';
+      html+=juristes.map(function(j){
+        return '<div style="background:#111420;border:1px solid #1f2537;border-radius:8px;padding:10px 14px;margin-bottom:6px">'
+          +'<div style="font-size:13px;font-weight:600;color:#e2e5f0">'+j.email+'</div>'
+          +'<div style="font-size:11px;color:#6b7280;margin-top:2px">Juriste - Depuis '+new Date(j.created_at).toLocaleDateString('fr-FR')+'</div>'
+          +'</div>';
+      }).join('')+'</div>';
+    }
+    if(pending.length){
+      html+='<div><div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:8px">Suggestions en attente ('+pending.length+')</div>';
+      html+=pending.map(function(s){
+        return '<div data-sid="'+s.id+'" style="background:#111420;border:1px solid #1f2537;border-radius:8px;padding:12px;margin-bottom:8px">'
+          +'<div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:4px">'+(s.filename||'Modele')+'</div>'
+          +'<div style="font-size:11px;color:#6b7280;margin-bottom:8px">Par: '+(s.suggested_by||'')+'</div>'
+          +'<div style="display:flex;gap:8px">'
+          +'<button class="fwd-sugg-btn" style="background:#10b98122;border:1px solid #10b981;color:#10b981;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer">Transmettre admin</button>'
+          +'<button class="rej-sugg-btn" style="background:#ef444422;border:1px solid #ef4444;color:#ef4444;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer">Rejeter</button>'
+          +'</div></div>';
+      }).join('')+'</div>';
+    }
+    el.innerHTML=html;
+    // Attach event listeners to suggestion buttons
+    el.querySelectorAll('.fwd-sugg-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var sid=this.closest('[data-sid]').getAttribute('data-sid');
+        forwardSugg(sid);
+      });
+    });
+    el.querySelectorAll('.rej-sugg-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var sid=this.closest('[data-sid]').getAttribute('data-sid');
+        rejectSuggDir(sid);
+      });
+    });
+  }catch(e){el.innerHTML='<p style="color:#ef4444;font-size:12px">Erreur: '+e.message+'</p>';}
+}
+
+async function forwardSugg(id){
+  if(!confirm('Transmettre cette suggestion a l\'admin ?'))return;
+  var r=await fetch('https://web-production-f96f7.up.railway.app/suggestions/forward-to-admin/'+id,{method:'POST'});
+  if(r.ok){alert('Suggestion transmise a l\'admin !');loadJuristes();}
+  else alert('Erreur');
+}
+
+async function rejectSuggDir(id){
+  if(!confirm('Rejeter cette suggestion ?'))return;
+  var r=await fetch('https://web-production-f96f7.up.railway.app/suggestions/reject-director/'+id,{method:'POST'});
+  if(r.ok){alert('Suggestion rejetee.');loadJuristes();}
+  else alert('Erreur');
+}
+</script>
 </body>
 </html>
