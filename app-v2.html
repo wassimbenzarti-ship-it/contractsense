@@ -807,7 +807,7 @@ async function loadDash(){
 async function upMdl(inp){
   if(!_cu){showAuth();return;}
   var f=inp.files[0];if(!f)return;
-  var r=await sf('/rest/v1/user_models',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify({user_id:_cu.id,filename:f.name,category:'contract',is_public:false})});
+  var r=await sf('/rest/v1/user_models',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify({user_id:_cu.id,user_email:_cu.email,filename:f.name,category:'contract',is_public:false})});
   if(r.ok){
     try{
       var fd=new FormData();
@@ -838,7 +838,7 @@ async function upMdl(inp){
 async function saveAna(fn,ct,pa,mods){
   // 1. Save to user account if logged in
   if(_cu){
-    sf('/rest/v1/analyses',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify({user_id:_cu.id,filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',modifications:mods||[]})})
+    sf('/rest/v1/analyses',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify({user_id:_cu.id,user_email:_cu.email,filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',modifications:mods||[]})})
     .then(function(){console.log('Saved to account');})
     .catch(function(e){console.log('Account save error:',e);});
   }
