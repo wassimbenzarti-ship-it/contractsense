@@ -979,16 +979,18 @@ async function getUserModelRAG(){
 
 
 
-function showAnaDetail(idx) {
+async function showAnaDetail(idx) {
   window._anaIdx = idx;
   var ana = (window._userAnalyses||[])[idx];
   if(!ana) return;
+  // S'assurer que le rôle est chargé avant d'afficher les boutons conditionnels
+  if(!_userRole) await checkRole();
   var mods = ana.modifications || [];
   if(typeof mods === 'string') { try { mods = JSON.parse(mods); } catch(e) { mods = []; } }
   window._currentMods = mods.map(function(m){ return Object.assign({}, m); });
 
   var st=ana.status||'draft';
-  var stLabels={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision','validated':'Validé par directeur','final_validated':'Validé RAG'};
+  var stLabels={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision','validated':'Validé par directeur','final_validated':'Validé — intégré au RAG'};
   var stColors={'draft':'#4a5470','pending_review':'#f59e0b','in_review':'#5b7cfa','revision_requested':'#ef4444','validated':'#10b981','final_validated':'#10b981'};
   var stColor=stColors[st]||'#4a5470';
   var isJuriste=_userRole==='juriste';
