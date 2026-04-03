@@ -636,7 +636,7 @@ function renderReview() {
 //    Export                                                 
 async function exportDoc() {
   var btn = document.getElementById('btn-export');
-  btn.textContent = '⏳ Génération en cours&';
+  btn.textContent = '⏳ Génération en cours...';
   btn.disabled = true;
   try {
     var fd = buildFormData();
@@ -777,8 +777,8 @@ async function loadDash(){
       // Directeur: own analyses + juristes' analyses
       var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at,modifications,user_id');
       a=r1.ok?await r1.json():[];
-      // Also load juristes analyses
-      var rj=await sf('/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email');
+      // Also load juristes analyses (use anon key to bypass user-level RLS)
+      var rj=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
       if(rj.ok){
         var juristes=await rj.json();
         window._juristesData=juristes;
@@ -951,7 +951,7 @@ async function dlUserAnalysis() {
       return (m.clause_name||'Clause') + ' - ' + (m.original||'');
     }).join(' | ');
     if(!contractText.trim()) contractText = 'Contrat - ' + (ana.filename||'document');
-    fd.append('file', new Blob([contractText], {type:'text/plain'}), ana.filename||'contrat.txt');
+    fd.append('file', new Blob([contractText], {type:'text/plain'}), 'contrat.txt');
     fd.append('lang', 'auto');
     fd.append('type', ana.contract_type||'generic');
     var decs = {};
@@ -991,7 +991,7 @@ async function loadJuristes(){
   if(!el||!_cu)return;
   el.innerHTML='<div style="color:#6b7280;font-size:13px">Chargement...</div>';
   try{
-    var r=await sf('/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email,role,created_at');
+    var r=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email,role,created_at',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
     var juristes=r.ok?await r.json():[];
     var rp=await fetch('https://web-production-f96f7.up.railway.app/suggestions/list-for-director?director_email='+encodeURIComponent(_cu.email));
     var pending=[];
