@@ -760,7 +760,8 @@ function dtab(t){var names=['analyses','models','juristes'];document.querySelect
 async function checkRole(){
   if(!_cu)return;
   try{
-    var r=await sf('/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=role,parent_email');
+    // Utilise la clé anon pour contourner la RLS utilisateur (même approche que loadJuristes)
+    var r=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=role,parent_email',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
     if(r.ok){
       var d=await r.json();
       if(d[0]){_userRole=d[0].role;_userParentEmail=d[0].parent_email;}

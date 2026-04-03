@@ -693,9 +693,9 @@ async function linkExistingAccount() {
   var headers = {'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation'};
   try {
     var payload = {email: email, role: role, parent_email: role === 'juriste' ? parentEmail : ''};
-    // Upsert : insère ou met à jour si l'email existe déjà
-    var upsertHeaders = Object.assign({}, headers, {'Prefer': 'resolution=merge-duplicates,return=representation'});
-    var r = await fetch(SB_URL + '/rest/v1/user_accounts?on_conflict=email', {method: 'POST', headers: upsertHeaders, body: JSON.stringify(payload)});
+    // Supprimer toute ligne existante pour cet email, puis insérer proprement
+    await fetch(SB_URL + '/rest/v1/user_accounts?email=eq.' + encodeURIComponent(email), {method: 'DELETE', headers: headers});
+    var r = await fetch(SB_URL + '/rest/v1/user_accounts', {method: 'POST', headers: headers, body: JSON.stringify(payload)});
     if(r.ok || r.status === 201) {
       msg.textContent = '✅ Compte ' + email + ' rattaché comme ' + role + (parentEmail ? ' → ' + parentEmail : '');
       msg.style.color = '#10b981'; msg.style.display = 'inline';
