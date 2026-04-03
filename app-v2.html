@@ -934,30 +934,21 @@ async function upMdl(inp){
 }
 
 async function saveAna(fn,ct,pa,mods){
-  // 1. Save to user account if logged in
-  if(_cu){
-    sf('/rest/v1/analyses',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify({user_id:_cu.id,user_email:_cu.email,filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',modifications:mods||[],status:'draft',director_email:_userParentEmail||''})})
-    .then(function(r){if(r.ok)r.json().then(function(d){if(d[0])window._lastSavedAnaId=d[0].id;});console.log('Saved to account');})
-    .catch(function(e){console.log('Account save error:',e);});
+  if(!_cu) return;
+  var isJuriste=_userRole==='juriste';
+  // Juriste : brouillon à soumettre au directeur ; Directeur : validé directement vers admin
+  var payload={user_id:_cu.id,user_email:_cu.email,filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',modifications:mods||[],status:isJuriste?'draft':'validated',director_email:_userParentEmail||''};
+  var r=await sf('/rest/v1/analyses',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(payload)}).catch(function(){return null;});
+  if(r&&r.ok){
+    var d=await r.json().catch(function(){return[];});
+    if(d[0]) window._lastSavedAnaId=d[0].id;
   }
-  // 2. Always send to admin queue
-  var decisions={};
-  (mods||[]).forEach(function(m,i){decisions[String(m.id||i+1)]='accepted';});
-  fetch('https://web-production-f96f7.up.railway.app/queue/add',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      filename:fn||'Contrat',
-      contract_type:ct||'',
-      partie:pa||'',
-      accepted_modifications:JSON.stringify(mods||[]),
-      decisions:JSON.stringify(decisions),
-      submitted_by:_cu?_cu.email:'anonymous',
-      score:75
-    })
-  })
-  .then(function(){console.log('Sent to admin queue');})
-  .catch(function(e){console.log('Queue error:',e);});
+  // Envoyer à l'admin queue UNIQUEMENT si directeur (le juriste doit d'abord passer par le directeur)
+  if(!isJuriste){
+    var decisions={};
+    (mods||[]).forEach(function(m,i){decisions[String(m.id||i+1)]='accepted';});
+    fetch(BACKEND+'/queue/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',accepted_modifications:JSON.stringify(mods||[]),decisions:JSON.stringify(decisions),submitted_by:_cu.email,score:75})}).catch(function(){});
+  }
 }
 
 
@@ -1010,7 +1001,7 @@ function showAnaDetail(idx) {
       +'<button onclick="submitForReview(\''+ana.id+'\')" style="padding:9px 18px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur pour validation →</button>'
       +'</div>';
   }
-  if(isDirecteur&&(st==='pending_review'||st==='in_review')){
+  if(isDirecteur&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'){
     actionBar='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'
       +'<button onclick="validateByDirector(\''+ana.id+'\')" style="padding:9px 18px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Valider et transmettre à l\'admin</button>'
       +'<button onclick="requestRevision(\''+ana.id+'\')" style="padding:9px 18px;background:#ef444422;border:1px solid #ef4444;color:#ef4444;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">Demander une révision</button>'
@@ -1063,7 +1054,7 @@ function showAnaDetail(idx) {
   });
 
   // Zone note directeur (visible uniquement pour le directeur en revue)
-  if(isDirecteur&&(st==='pending_review'||st==='in_review')){
+  if(isDirecteur&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'){
     html+='<div style="margin-top:12px">'
       +'<div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:6px;text-transform:uppercase">Note pour le juriste (optionnel)</div>'
       +'<textarea id="director-note-input" placeholder="Ex: Vérifier la clause de résiliation, modifier la durée..." style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:10px;font-size:12px;color:#e2e5f0;min-height:60px;resize:vertical;box-sizing:border-box"></textarea>'
@@ -1072,7 +1063,7 @@ function showAnaDetail(idx) {
   html += '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'
     +'<button onclick="dlUserAnalysis()" style="flex:1;padding:11px;background:#1a2035;border:1px solid #1f2537;border-radius:8px;color:#a0a8c0;font-size:13px;cursor:pointer;min-width:140px">Télécharger DOCX</button>'
     +(isJuriste&&(st==='draft'||st==='revision_requested')?'<button onclick="submitForReview(\''+ana.id+'\')" style="flex:2;padding:11px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur →</button>':'')
-    +(isDirecteur&&(st==='pending_review'||st==='in_review')?'<button onclick="validateByDirector(\''+ana.id+'\')" style="flex:2;padding:11px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Valider → admin</button>':'')
+    +(isDirecteur&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'?'<button onclick="validateByDirector(\''+ana.id+'\')" style="flex:2;padding:11px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Valider → admin</button>':'')
     +'</div>'
     + '</div>';
 

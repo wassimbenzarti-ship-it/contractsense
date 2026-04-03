@@ -595,10 +595,11 @@ async function approveSugg(id) {
   var rows = await rGet.json();
   if(!rows.length) { alert('Suggestion introuvable'); return; }
   var s = rows[0];
-  // 2. Upload content to RAG via /rag/upload
+  // 2. Upload content to RAG via /rag/upload (force .txt to avoid DOCX parse error)
   var blob = new Blob([s.content || ''], {type: 'text/plain'});
   var fd = new FormData();
-  fd.append('file', blob, (s.filename || 'modele.txt'));
+  var uploadName = (s.filename || 'modele').replace(/\.[^.]+$/, '') + '.txt';
+  fd.append('file', blob, uploadName);
   fd.append('category', s.category || 'contract');
   var rUp = await fetch(BACKEND + '/rag/upload', {method: 'POST', body: fd});
   if(!rUp.ok) { var d = await rUp.json(); alert('Erreur RAG upload: ' + (d.error || rUp.status)); return; }
@@ -614,9 +615,16 @@ async function approveSugg(id) {
 
 async function rejectSugg(id) {
   if(!confirm('Rejeter cette suggestion ?')) return;
-  var r = await fetch(BACKEND + '/suggestions/reject/' + id, {method:'POST'});
+  var SB_URL = 'https://nezxohrkikgjegnhgpyn.supabase.co';
+  var SK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lenhvaHJraWtnamVnbmhncHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MTQxNzYsImV4cCI6MjA4OTM5MDE3Nn0.zhBCacGGmIX-rVE9E9MUcbY2RpMomfq33lyq6DNU2kI';
+  var sbHeaders = {'apikey': SK, 'Authorization': 'Bearer ' + SK, 'Content-Type': 'application/json'};
+  var r = await fetch(SB_URL + '/rest/v1/pending_suggestions?id=eq.' + id, {
+    method: 'PATCH',
+    headers: sbHeaders,
+    body: JSON.stringify({status: 'rejected'})
+  });
   if(r.ok) { alert('Suggestion rejetée.'); loadSuggestions(); }
-  else { var d = await r.json(); alert('Erreur: ' + (d.error||r.status)); }
+  else { alert('Erreur lors du rejet: ' + r.status); }
 }
 
 // ===== SOUS-COMPTES =====
