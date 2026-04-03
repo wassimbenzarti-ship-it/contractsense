@@ -457,7 +457,8 @@ async function loadRag() {
       div.className = 'doc-item';
       var warningHtml = doc.warning ? '<span style="color:#ef4444;font-size:10px;margin-left:8px">⚠️ ' + (doc.warning_msg || 'Vérifier') + '</span>' : '';
       var partyHtml = doc.party_label ? '<span style="color:#7c5cfc;font-size:10px;margin-left:6px">· ' + doc.party_label + '</span>' : '';
-      div.innerHTML =
+            div.dataset.source = doc.source;
+div.innerHTML =
         '<div class="doc-info">' +
           '<div class="name">' +
             '<span style="background:' + typeColor + '22;color:' + typeColor + ';padding:2px 8px;border-radius:4px;font-size:10px;margin-right:6px;font-weight:600">' + catLabel.toUpperCase() + '</span>' +
@@ -465,8 +466,9 @@ async function loadRag() {
           '</div>' +
           '<div class="meta">' + doc.chunks + ' chunks' + partyHtml + '</div>' +
         '</div>' +
-        '<button class="btn-danger" onclick="deleteDoc(\' + doc.source.replace(/'/g,"\\'") + \', this)">🗑</button>';
+        '<button class="btn-danger del-doc-btn" style="flex-shrink:0">🗑</button>'
       list.appendChild(div);
+      div.querySelector('.del-doc-btn').addEventListener('click', function() { deleteDoc(div.dataset.source, this); });
     });
   } catch(e) {
     list.innerHTML = '<div class="empty" style="color:#ef4444">⚠ Erreur de connexion</div>';
