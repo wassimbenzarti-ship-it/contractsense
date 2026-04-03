@@ -172,7 +172,18 @@ select { appearance: none; }
             <div id="sc-parent-row" style="display:none"><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Directeur parent (email)</label><input id="sc-parent" type="email" placeholder="directeur@cabinet.ma" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box"></div>
           </div>
           <button id="sc-create-btn" onclick="createSubAccount()" style="background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer">+ Créer le compte</button>
-          <p style="font-size:11px;color:#f59e0b;margin-top:10px">Note: Le compte est enregistré dans user_accounts. Créez aussi l'authentification dans Supabase Dashboard > Authentication > Users.</p>
+        </div>
+        <!-- Rattacher un compte Auth existant -->
+        <div style="background:#111420;border:1px solid #f59e0b44;border-radius:12px;padding:20px;margin-bottom:24px">
+          <h3 style="font-size:14px;font-weight:600;color:#f59e0b;margin-bottom:6px">Rattacher un compte existant</h3>
+          <p style="font-size:12px;color:#6b7280;margin-bottom:14px">Si un compte Auth existe déjà mais que la fiche de rôle a été supprimée, utilisez ce formulaire pour recréer uniquement la ligne de metadata sans toucher à l'Auth.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Email du compte existant</label><input id="link-email" type="email" placeholder="contact@cabinet.ma" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box"></div>
+            <div><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Rôle</label><select id="link-role" onchange="document.getElementById('link-parent-row').style.display=this.value==='juriste'?'block':'none'" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px"><option value="directeur">Directeur Juridique</option><option value="juriste">⚖ Juriste</option></select></div>
+          </div>
+          <div id="link-parent-row" style="display:none;margin-bottom:12px"><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px">Email du directeur parent</label><input id="link-parent" type="email" placeholder="directeur@cabinet.ma" style="width:100%;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box"></div>
+          <button onclick="linkExistingAccount()" style="background:#f59e0b22;border:1px solid #f59e0b;color:#f59e0b;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">Rattacher</button>
+          <span id="link-msg" style="display:none;margin-left:12px;font-size:12px"></span>
         </div>
         <div style="background:#111420;border:1px solid #1f2537;border-radius:12px;padding:20px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
@@ -667,6 +678,37 @@ async function deleteAccount(id, btn) {
     if(r.ok || r.status === 204) btn.closest('div[style]').remove();
     else alert('Erreur suppression');
   } catch(e) { alert('Erreur: ' + e.message); }
+}
+
+async function linkExistingAccount() {
+  var email = document.getElementById('link-email').value.trim();
+  var role = document.getElementById('link-role').value;
+  var parentEmail = document.getElementById('link-parent').value.trim();
+  var msg = document.getElementById('link-msg');
+  if(!email) { alert('Email requis'); return; }
+  if(role === 'juriste' && !parentEmail) { alert('Email du directeur parent requis'); return; }
+  msg.style.display = 'none';
+  var SB_URL = 'https://nezxohrkikgjegnhgpyn.supabase.co';
+  var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lenhvaHJraWtnamVnbmhncHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MTQxNzYsImV4cCI6MjA4OTM5MDE3Nn0.zhBCacGGmIX-rVE9E9MUcbY2RpMomfq33lyq6DNU2kI';
+  var headers = {'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation'};
+  try {
+    var payload = {email: email, role: role, parent_email: role === 'juriste' ? parentEmail : ''};
+    var r = await fetch(SB_URL + '/rest/v1/user_accounts', {method: 'POST', headers: headers, body: JSON.stringify(payload)});
+    if(r.ok || r.status === 201) {
+      msg.textContent = '✅ Compte ' + email + ' rattaché comme ' + role + (parentEmail ? ' → ' + parentEmail : '');
+      msg.style.color = '#10b981'; msg.style.display = 'inline';
+      document.getElementById('link-email').value = '';
+      document.getElementById('link-parent').value = '';
+      loadSousComptes();
+    } else {
+      var d = await r.json();
+      msg.textContent = '❌ ' + (d.message || d.error || 'Erreur ' + r.status);
+      msg.style.color = '#ef4444'; msg.style.display = 'inline';
+    }
+  } catch(e) {
+    msg.textContent = '❌ ' + e.message;
+    msg.style.color = '#ef4444'; msg.style.display = 'inline';
+  }
 }
 
 </script>
