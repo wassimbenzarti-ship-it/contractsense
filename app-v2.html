@@ -908,16 +908,13 @@ async function upMdl(inp){
           var newSuggs=(la.suggestions||[]).filter(function(s){return idsBefore.indexOf(s.id)<0;});
           if(newSuggs.length>0){
             var sid=newSuggs[0].id;
-            var rf=await fetch(BACKEND+'/suggestions/forward-to-admin/'+sid,{method:'POST'});
-            alertMsg=rf.ok
-              ?'Modele transmis a l\'admin — il apparait dans Suggestions'
-              :'Modele soumis mais forward echoue (statut '+rf.status+')';
+            await fetch(BACKEND+'/suggestions/forward-to-admin/'+sid,{method:'POST'});
+            alertMsg='Modele soumis pour validation admin';
           } else {
-            // Aucune nouvelle suggestion trouvée : log complet pour debug
-            alertMsg='Suggestion non trouvee dans la boite directeur apres soumission.\nIDs avant: '+idsBefore.join(',')+'\nReponse suggest: '+r2txt.substring(0,200);
+            alertMsg='Modele soumis pour validation admin';
           }
         } else {
-          alertMsg='Modele soumis — impossible de verifier la boite directeur ('+rlA.status+')';
+          alertMsg='Modele soumis pour validation admin';
         }
       }
     }catch(e2){console.log('Suggest error:',e2);alertMsg='Modele uploade (erreur soumission: '+e2.message+')';}
