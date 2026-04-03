@@ -1065,6 +1065,17 @@ function showAnaDetail(idx) {
     +(isJuriste&&(st==='draft'||st==='revision_requested')?'<button onclick="submitForReview(\''+ana.id+'\')" style="flex:2;padding:11px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur →</button>':'')
     +(isDirecteur&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'?'<button onclick="validateByDirector(\''+ana.id+'\')" style="flex:2;padding:11px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Valider → admin</button>':'')
     +'</div>'
+    // Section markups partie adverse (visible juriste + directeur dès que l'analyse existe)
+    +'<div style="margin-top:20px;border-top:1px solid #1f2537;padding-top:16px">'
+    +'<div style="font-size:12px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">⚔ Markups partie adverse</div>'
+    +'<div style="font-size:12px;color:#6b7280;margin-bottom:12px;line-height:1.5">Après avoir envoyé votre version à la partie adverse, importez ici leur version annotée (DOCX ou TXT) pour analyser leurs modifications et générer des contre-propositions.</div>'
+    +'<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
+    +'<label style="flex:1;min-width:200px;padding:10px 14px;background:#1a2035;border:1px solid #2a3040;border-radius:8px;color:#a0a8c0;font-size:12px;cursor:pointer;text-align:center;display:block">'
+    +'<input type="file" id="adverse-file-inp" accept=".docx,.txt,.pdf" style="display:none" onchange="analyzeAdverse(\''+ana.id+'\',\''+ana.contract_type+'\',\''+ana.partie+'\')">'
+    +'📎 Importer version partie adverse</label>'
+    +'</div>'
+    +'<div id="adverse-result" style="margin-top:12px"></div>'
+    +'</div>'
     + '</div>';
 
   var cont = document.getElementById('d-analyses');
@@ -1074,6 +1085,75 @@ function showAnaDetail(idx) {
     det.innerHTML = html;
     det.scrollIntoView({behavior:'smooth', block:'start'});
   }
+}
+
+async function analyzeAdverse(anaId, contractType, partie){
+  var inp=document.getElementById('adverse-file-inp');
+  var file=inp?inp.files[0]:null;
+  if(!file){alert('Sélectionnez un fichier');return;}
+  var res=document.getElementById('adverse-result');
+  if(res)res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Analyse des markups en cours...</div>';
+  try{
+    var fd=new FormData();
+    fd.append('file',file);
+    fd.append('type',contractType||'general');
+    fd.append('partie',partie||'');
+    fd.append('lang','auto');
+    fd.append('mode','adverse_markup');
+    var r=await fetch(BACKEND+'/analyze',{method:'POST',body:fd});
+    var data=await r.json();
+    if(!r.ok)throw new Error(data.error||'Erreur serveur');
+    var mods=data.modifications||[];
+    if(!mods.length){if(res)res.innerHTML='<div style="color:#6b7280;font-size:13px;padding:10px 0">Aucun markup détecté dans ce document.</div>';return;}
+    var html='<div style="font-size:11px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+mods.length+' markup(s) détecté(s) — propositions de contre-rédaction</div>';
+    mods.forEach(function(m,i){
+      var risk=m.risk||'medium';
+      var col=risk==='high'?'#ef4444':risk==='low'?'#10b981':'#f59e0b';
+      var lbl=risk==='high'?'Risque élevé':risk==='low'?'Risque faible':'Risque modéré';
+      html+='<div style="background:#0d1017;border:1px solid #2a3040;border-left:3px solid #8b5cf6;border-radius:8px;padding:14px;margin-bottom:10px">'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+        +'<span style="padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:'+col+'22;color:'+col+'">'+lbl+'</span>'
+        +'<strong style="color:#e2e5f0;font-size:13px">'+( m.clause_name||'Clause')+'</strong>'
+        +'</div>'
+        +'<div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:4px;text-transform:uppercase">Markup adverse</div>'
+        +'<div style="background:#0a0c12;border-radius:6px;padding:8px;font-size:12px;color:#ef9a9a;margin-bottom:10px;white-space:pre-wrap">'+( m.original||'—')+'</div>'
+        +'<div style="font-size:11px;font-weight:600;color:#8b5cf6;margin-bottom:4px;text-transform:uppercase">Contre-proposition (modifiable)</div>'
+        +'<textarea id="adv-mod-'+i+'" style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:8px;font-size:12px;color:#e2e5f0;min-height:70px;resize:vertical;box-sizing:border-box">'+( m.proposed||m.original||'')+'</textarea>'
+        +'<div style="font-size:11px;color:#6b7280;margin-top:6px;line-height:1.4">'+( m.reason||'')+'</div>'
+        +'</div>';
+    });
+    html+='<button onclick="saveAdverseResponse(\''+anaId+'\','+mods.length+')" style="margin-top:8px;padding:10px 20px;background:#8b5cf6;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Sauvegarder mes contre-propositions</button>';
+    if(res)res.innerHTML=html;
+    window._adverseMods=mods;
+  }catch(e){
+    if(res)res.innerHTML='<div style="color:#ef4444;font-size:12px;padding:10px 0">Erreur : '+e.message+'</div>';
+  }
+}
+
+async function saveAdverseResponse(originalAnaId, modCount){
+  var mods=(window._adverseMods||[]).map(function(m,i){
+    var ta=document.getElementById('adv-mod-'+i);
+    return Object.assign({},m,{proposed:ta?ta.value:m.proposed,is_adverse_response:true});
+  });
+  if(!_cu)return;
+  var ana=(window._userAnalyses||[])[window._anaIdx||0]||{};
+  var payload={
+    user_id:_cu.id,user_email:_cu.email,
+    filename:'[ADVERSE] '+( ana.filename||'Contrat'),
+    contract_type:ana.contract_type||'',partie:ana.partie||'',
+    modifications:mods,status:'draft',
+    director_email:_userParentEmail||ana.director_email||''
+  };
+  var r=await fetch(_su+'/rest/v1/analyses',{
+    method:'POST',
+    headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify(payload)
+  });
+  if(r.ok||r.status===201||r.status===204){
+    alert('Contre-propositions sauvegardées comme nouvelle analyse. Vous pouvez la soumettre au directeur pour validation.');
+    window._juristesData=null;
+    loadDash();
+  } else { alert('Erreur sauvegarde ('+r.status+')'); }
 }
 
 async function dlUserAnalysis() {
@@ -1225,7 +1305,8 @@ async function requestRevision(id){
   var note=document.getElementById('director-note-input');
   var noteVal=note?note.value.trim():'';
   if(!confirm('Renvoyer cette analyse au juriste avec une demande de révision ?')) return;
-  var patch={status:'revision_requested'};
+  // Inclure les modifications du directeur dans le patch
+  var patch={status:'revision_requested',modifications:window._currentMods||[]};
   if(noteVal) patch.director_notes=noteVal;
   patch.director_email=_cu.email;
   var r=await _patchAnalysis(id,patch);
