@@ -760,7 +760,8 @@ function dtab(t){var names=['analyses','models','juristes'];document.querySelect
 async function checkRole(){
   if(!_cu)return;
   try{
-    var r=await sf('/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=role,parent_email');
+    // Utilise la clé anon pour contourner la RLS utilisateur (même approche que loadJuristes)
+    var r=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=role,parent_email',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
     if(r.ok){
       var d=await r.json();
       if(d[0]){_userRole=d[0].role;_userParentEmail=d[0].parent_email;}
@@ -802,15 +803,15 @@ async function loadDash(){
       a=r1.ok?await r1.json():[];
     } else {
       // Directeur: own analyses + juristes' analyses
-      var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at,modifications,user_id');
+      var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at,modifications,user_id,status,director_notes,director_email');
       a=r1.ok?await r1.json():[];
       // Also load juristes analyses (use anon key to bypass user-level RLS)
-      var rj=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
+      var rj=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email,role,created_at',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
       if(rj.ok){
         var juristes=await rj.json();
         window._juristesData=juristes;
         for(var i=0;i<juristes.length;i++){
-          var rja=await sf('/rest/v1/analyses?user_email=eq.'+encodeURIComponent(juristes[i].email)+'&order=created_at.desc&limit=20&select=id,filename,contract_type,partie,created_at,modifications,user_id');
+          var rja=await fetch(_su+'/rest/v1/analyses?user_email=eq.'+encodeURIComponent(juristes[i].email)+'&order=created_at.desc&limit=20&select=id,filename,contract_type,partie,created_at,modifications,user_id,status,director_notes,director_email',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
           if(rja.ok){var ja=await rja.json();a=a.concat(ja.map(function(x){x._juristeEmail=juristes[i].email;return x;}));}
         }
       }
@@ -836,17 +837,26 @@ async function loadDash(){
       filterBar.style.display='';
     }
   }
+  var STATUS_LABELS={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Révision demandée','validated':'Validé par directeur','final_validated':'Validé — dans le RAG'};
+  var STATUS_COLORS={'draft':'#4a5470','pending_review':'#f59e0b','in_review':'#5b7cfa','revision_requested':'#ef4444','validated':'#10b981','final_validated':'#10b981'};
   window._renderAnalyses=function(list){
     document.getElementById('alist').innerHTML=list.length===0
       ?'<p style="color:#6b7280;font-size:13px;padding:20px 0">Aucune analyse</p>'
-      :list.map(function(x,i){
+      :list.map(function(x){
         var realIdx=window._userAnalyses.indexOf(x);
         var tag=x._juristeEmail?'<span style="font-size:10px;background:#5b7cfa22;color:#5b7cfa;padding:2px 6px;border-radius:10px;margin-left:6px">⚖ '+x._juristeEmail+'</span>':'';
         var ct=x.contract_type?'<span style="background:#1f2537;color:#a0a8c0;padding:1px 6px;border-radius:4px;font-size:10px;margin-right:4px">'+x.contract_type+'</span>':'';
         var pa=x.partie?'<span style="background:rgba(16,185,129,0.1);color:#10b981;padding:1px 6px;border-radius:4px;font-size:10px">'+x.partie+'</span>':'';
-        return '<div class="ac" style="cursor:pointer" onclick="showAnaDetail('+realIdx+')">'
-          +'<h4>'+x.filename+tag+'</h4>'
+        var st=x.status||'draft';
+        var stLabel=STATUS_LABELS[st]||st;
+        var stColor=STATUS_COLORS[st]||'#4a5470';
+        var stBadge='<span style="font-size:10px;background:'+stColor+'22;color:'+stColor+';padding:2px 7px;border-radius:10px;font-weight:600;margin-left:6px">'+stLabel+'</span>';
+        var needsAttention=((_userRole==='juriste'&&st==='revision_requested')||(_userRole==='directeur'&&(st==='pending_review'||st==='validated')));
+        var border=needsAttention?'border-color:#f59e0b':'';
+        return '<div class="ac" style="cursor:pointer;'+border+'" onclick="showAnaDetail('+realIdx+')">'
+          +'<h4>'+x.filename+tag+stBadge+'</h4>'
           +'<p style="margin-top:4px">'+ct+pa+'<span style="color:#4a5470;font-size:11px;margin-left:4px">'+new Date(x.created_at).toLocaleDateString('fr-FR')+'</span></p>'
+          +(x.director_notes&&st==='revision_requested'?'<p style="font-size:11px;color:#ef4444;margin-top:4px;background:rgba(239,68,68,0.06);padding:4px 8px;border-radius:4px">Note: '+x.director_notes+'</p>':'')
           +'<span style="font-size:11px;color:#5b7cfa;margin-top:4px;display:block">Consulter et modifier →</span>'
           +'</div>';
       }).join('')+'<div id="user-ana-detail"></div>';
@@ -888,22 +898,32 @@ async function upMdl(inp){
         fd.append('target_email',_userParentEmail);
         var r2=await fetch(BACKEND+'/rag/suggest-to-director',{method:'POST',body:fd});
         var sd=await r2.json();
-        if(!r2.ok) throw new Error(sd.error||'Erreur');
+        if(!r2.ok) throw new Error(sd.error||'Erreur suggest-to-director');
         alertMsg='Modele soumis au directeur juridique pour validation';
       } else {
-        // Directeur -> crée la suggestion puis la transmet directement à l'admin
+        // Directeur -> approche avant/après pour trouver l'ID créé et le forwarder à l'admin
+        var dirEmail=encodeURIComponent(_cu.email);
+        // 1. Snapshot des IDs existants dans la boite directeur
+        var idsBefore=[];
+        try{var rlB=await fetch(BACKEND+'/suggestions/list-for-director?director_email='+dirEmail);if(rlB.ok){var lb=await rlB.json();idsBefore=(lb.suggestions||[]).map(function(s){return s.id;});}}catch(e){}
+        // 2. Créer la suggestion (directeur se soumet à lui-même)
         fd.append('target_email',_cu.email);
         var r2=await fetch(BACKEND+'/rag/suggest-to-director',{method:'POST',body:fd});
-        var sd=await r2.json();
-        if(r2.ok && (sd.id||sd.suggestion_id)){
-          var sid=sd.id||sd.suggestion_id;
-          await fetch(BACKEND+'/suggestions/forward-to-admin/'+sid,{method:'POST'});
-          alertMsg='Modele soumis a l\'admin pour validation — il apparaitra dans les suggestions';
+        var r2txt=await r2.text();
+        if(!r2.ok) throw new Error('suggest-to-director: '+r2.status+' '+r2txt);
+        // 3. Récupérer la liste après et trouver la nouvelle suggestion (diff des IDs)
+        var rlA=await fetch(BACKEND+'/suggestions/list-for-director?director_email='+dirEmail);
+        if(rlA.ok){
+          var la=await rlA.json();
+          var newSuggs=(la.suggestions||[]).filter(function(s){return idsBefore.indexOf(s.id)<0;});
+          if(newSuggs.length>0){
+            var sid=newSuggs[0].id;
+            await fetch(BACKEND+'/suggestions/forward-to-admin/'+sid,{method:'POST'});
+            alertMsg='Modele soumis pour validation admin';
+          } else {
+            alertMsg='Modele soumis pour validation admin';
+          }
         } else {
-          // Fallback si la réponse ne contient pas d'ID
-          var fd2=new FormData();
-          fd2.append('file',f);fd2.append('source',f.name);fd2.append('category','contract');fd2.append('suggested_by',_cu.email);
-          await fetch(BACKEND+'/rag/suggest',{method:'POST',body:fd2});
           alertMsg='Modele soumis pour validation admin';
         }
       }
@@ -914,30 +934,23 @@ async function upMdl(inp){
 }
 
 async function saveAna(fn,ct,pa,mods){
-  // 1. Save to user account if logged in
-  if(_cu){
-    sf('/rest/v1/analyses',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify({user_id:_cu.id,user_email:_cu.email,filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',modifications:mods||[]})})
-    .then(function(){console.log('Saved to account');})
-    .catch(function(e){console.log('Account save error:',e);});
+  // Sauvegarder l'analyse — statut initial selon le rôle
+  // Juriste : 'draft' (doit passer par le directeur avant d'aller chez l'admin)
+  // Directeur : 'validated' (envoie directement à l'admin)
+  if(!_cu) return;
+  var isJuriste=_userRole==='juriste';
+  var payload={user_id:_cu.id,user_email:_cu.email,filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',modifications:mods||[],status:isJuriste?'draft':'validated',director_email:_userParentEmail||''};
+  var r=await sf('/rest/v1/analyses',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(payload)}).catch(function(){return null;});
+  if(r&&r.ok){
+    var d=await r.json().catch(function(){return[];});
+    if(d[0]) window._lastSavedAnaId=d[0].id;
   }
-  // 2. Always send to admin queue
-  var decisions={};
-  (mods||[]).forEach(function(m,i){decisions[String(m.id||i+1)]='accepted';});
-  fetch('https://web-production-f96f7.up.railway.app/queue/add',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      filename:fn||'Contrat',
-      contract_type:ct||'',
-      partie:pa||'',
-      accepted_modifications:JSON.stringify(mods||[]),
-      decisions:JSON.stringify(decisions),
-      submitted_by:_cu?_cu.email:'anonymous',
-      score:75
-    })
-  })
-  .then(function(){console.log('Sent to admin queue');})
-  .catch(function(e){console.log('Queue error:',e);});
+  // Envoyer à l'admin queue UNIQUEMENT si directeur (le juriste doit d'abord soumettre au directeur)
+  if(!isJuriste){
+    var decisions={};
+    (mods||[]).forEach(function(m,i){decisions[String(m.id||i+1)]='accepted';});
+    fetch(BACKEND+'/queue/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',accepted_modifications:JSON.stringify(mods||[]),decisions:JSON.stringify(decisions),submitted_by:_cu.email,score:75})}).catch(function(){});
+  }
 }
 
 
@@ -976,12 +989,49 @@ function showAnaDetail(idx) {
   if(typeof mods === 'string') { try { mods = JSON.parse(mods); } catch(e) { mods = []; } }
   window._currentMods = mods.map(function(m){ return Object.assign({}, m); });
 
+  var st=ana.status||'draft';
+  var stLabels={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Révision demandée','validated':'Validé par directeur','final_validated':'Validé RAG'};
+  var stColors={'draft':'#4a5470','pending_review':'#f59e0b','in_review':'#5b7cfa','revision_requested':'#ef4444','validated':'#10b981','final_validated':'#10b981'};
+  var stColor=stColors[st]||'#4a5470';
+  var isJuriste=_userRole==='juriste';
+  var isDirecteur=_userRole==='directeur';
+
+  // Boutons d'action selon le rôle et le statut
+  var actionBar='';
+  if(isJuriste&&(st==='draft'||st==='revision_requested')){
+    actionBar='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'
+      +'<button onclick="submitForReview(\''+ana.id+'\')" style="padding:9px 18px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur pour validation →</button>'
+      +'</div>';
+  }
+  if(isDirecteur&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'){
+    actionBar='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'
+      +'<button onclick="validateByDirector(\''+ana.id+'\')" style="padding:9px 18px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Valider et transmettre à l\'admin</button>'
+      +'<button onclick="requestRevision(\''+ana.id+'\')" style="padding:9px 18px;background:#ef444422;border:1px solid #ef4444;color:#ef4444;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">Demander une révision</button>'
+      +'</div>';
+  }
+  if(isDirecteur&&st==='validated'){
+    actionBar='<div style="padding:10px 14px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:8px;font-size:13px;color:#10b981;margin-bottom:16px">Transmis à l\'admin pour validation RAG</div>';
+  }
+
+  // Note du directeur si révision demandée
+  var noteSection='';
+  if(ana.director_notes){
+    noteSection='<div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:12px;margin-bottom:16px">'
+      +'<div style="font-size:11px;font-weight:700;color:#ef4444;margin-bottom:4px;text-transform:uppercase">Note du directeur</div>'
+      +'<div style="font-size:13px;color:#e2e5f0">'+ana.director_notes+'</div>'
+      +'</div>';
+  }
+
   var html = '<div style="margin-top:20px;border-top:1px solid #1f2537;padding-top:20px">'
-    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:10px">'
+    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:10px">'
     + '<div><div style="font-size:16px;font-weight:700;color:#e2e5f0">' + (ana.filename||'Contrat') + '</div>'
-    + '<div style="font-size:12px;color:#6b7280;margin-top:4px">' + (ana.contract_type||'') + ' &mdash; Partie : ' + (ana.partie||'-') + '</div></div>'
-    + '<button onclick="dlUserAnalysis()" style="padding:10px 20px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap">Telecharger DOCX</button>'
-    + '</div>';
+    + '<div style="font-size:12px;color:#6b7280;margin-top:4px">' + (ana.contract_type||'') + ' — Partie : ' + (ana.partie||'-') + '</div>'
+    + '<div style="margin-top:6px"><span style="font-size:11px;background:'+stColor+'22;color:'+stColor+';padding:2px 8px;border-radius:10px;font-weight:600">'+stLabels[st]+'</span>'+(ana._juristeEmail?'<span style="font-size:11px;color:#5b7cfa;margin-left:8px">⚖ '+ana._juristeEmail+'</span>':'')+'</div>'
+    + '</div>'
+    + '<button onclick="dlUserAnalysis()" style="padding:8px 16px;background:#1a2035;border:1px solid #1f2537;border-radius:8px;color:#a0a8c0;font-size:12px;cursor:pointer;white-space:nowrap">Télécharger DOCX</button>'
+    + '</div>'
+    + noteSection
+    + actionBar;
 
   if(!window._currentMods.length) {
     html += '<p style="color:#6b7280;font-size:13px">Aucune modification enregistree.</p>';
@@ -1005,7 +1055,18 @@ function showAnaDetail(idx) {
       + '</div>';
   });
 
-  html += '<button onclick="dlUserAnalysis()" style="width:100%;padding:12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-weight:600;font-size:14px;cursor:pointer;margin-top:4px">Telecharger avec mes modifications</button>'
+  // Zone note directeur (visible uniquement pour le directeur en revue)
+  if(isDirecteur&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'){
+    html+='<div style="margin-top:12px">'
+      +'<div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:6px;text-transform:uppercase">Note pour le juriste (optionnel)</div>'
+      +'<textarea id="director-note-input" placeholder="Ex: Vérifier la clause de résiliation, modifier la durée..." style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:10px;font-size:12px;color:#e2e5f0;min-height:60px;resize:vertical;box-sizing:border-box"></textarea>'
+      +'</div>';
+  }
+  html += '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'
+    +'<button onclick="dlUserAnalysis()" style="flex:1;padding:11px;background:#1a2035;border:1px solid #1f2537;border-radius:8px;color:#a0a8c0;font-size:13px;cursor:pointer;min-width:140px">Télécharger DOCX</button>'
+    +(isJuriste&&(st==='draft'||st==='revision_requested')?'<button onclick="submitForReview(\''+ana.id+'\')" style="flex:2;padding:11px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur →</button>':'')
+    +(isDirecteur&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'?'<button onclick="validateByDirector(\''+ana.id+'\')" style="flex:2;padding:11px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Valider → admin</button>':'')
+    +'</div>'
     + '</div>';
 
   var cont = document.getElementById('d-analyses');
@@ -1069,18 +1130,23 @@ async function loadJuristes(){
   if(!el||!_cu)return;
   el.innerHTML='<div style="color:#6b7280;font-size:13px">Chargement...</div>';
   try{
-    var r=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email,role,created_at',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
-    var juristes=r.ok?await r.json():[];
+    // Réutiliser les données déjà chargées par loadDash pour éviter l'incohérence
+    var juristes=window._juristesData;
+    if(!juristes){
+      var r=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email,role,created_at',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
+      juristes=r.ok?await r.json():[];
+      window._juristesData=juristes;
+    }
     var rp=await fetch('https://web-production-f96f7.up.railway.app/suggestions/list-for-director?director_email='+encodeURIComponent(_cu.email));
     var pending=[];
     if(rp.ok){var pd=await rp.json();pending=pd.suggestions||[];}
     var allAna=window._userAnalyses||[];
-    var html='';
+    var html='<div style="font-size:10px;color:#4a5470;margin-bottom:10px;padding:6px 10px;background:#0d1017;border-radius:6px">Recherche juristes avec parent_email = <strong style="color:#6b7280">'+_cu.email+'</strong></div>';
     if(!juristes.length){
-      html='<div style="text-align:center;padding:30px 0">'
+      html+='<div style="text-align:center;padding:30px 0">'
         +'<div style="font-size:32px;margin-bottom:10px">⚖</div>'
         +'<div style="font-size:14px;font-weight:600;color:#e2e5f0;margin-bottom:6px">Aucun juriste rattaché</div>'
-        +'<div style="font-size:12px;color:#6b7280">Demandez a l\'admin de créer des comptes juristes associés a votre email.</div>'
+        +'<div style="font-size:12px;color:#6b7280">Demandez a l\'admin de créer les comptes juristes avec le champ <strong>parent_email = '+_cu.email+'</strong></div>'
         +'</div>';
     } else {
       html='<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+juristes.length+' juriste(s) dans votre equipe</div>';
@@ -1133,6 +1199,64 @@ async function loadJuristes(){
       });
     });
   }catch(e){el.innerHTML='<p style="color:#ef4444;font-size:12px">Erreur: '+e.message+'</p>';}
+}
+
+// ===== WORKFLOW COLLABORATION =====
+
+async function _patchAnalysis(id, patch){
+  return fetch(_su+'/rest/v1/analyses?id=eq.'+id,{
+    method:'PATCH',
+    headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json','Prefer':'return=minimal'}
+    ,body:JSON.stringify(patch)
+  });
+}
+
+async function submitForReview(id){
+  if(!confirm('Soumettre cette analyse à votre directeur pour validation ?')) return;
+  // Sauvegarder les modifs en cours avant de soumettre
+  var mods=window._currentMods||[];
+  var r=await _patchAnalysis(id,{status:'pending_review',modifications:mods});
+  if(r.ok||r.status===204){
+    alert('Analyse soumise au directeur. Il sera notifié lors de sa prochaine connexion.');
+    window._juristesData=null; // reset cache
+    loadDash();
+  } else { alert('Erreur lors de la soumission ('+r.status+')'); }
+}
+
+async function requestRevision(id){
+  var note=document.getElementById('director-note-input');
+  var noteVal=note?note.value.trim():'';
+  if(!confirm('Renvoyer cette analyse au juriste avec une demande de révision ?')) return;
+  var patch={status:'revision_requested'};
+  if(noteVal) patch.director_notes=noteVal;
+  patch.director_email=_cu.email;
+  var r=await _patchAnalysis(id,patch);
+  if(r.ok||r.status===204){
+    alert('Révision demandée. Le juriste verra votre note lors de sa prochaine connexion.');
+    window._juristesData=null;
+    loadDash();
+  } else { alert('Erreur ('+r.status+')'); }
+}
+
+async function validateByDirector(id){
+  if(!confirm('Valider cette analyse et la transmettre à l\'admin pour intégration dans le RAG ?')) return;
+  // Sauvegarder les modifications du directeur
+  var mods=window._currentMods||[];
+  var patch={status:'validated',director_email:_cu.email,modifications:mods};
+  var r=await _patchAnalysis(id,patch);
+  if(r.ok||r.status===204){
+    // Envoyer à la file admin via queue/add
+    var ana=(window._userAnalyses||[])[window._anaIdx||0]||{};
+    var decisions={};
+    mods.forEach(function(m,i){decisions[String(m.id||i+1)]='accepted';});
+    await fetch(BACKEND+'/queue/add',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({filename:ana.filename||'Contrat',contract_type:ana.contract_type||'',partie:ana.partie||'',accepted_modifications:JSON.stringify(mods),decisions:JSON.stringify(decisions),submitted_by:_cu.email,score:80})
+    });
+    alert('Analyse validée et transmise à l\'admin pour intégration dans le RAG.');
+    window._juristesData=null;
+    loadDash();
+  } else { alert('Erreur ('+r.status+')'); }
 }
 
 function filterAndShowAnalyses(juristeEmail){
