@@ -891,19 +891,24 @@ async function upMdl(inp){
         if(!r2.ok) throw new Error(sd.error||'Erreur');
         alertMsg='Modele soumis au directeur juridique pour validation';
       } else {
-        // Directeur -> crée la suggestion puis la transmet directement à l'admin
+        // Directeur -> soumet via suggest-to-director puis récupère l'ID depuis la liste pour forwarder
         fd.append('target_email',_cu.email);
         var r2=await fetch(BACKEND+'/rag/suggest-to-director',{method:'POST',body:fd});
-        var sd=await r2.json();
-        if(r2.ok && (sd.id||sd.suggestion_id)){
-          var sid=sd.id||sd.suggestion_id;
-          await fetch(BACKEND+'/suggestions/forward-to-admin/'+sid,{method:'POST'});
-          alertMsg='Modele soumis a l\'admin pour validation — il apparaitra dans les suggestions';
+        if(!r2.ok){var err=await r2.json();throw new Error(err.error||'Erreur suggest');}
+        // Récupérer la suggestion créée depuis la liste du directeur (filtre par son email)
+        var rl=await fetch(BACKEND+'/suggestions/list-for-director?director_email='+encodeURIComponent(_cu.email));
+        if(rl.ok){
+          var ld=await rl.json();
+          // Trouver la suggestion soumise par le directeur lui-même (pending)
+          var ownSuggs=(ld.suggestions||[]).filter(function(s){return s.suggested_by===_cu.email&&s.status==='pending';});
+          if(ownSuggs.length>0){
+            var sid=ownSuggs[0].id;
+            var rf=await fetch(BACKEND+'/suggestions/forward-to-admin/'+sid,{method:'POST'});
+            alertMsg=rf.ok?'Modele transmis a l\'admin — visible dans l\'onglet Suggestions':'Modele soumis (la transmission a l\'admin a echoue)';
+          } else {
+            alertMsg='Modele soumis au directeur (en attente dans votre boite)';
+          }
         } else {
-          // Fallback si la réponse ne contient pas d'ID
-          var fd2=new FormData();
-          fd2.append('file',f);fd2.append('source',f.name);fd2.append('category','contract');fd2.append('suggested_by',_cu.email);
-          await fetch(BACKEND+'/rag/suggest',{method:'POST',body:fd2});
           alertMsg='Modele soumis pour validation admin';
         }
       }
