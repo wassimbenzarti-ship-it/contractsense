@@ -172,7 +172,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <input type="file" id="minp" accept=".pdf,.docx,.txt" style="display:none" onchange="upMdl(this)"/>
 <div id="mlist"></div>
 </div>
-<div id="d-juristes" class="ds" style="display:none">
+<div id="d-juristes" class="ds">
 <div id="juristes-list"><div style="color:#6b7280;font-size:13px;padding:20px 0">Chargement...</div></div>
 </div>
 </div>
@@ -756,7 +756,7 @@ function showReg(){document.getElementById('afl').style.display='none';document.
 function showLogin(){document.getElementById('afr').style.display='none';document.getElementById('afl').style.display='block';document.getElementById('atitle').textContent='Connexion';}
 function showDash(){document.getElementById('dash-ov').classList.add('show');loadDash();}
 function closeDash(){document.getElementById('dash-ov').classList.remove('show');}
-function dtab(t){var names=['analyses','models','juristes'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');}
+function dtab(t){var names=['analyses','models','juristes'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();}
 async function checkRole(){
   if(!_cu)return;
   try{
@@ -837,7 +837,7 @@ async function loadDash(){
       filterBar.style.display='';
     }
   }
-  var STATUS_LABELS={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Révision demandée','validated':'Validé par directeur','final_validated':'Validé — dans le RAG'};
+  var STATUS_LABELS={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision','validated':'Validé par directeur','final_validated':'Validé — dans le RAG'};
   var STATUS_COLORS={'draft':'#4a5470','pending_review':'#f59e0b','in_review':'#5b7cfa','revision_requested':'#ef4444','validated':'#10b981','final_validated':'#10b981'};
   window._renderAnalyses=function(list){
     document.getElementById('alist').innerHTML=list.length===0
@@ -988,7 +988,7 @@ function showAnaDetail(idx) {
   window._currentMods = mods.map(function(m){ return Object.assign({}, m); });
 
   var st=ana.status||'draft';
-  var stLabels={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Révision demandée','validated':'Validé par directeur','final_validated':'Validé RAG'};
+  var stLabels={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision','validated':'Validé par directeur','final_validated':'Validé RAG'};
   var stColors={'draft':'#4a5470','pending_review':'#f59e0b','in_review':'#5b7cfa','revision_requested':'#ef4444','validated':'#10b981','final_validated':'#10b981'};
   var stColor=stColors[st]||'#4a5470';
   var isJuriste=_userRole==='juriste';
@@ -1230,9 +1230,11 @@ async function requestRevision(id){
   patch.director_email=_cu.email;
   var r=await _patchAnalysis(id,patch);
   if(r.ok||r.status===204){
-    alert('Révision demandée. Le juriste verra votre note lors de sa prochaine connexion.');
+    alert('Renvoyé pour révision. Le juriste verra votre note lors de sa prochaine connexion.');
     window._juristesData=null;
-    loadDash();
+    var savedIdx=window._anaIdx||0;
+    await loadDash();
+    showAnaDetail(savedIdx);
   } else { alert('Erreur ('+r.status+')'); }
 }
 
@@ -1253,7 +1255,9 @@ async function validateByDirector(id){
     });
     alert('Analyse validée et transmise à l\'admin pour intégration dans le RAG.');
     window._juristesData=null;
-    loadDash();
+    var savedIdx=window._anaIdx||0;
+    await loadDash();
+    showAnaDetail(savedIdx);
   } else { alert('Erreur ('+r.status+')'); }
 }
 
