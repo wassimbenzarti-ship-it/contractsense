@@ -989,13 +989,23 @@ async function loadDash(){
         var border=needsAttention?'border-color:#f59e0b':'';
         var adverseStyle=isAdverse?'margin-left:20px;border-left:3px solid #8b5cf6;':'';
         var displayName=isAdverse?'↳ '+x.filename:x.filename;
-        return '<div class="ac" style="cursor:pointer;'+border+adverseStyle+'" onclick="showAnaDetail('+realIdx+')">'
-          +'<h4>'+displayName+tag+stBadge+'</h4>'
-          +'<p style="margin-top:4px">'+ct+pa+'<span style="color:#4a5470;font-size:11px;margin-left:4px">'+new Date(x.created_at).toLocaleDateString('fr-FR')+'</span></p>'
+        var canDelete=!x._juristeEmail; // juriste can delete own; directeur can delete juriste too
+        return '<div class="ac" id="ana-card-'+realIdx+'" style="cursor:pointer;'+border+adverseStyle+'">'
+          +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px" onclick="toggleAnaDetail('+realIdx+')">'
+          +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:15px;font-weight:700;color:#e2e5f0;margin-bottom:4px;word-break:break-word">'+displayName+'</div>'
+          +'<div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">'+tag+stBadge+'</div>'
+          +'<p style="margin-top:5px">'+ct+pa+'<span style="color:#4a5470;font-size:11px;margin-left:4px">'+new Date(x.created_at).toLocaleDateString('fr-FR')+'</span></p>'
           +(x.director_notes&&st==='revision_requested'?'<p style="font-size:11px;color:#ef4444;margin-top:4px;background:rgba(239,68,68,0.06);padding:4px 8px;border-radius:4px">Note: '+x.director_notes+'</p>':'')
-          +'<span style="font-size:11px;color:#5b7cfa;margin-top:4px;display:block">Consulter et modifier →</span>'
+          +'</div>'
+          +'<div style="display:flex;gap:6px;align-items:center;flex-shrink:0">'
+          +'<span style="font-size:11px;color:#4a5470" id="ana-toggle-icon-'+realIdx+'">▼</span>'
+          +'<button onclick="event.stopPropagation();deleteAnalysis(\''+x.id+'\','+realIdx+')" title="Supprimer cette analyse" style="background:transparent;border:1px solid #ef444440;color:#ef4444;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;line-height:1">✕</button>'
+          +'</div>'
+          +'</div>'
+          +'<div id="ana-detail-inline-'+realIdx+'" style="display:none"></div>'
           +'</div>';
-      }).join('')+'<div id="user-ana-detail"></div>';
+      }).join('');
   };
   window._renderAnalyses(a);
   window.filterAnalysesByJuriste=function(val){
@@ -1158,13 +1168,15 @@ async function showAnaDetail(idx) {
       +'</div>';
   }
 
-  var html = '<div style="margin-top:20px;border-top:1px solid #1f2537;padding-top:20px">'
-    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:10px">'
-    + '<div><div style="font-size:16px;font-weight:700;color:#e2e5f0">' + (ana.filename||'Contrat') + '</div>'
-    + '<div style="font-size:12px;color:#6b7280;margin-top:4px">' + (ana.contract_type||'') + ' — Partie : ' + (ana.partie||'-') + '</div>'
-    + '<div style="margin-top:6px"><span style="font-size:11px;background:'+stColor+'22;color:'+stColor+';padding:2px 8px;border-radius:10px;font-weight:600">'+stLabels[st]+'</span>'+(ana._juristeEmail?'<span style="font-size:11px;color:#5b7cfa;margin-left:8px">⚖ '+ana._juristeEmail+'</span>':'')+'</div>'
+  var html = '<div style="margin-top:16px;border-top:1px solid #1f2537;padding-top:16px">'
+    + '<div style="background:#0d1017;border-radius:10px;padding:14px;margin-bottom:14px">'
+    + '<div style="font-size:18px;font-weight:800;color:#e2e5f0;margin-bottom:6px;word-break:break-word">📄 ' + (ana.filename||'Contrat') + '</div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">'
+    + (ana.contract_type?'<span style="background:#1f2537;color:#a0a8c0;padding:2px 8px;border-radius:4px;font-size:11px">'+ana.contract_type+'</span>':'')
+    + (ana.partie?'<span style="background:rgba(16,185,129,0.1);color:#10b981;padding:2px 8px;border-radius:4px;font-size:11px">'+ana.partie+'</span>':'')
+    + '<span style="font-size:11px;background:'+stColor+'22;color:'+stColor+';padding:2px 8px;border-radius:10px;font-weight:600">'+stLabels[st]+'</span>'
+    + (ana._juristeEmail?'<span style="font-size:11px;color:#5b7cfa">⚖ '+ana._juristeEmail+'</span>':'')
     + '</div>'
-    + '<button onclick="dlUserAnalysis()" style="padding:8px 16px;background:#1a2035;border:1px solid #1f2537;border-radius:8px;color:#a0a8c0;font-size:12px;cursor:pointer;white-space:nowrap">Télécharger DOCX</button>'
     + '</div>'
     + noteSection
     + actionBar;
@@ -1245,12 +1257,49 @@ async function showAnaDetail(idx) {
     :'')
     + '</div>';
 
-  var cont = document.getElementById('d-analyses');
-  if(cont) {
-    var det = document.getElementById('user-ana-detail');
-    if(!det) { det = document.createElement('div'); det.id = 'user-ana-detail'; cont.appendChild(det); }
-    det.innerHTML = html;
-    det.scrollIntoView({behavior:'smooth', block:'start'});
+  // Rendre inline dans la carte
+  var inlineDiv = document.getElementById('ana-detail-inline-'+idx);
+  if(inlineDiv) {
+    inlineDiv.innerHTML = html;
+    inlineDiv.style.display = 'block';
+    inlineDiv.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+}
+
+function toggleAnaDetail(idx){
+  var inlineDiv = document.getElementById('ana-detail-inline-'+idx);
+  var icon = document.getElementById('ana-toggle-icon-'+idx);
+  if(!inlineDiv) return;
+  var isOpen = inlineDiv.style.display !== 'none' && inlineDiv.innerHTML !== '';
+  if(isOpen){
+    inlineDiv.style.display = 'none';
+    if(icon) icon.textContent = '▼';
+    window._anaIdx = null;
+  } else {
+    showAnaDetail(idx);
+    if(icon) icon.textContent = '▲';
+  }
+}
+
+async function deleteAnalysis(id, idx){
+  if(!confirm('Supprimer cette analyse ? Cette action est irréversible.')) return;
+  var card = document.getElementById('ana-card-'+idx);
+  if(card) card.style.opacity='0.4';
+  try{
+    var r = await fetch(_su+'/rest/v1/analyses?id=eq.'+id, {
+      method:'DELETE',
+      headers:{'apikey':_sk,'Authorization':'Bearer '+(localStorage.getItem('sbt')||_sk),'Content-Type':'application/json'}
+    });
+    if(r.ok||r.status===204){
+      window._juristesData=null;
+      loadDash();
+    } else {
+      alert('Erreur lors de la suppression ('+r.status+')');
+      if(card) card.style.opacity='1';
+    }
+  }catch(e){
+    alert('Erreur : '+e.message);
+    if(card) card.style.opacity='1';
   }
 }
 
