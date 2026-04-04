@@ -379,8 +379,8 @@ async function loadQueue() {
               }).join('') +
             '</select>' +
           '</div>' +
-          '<button class="btn-success" onclick="validateContract(' + JSON.stringify(item.id) + ')">✅ Valider → RAG</button>' +
-          '<button class="btn-danger" onclick="rejectContract(' + JSON.stringify(item.id) + ')">❌ Rejeter</button>' +
+          '<button class="btn-success" onclick="validateContract(\'' + item.id + '\')">✅ Valider → RAG</button>' +
+          '<button class="btn-danger" onclick="rejectContract(\'' + item.id + '\')">❌ Rejeter</button>' +
         '</div>';
       list.appendChild(div);
     });
