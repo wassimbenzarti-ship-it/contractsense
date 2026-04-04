@@ -736,100 +736,164 @@ footer {
 
 <!-- DEMO -->
 <section id="demo">
-  <div class="section-tag reveal">Workflow complet</div>
-  <h2 class="section-h2 reveal">De l'upload au document<br/>en 4 étapes.</h2>
-  <p class="section-sub reveal">Suivez le workflow interactif — du contrat brut au document professionnel prêt à envoyer.</p>
+  <div class="section-tag reveal">Workflow interactif</div>
+  <h2 class="section-h2 reveal">Du contrat brut au RAG<br/>en 6 étapes.</h2>
+  <p class="section-sub reveal">Le circuit complet — analyse IA, extension aux clauses non détectées, validation juriste → directeur → admin → base de connaissances.</p>
 
   <div class="demo-wrap reveal">
     <div class="demo-topbar">
       <div class="win-dots"><span></span><span></span><span></span></div>
-      <div class="demo-url-bar">omniscient.westfieldavocats.com</div>
+      <div class="demo-url-bar">omniscient.westfieldavocats.com · <span id="demo-role-label" style="color:var(--accent)">juriste</span></div>
     </div>
     <div class="demo-content">
 
-      <!-- S1 -->
+      <!-- S1 : Upload -->
       <div class="demo-step active" id="ds1">
-        <div class="step-tag">Étape 1 — Upload du contrat</div>
+        <div class="step-tag">Étape 1 — Juriste · Upload du contrat</div>
         <div class="drop-zone" id="dz">
           <div class="drop-icon">📄</div>
           <div class="drop-title">Déposez votre contrat</div>
-          <div class="drop-sub">PDF · DOCX · DOC · TXT — tous formats acceptés</div>
+          <div class="drop-sub">DOCX · TXT · PDF — analyse automatique des clauses</div>
         </div>
       </div>
 
-      <!-- S2 -->
+      <!-- S2 : Markups IA -->
       <div class="demo-step" id="ds2">
-        <div class="step-tag">Étape 2 — L'IA identifie les parties</div>
-        <div style="font-size:15px;font-weight:600;margin-bottom:6px">Quelle partie représentez-vous ?</div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:22px">Omniscient adapte chaque modification pour protéger vos intérêts.</div>
-        <div class="parties-row">
-          <div class="p-card sel" id="pc1">
-            <div class="p-card-name">Nexora Consulting S.A.R.L.</div>
-            <div class="p-card-role">Prestataire — fournisseur de services</div>
-            <span class="p-chip">favorable prestataire</span>
-          </div>
-          <div class="p-card" id="pc2">
-            <div class="p-card-name">Atlas Industries S.A.</div>
-            <div class="p-card-role">Client — donneur d'ordre</div>
-            <span class="p-chip" style="background:rgba(200,169,75,0.12);color:var(--gold)">favorable client</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- S3 -->
-      <div class="demo-step" id="ds3">
-        <div class="step-tag">Étape 3 — Markups proposés & éditables</div>
+        <div class="step-tag">Étape 2 — Juriste · Markups IA proposés</div>
         <div class="mods-header">
-          <div class="mods-count">6 clauses analysées</div>
-          <div class="mods-rag-badge">🧠 3 basées sur le RAG Westfield</div>
+          <div class="mods-count" id="demo-mods-count">0 clause analysée</div>
+          <div class="mods-rag-badge">🧠 RAG Westfield actif</div>
         </div>
-        <div id="mlist">
+        <div id="mlist2">
           <div class="mod-card" data-d="0">
             <div class="mod-head">
               <div class="mod-name">Délai de paiement & pénalités</div>
               <span class="risk-tag r-h">Risque élevé</span>
             </div>
             <div class="mod-body">
-              <div class="mod-orig">Modification proposée — éditable directement ✏️</div>
+              <div class="mod-orig">Modification proposée</div>
               <div class="mod-proposed-wrap">
-                <div class="mod-proposed-text" contenteditable="false">Le Client s'engage à régler les factures dans un délai de trente (30) jours calendaires à compter de leur date d'émission. Tout retard de paiement entraînera de plein droit l'application d'intérêts de retard au taux de 1,5% par mois, sans mise en demeure préalable.</div>
-                <div class="edit-hint">✏ Cliquez pour modifier</div>
+                <div class="mod-proposed-text">Le Client s'engage à régler les factures dans un délai de trente (30) jours. Tout retard entraînera des intérêts de 1,5 %/mois, sans mise en demeure préalable.</div>
               </div>
-              <div class="mod-source">🧠 Basé sur clause validée RAG — Westfield · Contrats de prestation</div>
+              <div class="mod-source">🧠 RAG Westfield · Contrats de prestation</div>
+            </div>
+            <div style="display:flex;gap:8px;padding:10px 18px;border-top:1px solid var(--border)">
+              <button class="btn-accept on" style="max-width:120px;padding:6px">✅ Accepté</button>
             </div>
           </div>
-          <div class="mod-card" data-d="180">
+          <div class="mod-card" data-d="200">
             <div class="mod-head">
-              <div class="mod-name">Résiliation & indemnité</div>
+              <div class="mod-name">Résiliation anticipée</div>
               <span class="risk-tag r-h">Risque élevé</span>
             </div>
             <div class="mod-body">
-              <div class="mod-orig">Modification proposée — éditable directement ✏️</div>
+              <div class="mod-orig">Modification proposée</div>
               <div class="mod-proposed-wrap">
-                <div class="mod-proposed-text" contenteditable="false">En cas de résiliation à l'initiative du Client, hors manquement du Prestataire, celui-ci sera redevable d'une indemnité compensatrice équivalente à deux (2) mois d'honoraires, exigible dans les quinze (15) jours suivant la notification.</div>
-                <div class="edit-hint">✏ Cliquez pour modifier</div>
+                <div class="mod-proposed-text">En cas de résiliation par le Client hors manquement, une indemnité de deux (2) mois d'honoraires est due dans les 15 jours suivant la notification.</div>
               </div>
-              <div class="mod-source">⚖️ DOC Art. 230 — obligations contractuelles</div>
+              <div class="mod-source">⚖️ DOC Art. 230</div>
+            </div>
+            <div style="display:flex;gap:8px;padding:10px 18px;border-top:1px solid var(--border)">
+              <button class="btn-accept on" style="max-width:120px;padding:6px">✅ Accepté</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- S4 -->
-      <div class="demo-step" id="ds4">
-        <div class="step-tag">Étape 4 — Export Track Changes</div>
-        <div class="export-summary">
-          <div style="font-size:15px;font-weight:600;margin-bottom:4px">✅ 5 markups acceptés · 1 refusé</div>
-          <div style="font-size:12px;color:var(--muted)">Document prêt à envoyer à la contrepartie</div>
-          <div class="export-rows" id="erows">
-            <div class="export-row" data-d="0"><span style="color:var(--green)">✓</span> Délai paiement — pénalités 1,5%/mois <span style="color:var(--purple);font-size:10px;margin-left:auto">RAG</span></div>
-            <div class="export-row" data-d="100"><span style="color:var(--green)">✓</span> Résiliation — indemnité 2 mois</div>
-            <div class="export-row" data-d="200"><span style="color:var(--green)">✓</span> Propriété intellectuelle — cession limitée</div>
-            <div class="export-row" data-d="300"><span style="color:var(--green)">✓</span> Force majeure — définition élargie</div>
-            <div class="export-row" data-d="400"><span style="color:var(--green)">✓</span> Responsabilité — plafonnée 12 mois d'honoraires</div>
+      <!-- S3 : Clause non détectée -->
+      <div class="demo-step" id="ds3">
+        <div class="step-tag">Étape 3 — Juriste · Extension aux clauses non analysées</div>
+        <div style="background:#0d1017;border:1px dashed #2a3040;border-radius:12px;padding:18px">
+          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">+ Signaler une clause inacceptable non détectée</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:12px" id="demo-clause-count">4 clauses du contrat non analysées</div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+            <select id="demo-clause-sel" style="flex:2;min-width:200px;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text)">
+              <option value="">— Sélectionner une clause du contrat —</option>
+              <option value="Clause de confidentialité">Clause de confidentialité</option>
+              <option value="Propriété intellectuelle">Propriété intellectuelle</option>
+              <option value="Non-sollicitation du personnel">Non-sollicitation du personnel</option>
+              <option value="Droit applicable & juridiction">Droit applicable & juridiction</option>
+            </select>
+            <input id="demo-clause-name" type="text" value="" placeholder="ou saisir librement" style="flex:1;min-width:140px;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text)">
+          </div>
+          <textarea id="demo-clause-text" style="width:100%;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:8px 10px;font-size:12px;color:var(--text);min-height:72px;resize:none;box-sizing:border-box;line-height:1.6;font-family:inherit" placeholder="Texte rempli automatiquement à la sélection…"></textarea>
+          <div style="margin-top:10px;display:flex;align-items:center;gap:12px">
+            <button style="padding:8px 18px;background:var(--accent);border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:default">Analyser avec l'IA et ajouter</button>
+            <span id="demo-clause-status" style="font-size:11px;color:var(--green);display:none">✓ Clause ajoutée à l'analyse</span>
           </div>
         </div>
-        <button class="export-btn">⬇ Télécharger DOCX avec Track Changes natifs Word</button>
+      </div>
+
+      <!-- S4 : Soumission au directeur -->
+      <div class="demo-step" id="ds4">
+        <div class="step-tag">Étape 4 — Juriste · Soumission au directeur</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">contrat_prestation_nexora.docx</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:16px">3 markups acceptés · 1 clause ajoutée manuellement</div>
+          <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+            <button style="padding:10px 22px;background:var(--amber);border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:default">Soumettre au directeur →</button>
+            <button style="padding:10px 18px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;cursor:default">⬇ Télécharger DOCX</button>
+          </div>
+          <div id="demo-submit-progress" style="display:none">
+            <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Transmission en cours…</div>
+            <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+              <div id="demo-pbar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--purple));transition:width 1.2s ease;border-radius:2px"></div>
+            </div>
+          </div>
+          <div id="demo-submit-done" style="display:none;padding:14px;background:rgba(13,207,138,0.07);border:1px solid rgba(13,207,138,0.25);border-radius:10px">
+            <div style="font-size:13px;font-weight:600;color:var(--green)">✅ Transmis au directeur juridique</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">Statut : En attente de validation · Notification envoyée</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S5 : Vue directeur -->
+      <div class="demo-step" id="ds5">
+        <div class="step-tag">Étape 5 — Directeur juridique · Révision & validation</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+          <div style="background:#080b14;padding:12px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <span style="font-size:12px;font-weight:600">contrat_prestation_nexora.docx</span>
+              <span style="margin-left:10px;font-size:10px;padding:2px 10px;border-radius:20px;background:rgba(245,158,11,0.15);color:var(--amber)">En attente</span>
+            </div>
+            <span style="font-size:11px;color:var(--muted)">par m.alami@nexora.ma</span>
+          </div>
+          <div style="padding:16px 18px">
+            <div id="demo-dir-mods" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+              <div class="export-row" data-d="0" style="font-size:12px"><span style="color:var(--green)">✓</span> Délai paiement — pénalités 1,5%/mois <span style="color:var(--purple);font-size:10px;margin-left:auto">RAG</span></div>
+              <div class="export-row" data-d="80" style="font-size:12px"><span style="color:var(--green)">✓</span> Résiliation — indemnité 2 mois</div>
+              <div class="export-row" data-d="160" style="font-size:12px"><span style="color:var(--green)">✓</span> Force majeure — définition élargie</div>
+              <div class="export-row" data-d="240" style="font-size:12px"><span style="color:var(--accent)">+</span> Confidentialité — ajoutée par juriste</div>
+            </div>
+            <div style="display:flex;gap:10px">
+              <button style="flex:1;padding:10px;background:var(--green);border:none;border-radius:8px;color:#05070e;font-weight:700;font-size:12px;cursor:default" id="demo-dir-btn">Valider → admin</button>
+              <button style="flex:1;padding:10px;background:rgba(255,69,96,0.1);border:1px solid rgba(255,69,96,0.25);border-radius:8px;color:var(--red);font-size:12px;cursor:default">Demander révision</button>
+            </div>
+            <div id="demo-dir-done" style="display:none;margin-top:12px;padding:12px;background:rgba(13,207,138,0.07);border:1px solid rgba(13,207,138,0.2);border-radius:8px;font-size:12px;color:var(--green)">
+              ✅ Validé — transmis à l'admin Westfield pour intégration RAG
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S6 : RAG enrichi -->
+      <div class="demo-step" id="ds6">
+        <div class="step-tag">Étape 6 — Admin · Intégration RAG & export final</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="background:rgba(13,207,138,0.05);border:1px solid rgba(13,207,138,0.2);border-radius:12px;padding:18px">
+            <div style="font-size:13px;font-weight:600;margin-bottom:4px">✅ Contrat validé · intégré à la base RAG</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">contrat_prestation_nexora.docx · catégorie : Prestation de services</div>
+            <div class="export-rows" id="erows2">
+              <div class="export-row" data-d="0" style="font-size:12px"><span style="color:var(--green)">✓</span> 4 clauses enrichissent la base Westfield</div>
+              <div class="export-row" data-d="120" style="font-size:12px"><span style="color:var(--purple)">🧠</span> Prochaines analyses améliorées automatiquement</div>
+              <div class="export-row" data-d="240" style="font-size:12px"><span style="color:var(--gold)">⬇</span> DOCX Track Changes exporté — prêt à envoyer</div>
+            </div>
+          </div>
+          <div style="background:rgba(61,107,255,0.05);border:1px solid rgba(61,107,255,0.2);border-radius:12px;padding:16px;font-size:12px;color:var(--muted);line-height:1.7">
+            💡 <strong style="color:var(--text)">La boucle est fermée.</strong> Chaque contrat validé par le directeur et l'admin renforce la base de connaissances — les markups des prochains contrats similaires seront plus précis, plus rapides, plus adaptés au droit marocain.
+          </div>
+          <button class="export-btn">⬇ Télécharger DOCX avec Track Changes natifs Word</button>
+        </div>
       </div>
 
     </div>
@@ -840,6 +904,8 @@ footer {
     <div class="step-dot" onclick="gotoStep(2)"></div>
     <div class="step-dot" onclick="gotoStep(3)"></div>
     <div class="step-dot" onclick="gotoStep(4)"></div>
+    <div class="step-dot" onclick="gotoStep(5)"></div>
+    <div class="step-dot" onclick="gotoStep(6)"></div>
   </div>
 </section>
 
@@ -1044,6 +1110,7 @@ document.querySelectorAll('.reveal').forEach(function(el) { ro.observe(el); });
 // Demo steps
 var cur = 1;
 var timer;
+var STEP_DUR = [0, 3800, 4500, 5000, 4500, 5000, 4000];
 
 function gotoStep(n) {
   clearTimeout(timer);
@@ -1051,48 +1118,109 @@ function gotoStep(n) {
   document.querySelectorAll('.step-dot').forEach(function(d) { d.classList.remove('on'); });
   document.getElementById('ds' + n).classList.add('active');
   document.querySelectorAll('.step-dot')[n-1].classList.add('on');
+  // Role label
+  var rl = document.getElementById('demo-role-label');
+  if (rl) rl.textContent = (n <= 4) ? 'juriste' : (n === 5 ? 'directeur juridique' : 'admin');
   cur = n;
-  if (n === 1) animS1();
-  if (n === 2) animS2();
-  if (n === 3) animS3();
-  if (n === 4) animS4();
-  timer = setTimeout(function() { gotoStep(n < 4 ? n+1 : 1); }, n === 3 ? 5000 : 3500);
+  var anims = [null, animS1, animS2, animS3, animS4, animS5, animS6];
+  if (anims[n]) anims[n]();
+  timer = setTimeout(function() { gotoStep(n < 6 ? n + 1 : 1); }, STEP_DUR[n]);
 }
 
 function animS1() {
   var dz = document.getElementById('dz');
   dz.className = 'drop-zone';
-  dz.innerHTML = '<div class="drop-icon">📄</div><div class="drop-title">Déposez votre contrat</div><div class="drop-sub">PDF · DOCX · DOC · TXT</div>';
+  dz.innerHTML = '<div class="drop-icon">📄</div><div class="drop-title">Déposez votre contrat</div><div class="drop-sub">DOCX · TXT · PDF — analyse automatique des clauses</div>';
   setTimeout(function() {
     dz.classList.add('lit');
     setTimeout(function() {
-      dz.innerHTML = '<div class="drop-icon">✅</div><div class="drop-title">contrat_prestation.docx</div><div class="drop-sub">38 paragraphes détectés · Analyse en cours…</div>';
-    }, 900);
-  }, 600);
+      dz.innerHTML = '<div class="drop-icon">⏳</div><div class="drop-title">contrat_prestation_nexora.docx</div><div class="drop-sub">42 paragraphes détectés · Analyse IA en cours…</div>';
+      setTimeout(function() {
+        dz.innerHTML = '<div class="drop-icon">✅</div><div class="drop-title">contrat_prestation_nexora.docx</div><div class="drop-sub">6 clauses analysées · 4 clauses non traitées identifiées</div>';
+      }, 1200);
+    }, 700);
+  }, 500);
 }
 
 function animS2() {
-  setTimeout(function() { document.getElementById('pc1').classList.add('sel'); }, 500);
+  var cnt = document.getElementById('demo-mods-count');
+  var cards = document.querySelectorAll('#mlist2 .mod-card');
+  cards.forEach(function(c) { c.classList.remove('vis'); });
+  if (cnt) cnt.textContent = '0 clause analysée';
+  var n = 0;
+  cards.forEach(function(c) {
+    setTimeout(function() {
+      c.classList.add('vis');
+      n++;
+      if (cnt) cnt.textContent = n + ' clause' + (n > 1 ? 's' : '') + ' analysée' + (n > 1 ? 's' : '');
+    }, parseInt(c.dataset.d) + 200);
+  });
 }
 
 function animS3() {
-  var cards = document.querySelectorAll('.mod-card');
-  cards.forEach(function(c) { c.classList.remove('vis'); });
-  cards.forEach(function(c) {
-    setTimeout(function() { c.classList.add('vis'); }, parseInt(c.dataset.d) + 200);
-  });
-  // Make proposed text editable on click
-  document.querySelectorAll('.mod-proposed-text').forEach(function(el) {
-    el.addEventListener('click', function() {
-      this.contentEditable = 'true';
-      this.focus();
-      this.parentElement.querySelector('.edit-hint').style.display = 'none';
-    });
-  });
+  var sel = document.getElementById('demo-clause-sel');
+  var name = document.getElementById('demo-clause-name');
+  var ta = document.getElementById('demo-clause-text');
+  var status = document.getElementById('demo-clause-status');
+  var cnt = document.getElementById('demo-clause-count');
+  if (sel) sel.value = '';
+  if (name) name.value = '';
+  if (ta) ta.value = '';
+  if (status) status.style.display = 'none';
+  // Simule la sélection d'une clause après 1s
+  setTimeout(function() {
+    if (sel) { sel.value = 'Clause de confidentialité'; }
+    if (name) name.value = 'Clause de confidentialité';
+    if (ta) {
+      var txt = 'Le Prestataire s\'engage à maintenir strictement confidentielle toute information commerciale, technique ou financière communiquée par le Client dans le cadre de la présente convention, et ce pendant une durée de cinq (5) ans suivant la fin du contrat.';
+      var i = 0;
+      var iv = setInterval(function() {
+        ta.value = txt.slice(0, i);
+        i += 3;
+        if (i > txt.length) { ta.value = txt; clearInterval(iv); }
+      }, 18);
+    }
+  }, 1000);
+  // Simule l'envoi à l'IA après 3s
+  setTimeout(function() {
+    if (status) status.style.display = 'inline';
+    if (cnt) cnt.textContent = '3 clauses du contrat non analysées';
+  }, 3200);
 }
 
 function animS4() {
-  var rows = document.querySelectorAll('.export-row');
+  var prog = document.getElementById('demo-submit-progress');
+  var done = document.getElementById('demo-submit-done');
+  var pbar = document.getElementById('demo-pbar');
+  if (prog) prog.style.display = 'none';
+  if (done) done.style.display = 'none';
+  if (pbar) pbar.style.width = '0%';
+  setTimeout(function() {
+    if (prog) prog.style.display = 'block';
+    setTimeout(function() { if (pbar) pbar.style.width = '100%'; }, 100);
+    setTimeout(function() {
+      if (prog) prog.style.display = 'none';
+      if (done) done.style.display = 'block';
+    }, 1500);
+  }, 1200);
+}
+
+function animS5() {
+  var rows = document.querySelectorAll('#demo-dir-mods .export-row');
+  var done = document.getElementById('demo-dir-done');
+  if (done) done.style.display = 'none';
+  rows.forEach(function(r) { r.classList.remove('vis'); });
+  rows.forEach(function(r) {
+    setTimeout(function() { r.classList.add('vis'); }, parseInt(r.dataset.d) + 200);
+  });
+  // Simule la validation du directeur après 3s
+  setTimeout(function() {
+    if (done) done.style.display = 'block';
+  }, 3200);
+}
+
+function animS6() {
+  var rows = document.querySelectorAll('#erows2 .export-row');
   rows.forEach(function(r) { r.classList.remove('vis'); });
   rows.forEach(function(r) {
     setTimeout(function() { r.classList.add('vis'); }, parseInt(r.dataset.d) + 100);
