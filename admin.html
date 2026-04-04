@@ -379,8 +379,8 @@ async function loadQueue() {
               }).join('') +
             '</select>' +
           '</div>' +
-          '<button class="btn-success" onclick="validateContract(\' + item.id + \')">✅ Valider → RAG</button>' +
-          '<button class="btn-danger" onclick="rejectContract(\' + item.id + \')">❌ Rejeter</button>' +
+          '<button class="btn-success" onclick="validateContract(' + JSON.stringify(item.id) + ')">✅ Valider → RAG</button>' +
+          '<button class="btn-danger" onclick="rejectContract(' + JSON.stringify(item.id) + ')">❌ Rejeter</button>' +
         '</div>';
       list.appendChild(div);
     });
@@ -390,8 +390,10 @@ async function loadQueue() {
 }
 
 async function validateContract(id) {
-  var category = document.getElementById('cat-' + id).value;
+  var catEl = document.getElementById('cat-' + id);
   var card = document.getElementById('qcard-' + id);
+  if(!card || !catEl) { alert('Carte introuvable — rechargez la page.'); return; }
+  var category = catEl.value;
 
   // Collect edited modifications
   var editedMods = [];
@@ -435,7 +437,7 @@ async function validateContract(id) {
 async function rejectContract(id) {
   if (!confirm('Rejeter ce contrat ?')) return;
   var card = document.getElementById('qcard-' + id);
-  card.style.opacity = '0.5';
+  if(card) card.style.opacity = '0.5';
   try {
     var resp = await fetch(BACKEND + '/queue/reject', {
       method: 'POST',
@@ -443,7 +445,7 @@ async function rejectContract(id) {
       body: JSON.stringify({ id: id })
     });
     if (!resp.ok) throw new Error('Erreur');
-    card.remove();
+    if(card) card.remove();
     loadStats();
   } catch(e) {
     alert('Erreur: ' + e.message);
