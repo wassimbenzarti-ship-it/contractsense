@@ -761,21 +761,41 @@ function _extractContractClauses(text){
   var clauses=[];
   var curName=null;
   var curLines=[];
-  var headRe=/^(article|clause|section|chapitre|titre|\d+[\.\)§])\s/i;
-  var numTitleRe=/^\d+(\.\d+)*\.?\s+[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ]/;
+  // Détecte les en-têtes de clauses dans les formats français courants :
+  // "Article 1", "ARTICLE 1 -", "Clause 2 :", "Section 3", "Chapitre", "Titre"
+  // "1.", "1.1", "1.1.", "I.", "I -", "A.", "(1)", lignes entièrement en majuscules courtes
+  var headRe=/^(article|clause|section|chapitre|titre|annexe)\b/i;
+  var numRe=/^(\d+(\.\d+)*\.?|[IVXivx]+\.?|[A-Z]\.)\s+\S/;
+  var allCapsRe=/^[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ\s\d\-–:]{6,80}$/;
   lines.forEach(function(line){
     var t=line.trim();
     if(!t) return;
-    var isHead=(headRe.test(t)||numTitleRe.test(t))&&t.length<160;
+    var isHead=t.length<180&&(
+      headRe.test(t)||
+      numRe.test(t)||
+      (allCapsRe.test(t)&&t.length>5&&t===t.toUpperCase()&&/[A-ZÀ-Ü]{3}/.test(t))
+    );
     if(isHead){
-      if(curName) clauses.push({name:curName,text:curLines.join('\n').trim()});
+      if(curName&&curLines.length>0) clauses.push({name:curName,text:curLines.join('\n').trim()});
+      else if(curName) clauses.push({name:curName,text:''});
       curName=t; curLines=[];
     } else if(curName){
       curLines.push(t);
+      // Limiter le texte stocké à 600 caractères
+      if(curLines.join('\n').length>600) return;
     }
   });
-  if(curName) clauses.push({name:curName,text:curLines.join('\n').trim()});
-  return clauses.slice(0,60);
+  if(curName) clauses.push({name:curName,text:curLines.join('\n').trim().slice(0,600)});
+  return clauses.filter(function(c){return c.name.length>2;}).slice(0,80);
+}
+
+// Ajoute la métadonnée des clauses dans un tableau de modifications
+function _modsWithMeta(mods){
+  var list=(mods||[]).filter(function(m){return !m._isClauseMeta;});
+  if(window._allContractClauses&&window._allContractClauses.length){
+    list=[{_isClauseMeta:true,clauses:window._allContractClauses}].concat(list);
+  }
+  return list;
 }
 
 async function saveAndSubmitFromReview(){
@@ -787,7 +807,7 @@ async function saveAndSubmitFromReview(){
     await saveAna(curFile?curFile.name:'Contrat', savedType||'generic', selectedPartie||'', modifications);
     var anaId = window._lastSavedAnaId;
     if(anaId){
-      await _patchAnalysis(anaId, {status:'pending_review', modifications:modifications});
+      await _patchAnalysis(anaId, {status:'pending_review', modifications:_modsWithMeta(modifications)});
       alert('Analyse soumise au directeur. Il sera notifi\u00e9 lors de sa prochaine connexion.');
     } else {
       alert('Analyse sauvegard\u00e9e.');
@@ -1157,12 +1177,7 @@ async function upMdl(inp){
 async function saveAna(fn,ct,pa,mods){
   if(!_cu) return;
   var isJuriste=_userRole==='juriste';
-  // Intégrer les clauses du contrat en metadata pour pouvoir les afficher dans le tableau de bord
-  var allMods=(mods||[]).slice();
-  if(window._allContractClauses&&window._allContractClauses.length){
-    allMods=[{_isClauseMeta:true,clauses:window._allContractClauses}].concat(allMods);
-  }
-  var payload={user_id:_cu.id,user_email:_cu.email,filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',modifications:allMods,status:isJuriste?'draft':'validated',director_email:_userParentEmail||''};
+  var payload={user_id:_cu.id,user_email:_cu.email,filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',modifications:_modsWithMeta(mods),status:isJuriste?'draft':'validated',director_email:_userParentEmail||''};
   var r=await sf('/rest/v1/analyses',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(payload)}).catch(function(){return null;});
   if(r&&r.ok){
     var d=await r.json().catch(function(){return[];});
@@ -1688,8 +1703,7 @@ async function _patchAnalysis(id, patch){
 async function submitForReview(id){
   if(!confirm('Soumettre cette analyse à votre directeur pour validation ?')) return;
   // Sauvegarder les modifs en cours avant de soumettre
-  var mods=window._currentMods||[];
-  var r=await _patchAnalysis(id,{status:'pending_review',modifications:mods});
+  var r=await _patchAnalysis(id,{status:'pending_review',modifications:_modsWithMeta(window._currentMods)});
   if(r.ok||r.status===204){
     alert('Analyse soumise au directeur. Il sera notifié lors de sa prochaine connexion.');
     window._juristesData=null; // reset cache
@@ -1702,7 +1716,7 @@ async function requestRevision(id){
   var noteVal=note?note.value.trim():'';
   if(!confirm('Renvoyer cette analyse au juriste avec une demande de révision ?')) return;
   // Inclure les modifications du directeur dans le patch
-  var patch={status:'revision_requested',modifications:window._currentMods||[]};
+  var patch={status:'revision_requested',modifications:_modsWithMeta(window._currentMods)};
   if(noteVal) patch.director_notes=noteVal;
   patch.director_email=_cu.email;
   var r=await _patchAnalysis(id,patch);
