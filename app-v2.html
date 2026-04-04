@@ -1080,6 +1080,20 @@ async function showAnaDetail(idx) {
     +(isJuriste&&(st==='draft'||st==='revision_requested')?'<button onclick="submitForReview(\''+ana.id+'\')" style="flex:2;padding:11px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur →</button>':'')
     +(isDirecteur&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'?'<button onclick="validateByDirector(\''+ana.id+'\')" style="flex:2;padding:11px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Valider → admin</button>':'')
     +'</div>'
+    // Section "Ajouter une clause" pour juriste en révision
+    +(isJuriste&&(st==='draft'||st==='revision_requested')?
+      '<div style="margin-top:16px;border:1px dashed #2a3040;border-radius:10px;padding:14px">'
+      +'<div style="font-size:12px;font-weight:700;color:#5b7cfa;margin-bottom:6px">+ Signaler une clause inacceptable</div>'
+      +'<div style="font-size:11px;color:#6b7280;margin-bottom:10px;line-height:1.5">Ajoutez manuellement une clause que vous jugez problématique et qui n\'a pas été signalée par l\'IA.</div>'
+      +'<input type="text" id="add-clause-name" placeholder="Nom de la clause (ex : Article 15 — Résiliation)" style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:8px 10px;font-size:12px;color:#e2e5f0;box-sizing:border-box;margin-bottom:8px">'
+      +'<label style="display:block;font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Texte de la clause dans le contrat</label>'
+      +'<textarea id="add-clause-orig" placeholder="Collez le texte de la clause telle qu\'elle figure dans le contrat..." style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:8px 10px;font-size:12px;color:#e2e5f0;min-height:80px;resize:vertical;box-sizing:border-box;line-height:1.6;font-family:inherit;margin-bottom:8px"></textarea>'
+      +'<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
+      +'<button id="add-clause-btn" onclick="analyzeManualClause()" style="padding:9px 18px;background:#5b7cfa;border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:pointer">Analyser avec l\'IA</button>'
+      +'<span style="font-size:11px;color:#4a5470">L\'IA analysera ce texte et proposera une contre-rédaction.</span>'
+      +'</div>'
+      +'</div>'
+    :'')
     // Section markups partie adverse — uniquement après validation directeur
     +(st==='validated'||st==='final_validated'?
       '<div style="margin-top:20px;border-top:1px solid #1f2537;padding-top:16px">'
@@ -1102,15 +1116,28 @@ async function showAnaDetail(idx) {
   }
 }
 
+function _escH(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function _escHBr(s){return _escH(s).replace(/\n/g,'<br>');}
+
+// Ratio de mots communs entre deux textes (0 = rien en commun, 1 = identique)
+function _wordSim(a,b){
+  if(!a||!b) return 0;
+  var wa=a.toLowerCase().replace(/[^\w\s]/g,'').split(/\s+/).filter(Boolean);
+  var wb=b.toLowerCase().replace(/[^\w\s]/g,'').split(/\s+/).filter(Boolean);
+  if(!wa.length||!wb.length) return 0;
+  var setB=new Set(wb);
+  var common=wa.filter(function(w){return setB.has(w);}).length;
+  return common/Math.max(wa.length,wb.length);
+}
+
 async function analyzeAdverse(anaId, contractType, partie){
   var inp=document.getElementById('adverse-file-inp');
   var file=inp?inp.files[0]:null;
   if(!file) return;
   var res=document.getElementById('adverse-result');
-  if(res)res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Analyse du document adverse...</div>';
+  if(res)res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Analyse des écarts par rapport à vos positions validées...</div>';
 
   try{
-    // 1. Envoyer le document adverse au backend pour analyse
     var fd=new FormData();
     fd.append('file',file);
     fd.append('type',contractType||'general');
@@ -1120,60 +1147,64 @@ async function analyzeAdverse(anaId, contractType, partie){
     var data=await r.json();
     if(!r.ok) throw new Error(data.error||'Erreur serveur');
     var adverseMods=data.modifications||[];
-    if(!adverseMods.length){
-      if(res)res.innerHTML='<div style="color:#6b7280;font-size:13px;padding:10px 0">Aucune clause problématique détectée dans le document adverse.</div>';
-      return;
-    }
 
-    // 2. Croiser les résultats avec nos clauses validées
-    // Pour chaque clause signalée dans le document adverse, chercher notre
-    // contre-proposition validée par clause_name, sinon utiliser la suggestion du backend
     var ourMods=window._currentMods||[];
+
     function findOurClause(adverseClauseName){
       if(!adverseClauseName||!ourMods.length) return null;
       var name=adverseClauseName.toLowerCase();
       return ourMods.find(function(m){
         var mn=(m.clause_name||'').toLowerCase();
-        // Match si au moins le premier mot-clé significatif correspond
         return mn&&(mn===name||name.indexOf(mn.split(' ')[0])>=0||mn.indexOf(name.split(' ')[0])>=0);
       })||null;
     }
 
+    // Filtrer : ne garder que les clauses où la partie adverse s'écarte de notre position validée
     var results=adverseMods.map(function(m){
       var ours=findOurClause(m.clause_name);
+      var ourProposed=ours?(ours.proposed||ours.original):'';
+      // Si le texte adverse est très proche de notre proposition validée (>65%), ils ont accepté → ignorer
+      if(ours&&_wordSim(ourProposed,m.original||'')>0.65) return null;
       return {
         clause_name: m.clause_name,
-        original: m.original,   // ce que dit la partie adverse
-        proposed: ours?(ours.proposed||ours.original):m.proposed, // notre version validée prioritaire
+        original: m.original,       // version de la partie adverse
+        proposed: ours?ourProposed:m.proposed,  // notre contre-proposition
         risk: m.risk,
         reason: m.reason,
         _fromOurs: !!ours
       };
-    });
+    }).filter(Boolean);
+
+    if(!results.length){
+      if(res)res.innerHTML='<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:14px;font-size:13px;color:#10b981">✅ La partie adverse n\'a pas modifié vos positions validées. Aucune contre-proposition nécessaire.</div>';
+      return;
+    }
 
     var html='<div style="font-size:11px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">'
-      +results.length+' clause(s) adverse(s) analysée(s)</div>';
+      +'⚔ '+results.length+' écart(s) détecté(s) par rapport à vos positions validées</div>';
+
     results.forEach(function(m,i){
       var risk=m.risk||'medium';
       var col=risk==='high'?'#ef4444':risk==='low'?'#10b981':'#f59e0b';
       var lbl=risk==='high'?'Risque élevé':risk==='low'?'Risque faible':'Risque modéré';
       var sourceTag=m._fromOurs
-        ?'<span style="font-size:10px;background:#10b98122;color:#10b981;padding:1px 6px;border-radius:10px;margin-left:6px">✓ depuis notre version validée</span>'
-        :'<span style="font-size:10px;background:#5b7cfa22;color:#5b7cfa;padding:1px 6px;border-radius:10px;margin-left:6px">suggestion IA</span>';
-      html+='<div style="background:#0d1017;border:1px solid #2a3040;border-left:3px solid #8b5cf6;border-radius:8px;padding:14px;margin-bottom:10px">'
-        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">'
-        +'<span style="padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:'+col+'22;color:'+col+'">'+lbl+'</span>'
-        +'<strong style="color:#e2e5f0;font-size:13px">'+(m.clause_name||'Clause')+'</strong>'
-        +sourceTag
+        ?'<span style="font-size:10px;background:#10b98122;color:#10b981;padding:1px 6px;border-radius:10px">✓ vs notre version validée</span>'
+        :'<span style="font-size:10px;background:#f59e0b22;color:#f59e0b;padding:1px 6px;border-radius:10px">clause non couverte</span>';
+      html+='<div class="mod-card" style="margin-bottom:14px">'
+        +'<div class="mod-header">'
+        +'<div class="mod-name">'+_escH(m.clause_name||'Clause')+'&nbsp;'+sourceTag+'</div>'
+        +'<span class="risk-pill" style="background:'+col+'20;color:'+col+'">'+lbl+'</span>'
         +'</div>'
-        +'<div style="font-size:11px;font-weight:600;color:#ef4444;margin-bottom:4px;text-transform:uppercase">Version adverse</div>'
-        +'<div style="background:#0a0c12;border-radius:6px;padding:8px;font-size:12px;color:#ef9a9a;margin-bottom:10px;white-space:pre-wrap">'+(m.original||'—')+'</div>'
-        +'<div style="font-size:11px;font-weight:600;color:#8b5cf6;margin-bottom:4px;text-transform:uppercase">Contre-proposition (modifiable)</div>'
-        +'<textarea id="adv-mod-'+i+'" style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:8px;font-size:12px;color:#e2e5f0;min-height:70px;resize:vertical;box-sizing:border-box">'+(m.proposed||'')+'</textarea>'
-        +'<div style="font-size:11px;color:#6b7280;margin-top:6px;line-height:1.4">'+(m.reason||'')+'</div>'
+        +'<div class="mod-body">'
+        +(m.reason?'<div style="font-size:11px;color:#8892a4;margin-bottom:10px;line-height:1.5">💡 '+_escH(m.reason)+'</div>':'')
+        +'<div class="mod-label" style="color:#ef4444">⚔ Version de la partie adverse</div>'
+        +'<div class="mod-original" style="color:#ef9a9a;line-height:1.6">'+_escHBr(m.original||'—')+'</div>'
+        +'<div class="mod-label" style="color:#8b5cf6"> Notre contre-proposition <span style="color:#6b7280;font-size:10px;font-weight:400">(éditable)</span></div>'
+        +'<textarea id="adv-mod-'+i+'" class="mod-proposed" style="width:100%;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:10px;font-size:12px;color:#e2e5f0;min-height:80px;resize:vertical;box-sizing:border-box;line-height:1.6;font-family:inherit">'+_escH(m.proposed||'')+'</textarea>'
+        +'</div>'
         +'</div>';
     });
-    html+='<button onclick="saveAdverseResponse(\''+anaId+'\','+results.length+')" style="margin-top:8px;padding:10px 20px;background:#8b5cf6;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Sauvegarder les contre-propositions</button>';
+    html+='<button onclick="saveAdverseResponse(\''+anaId+'\','+results.length+')" style="margin-top:4px;padding:10px 22px;background:#8b5cf6;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Sauvegarder les contre-propositions →</button>';
     if(res)res.innerHTML=html;
     window._adverseMods=results;
   }catch(e){
@@ -1211,6 +1242,44 @@ async function saveAdverseResponse(originalAnaId, modCount){
       if(newIdx>=0)showAnaDetail(newIdx);
     }
   } else { alert('Erreur sauvegarde ('+r.status+')'); }
+}
+
+async function analyzeManualClause(){
+  var nameEl=document.getElementById('add-clause-name');
+  var origEl=document.getElementById('add-clause-orig');
+  var btn=document.getElementById('add-clause-btn');
+  var name=(nameEl||{}).value||'';
+  var orig=(origEl||{}).value||'';
+  name=name.trim(); orig=orig.trim();
+  if(!name||!orig){alert('Veuillez saisir le nom et le texte de la clause.');return;}
+  var ana=(window._userAnalyses||[])[window._anaIdx||0]||{};
+  if(btn){btn.textContent='⏳ Analyse en cours...';btn.disabled=true;}
+  try{
+    // Envoyer uniquement le texte de cette clause à l'IA pour analyse
+    var fd=new FormData();
+    fd.append('file',new Blob([orig],{type:'text/plain'}),'clause.txt');
+    fd.append('type',ana.contract_type||'general');
+    fd.append('partie',ana.partie||'');
+    fd.append('lang','auto');
+    var r=await fetch(BACKEND+'/analyze',{method:'POST',body:fd});
+    var data=await r.json();
+    var mods=data.modifications||[];
+    // Prendre la première modification IA ou construire une entrée de base
+    var aiMod=mods[0]||{};
+    window._currentMods.push({
+      id:Date.now(),
+      clause_name:name,
+      original:orig,
+      proposed:aiMod.proposed||orig,
+      risk:aiMod.risk||'medium',
+      reason:aiMod.reason||'Clause signalée manuellement par le juriste',
+      _manual:true
+    });
+    showAnaDetail(window._anaIdx);
+  }catch(e){
+    alert('Erreur lors de l\'analyse : '+e.message);
+    if(btn){btn.textContent='Analyser avec l\'IA';btn.disabled=false;}
+  }
 }
 
 async function dlUserAnalysis() {
