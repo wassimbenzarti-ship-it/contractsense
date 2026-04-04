@@ -520,7 +520,11 @@ async function analyzeWithPartie(partieName) {
     modifications.forEach(function(m) { decisions[m.id] = 'pending'; });
 
     // Extraire toutes les clauses du contrat pour le dropdown "ajouter une clause"
-    window._allContractClauses = _extractContractClauses(savedText || '');
+    // Utiliser savedText (mode texte) ou lire le fichier uploadé (mode fichier)
+    var contractText = savedText || data.text || data.document_text || '';
+    if(!contractText && curFile) contractText = await _readFileText(curFile);
+    if(contractText && !savedText) savedText = contractText; // cache pour saveAna
+    window._allContractClauses = _extractContractClauses(contractText);
 
     hide('step-loading');
     renderReview();
@@ -711,6 +715,45 @@ function _syncClauseDash(sel){
   if(ta&&opt.dataset.text) ta.value=opt.dataset.text;
   sel.value='';
 }
+// Lit un fichier en texte brut (txt) ou extrait le texte d'un DOCX via JSZip
+async function _readFileText(file){
+  if(!file) return '';
+  var name=file.name.toLowerCase();
+  if(name.endsWith('.txt')||name.endsWith('.text')){
+    return new Promise(function(res){
+      var r=new FileReader();
+      r.onload=function(e){res(e.target.result||'');};
+      r.onerror=function(){res('');};
+      r.readAsText(file,'utf-8');
+    });
+  }
+  if(name.endsWith('.docx')){
+    try{
+      // Charger JSZip à la demande
+      if(!window.JSZip){
+        await new Promise(function(res,rej){
+          var s=document.createElement('script');
+          s.src='https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+          s.onload=res; s.onerror=rej;
+          document.head.appendChild(s);
+        });
+      }
+      var zip=await JSZip.loadAsync(file);
+      var docXml=zip.file('word/document.xml');
+      if(!docXml) return '';
+      var xml=await docXml.async('text');
+      // Reconstituer les paragraphes : <w:p> = nouvelle ligne, <w:t> = texte
+      var paras=xml.split(/<w:p[ >]/);
+      return paras.map(function(p){
+        return (p.match(/<w:t[^>]*>([^<]*)<\/w:t>/g)||[]).map(function(m){
+          return m.replace(/<[^>]+>/g,'');
+        }).join('');
+      }).filter(Boolean).join('\n');
+    }catch(e){return '';}
+  }
+  return '';
+}
+
 // Extrait les clauses d'un texte de contrat (Article X, Clause X, 1. Objet, etc.)
 function _extractContractClauses(text){
   if(!text||text.length<50) return [];
