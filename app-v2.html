@@ -519,6 +519,9 @@ async function analyzeWithPartie(partieName) {
     decisions = {};
     modifications.forEach(function(m) { decisions[m.id] = 'pending'; });
 
+    // Extraire toutes les clauses du contrat pour le dropdown "ajouter une clause"
+    window._allContractClauses = _extractContractClauses(savedText || '');
+
     hide('step-loading');
     renderReview();
   } catch(e) {
@@ -660,47 +663,76 @@ function _renderReviewJuristeBar(){
   if(!jAct) return;
   if(_userRole && _userRole !== 'juriste') { jAct.innerHTML=''; return; }
   var alreadyNames = modifications.map(function(m){ return (m.clause_name||'').toLowerCase(); });
-  var allClauses = [
-    'Objet du contrat','Durée du contrat','Prix et conditions de paiement',
-    'Livraison et délais','Garanties','Responsabilité et limitation de responsabilité',
-    'Confidentialité','Propriété intellectuelle','Clause de non-concurrence',
-    'Résiliation','Force majeure','Loi applicable et juridiction compétente',
-    'Cession du contrat','Sous-traitance','Pénalités de retard',
-    "Clause d'indexation","Clause de révision du prix","Clause d'exclusivité",
-    'Droit de préemption','Clause résolutoire','Condition suspensive',
-    'Clause pénale','Solidarité','Renonciation','Notices et communications',
-    "Intégralité de l'accord",'Divisibilité','Modifications et avenants',
-    'Protection des données personnelles'
-  ];
-  var remaining = allClauses.filter(function(c){ return alreadyNames.indexOf(c.toLowerCase()) < 0; });
+  var contractClauses = window._allContractClauses||[];
+  var remaining = contractClauses.filter(function(c){ return alreadyNames.indexOf((c.name||'').toLowerCase())<0; });
+  var hasContractClauses = remaining.length > 0;
+  var optionsHtml = hasContractClauses
+    ? remaining.map(function(c){
+        var safe=c.name.replace(/"/g,'&quot;');
+        var safeT=(c.text||'').replace(/"/g,'&quot;').replace(/\n/g,' ').slice(0,500);
+        return '<option value="'+safe+'" data-text="'+safeT+'">'+_escH(c.name)+'</option>';
+      }).join('')
+    : '<option value="" disabled style="color:#4a5470">— collez le contrat en mode texte pour lister les clauses —</option>';
   jAct.innerHTML =
     '<div style="background:#0d1017;border:1px solid #1f2537;border-radius:12px;padding:16px;margin-bottom:16px">'
     +'<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">'
-    +'<button id="btn-submit-review" onclick="saveAndSubmitFromReview()" style="padding:10px 20px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur pour validation \u2192</button>'
-    +'<span style="font-size:11px;color:#4a5470">Vous pouvez aussi t\u00e9l\u00e9charger le DOCX ci-dessous.</span>'
+    +'<button id="btn-submit-review" onclick="saveAndSubmitFromReview()" style="padding:10px 20px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur pour validation →</button>'
+    +'<span style="font-size:11px;color:#4a5470">Vous pouvez aussi télécharger le DOCX ci-dessous.</span>'
     +'</div>'
     +'<div style="border-top:1px solid #1f2537;padding-top:12px">'
-    +'<div style="font-size:12px;font-weight:700;color:#5b7cfa;margin-bottom:8px">+ Signaler une clause inacceptable non d\u00e9tect\u00e9e</div>'
+    +'<div style="font-size:12px;font-weight:700;color:#5b7cfa;margin-bottom:4px">+ Signaler une clause inacceptable non détectée</div>'
+    +(hasContractClauses?'<div style="font-size:11px;color:#6b7280;margin-bottom:8px">'+remaining.length+' clause(s) du contrat non analysée(s)</div>':'')
     +'<div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">'
-    +'<select id="add-clause-select" onchange="_syncClause(this)" style="flex:1;min-width:200px;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;margin:0">'
-    +'<option value="">\u2014 Choisir dans la liste des clauses courantes \u2014</option>'
-    +remaining.map(function(c){ return '<option value="'+c+'">'+c+'</option>'; }).join('')
+    +'<select id="add-clause-select" onchange="_syncClause(this)" style="flex:2;min-width:200px;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;margin:0">'
+    +'<option value="">— Sélectionner une clause du contrat —</option>'
+    +optionsHtml
     +'</select>'
-    +'<input type="text" id="add-clause-name-r" placeholder="ou saisir librement (ex: Article 15)" style="flex:1;min-width:160px;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;box-sizing:border-box">'
+    +'<input type="text" id="add-clause-name-r" placeholder="ou saisir librement" style="flex:1;min-width:130px;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;box-sizing:border-box">'
     +'</div>'
-    +'<textarea id="add-clause-orig-r" placeholder="Texte de la clause (optionnel)" style="width:100%;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:8px 10px;font-size:12px;color:#e2e5f0;min-height:60px;resize:vertical;box-sizing:border-box;line-height:1.6;font-family:inherit;margin-bottom:8px"></textarea>'
-    +'<button id="add-clause-btn-r" onclick="analyzeManualClauseInReview()" style="padding:8px 16px;background:#5b7cfa;border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:pointer">Analyser avec l\u0027IA et ajouter</button>'
+    +'<textarea id="add-clause-orig-r" placeholder="Texte de la clause (rempli automatiquement si sélectionnée ci-dessus)" style="width:100%;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:8px 10px;font-size:12px;color:#e2e5f0;min-height:70px;resize:vertical;box-sizing:border-box;line-height:1.6;font-family:inherit;margin-bottom:8px"></textarea>'
+    +'<button id="add-clause-btn-r" onclick="analyzeManualClauseInReview()" style="padding:8px 16px;background:#5b7cfa;border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:pointer">Analyser avec l\'IA et ajouter</button>'
     +'</div>'
     +'</div>';
 }
 
 function _syncClause(sel){
+  var opt=sel.options[sel.selectedIndex];
   var inp=document.getElementById('add-clause-name-r');
-  if(sel.value&&inp){inp.value=sel.value;sel.value='';}
+  var ta=document.getElementById('add-clause-orig-r');
+  if(inp&&opt.value) inp.value=opt.value;
+  if(ta&&opt.dataset.text) ta.value=opt.dataset.text;
+  sel.value='';
 }
 function _syncClauseDash(sel){
+  var opt=sel.options[sel.selectedIndex];
   var inp=document.getElementById('add-clause-name');
-  if(sel.value&&inp){inp.value=sel.value;sel.value='';}
+  var ta=document.getElementById('add-clause-orig');
+  if(inp&&opt.value) inp.value=opt.value;
+  if(ta&&opt.dataset.text) ta.value=opt.dataset.text;
+  sel.value='';
+}
+// Extrait les clauses d'un texte de contrat (Article X, Clause X, 1. Objet, etc.)
+function _extractContractClauses(text){
+  if(!text||text.length<50) return [];
+  var lines=text.split('\n');
+  var clauses=[];
+  var curName=null;
+  var curLines=[];
+  var headRe=/^(article|clause|section|chapitre|titre|\d+[\.\)§])\s/i;
+  var numTitleRe=/^\d+(\.\d+)*\.?\s+[A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ]/;
+  lines.forEach(function(line){
+    var t=line.trim();
+    if(!t) return;
+    var isHead=(headRe.test(t)||numTitleRe.test(t))&&t.length<160;
+    if(isHead){
+      if(curName) clauses.push({name:curName,text:curLines.join('\n').trim()});
+      curName=t; curLines=[];
+    } else if(curName){
+      curLines.push(t);
+    }
+  });
+  if(curName) clauses.push({name:curName,text:curLines.join('\n').trim()});
+  return clauses.slice(0,60);
 }
 
 async function saveAndSubmitFromReview(){
@@ -1082,8 +1114,12 @@ async function upMdl(inp){
 async function saveAna(fn,ct,pa,mods){
   if(!_cu) return;
   var isJuriste=_userRole==='juriste';
-  // Juriste : brouillon à soumettre au directeur ; Directeur : validé directement vers admin
-  var payload={user_id:_cu.id,user_email:_cu.email,filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',modifications:mods||[],status:isJuriste?'draft':'validated',director_email:_userParentEmail||''};
+  // Intégrer les clauses du contrat en metadata pour pouvoir les afficher dans le tableau de bord
+  var allMods=(mods||[]).slice();
+  if(window._allContractClauses&&window._allContractClauses.length){
+    allMods=[{_isClauseMeta:true,clauses:window._allContractClauses}].concat(allMods);
+  }
+  var payload={user_id:_cu.id,user_email:_cu.email,filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',modifications:allMods,status:isJuriste?'draft':'validated',director_email:_userParentEmail||''};
   var r=await sf('/rest/v1/analyses',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(payload)}).catch(function(){return null;});
   if(r&&r.ok){
     var d=await r.json().catch(function(){return[];});
@@ -1133,6 +1169,10 @@ async function showAnaDetail(idx) {
   if(!_userRole) await checkRole();
   var mods = ana.modifications || [];
   if(typeof mods === 'string') { try { mods = JSON.parse(mods); } catch(e) { mods = []; } }
+  // Extraire la métadonnée des clauses si elle a été sauvegardée
+  var clauseMeta = mods.find(function(m){ return m._isClauseMeta; });
+  window._allContractClauses = clauseMeta ? (clauseMeta.clauses||[]) : [];
+  mods = mods.filter(function(m){ return !m._isClauseMeta; });
   window._currentMods = mods.map(function(m){ return Object.assign({}, m); });
 
   var st=ana.status||'draft';
@@ -1219,27 +1259,27 @@ async function showAnaDetail(idx) {
     +(isJuriste&&(st==='draft'||st==='revision_requested')?
       (function(){
         var doneNames=(window._currentMods||[]).map(function(m){return (m.clause_name||'').toLowerCase();});
-        var all=['Objet du contrat','Durée du contrat','Prix et conditions de paiement',
-          'Livraison et délais','Garanties','Responsabilité et limitation de responsabilité',
-          'Confidentialité','Propriété intellectuelle','Clause de non-concurrence',
-          'Résiliation','Force majeure','Loi applicable et juridiction compétente',
-          'Cession du contrat','Sous-traitance','Pénalités de retard',
-          "Clause d'indexation","Clause de révision du prix","Clause d'exclusivité",
-          'Droit de préemption','Clause résolutoire','Condition suspensive',
-          'Clause pénale','Solidarité','Renonciation','Notices et communications',
-          "Intégralité de l'accord",'Divisibilité','Modifications et avenants',
-          'Protection des données personnelles'];
-        var rem=all.filter(function(c){return doneNames.indexOf(c.toLowerCase())<0;});
+        var contractClauses=window._allContractClauses||[];
+        var rem=contractClauses.filter(function(c){return doneNames.indexOf((c.name||'').toLowerCase())<0;});
+        var hasReal=rem.length>0;
+        var optHtml=hasReal
+          ?rem.map(function(c){
+              var safe=c.name.replace(/"/g,'&quot;');
+              var safeT=(c.text||'').replace(/"/g,'&quot;').replace(/\n/g,' ').slice(0,500);
+              return '<option value="'+safe+'" data-text="'+safeT+'">'+_escH(c.name)+'</option>';
+            }).join('')
+          :'<option value="" disabled style="color:#4a5470">— aucune clause enregistrée (contrat collé en mode texte) —</option>';
         return '<div style="margin-top:16px;border:1px dashed #2a3040;border-radius:10px;padding:14px">'
-          +'<div style="font-size:12px;font-weight:700;color:#5b7cfa;margin-bottom:8px">+ Signaler une clause inacceptable non détectée</div>'
+          +'<div style="font-size:12px;font-weight:700;color:#5b7cfa;margin-bottom:4px">+ Signaler une clause inacceptable non détectée</div>'
+          +(hasReal?'<div style="font-size:11px;color:#6b7280;margin-bottom:8px">'+rem.length+' clause(s) du contrat non analysée(s)</div>':'')
           +'<div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">'
-          +'<select id="add-clause-sel-d" onchange="_syncClauseDash(this)" style="flex:1;min-width:180px;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;margin:0">'
-          +'<option value="">— Choisir dans la liste —</option>'
-          +rem.map(function(c){return '<option value="'+c+'">'+c+'</option>';}).join('')
+          +'<select id="add-clause-sel-d" onchange="_syncClauseDash(this)" style="flex:2;min-width:180px;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;margin:0">'
+          +'<option value="">— Sélectionner une clause du contrat —</option>'
+          +optHtml
           +'</select>'
-          +'<input type="text" id="add-clause-name" placeholder="ou saisir librement" style="flex:1;min-width:140px;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;box-sizing:border-box">'
+          +'<input type="text" id="add-clause-name" placeholder="ou saisir librement" style="flex:1;min-width:120px;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;box-sizing:border-box">'
           +'</div>'
-          +'<textarea id="add-clause-orig" placeholder="Texte de la clause (optionnel — si vide, l\'IA analyse sur le nom seul)" style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:8px 10px;font-size:12px;color:#e2e5f0;min-height:70px;resize:vertical;box-sizing:border-box;line-height:1.6;font-family:inherit;margin-bottom:8px"></textarea>'
+          +'<textarea id="add-clause-orig" placeholder="Texte rempli automatiquement à la sélection — modifiable" style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:8px 10px;font-size:12px;color:#e2e5f0;min-height:80px;resize:vertical;box-sizing:border-box;line-height:1.6;font-family:inherit;margin-bottom:8px"></textarea>'
           +'<button id="add-clause-btn" onclick="analyzeManualClause()" style="padding:9px 18px;background:#5b7cfa;border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:pointer">Analyser avec l\'IA et ajouter</button>'
           +'</div>';
       })()
