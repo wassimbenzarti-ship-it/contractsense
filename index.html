@@ -629,7 +629,10 @@ footer {
   .section-h2 { letter-spacing: -1px; }
   .cta-h2 { letter-spacing: -1px; }
   
-  #vs, #demo, #edit-feature, #features, #cta { padding: 60px 16px; }
+  #vs, #demo, #edit-feature, #workflow, #features, #cta { padding: 60px 16px; }
+  #workflow [style*="grid-template-columns:repeat(4"] { grid-template-columns: repeat(2,1fr) !important; gap: 32px !important; }
+  #workflow [style*="grid-template-columns:repeat(3"] { grid-template-columns: 1fr !important; }
+  #workflow [style*="position:absolute;top:36px"] { display: none; }
   
   footer { flex-direction: column; gap: 10px; text-align: center; padding: 28px 16px; }
   .footer-brand { font-size: 15px; }
@@ -656,7 +659,10 @@ footer {
     </div>
     <div class="nav-by">by Westfield Avocats</div>
   </div>
-  <a href="app.html" class="nav-cta">Analyser un contrat →</a>
+  <div style="display:flex;align-items:center;gap:20px">
+    <a href="#workflow" style="font-size:13px;color:var(--muted);text-decoration:none;display:none" class="nav-workflow-link">Workflow</a>
+    <a href="app-v2.html" class="nav-cta">Analyser un contrat →</a>
+  </div>
 </nav>
 
 <!-- HERO -->
@@ -668,8 +674,8 @@ footer {
   </h1>
   <p class="hero-sub">Omniscient analyse vos contrats, propose des modifications professionnelles basées sur une base de connaissances créée et validée par des avocats — et s'améliore à chaque utilisation.</p>
   <div class="hero-btns">
-    <a href="app.html" class="btn-gold">Analyser un contrat gratuitement</a>
-    <a href="#demo" class="btn-outline">Voir la démo ↓</a>
+    <a href="app-v2.html" class="btn-gold">Analyser un contrat gratuitement</a>
+    <a href="#workflow" class="btn-outline">Voir le workflow →</a>
   </div>
   <div class="hero-trust">
     <div class="trust-item">
@@ -883,9 +889,93 @@ footer {
   </div>
 </section>
 
+<!-- WORKFLOW SUPERVISE -->
+<section id="workflow" style="padding:120px 48px;display:flex;flex-direction:column;align-items:center">
+  <div class="section-tag reveal">Nouveau — Workflow juridique complet</div>
+  <h2 class="section-h2 reveal">De l'analyse au RAG,<br/>en circuit fermé.</h2>
+  <p class="section-sub reveal">Omniscient structure la collaboration entre juristes, directeurs juridiques et administrateurs — chaque analyse suit un circuit de validation rigoureux avant d'enrichir la base de connaissances.</p>
+
+  <!-- Pipeline visuel -->
+  <div class="reveal" style="width:100%;max-width:1000px;margin-bottom:72px">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative">
+      <!-- Ligne de connexion -->
+      <div style="position:absolute;top:36px;left:12%;right:12%;height:2px;background:linear-gradient(90deg,var(--accent),var(--purple),var(--gold));z-index:0;opacity:0.35"></div>
+
+      <!-- Étape 1 -->
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 12px;position:relative;z-index:1">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1a2680,#3d6bff22);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">📄</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--accent)">Juriste</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6">Upload du contrat, analyse IA, révision des markups, extension aux clauses non détectées</div>
+      </div>
+
+      <!-- Étape 2 -->
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 12px;position:relative;z-index:1">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1a1040,#7c5cfc22);border:2px solid var(--purple);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">🔍</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--purple)">Directeur juridique</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6">Révision des markups, demande de révision au juriste, validation finale</div>
+      </div>
+
+      <!-- Étape 3 -->
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 12px;position:relative;z-index:1">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1a1200,#c8a94b22);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">✅</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--gold)">Admin Westfield</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6">Validation finale des contrats soumis, catégorisation et intégration au RAG</div>
+      </div>
+
+      <!-- Étape 4 -->
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 12px;position:relative;z-index:1">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#001a10,#0dcf8a22);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">🧠</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--green)">RAG enrichi</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6">La base de connaissances s'améliore — chaque analyse validée profite à tous les juristes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cartes de fonctionnalités nouvelles -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1000px;width:100%">
+
+    <div class="feat-card reveal" style="border-color:rgba(91,124,250,0.25)">
+      <span class="feat-icon">🔎</span>
+      <div class="feat-title">Clauses non analysées</div>
+      <p class="feat-text">Le juriste peut étendre l'analyse aux clauses que l'IA n'a pas traitées. Une liste déroulante extraite du contrat réel permet de sélectionner une clause — son texte se remplit automatiquement — puis de la soumettre à l'IA pour markup.</p>
+    </div>
+
+    <div class="feat-card reveal" style="border-color:rgba(124,92,252,0.25)">
+      <span class="feat-icon">↔️</span>
+      <div class="feat-title">Circuit juriste → directeur</div>
+      <p class="feat-text">Le juriste soumet l'analyse à son directeur juridique en un clic. Le directeur révise, peut demander des corrections, puis valide. Chaque statut est visible en temps réel sur le tableau de bord.</p>
+    </div>
+
+    <div class="feat-card reveal" style="border-color:rgba(200,169,75,0.25)">
+      <span class="feat-icon">⚔️</span>
+      <div class="feat-title">Analyse version adverse</div>
+      <p class="feat-text">Importez la version modifiée de la partie adverse. Omniscient compare automatiquement, identifie les clauses modifiées et propose des contre-rédactions — les clauses acceptées par l'adverse sont filtrées.</p>
+    </div>
+
+    <div class="feat-card reveal">
+      <span class="feat-icon">📂</span>
+      <div class="feat-title">Historique & gestion</div>
+      <p class="feat-text">Toutes vos analyses sont sauvegardées. Dépliez une analyse pour voir les markups, supprimez une entrée erronée avec confirmation, retrouvez le nom du contrat en tête de chaque carte.</p>
+    </div>
+
+    <div class="feat-card reveal">
+      <span class="feat-icon">🔐</span>
+      <div class="feat-title">Session persistante</div>
+      <p class="feat-text">Plus de déconnexions intempestives. Le token de session est automatiquement renouvelé — juristes et directeurs restent connectés entre les sessions sans avoir à se reconnecter à chaque visite.</p>
+    </div>
+
+    <div class="feat-card reveal">
+      <span class="feat-icon">📤</span>
+      <div class="feat-title">Soumission immédiate</div>
+      <p class="feat-text">Le bouton "Soumettre au directeur" apparaît dès le retour de l'analyse, sans attendre le téléchargement DOCX. Le juriste peut agir immédiatement, le téléchargement reste disponible en parallèle.</p>
+    </div>
+
+  </div>
+</section>
+
 <!-- FEATURES -->
 <section id="features">
-  <div class="section-tag reveal">Tout ce dont vous avez besoin</div>
+  <div class="section-tag reveal">Les fondamentaux</div>
   <h2 class="section-h2 reveal">Conçu par des juristes,<br/>pour des juristes.</h2>
   <p class="section-sub reveal">Chaque fonctionnalité répond à un besoin réel de la pratique contractuelle.</p>
 
@@ -929,7 +1019,7 @@ footer {
   <div class="section-tag reveal">Commencer maintenant</div>
   <h2 class="cta-h2 reveal">Votre premier contrat<br/><em>analysé en 60 secondes.</em></h2>
   <p class="cta-sub reveal">Gratuit, sans inscription. Uploadez un contrat et obtenez des markups professionnels basés sur les standards Westfield.</p>
-  <a href="app.html" class="btn-gold reveal">Analyser un contrat gratuitement →</a>
+  <a href="app-v2.html" class="btn-gold reveal">Analyser un contrat gratuitement →</a>
 </section>
 
 <footer>
