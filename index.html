@@ -153,7 +153,6 @@ nav {
 
 .hero-btns {
   display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
-  animation: fadeUp 1s 0.3s ease both;
 }
 
 .btn-gold {
@@ -674,22 +673,21 @@ footer {
     <em>au service du droit.</em>
   </h1>
   <p class="hero-sub">Omniscient analyse vos contrats, propose des modifications professionnelles basées sur une base de connaissances créée et validée par des avocats — et s'améliore à chaque utilisation.</p>
-  <div class="hero-btns">
-    <a href="app-v2.html" class="btn-gold">Analyser un contrat gratuitement</a>
-    <a href="#workflow" class="btn-outline">Voir le workflow →</a>
-  </div>
-
-  <!-- Presse -->
-  <div style="margin-top:40px;display:flex;flex-direction:column;align-items:center;gap:10px;animation:fadeUp 1s 0.35s ease both">
-    <div style="font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase">Vu dans la presse</div>
-    <a href="https://leseco.ma/business/legaltec-avec-omniscient-westfield-veut-industrialiser-lanalyse-contractuelle.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;padding:10px 22px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;transition:all 0.3s" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(200,169,75,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.borderColor='rgba(255,255,255,0.08)'">
-      <!-- Logo Les Eco stylisé -->
-      <svg width="72" height="22" viewBox="0 0 72 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <text x="0" y="17" font-family="Georgia, serif" font-size="18" font-weight="700" fill="#c8a94b" letter-spacing="-0.5">Les</text>
-        <text x="36" y="17" font-family="Georgia, serif" font-size="18" font-weight="700" fill="#e6eaf6" letter-spacing="-0.5">Éco</text>
-      </svg>
-      <span style="font-size:11px;color:var(--muted);max-width:260px;text-align:left;line-height:1.4">« Westfield veut industrialiser l'analyse contractuelle »</span>
-      <span style="font-size:11px;color:var(--gold);white-space:nowrap">Lire →</span>
+  <div style="display:flex;justify-content:center;align-items:flex-start;gap:24px;flex-wrap:wrap;animation:fadeUp 1s 0.3s ease both">
+    <div class="hero-btns" style="margin-top:0">
+      <a href="app-v2.html" class="btn-gold">Analyser un contrat gratuitement</a>
+      <a href="#workflow" class="btn-outline">Voir le workflow →</a>
+    </div>
+    <!-- Presse — alignée à droite des boutons -->
+    <a href="https://leseco.ma/business/legaltec-avec-omniscient-westfield-veut-industrialiser-lanalyse-contractuelle.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;padding:10px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;transition:all 0.3s;align-self:center" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(200,169,75,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.borderColor='rgba(255,255,255,0.08)'">
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1px">
+        <span style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase">Vu dans la presse</span>
+        <svg width="64" height="20" viewBox="0 0 64 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text x="0" y="16" font-family="Georgia, serif" font-size="16" font-weight="700" fill="#c8a94b">Les</text>
+          <text x="32" y="16" font-family="Georgia, serif" font-size="16" font-weight="700" fill="#e6eaf6">Éco</text>
+        </svg>
+      </div>
+      <span style="font-size:10px;color:var(--gold)">↗</span>
     </a>
   </div>
   <div class="hero-trust">
@@ -1087,15 +1085,15 @@ footer {
     </div>
 
     <div class="feat-card reveal">
-      <span class="feat-icon">🔐</span>
-      <div class="feat-title">Session persistante</div>
-      <p class="feat-text">Plus de déconnexions intempestives. Le token de session est automatiquement renouvelé — juristes et directeurs restent connectés entre les sessions sans avoir à se reconnecter à chaque visite.</p>
+      <span class="feat-icon">🔁</span>
+      <div class="feat-title">Cycle de révision intégré</div>
+      <p class="feat-text">Le directeur peut renvoyer une analyse au juriste pour correction sans sortir de la plateforme. Chaque cycle est tracé — statut, date, commentaires — jusqu'à validation définitive.</p>
     </div>
 
     <div class="feat-card reveal">
-      <span class="feat-icon">📤</span>
-      <div class="feat-title">Soumission immédiate</div>
-      <p class="feat-text">Le bouton "Soumettre au directeur" apparaît dès le retour de l'analyse, sans attendre le téléchargement DOCX. Le juriste peut agir immédiatement, le téléchargement reste disponible en parallèle.</p>
+      <span class="feat-icon">📋</span>
+      <div class="feat-title">Tableau de bord unifié</div>
+      <p class="feat-text">Juriste et directeur disposent chacun d'une vue centralisée de toutes leurs analyses en cours — filtrage par statut, accès direct aux markups, historique complet par contrat.</p>
     </div>
 
   </div>
