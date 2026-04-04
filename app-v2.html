@@ -676,7 +676,7 @@ function _renderReviewJuristeBar(){
         var safeT=(c.text||'').replace(/"/g,'&quot;').replace(/\n/g,' ').slice(0,500);
         return '<option value="'+safe+'" data-text="'+safeT+'">'+_escH(c.name)+'</option>';
       }).join('')
-    : '<option value="" disabled style="color:#4a5470">— collez le contrat en mode texte pour lister les clauses —</option>';
+    : '';
   jAct.innerHTML =
     '<div style="background:#0d1017;border:1px solid #1f2537;border-radius:12px;padding:16px;margin-bottom:16px">'
     +'<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">'
@@ -686,12 +686,15 @@ function _renderReviewJuristeBar(){
     +'<div style="border-top:1px solid #1f2537;padding-top:12px">'
     +'<div style="font-size:12px;font-weight:700;color:#5b7cfa;margin-bottom:4px">+ Signaler une clause inacceptable non détectée</div>'
     +(hasContractClauses?'<div style="font-size:11px;color:#6b7280;margin-bottom:8px">'+remaining.length+' clause(s) du contrat non analysée(s)</div>':'')
+    +(!hasContractClauses?'<label style="display:inline-flex;align-items:center;gap:8px;padding:7px 12px;background:#181c2a;border:1px solid #2a3040;border-radius:7px;color:#6b7280;font-size:11px;cursor:pointer;margin-bottom:10px">'
+      +'<input type="file" accept=".docx,.txt" style="display:none" onchange="reExtractClausesReview(this)">'
+      +'📂 Recharger le contrat pour lister les clauses</label>':'')
     +'<div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">'
-    +'<select id="add-clause-select" onchange="_syncClause(this)" style="flex:2;min-width:200px;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;margin:0">'
-    +'<option value="">— Sélectionner une clause du contrat —</option>'
-    +optionsHtml
-    +'</select>'
-    +'<input type="text" id="add-clause-name-r" placeholder="ou saisir librement" style="flex:1;min-width:130px;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;box-sizing:border-box">'
+    +(hasContractClauses?'<select id="add-clause-select" onchange="_syncClause(this)" style="flex:2;min-width:200px;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;margin:0">'
+      +'<option value="">— Sélectionner une clause du contrat —</option>'
+      +optionsHtml
+      +'</select>':'')
+    +'<input type="text" id="add-clause-name-r" placeholder="'+(hasContractClauses?'ou saisir librement':'Nom de la clause')+'\" style="flex:1;min-width:130px;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;box-sizing:border-box">'
     +'</div>'
     +'<textarea id="add-clause-orig-r" placeholder="Texte de la clause (rempli automatiquement si sélectionnée ci-dessus)" style="width:100%;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:8px 10px;font-size:12px;color:#e2e5f0;min-height:70px;resize:vertical;box-sizing:border-box;line-height:1.6;font-family:inherit;margin-bottom:8px"></textarea>'
     +'<button id="add-clause-btn-r" onclick="analyzeManualClauseInReview()" style="padding:8px 16px;background:#5b7cfa;border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:pointer">Analyser avec l\'IA et ajouter</button>'
@@ -714,6 +717,34 @@ function _syncClauseDash(sel){
   if(inp&&opt.value) inp.value=opt.value;
   if(ta&&opt.dataset.text) ta.value=opt.dataset.text;
   sel.value='';
+}
+// Re-extraction des clauses depuis un fichier rechargé (tableau de bord)
+async function reExtractClausesDash(inp, idx){
+  if(!inp.files||!inp.files[0]) return;
+  var label=inp.parentElement;
+  if(label) label.textContent='⏳ Extraction en cours…';
+  var text=await _readFileText(inp.files[0]);
+  var clauses=_extractContractClauses(text);
+  if(!clauses.length){ if(label) label.textContent='⚠️ Aucune clause détectée — essayez un fichier TXT'; return; }
+  window._allContractClauses=clauses;
+  // Sauvegarder immédiatement dans Supabase pour les prochaines fois
+  var ana=(window._userAnalyses||[])[idx];
+  if(ana&&ana.id){
+    var mods=window._currentMods||[];
+    _patchAnalysis(ana.id,{modifications:_modsWithMeta(mods)}).catch(function(){});
+  }
+  showAnaDetail(idx);
+}
+// Re-extraction des clauses depuis un fichier rechargé (flux analyse directe)
+async function reExtractClausesReview(inp){
+  if(!inp.files||!inp.files[0]) return;
+  var label=inp.parentElement;
+  if(label) label.textContent='⏳ Extraction en cours…';
+  var text=await _readFileText(inp.files[0]);
+  var clauses=_extractContractClauses(text);
+  if(!clauses.length){ if(label) label.textContent='⚠️ Aucune clause détectée — essayez un fichier TXT'; return; }
+  window._allContractClauses=clauses;
+  _renderReviewJuristeBar();
 }
 // Lit un fichier en texte brut (txt) ou extrait le texte d'un DOCX via JSZip
 async function _readFileText(file){
@@ -1326,16 +1357,19 @@ async function showAnaDetail(idx) {
               var safeT=(c.text||'').replace(/"/g,'&quot;').replace(/\n/g,' ').slice(0,500);
               return '<option value="'+safe+'" data-text="'+safeT+'">'+_escH(c.name)+'</option>';
             }).join('')
-          :'<option value="" disabled style="color:#4a5470">— aucune clause enregistrée (contrat collé en mode texte) —</option>';
+          :'';
         return '<div style="margin-top:16px;border:1px dashed #2a3040;border-radius:10px;padding:14px">'
           +'<div style="font-size:12px;font-weight:700;color:#5b7cfa;margin-bottom:4px">+ Signaler une clause inacceptable non détectée</div>'
           +(hasReal?'<div style="font-size:11px;color:#6b7280;margin-bottom:8px">'+rem.length+' clause(s) du contrat non analysée(s)</div>':'')
+          +(!hasReal?'<label style="display:inline-flex;align-items:center;gap:8px;padding:7px 12px;background:#1a2035;border:1px solid #2a3040;border-radius:7px;color:#6b7280;font-size:11px;cursor:pointer;margin-bottom:10px">'
+            +'<input type="file" accept=".docx,.txt" style="display:none" onchange="reExtractClausesDash(this,'+idx+')">'
+            +'📂 Recharger le contrat pour lister les clauses</label>':'')
           +'<div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">'
-          +'<select id="add-clause-sel-d" onchange="_syncClauseDash(this)" style="flex:2;min-width:180px;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;margin:0">'
-          +'<option value="">— Sélectionner une clause du contrat —</option>'
-          +optHtml
-          +'</select>'
-          +'<input type="text" id="add-clause-name" placeholder="ou saisir librement" style="flex:1;min-width:120px;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;box-sizing:border-box">'
+          +(hasReal?'<select id="add-clause-sel-d" onchange="_syncClauseDash(this)" style="flex:2;min-width:180px;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;margin:0">'
+            +'<option value="">— Sélectionner une clause du contrat —</option>'
+            +optHtml
+            +'</select>':'')
+          +'<input type="text" id="add-clause-name" placeholder="'+(hasReal?'ou saisir librement':'Nom de la clause')+'\" style="flex:1;min-width:120px;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;box-sizing:border-box">'
           +'</div>'
           +'<textarea id="add-clause-orig" placeholder="Texte rempli automatiquement à la sélection — modifiable" style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:8px 10px;font-size:12px;color:#e2e5f0;min-height:80px;resize:vertical;box-sizing:border-box;line-height:1.6;font-family:inherit;margin-bottom:8px"></textarea>'
           +'<button id="add-clause-btn" onclick="analyzeManualClause()" style="padding:9px 18px;background:#5b7cfa;border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:pointer">Analyser avec l\'IA et ajouter</button>'
@@ -1733,7 +1767,7 @@ async function validateByDirector(id){
   if(!confirm('Valider cette analyse et la transmettre à l\'admin pour intégration dans le RAG ?')) return;
   // Sauvegarder les modifications du directeur
   var mods=window._currentMods||[];
-  var patch={status:'validated',director_email:_cu.email,modifications:mods};
+  var patch={status:'validated',director_email:_cu.email,modifications:_modsWithMeta(mods)};
   var r=await _patchAnalysis(id,patch);
   if(r.ok||r.status===204){
     // Envoyer à la file admin via queue/add
