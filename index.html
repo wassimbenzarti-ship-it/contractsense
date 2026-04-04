@@ -523,6 +523,7 @@ nav {
   animation: blink 1s step-end infinite;
 }
 @keyframes blink { 50% { opacity: 0; } }
+@keyframes pulse { 0%,100% { opacity:1; transform:translateX(0); } 50% { opacity:0.4; transform:translateX(-4px); } }
 
 .edit-label-float {
   position: absolute; top: -10px; right: 12px;
@@ -738,7 +739,7 @@ footer {
 <section id="demo">
   <div class="section-tag reveal">Workflow interactif</div>
   <h2 class="section-h2 reveal">Du contrat brut au RAG<br/>en 6 étapes.</h2>
-  <p class="section-sub reveal">Le circuit complet — analyse IA, extension aux clauses non détectées, validation juriste → directeur → admin → base de connaissances.</p>
+  <p class="section-sub reveal">Analyse IA, extension aux clauses non détectées, analyse de la version adverse, validation en circuit fermé.</p>
 
   <div class="demo-wrap reveal">
     <div class="demo-topbar">
@@ -757,9 +758,9 @@ footer {
         </div>
       </div>
 
-      <!-- S2 : Markups IA -->
+      <!-- S2 : Markups IA — clauses juridiques high-level -->
       <div class="demo-step" id="ds2">
-        <div class="step-tag">Étape 2 — Juriste · Markups IA proposés</div>
+        <div class="step-tag">Étape 2 — Juriste · Analyse IA · Markups proposés</div>
         <div class="mods-header">
           <div class="mods-count" id="demo-mods-count">0 clause analysée</div>
           <div class="mods-rag-badge">🧠 RAG Westfield actif</div>
@@ -767,106 +768,148 @@ footer {
         <div id="mlist2">
           <div class="mod-card" data-d="0">
             <div class="mod-head">
-              <div class="mod-name">Délai de paiement & pénalités</div>
+              <div class="mod-name">Limitation de responsabilité</div>
               <span class="risk-tag r-h">Risque élevé</span>
             </div>
             <div class="mod-body">
-              <div class="mod-orig">Modification proposée</div>
-              <div class="mod-proposed-wrap">
-                <div class="mod-proposed-text">Le Client s'engage à régler les factures dans un délai de trente (30) jours. Tout retard entraînera des intérêts de 1,5 %/mois, sans mise en demeure préalable.</div>
+              <div class="mod-orig">Original · <span style="color:var(--red);text-decoration:line-through;font-size:11px">La responsabilité du Prestataire est illimitée pour tout dommage direct ou indirect.</span></div>
+              <div class="mod-proposed-wrap" style="margin-top:8px">
+                <div class="mod-proposed-text">La responsabilité du Prestataire est expressément limitée au montant des honoraires versés au titre des douze (12) derniers mois précédant le sinistre. Toute responsabilité pour dommages indirects, perte d'exploitation ou manque à gagner est exclue.</div>
               </div>
-              <div class="mod-source">🧠 RAG Westfield · Contrats de prestation</div>
+              <div class="mod-source">🧠 RAG Westfield · 18 contrats de prestation similaires</div>
             </div>
-            <div style="display:flex;gap:8px;padding:10px 18px;border-top:1px solid var(--border)">
-              <button class="btn-accept on" style="max-width:120px;padding:6px">✅ Accepté</button>
+            <div style="display:flex;gap:8px;padding:8px 18px;border-top:1px solid var(--border)">
+              <button class="btn-accept on" style="max-width:110px;padding:5px 10px;font-size:11px">✅ Accepté</button>
             </div>
           </div>
-          <div class="mod-card" data-d="200">
+          <div class="mod-card" data-d="220">
             <div class="mod-head">
-              <div class="mod-name">Résiliation anticipée</div>
+              <div class="mod-name">Clause pénale & résiliation</div>
               <span class="risk-tag r-h">Risque élevé</span>
             </div>
             <div class="mod-body">
-              <div class="mod-orig">Modification proposée</div>
-              <div class="mod-proposed-wrap">
-                <div class="mod-proposed-text">En cas de résiliation par le Client hors manquement, une indemnité de deux (2) mois d'honoraires est due dans les 15 jours suivant la notification.</div>
+              <div class="mod-orig">Original · <span style="color:var(--red);text-decoration:line-through;font-size:11px">Le Client peut résilier sans préavis ni indemnité.</span></div>
+              <div class="mod-proposed-wrap" style="margin-top:8px">
+                <div class="mod-proposed-text">En cas de résiliation anticipée à l'initiative du Client, hors inexécution fautive du Prestataire, une indemnité forfaitaire équivalente à trois (3) mois d'honoraires est due de plein droit, exigible dans les quinze (15) jours suivant la notification.</div>
               </div>
-              <div class="mod-source">⚖️ DOC Art. 230</div>
+              <div class="mod-source">⚖️ DOC Art. 230 — force obligatoire des conventions</div>
             </div>
-            <div style="display:flex;gap:8px;padding:10px 18px;border-top:1px solid var(--border)">
-              <button class="btn-accept on" style="max-width:120px;padding:6px">✅ Accepté</button>
+            <div style="display:flex;gap:8px;padding:8px 18px;border-top:1px solid var(--border)">
+              <button class="btn-accept on" style="max-width:110px;padding:5px 10px;font-size:11px">✅ Accepté</button>
+            </div>
+          </div>
+          <div class="mod-card" data-d="440">
+            <div class="mod-head">
+              <div class="mod-name">Force majeure</div>
+              <span class="risk-tag r-m">Risque moyen</span>
+            </div>
+            <div class="mod-body">
+              <div class="mod-proposed-wrap">
+                <div class="mod-proposed-text">Constitue un cas de force majeure tout événement imprévisible, irrésistible et extérieur aux parties — incluant pandémie, acte gouvernemental, catastrophe naturelle — suspendant les obligations sans indemnité, sous réserve de notification dans les 48h.</div>
+              </div>
+              <div class="mod-source">🧠 RAG Westfield · Jurisprudence marocaine 2023</div>
+            </div>
+            <div style="display:flex;gap:8px;padding:8px 18px;border-top:1px solid var(--border)">
+              <button class="btn-accept on" style="max-width:110px;padding:5px 10px;font-size:11px">✅ Accepté</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- S3 : Clause non détectée -->
+      <!-- S3 : Clause non analysée — identifiée automatiquement, sélection → texte snap -->
       <div class="demo-step" id="ds3">
-        <div class="step-tag">Étape 3 — Juriste · Extension aux clauses non analysées</div>
+        <div class="step-tag">Étape 3 — Juriste · Clause inacceptable non détectée</div>
         <div style="background:#0d1017;border:1px dashed #2a3040;border-radius:12px;padding:18px">
-          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px">+ Signaler une clause inacceptable non détectée</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:12px" id="demo-clause-count">4 clauses du contrat non analysées</div>
-          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-            <select id="demo-clause-sel" style="flex:2;min-width:200px;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text)">
+          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">+ Étendre l'analyse à une clause non traitée</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:12px" id="demo-clause-hint">
+            Le système a identifié <strong style="color:var(--text)">5 clauses non analysées</strong> dans le contrat — sélectionnez-en une pour soumettre son texte à l'IA
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
+            <select id="demo-clause-sel" style="flex:2;min-width:210px;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text)">
               <option value="">— Sélectionner une clause du contrat —</option>
-              <option value="Clause de confidentialité">Clause de confidentialité</option>
-              <option value="Propriété intellectuelle">Propriété intellectuelle</option>
-              <option value="Non-sollicitation du personnel">Non-sollicitation du personnel</option>
-              <option value="Droit applicable & juridiction">Droit applicable & juridiction</option>
+              <option value="arb" data-text="Tout différend relatif à l'interprétation ou l'exécution de la présente convention sera soumis à l'arbitrage de la Cour d'Arbitrage de Casablanca (CAC), statuant en langue française selon son règlement en vigueur. Les parties renoncent expressément à tout recours judiciaire ordinaire.">Clause compromissoire (arbitrage)</option>
+              <option value="pi" data-text="L'ensemble des livrables, développements, œuvres et créations réalisés dans le cadre de cette convention demeurent la propriété exclusive du Prestataire jusqu'au paiement intégral des honoraires. Toute cession ultérieure fera l'objet d'un acte séparé.">Propriété intellectuelle des livrables</option>
+              <option value="nc" data-text="Le Client s'interdit de solliciter ou recruter, directement ou indirectement, tout collaborateur ou sous-traitant du Prestataire ayant participé à la mission, et ce pendant une durée de vingt-quatre (24) mois suivant la fin du contrat, sous peine d'une indemnité forfaitaire de 200 000 MAD.">Non-concurrence & non-sollicitation</option>
+              <option value="jur" data-text="La présente convention est soumise au droit marocain. En cas de litige, les parties conviennent d'une tentative de médiation préalable de trente (30) jours avant tout recours judiciaire. À défaut d'accord, le Tribunal de Commerce de Casablanca sera seul compétent.">Droit applicable & juridiction</option>
+              <option value="gar" data-text="Le Prestataire garantit ses prestations contre tout défaut de conformité pendant une durée de six (6) mois à compter de la réception définitive. Cette garantie est limitée à la correction des défauts signalés par écrit et exclut toute modification demandée postérieurement.">Garantie & réception des livrables</option>
             </select>
-            <input id="demo-clause-name" type="text" value="" placeholder="ou saisir librement" style="flex:1;min-width:140px;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text)">
+            <span id="demo-sel-arrow" style="font-size:18px;color:var(--accent);animation:pulse 1.2s infinite">←</span>
           </div>
-          <textarea id="demo-clause-text" style="width:100%;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:8px 10px;font-size:12px;color:var(--text);min-height:72px;resize:none;box-sizing:border-box;line-height:1.6;font-family:inherit" placeholder="Texte rempli automatiquement à la sélection…"></textarea>
-          <div style="margin-top:10px;display:flex;align-items:center;gap:12px">
-            <button style="padding:8px 18px;background:var(--accent);border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:default">Analyser avec l'IA et ajouter</button>
-            <span id="demo-clause-status" style="font-size:11px;color:var(--green);display:none">✓ Clause ajoutée à l'analyse</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- S4 : Soumission au directeur -->
-      <div class="demo-step" id="ds4">
-        <div class="step-tag">Étape 4 — Juriste · Soumission au directeur</div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px">
-          <div style="font-size:13px;font-weight:600;margin-bottom:4px">contrat_prestation_nexora.docx</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:16px">3 markups acceptés · 1 clause ajoutée manuellement</div>
-          <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
-            <button style="padding:10px 22px;background:var(--amber);border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:default">Soumettre au directeur →</button>
-            <button style="padding:10px 18px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;cursor:default">⬇ Télécharger DOCX</button>
-          </div>
-          <div id="demo-submit-progress" style="display:none">
-            <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Transmission en cours…</div>
-            <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
-              <div id="demo-pbar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--purple));transition:width 1.2s ease;border-radius:2px"></div>
+          <div id="demo-clause-textbox" style="display:none">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px">Texte extrait du contrat</div>
+            <div id="demo-clause-text" style="background:#181c2a;border:1px solid var(--accent);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.65;min-height:60px"></div>
+            <div style="margin-top:10px;display:flex;align-items:center;gap:12px">
+              <button style="padding:8px 18px;background:var(--accent);border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:default">Analyser avec l'IA et ajouter →</button>
+              <span id="demo-clause-status" style="font-size:11px;color:var(--green);display:none">✓ Markup ajouté à l'analyse</span>
             </div>
           </div>
-          <div id="demo-submit-done" style="display:none;padding:14px;background:rgba(13,207,138,0.07);border:1px solid rgba(13,207,138,0.25);border-radius:10px">
-            <div style="font-size:13px;font-weight:600;color:var(--green)">✅ Transmis au directeur juridique</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:4px">Statut : En attente de validation · Notification envoyée</div>
+        </div>
+      </div>
+
+      <!-- S4 : Version adverse -->
+      <div class="demo-step" id="ds4">
+        <div class="step-tag">Étape 4 — Juriste · Analyse de la version adverse</div>
+        <div id="demo-adverse-upload" style="border:2px dashed #3d2a6040;border-radius:12px;padding:28px;text-align:center;background:rgba(124,92,252,0.03)">
+          <div style="font-size:32px;margin-bottom:10px">⚔️</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;color:var(--purple)">Importer la version de la partie adverse</div>
+          <div style="font-size:12px;color:var(--muted)">DOCX ou TXT — le système compare automatiquement clause par clause</div>
+        </div>
+        <div id="demo-adverse-result" style="display:none;margin-top:0">
+          <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:10px">⚔️ Comparaison avec vos clauses validées</div>
+          <div style="display:flex;flex-direction:column;gap:8px" id="demo-adverse-rows">
+            <div class="adv-row" data-d="0" style="opacity:0;transform:translateX(-12px);transition:all 0.35s;background:#0d1017;border:1px solid var(--border);border-radius:8px;padding:10px 14px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;font-weight:600">Limitation de responsabilité</span>
+                <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(13,207,138,0.12);color:var(--green);font-weight:600">✓ Acceptée telle quelle</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">La partie adverse a repris votre rédaction sans modification — aucune contre-proposition nécessaire.</div>
+            </div>
+            <div class="adv-row" data-d="150" style="opacity:0;transform:translateX(-12px);transition:all 0.35s;background:#0d1017;border:1px solid rgba(255,69,96,0.3);border-radius:8px;padding:10px 14px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;font-weight:600">Clause pénale & résiliation</span>
+                <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(255,69,96,0.12);color:var(--red);font-weight:600">⚠ Modifiée par l'adverse</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">Indemnité réduite à 1 mois (vs 3 mois proposés). <strong style="color:var(--text)">Contre-rédaction générée par l'IA →</strong></div>
+            </div>
+            <div class="adv-row" data-d="300" style="opacity:0;transform:translateX(-12px);transition:all 0.35s;background:#0d1017;border:1px solid rgba(255,69,96,0.3);border-radius:8px;padding:10px 14px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;font-weight:600">Propriété intellectuelle des livrables</span>
+                <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(255,69,96,0.12);color:var(--red);font-weight:600">⚠ Supprimée par l'adverse</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">L'adverse a retiré la clause. <strong style="color:var(--text)">Réintégration proposée avec formulation renforcée →</strong></div>
+            </div>
+            <div class="adv-row" data-d="450" style="opacity:0;transform:translateX(-12px);transition:all 0.35s;background:#0d1017;border:1px solid var(--border);border-radius:8px;padding:10px 14px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:12px;font-weight:600">Force majeure</span>
+                <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(13,207,138,0.12);color:var(--green);font-weight:600">✓ Acceptée telle quelle</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">Votre rédaction conservée intégralement.</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- S5 : Vue directeur -->
+      <!-- S5 : Validation directeur -->
       <div class="demo-step" id="ds5">
         <div class="step-tag">Étape 5 — Directeur juridique · Révision & validation</div>
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden">
           <div style="background:#080b14;padding:12px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
             <div>
               <span style="font-size:12px;font-weight:600">contrat_prestation_nexora.docx</span>
-              <span style="margin-left:10px;font-size:10px;padding:2px 10px;border-radius:20px;background:rgba(245,158,11,0.15);color:var(--amber)">En attente</span>
+              <span style="margin-left:10px;font-size:10px;padding:2px 10px;border-radius:20px;background:rgba(245,158,11,0.15);color:var(--amber)">En attente directeur</span>
             </div>
-            <span style="font-size:11px;color:var(--muted)">par m.alami@nexora.ma</span>
+            <span style="font-size:11px;color:var(--muted)">soumis par m.alami@nexora.ma</span>
           </div>
           <div style="padding:16px 18px">
-            <div id="demo-dir-mods" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
-              <div class="export-row" data-d="0" style="font-size:12px"><span style="color:var(--green)">✓</span> Délai paiement — pénalités 1,5%/mois <span style="color:var(--purple);font-size:10px;margin-left:auto">RAG</span></div>
-              <div class="export-row" data-d="80" style="font-size:12px"><span style="color:var(--green)">✓</span> Résiliation — indemnité 2 mois</div>
-              <div class="export-row" data-d="160" style="font-size:12px"><span style="color:var(--green)">✓</span> Force majeure — définition élargie</div>
-              <div class="export-row" data-d="240" style="font-size:12px"><span style="color:var(--accent)">+</span> Confidentialité — ajoutée par juriste</div>
+            <div id="demo-dir-mods" style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px">
+              <div class="export-row" data-d="0" style="font-size:12px"><span style="color:var(--green)">✓</span> Limitation de responsabilité — plafond 12 mois <span style="color:var(--purple);font-size:10px;margin-left:auto">RAG</span></div>
+              <div class="export-row" data-d="80" style="font-size:12px"><span style="color:var(--green)">✓</span> Clause pénale — indemnité 3 mois</div>
+              <div class="export-row" data-d="160" style="font-size:12px"><span style="color:var(--green)">✓</span> Force majeure — définition élargie <span style="color:var(--purple);font-size:10px;margin-left:auto">RAG</span></div>
+              <div class="export-row" data-d="240" style="font-size:12px"><span style="color:var(--accent)">+</span> Clause compromissoire — ajoutée par juriste</div>
+              <div class="export-row" data-d="320" style="font-size:12px"><span style="color:var(--purple)">⚔</span> Contre-rédaction adverse — PI renforcée</div>
             </div>
             <div style="display:flex;gap:10px">
-              <button style="flex:1;padding:10px;background:var(--green);border:none;border-radius:8px;color:#05070e;font-weight:700;font-size:12px;cursor:default" id="demo-dir-btn">Valider → admin</button>
+              <button style="flex:1;padding:10px;background:var(--green);border:none;border-radius:8px;color:#05070e;font-weight:700;font-size:12px;cursor:default">Valider → admin</button>
               <button style="flex:1;padding:10px;background:rgba(255,69,96,0.1);border:1px solid rgba(255,69,96,0.25);border-radius:8px;color:var(--red);font-size:12px;cursor:default">Demander révision</button>
             </div>
             <div id="demo-dir-done" style="display:none;margin-top:12px;padding:12px;background:rgba(13,207,138,0.07);border:1px solid rgba(13,207,138,0.2);border-radius:8px;font-size:12px;color:var(--green)">
@@ -876,21 +919,21 @@ footer {
         </div>
       </div>
 
-      <!-- S6 : RAG enrichi -->
+      <!-- S6 : Export + RAG -->
       <div class="demo-step" id="ds6">
         <div class="step-tag">Étape 6 — Admin · Intégration RAG & export final</div>
         <div style="display:flex;flex-direction:column;gap:12px">
           <div style="background:rgba(13,207,138,0.05);border:1px solid rgba(13,207,138,0.2);border-radius:12px;padding:18px">
             <div style="font-size:13px;font-weight:600;margin-bottom:4px">✅ Contrat validé · intégré à la base RAG</div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">contrat_prestation_nexora.docx · catégorie : Prestation de services</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px">contrat_prestation_nexora.docx · Prestation de services · Droit marocain</div>
             <div class="export-rows" id="erows2">
-              <div class="export-row" data-d="0" style="font-size:12px"><span style="color:var(--green)">✓</span> 4 clauses enrichissent la base Westfield</div>
-              <div class="export-row" data-d="120" style="font-size:12px"><span style="color:var(--purple)">🧠</span> Prochaines analyses améliorées automatiquement</div>
-              <div class="export-row" data-d="240" style="font-size:12px"><span style="color:var(--gold)">⬇</span> DOCX Track Changes exporté — prêt à envoyer</div>
+              <div class="export-row" data-d="0" style="font-size:12px"><span style="color:var(--green)">✓</span> 5 clauses enrichissent la base Westfield</div>
+              <div class="export-row" data-d="120" style="font-size:12px"><span style="color:var(--purple)">🧠</span> Limitation de responsabilité & clause pénale — nouvelles références RAG</div>
+              <div class="export-row" data-d="240" style="font-size:12px"><span style="color:var(--gold)">⬇</span> DOCX Track Changes exporté — prêt à envoyer à la contrepartie</div>
             </div>
           </div>
           <div style="background:rgba(61,107,255,0.05);border:1px solid rgba(61,107,255,0.2);border-radius:12px;padding:16px;font-size:12px;color:var(--muted);line-height:1.7">
-            💡 <strong style="color:var(--text)">La boucle est fermée.</strong> Chaque contrat validé par le directeur et l'admin renforce la base de connaissances — les markups des prochains contrats similaires seront plus précis, plus rapides, plus adaptés au droit marocain.
+            💡 <strong style="color:var(--text)">La boucle est fermée.</strong> Chaque contrat validé renforce la base — les prochaines analyses de contrats similaires bénéficieront de ces clauses comme références validées.
           </div>
           <button class="export-btn">⬇ Télécharger DOCX avec Track Changes natifs Word</button>
         </div>
@@ -1110,7 +1153,8 @@ document.querySelectorAll('.reveal').forEach(function(el) { ro.observe(el); });
 // Demo steps
 var cur = 1;
 var timer;
-var STEP_DUR = [0, 3800, 4500, 5000, 4500, 5000, 4000];
+// Durée de chaque étape en ms
+var STEP_DUR = [0, 4000, 5500, 5500, 6000, 5500, 4500];
 
 function gotoStep(n) {
   clearTimeout(timer);
@@ -1118,15 +1162,14 @@ function gotoStep(n) {
   document.querySelectorAll('.step-dot').forEach(function(d) { d.classList.remove('on'); });
   document.getElementById('ds' + n).classList.add('active');
   document.querySelectorAll('.step-dot')[n-1].classList.add('on');
-  // Role label
   var rl = document.getElementById('demo-role-label');
-  if (rl) rl.textContent = (n <= 4) ? 'juriste' : (n === 5 ? 'directeur juridique' : 'admin');
+  if (rl) rl.textContent = n <= 4 ? 'juriste' : n === 5 ? 'directeur juridique' : 'admin';
   cur = n;
-  var anims = [null, animS1, animS2, animS3, animS4, animS5, animS6];
-  if (anims[n]) anims[n]();
+  [null, animS1, animS2, animS3, animS4, animS5, animS6][n]();
   timer = setTimeout(function() { gotoStep(n < 6 ? n + 1 : 1); }, STEP_DUR[n]);
 }
 
+/* ── Étape 1 : Upload ── */
 function animS1() {
   var dz = document.getElementById('dz');
   dz.className = 'drop-zone';
@@ -1134,14 +1177,15 @@ function animS1() {
   setTimeout(function() {
     dz.classList.add('lit');
     setTimeout(function() {
-      dz.innerHTML = '<div class="drop-icon">⏳</div><div class="drop-title">contrat_prestation_nexora.docx</div><div class="drop-sub">42 paragraphes détectés · Analyse IA en cours…</div>';
+      dz.innerHTML = '<div class="drop-icon">⏳</div><div class="drop-title">contrat_prestation_nexora.docx</div><div class="drop-sub">47 paragraphes détectés · Analyse IA en cours…</div>';
       setTimeout(function() {
-        dz.innerHTML = '<div class="drop-icon">✅</div><div class="drop-title">contrat_prestation_nexora.docx</div><div class="drop-sub">6 clauses analysées · 4 clauses non traitées identifiées</div>';
-      }, 1200);
+        dz.innerHTML = '<div class="drop-icon">✅</div><div class="drop-title">contrat_prestation_nexora.docx</div><div class="drop-sub" style="color:var(--green)">3 clauses analysées · <span style="color:var(--amber)">5 clauses non traitées identifiées</span></div>';
+      }, 1400);
     }, 700);
   }, 500);
 }
 
+/* ── Étape 2 : Markups IA ── */
 function animS2() {
   var cnt = document.getElementById('demo-mods-count');
   var cards = document.querySelectorAll('#mlist2 .mod-card');
@@ -1157,54 +1201,76 @@ function animS2() {
   });
 }
 
+/* ── Étape 3 : Clause non analysée — sélection dans dropdown, texte snap depuis contrat ── */
+var _s3timer = null;
 function animS3() {
+  clearTimeout(_s3timer);
   var sel = document.getElementById('demo-clause-sel');
-  var name = document.getElementById('demo-clause-name');
-  var ta = document.getElementById('demo-clause-text');
+  var box = document.getElementById('demo-clause-textbox');
+  var txt = document.getElementById('demo-clause-text');
   var status = document.getElementById('demo-clause-status');
-  var cnt = document.getElementById('demo-clause-count');
+  var arrow = document.getElementById('demo-sel-arrow');
   if (sel) sel.value = '';
-  if (name) name.value = '';
-  if (ta) ta.value = '';
+  if (box) box.style.display = 'none';
+  if (txt) txt.textContent = '';
   if (status) status.style.display = 'none';
-  // Simule la sélection d'une clause après 1s
-  setTimeout(function() {
-    if (sel) { sel.value = 'Clause de confidentialité'; }
-    if (name) name.value = 'Clause de confidentialité';
-    if (ta) {
-      var txt = 'Le Prestataire s\'engage à maintenir strictement confidentielle toute information commerciale, technique ou financière communiquée par le Client dans le cadre de la présente convention, et ce pendant une durée de cinq (5) ans suivant la fin du contrat.';
-      var i = 0;
-      var iv = setInterval(function() {
-        ta.value = txt.slice(0, i);
-        i += 3;
-        if (i > txt.length) { ta.value = txt; clearInterval(iv); }
-      }, 18);
+  if (arrow) arrow.style.display = 'inline';
+
+  // Après 1.5s : sélectionne automatiquement "Clause compromissoire"
+  _s3timer = setTimeout(function() {
+    if (!sel) return;
+    sel.value = 'arb';
+    if (arrow) arrow.style.display = 'none';
+    // Récupère le data-text depuis l'option sélectionnée
+    var opt = sel.options[sel.selectedIndex];
+    var clauseText = opt ? opt.getAttribute('data-text') : '';
+    // Affiche la zone de texte avec le contenu extrait du contrat (snap instantané, pas de frappe)
+    if (box) box.style.display = 'block';
+    if (txt) {
+      txt.style.opacity = '0';
+      txt.textContent = clauseText;
+      setTimeout(function() {
+        txt.style.transition = 'opacity 0.4s';
+        txt.style.opacity = '1';
+      }, 50);
     }
-  }, 1000);
-  // Simule l'envoi à l'IA après 3s
-  setTimeout(function() {
-    if (status) status.style.display = 'inline';
-    if (cnt) cnt.textContent = '3 clauses du contrat non analysées';
-  }, 3200);
+    // Après 2.5s : simule le clic sur "Analyser"
+    _s3timer = setTimeout(function() {
+      if (status) status.style.display = 'inline';
+    }, 2500);
+  }, 1500);
 }
 
+/* ── Étape 4 : Version adverse ── */
+var _s4timer = null;
 function animS4() {
-  var prog = document.getElementById('demo-submit-progress');
-  var done = document.getElementById('demo-submit-done');
-  var pbar = document.getElementById('demo-pbar');
-  if (prog) prog.style.display = 'none';
-  if (done) done.style.display = 'none';
-  if (pbar) pbar.style.width = '0%';
-  setTimeout(function() {
-    if (prog) prog.style.display = 'block';
-    setTimeout(function() { if (pbar) pbar.style.width = '100%'; }, 100);
+  clearTimeout(_s4timer);
+  var upload = document.getElementById('demo-adverse-upload');
+  var result = document.getElementById('demo-adverse-result');
+  var rows = document.querySelectorAll('.adv-row');
+  if (upload) upload.style.display = 'block';
+  if (result) result.style.display = 'none';
+  rows.forEach(function(r) { r.style.opacity = '0'; r.style.transform = 'translateX(-12px)'; });
+
+  // Simule le drop du fichier adverse
+  _s4timer = setTimeout(function() {
+    if (upload) {
+      upload.innerHTML = '<div style="font-size:28px;margin-bottom:8px">⏳</div><div style="font-size:13px;font-weight:600;color:var(--purple)">contrat_adverse_atlas.docx</div><div style="font-size:11px;color:var(--muted);margin-top:4px">Comparaison en cours…</div>';
+    }
     setTimeout(function() {
-      if (prog) prog.style.display = 'none';
-      if (done) done.style.display = 'block';
-    }, 1500);
+      if (upload) upload.style.display = 'none';
+      if (result) result.style.display = 'block';
+      rows.forEach(function(r) {
+        setTimeout(function() {
+          r.style.opacity = '1';
+          r.style.transform = 'translateX(0)';
+        }, parseInt(r.dataset.d) + 100);
+      });
+    }, 1200);
   }, 1200);
 }
 
+/* ── Étape 5 : Directeur ── */
 function animS5() {
   var rows = document.querySelectorAll('#demo-dir-mods .export-row');
   var done = document.getElementById('demo-dir-done');
@@ -1213,12 +1279,10 @@ function animS5() {
   rows.forEach(function(r) {
     setTimeout(function() { r.classList.add('vis'); }, parseInt(r.dataset.d) + 200);
   });
-  // Simule la validation du directeur après 3s
-  setTimeout(function() {
-    if (done) done.style.display = 'block';
-  }, 3200);
+  setTimeout(function() { if (done) done.style.display = 'block'; }, 3800);
 }
 
+/* ── Étape 6 : RAG ── */
 function animS6() {
   var rows = document.querySelectorAll('#erows2 .export-row');
   rows.forEach(function(r) { r.classList.remove('vis'); });
@@ -1227,7 +1291,7 @@ function animS6() {
   });
 }
 
-// Auto-start demo when in viewport
+// Auto-start quand la section est visible
 var demoObs = new IntersectionObserver(function(entries) {
   if (entries[0].isIntersecting) { gotoStep(1); demoObs.disconnect(); }
 }, { threshold: 0.3 });
