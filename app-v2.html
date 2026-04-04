@@ -859,12 +859,20 @@ var _cu=null;
 var _userRole=null;
 var _userParentEmail=null;
 async function sf(p,o){o=o||{};var t=localStorage.getItem('sbt')||_sk;var h={'apikey':_sk,'Authorization':'Bearer '+t,'Content-Type':'application/json'};if(o.headers)Object.assign(h,o.headers);return fetch(_su+p,Object.assign({},o,{headers:h}));}
-async function chkSess(){var t=localStorage.getItem('sbt');if(!t)return;var r=await sf('/auth/v1/user');if(r.ok)setU(await r.json());else localStorage.removeItem('sbt');}
+async function _refreshSession(){
+  var rt=localStorage.getItem('sbr');
+  if(!rt) return false;
+  var rr=await fetch(_su+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'apikey':_sk,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:rt})});
+  var rd=await rr.json();
+  if(rd.access_token){localStorage.setItem('sbt',rd.access_token);if(rd.refresh_token)localStorage.setItem('sbr',rd.refresh_token);setU(rd.user||{email:_cu&&_cu.email});return true;}
+  localStorage.removeItem('sbt');localStorage.removeItem('sbr');return false;
+}
+async function chkSess(){var t=localStorage.getItem('sbt');if(!t)return;var r=await sf('/auth/v1/user');if(r.ok){setU(await r.json());return;}var ok=await _refreshSession();if(!ok)localStorage.removeItem('sbt');}
 function setU(u){_cu=u;document.getElementById('ubar').classList.add('show');var emailDisplay=(u.email||'').replace('@','[at]'); document.getElementById('ueml').textContent='>> '+emailDisplay;document.getElementById('deml').textContent=(u.email||'').replace('@','[at]');var b=document.getElementById('nlbtn');if(b)b.style.display='none';closeAuth();checkRole();}
-async function doLogin(){var e=document.getElementById('ae1').value.trim(),p=document.getElementById('ap1').value,err=document.getElementById('aerr');err.style.display='none';if(!e||!p){err.textContent='Champs requis';err.style.display='block';return;}var r=await sf('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:e,password:p})});var d=await r.json();if(d.access_token){localStorage.setItem('sbt',d.access_token);setU(d.user);}else{err.textContent=d.error_description||'Erreur';err.style.display='block';}}
+async function doLogin(){var e=document.getElementById('ae1').value.trim(),p=document.getElementById('ap1').value,err=document.getElementById('aerr');err.style.display='none';if(!e||!p){err.textContent='Champs requis';err.style.display='block';return;}var r=await sf('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:e,password:p})});var d=await r.json();if(d.access_token){localStorage.setItem('sbt',d.access_token);if(d.refresh_token)localStorage.setItem('sbr',d.refresh_token);setU(d.user);}else{err.textContent=d.error_description||'Erreur';err.style.display='block';}}
 async function doReg(){var e=document.getElementById('ae2').value.trim(),p=document.getElementById('ap2').value,err=document.getElementById('aerr2'),ok=document.getElementById('aok2');err.style.display='none';ok.style.display='none';if(!e||p.length<6){err.textContent='Email + mdp 6+ requis';err.style.display='block';return;}var r=await sf('/auth/v1/signup',{method:'POST',body:JSON.stringify({email:e,password:p})});var d=await r.json();if(d.id||d.user){ok.textContent='Compte cree - verifiez votre email';ok.style.display='block';}else{err.textContent=d.error_description||'Erreur';err.style.display='block';}}
 function doGoogle(){window.location.href=_su+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(window.location.href);}
-async function doOut(){await sf('/auth/v1/logout',{method:'POST'});localStorage.removeItem('sbt');_cu=null;document.getElementById('ubar').classList.remove('show');var b=document.getElementById('nlbtn');if(b)b.style.display='';}
+async function doOut(){await sf('/auth/v1/logout',{method:'POST'});localStorage.removeItem('sbt');localStorage.removeItem('sbr');_cu=null;document.getElementById('ubar').classList.remove('show');var b=document.getElementById('nlbtn');if(b)b.style.display='';}
 function showAuth(){var o=document.getElementById('auth-ov');o.classList.add('show');o.style.display='flex';}
 function closeAuth(){var o=document.getElementById('auth-ov');o.classList.remove('show');o.style.display='none';}
 function showReg(){document.getElementById('afl').style.display='none';document.getElementById('afr').style.display='block';document.getElementById('atitle').textContent='Creer un compte';}
