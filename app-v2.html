@@ -464,35 +464,42 @@ function buildFormData() {
 async function analyze() {
   hideErr('form-error');
 
-  // Check free usage limit  skip if valid access code
-  var hasAccess = localStorage.getItem('cs_access');
-
-  // Gate Supabase pour utilisateurs connectés — vérifier analyses_remaining
+  // Gate : vérifier quota via backend (gère reset hebdo + is_admin)
   if(_cu){
     try{
-      var accR=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=analyses_remaining,payment_status',
-        {headers:{'apikey':_sk,'Authorization':'Bearer '+_sk}});
+      var accR=await fetch(BACKEND+'/account/info',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email:_cu.email})
+      });
       if(accR.ok){
-        var accD=await accR.json();
-        if(accD[0]){
-          var rem=accD[0].analyses_remaining;
-          if(rem!==null && rem<=0){
-            showErr('form-error', 'Limite de 10 analyses atteinte. Demandez a votre directeur de renouveler l\'abonnement.');
-            return;
+        var acc=await accR.json();
+        if(!acc.is_admin && acc.analyses_remaining!==-1 && !acc.can_analyze){
+          var isDir=acc.role==='directeur';
+          var subEnd=acc.subscription_end?new Date(acc.subscription_end).toLocaleDateString('fr-FR'):'';
+          if(acc.payment_status==='active'){
+            showErr('form-error','Vos 20 analyses de ce mois sont épuisées. Renouvellement le '+subEnd+'.');
+          } else {
+            showErr('form-error',
+              '<strong>Vos 3 analyses gratuites de la semaine sont épuisées.</strong><br><br>'
+              +(isDir
+                ? 'Plan Directeur : 850 DH HT/mois par utilisateur · 20 analyses/user<br>'
+                : 'Plan Juriste : 950 DH HT/mois · 20 analyses/mois<br>')
+              +'<button onclick="showDash();dtab(\'abonnement\')" style="margin-top:10px;padding:10px 20px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:8px;color:#0a0c12;font-weight:700;cursor:pointer;font-size:14px">💳 Souscrire maintenant</button>'
+            );
           }
+          return;
         }
       }
     }catch(e){console.log('Gate check error:',e);}
   }
-  var usage = parseInt(localStorage.getItem('cs_usage') || '0');
-  if (usage >= 3 && !hasAccess) {
-    document.getElementById('access-code-section').style.display = 'block';
-  showErr('form-error', '⚠️ Vous avez utilisé vos 3 analyses gratuites. Pour un accès illimité, contactez Westfield :<br><br>' +
-      '📧 <a href="mailto:contact&#64;westfieldavocats.com" style="color:#5b7cfa">contact&#64;westfieldavocats.com</a><br>' +
-      '< <a href="https://westfieldmorocco.com" target="_blank" style="color:#5b7cfa">westfieldmorocco.com</a><br>' +
-      '📧 <a href="tel:+212634394490" style="color:#5b7cfa">+212 6 34 39 44 90</a><br><br>' +
-      '📧 <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="color:#10b981;font-weight:600">⬆ Souscrire en ligne</a>');
-    return;
+  // Utilisateur non connecté → limite localStorage (3/semaine)
+  if(!_cu){
+    var usage = parseInt(localStorage.getItem('cs_usage') || '0');
+    if (usage >= 3) {
+      showErr('form-error','<strong>3 analyses gratuites utilisées.</strong><br>Créez un compte pour continuer.');
+      return;
+    }
   }
 
   var txt = document.getElementById('contract-text').value;
@@ -1308,7 +1315,7 @@ async function _decrementAnalyses(){
       {headers:{'apikey':_sk,'Authorization':'Bearer '+_sk}});
     if(accR.ok){
       var accD=await accR.json();
-      if(accD[0]&&accD[0].analyses_remaining>0){
+      if(accD[0]&&accD[0].analyses_remaining>0&&accD[0].analyses_remaining!==-1){
         var newVal=accD[0].analyses_remaining-1;
         await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email),{
           method:'PATCH',
@@ -1899,7 +1906,7 @@ async function loadAbonnement(){
     var dir=dirData[0]||{};
     dir.email=dir.email||_cu.email;
     var nbUsers=juristes.length+1;
-    var pricePerUser=nbUsers>10?850:950;
+    var pricePerUser=dir.role==='juriste'?950:850;
     var total=nbUsers*pricePerUser;
     var subEnd=dir.subscription_end?new Date(dir.subscription_end).toLocaleDateString('fr-FR'):'—';
     var isActive=dir.payment_status==='active';
@@ -1916,12 +1923,12 @@ async function loadAbonnement(){
       +'<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Analyses restantes par utilisateur</div>'
       +allUsers.map(function(u){
         var rem=u.analyses_remaining!==null&&u.analyses_remaining!==undefined?u.analyses_remaining:10;
-        var pct=Math.min(100,Math.max(0,rem)*10);
+        var pct=Math.min(100,Math.max(0,rem/20*100));
         var col=rem>5?'#10b981':rem>2?'#f59e0b':'#ef4444';
         return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
           +'<div style="font-size:12px;color:#e2e5f0;width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(u._isDir?'[dir] ':'[jur] ')+String(u.email||'?')+'</div>'
           +'<div style="flex:1;height:6px;background:#1f2537;border-radius:3px"><div style="width:'+pct+'%;height:100%;background:'+col+';border-radius:3px"></div></div>'
-          +'<div style="font-size:12px;color:#e2e5f0;width:50px;text-align:right">'+rem+'/10</div>'
+          +'<div style="font-size:12px;color:#e2e5f0;width:50px;text-align:right">'+rem+'/20</div>'
           +'</div>';
       }).join('')
       +'</div>'
@@ -1933,14 +1940,14 @@ async function loadAbonnement(){
       +'</div>'
       +'<button onclick="initiateCMIPayment('+nbUsers+','+total+')" style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:10px;color:#0a0c12;font-size:15px;font-weight:800;cursor:pointer">Payer '+total+' DH via CMI</button>'
       +'</div>'
-      +'<div style="font-size:11px;color:#4a5470;text-align:center;margin-top:8px">Paiement securise · Chaque utilisateur recoit 10 analyses · Renouvelable mensuellement</div>';
+      +'<div style="font-size:11px;color:#4a5470;text-align:center;margin-top:8px">Paiement securise · Chaque utilisateur recoit 20 analyses (HT) · Renouvelable mensuellement</div>';
   }catch(e){
     console.error('[loadAbonnement] exception:', e);
     el.innerHTML='<div style="background:#1a0a0a;border:1px solid #ef4444;border-radius:12px;padding:20px"><p style="color:#ef4444;font-size:13px">Erreur: '+String(e.message)+'</p></div>';
   }
 }
 
-async function initiateCMIPayment(nbUsers, total){
+async function initiateCMIPayment(nbUsers, total, role){
   if(!_cu){alert('Connectez-vous pour payer.');return;}
   var btn=event.currentTarget||event.target;
   btn.disabled=true;btn.textContent='⏳ Redirection vers CMI...';
@@ -1948,7 +1955,7 @@ async function initiateCMIPayment(nbUsers, total){
     var r=await fetch(BACKEND+'/payment/initiate',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({director_email:_cu.email,nb_users:nbUsers})
+      body:JSON.stringify({director_email:_cu.email,nb_users:nbUsers,role:role||'directeur'})
     });
     var d=await r.json();
     if(!r.ok) throw new Error(d.error||'Erreur initiation paiement');
