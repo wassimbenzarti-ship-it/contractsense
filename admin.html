@@ -350,16 +350,19 @@ async function loadQueue() {
       div.className = 'queue-card';
       div.id = 'qcard-' + item.id;
       div.dataset.analysisId = item.analysis_id || '';
+      var senderLabel = item.submitted_by || item.juriste_email || '';
       div.innerHTML =
         '<div class="queue-header">' +
           '<div style="flex:1">' +
             '<div class="queue-title">' +
               '<span class="badge badge-contract" style="margin-right:8px">' + catLabel + '</span>' +
-              (item.party_label || '') +
+              (item.filename ? '<span style="font-weight:700;color:#e2e5f0">' + item.filename + '</span>' : (item.party_label || 'Contrat sans nom')) +
             '</div>' +
+            (item.filename && item.party_label ? '<div style="font-size:11px;color:#9ca3af;margin-top:2px;margin-bottom:4px">Partie : ' + item.party_label + '</div>' : '') +
             '<div class="queue-meta">' +
+              (senderLabel ? '👤 <span style="color:#c8a94b;font-weight:600">' + senderLabel + '</span> · ' : '') +
               '📅 ' + new Date(item.submitted_at).toLocaleDateString('fr-FR') +
-              ' · ✅ ' + (item.accepted_count||0) + ' clauses acceptées' +
+              ' · ✅ ' + (item.accepted_count||0) + ' acceptées' +
               ' · ❌ ' + (item.rejected_count||0) + ' refusées' +
             '</div>' +
           '</div>' +
@@ -542,19 +545,34 @@ async function uploadDoc() {
 }
 
 async function deleteDoc(source, btn) {
-  if (!confirm('Supprimer "' + source + '" ?')) return;
+  if (!confirm('Supprimer "' + source + '" du RAG ? Cette action est irréversible.')) return;
   btn.disabled = true;
+  btn.textContent = '⏳';
   try {
+    // Essai 1 : POST /rag/delete
     var resp = await fetch(BACKEND + '/rag/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ source: source })
     });
-    if (!resp.ok) throw new Error('Erreur');
+    // Essai 2 : DELETE /rag/delete si POST échoue
+    if (!resp.ok) {
+      resp = await fetch(BACKEND + '/rag/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source: source })
+      });
+    }
+    if (!resp.ok) {
+      var errData = {};
+      try { errData = await resp.json(); } catch(e) {}
+      throw new Error(errData.error || errData.detail || 'Statut ' + resp.status);
+    }
     loadStats(); loadRag();
   } catch(e) {
-    alert('Erreur: ' + e.message);
+    alert('Erreur suppression : ' + e.message);
     btn.disabled = false;
+    btn.textContent = '🗑';
   }
 }
 
