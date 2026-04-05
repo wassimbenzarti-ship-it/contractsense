@@ -548,59 +548,41 @@ async function deleteDoc(source, btn) {
   if (!confirm('Supprimer "' + source + '" du RAG ? Cette action est irréversible.')) return;
   btn.disabled = true;
   btn.textContent = '⏳';
+
+  var SB_DEL = 'https://nezxohrkikgjegnhgpyn.supabase.co';
+  var SK_DEL = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lenhvaHJraWtnamVnbmhncHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MTQxNzYsImV4cCI6MjA4OTM5MDE3Nn0.zhBCacGGmIX-rVE9E9MUcbY2RpMomfq33lyq6DNU2kI';
+  var sbH = { 'apikey': SK_DEL, 'Authorization': 'Bearer ' + SK_DEL, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
+
   try {
-    // Essai 1 : POST /rag/delete
-    var resp = await fetch(BACKEND + '/rag/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ source: source })
-    });
-    var respBody = {};
-    try { respBody = await resp.clone().json(); } catch(e) {}
-    console.log('[deleteDoc] POST /rag/delete →', resp.status, respBody);
+    // Suppression directe Supabase — le backend /rag/delete a un bug (limit 1000 rows, 3489 chunks au total)
+    // Titre stocké sous forme "SOURCE (partie N)" → on filtre avec like
+    var partieFilter = encodeURIComponent(source + ' (partie');
+    var exactFilter  = encodeURIComponent(source);
 
-    // Essai 2 : DELETE /rag/delete si POST échoue
-    if (!resp.ok) {
-      resp = await fetch(BACKEND + '/rag/delete', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source: source })
-      });
-      try { respBody = await resp.clone().json(); } catch(e) {}
-      console.log('[deleteDoc] DELETE /rag/delete →', resp.status, respBody);
+    var r1 = await fetch(SB_DEL + '/rest/v1/rag_documents?title=like.' + partieFilter + '*', { method: 'DELETE', headers: sbH });
+    var deleted1 = r1.ok ? (await r1.json()) : [];
+    var r2 = await fetch(SB_DEL + '/rest/v1/rag_documents?title=eq.' + exactFilter, { method: 'DELETE', headers: sbH });
+    var deleted2 = r2.ok ? (await r2.json()) : [];
+    var total = (Array.isArray(deleted1) ? deleted1.length : 0) + (Array.isArray(deleted2) ? deleted2.length : 0);
+    console.log('[deleteDoc] Supabase supprimé:', total, 'chunks pour source:', source);
+
+    if (!r1.ok && !r2.ok) {
+      throw new Error('Supabase: ' + r1.status);
     }
-    if (!resp.ok) {
-      throw new Error(respBody.error || respBody.detail || 'Statut ' + resp.status);
-    }
-
-    // Vérifier que le doc a bien disparu du RAG
-    var checkResp = await fetch(BACKEND + '/rag/list');
-    var checkData = await checkResp.json();
-    var stillThere = (checkData.documents || []).find(function(d) { return d.source === source; });
-    if (stillThere) {
-      // Le backend a répondu 200 mais le doc est toujours là — essayer avec filename sans extension
-      var altSource = source.replace(/\.[^.]+$/, '');
-      console.log('[deleteDoc] Toujours présent, essai avec source alternative:', altSource);
-      var resp2 = await fetch(BACKEND + '/rag/delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source: altSource })
-      });
-      var body2 = {};
-      try { body2 = await resp2.clone().json(); } catch(e) {}
-      console.log('[deleteDoc] POST altSource →', resp2.status, body2);
-
-      // Re-vérifier
-      var chk2 = await fetch(BACKEND + '/rag/list');
-      var dat2 = await chk2.json();
-      var still2 = (dat2.documents || []).find(function(d) { return d.source === source || d.source === altSource; });
-      if (still2) {
-        alert('Le document est toujours dans le RAG après suppression (source: "' + source + '").\nConsultez la console (F12) pour les détails.');
+    if (total === 0) {
+      // Titre stocké différemment — essai sans "(partie" (ex: docs depuis suggestions)
+      var r3 = await fetch(SB_DEL + '/rest/v1/rag_documents?title=like.' + exactFilter + '*', { method: 'DELETE', headers: sbH });
+      var deleted3 = r3.ok ? (await r3.json()) : [];
+      total = Array.isArray(deleted3) ? deleted3.length : 0;
+      console.log('[deleteDoc] Fallback like.*:', total, 'chunks');
+      if (total === 0) {
+        alert('Document introuvable dans la base (source: "' + source + '").\nIl a peut-être déjà été supprimé.');
         btn.disabled = false;
         btn.textContent = '🗑';
         return;
       }
     }
+
     loadStats(); loadRag();
   } catch(e) {
     alert('Erreur suppression : ' + e.message);
