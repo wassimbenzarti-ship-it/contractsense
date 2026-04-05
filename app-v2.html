@@ -1992,6 +1992,12 @@ async function loadAbonnement(){
     var subEnd=dir.subscription_end?new Date(dir.subscription_end).toLocaleDateString('fr-FR'):'—';
     var isActive=dir.payment_status==='active';
     var isJuristeRole=dir.role==='juriste';
+    // Toujours utiliser /account/info pour les analyses restantes (source de verite backend)
+    var _backendRem=null;
+    try{
+      var _biR=await fetch(BACKEND+'/account/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email})});
+      if(_biR.ok){var _bi=await _biR.json();_backendRem=_bi.analyses_remaining;}
+    }catch(e4){}
     var allUsers=[Object.assign({_isDir:true},dir)].concat(juristes);
     console.log('[loadAbonnement] rendering, nbUsers=',nbUsers,'allUsers=',allUsers.map(function(u){return u.email;}));
     el.innerHTML=
@@ -2004,7 +2010,7 @@ async function loadAbonnement(){
       +'<div style="background:#0a0c12;border-radius:8px;padding:14px;margin-bottom:16px">'
       +'<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Analyses restantes par utilisateur</div>'
       +allUsers.map(function(u){
-        var rem=u.analyses_remaining!==null&&u.analyses_remaining!==undefined?u.analyses_remaining:10;
+        var rem=u._isDir&&_backendRem!==null?_backendRem:(u.analyses_remaining!==null&&u.analyses_remaining!==undefined?u.analyses_remaining:0);
         var pct=Math.min(100,Math.max(0,rem/20*100));
         var col=rem>5?'#10b981':rem>2?'#f59e0b':'#ef4444';
         return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
