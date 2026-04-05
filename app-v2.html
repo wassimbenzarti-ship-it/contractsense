@@ -1878,45 +1878,70 @@ async function submitForReview(id){
 // ===== PAIEMENT CMI =====
 async function loadAbonnement(){
   var el=document.getElementById('abonnement-content');
+  console.log('[loadAbonnement] called, el=',!!el,'_cu=',_cu?_cu.email:'null');
   if(!el)return;
-  if(!_cu){el.innerHTML='<p style="color:#6b7280;font-size:13px;padding:20px 0">Connectez-vous pour acceder a votre abonnement.</p>';return;}
-  el.innerHTML='<div style="color:#6b7280;font-size:13px">Chargement...</div>';
+  if(!_cu){
+    el.innerHTML='<div style="background:#1a1f2e;border:1px solid #f59e0b;border-radius:12px;padding:24px;text-align:center">'
+      +'<div style="font-size:28px;margin-bottom:12px">🔐</div>'
+      +'<div style="font-size:14px;color:#e2e5f0;font-weight:600;margin-bottom:8px">Connexion requise</div>'
+      +'<div style="font-size:12px;color:#6b7280;margin-bottom:16px">Connectez-vous pour acceder a votre abonnement.</div>'
+      +'<button onclick="showAuth()" style="padding:10px 24px;background:#5b7cfa;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Se connecter</button>'
+      +'</div>';
+    return;
+  }
+  el.innerHTML='<div style="color:#6b7280;font-size:13px;padding:20px 0">Chargement de votre abonnement...</div>';
   try{
-    var rj=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=email,analyses_remaining,payment_status,subscription_end',
+    // Utilise select=* pour eviter les erreurs de colonnes manquantes
+    var rj=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=*',
       {headers:{'apikey':_sk,'Authorization':'Bearer '+_sk}});
+    console.log('[loadAbonnement] juristes status:', rj.status);
     var juristes=rj.ok?await rj.json():[];
-    var rd=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=email,analyses_remaining,payment_status,subscription_end',
+    var rd=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=*',
       {headers:{'apikey':_sk,'Authorization':'Bearer '+_sk}});
+    console.log('[loadAbonnement] dir status:', rd.status);
     var dirData=rd.ok?await rd.json():[];
-    var dir=dirData[0]||{email:_cu.email};
-    if(!dir.email)dir.email=_cu.email;
-    var nbUsers=juristes.length+1; // juristes + directeur
+    var dir=dirData[0]||{};
+    dir.email=dir.email||_cu.email;
+    var nbUsers=juristes.length+1;
     var pricePerUser=nbUsers>10?850:950;
     var total=nbUsers*pricePerUser;
     var subEnd=dir.subscription_end?new Date(dir.subscription_end).toLocaleDateString('fr-FR'):'—';
     var isActive=dir.payment_status==='active';
     var allUsers=[Object.assign({_isDir:true},dir)].concat(juristes);
+    console.log('[loadAbonnement] rendering, nbUsers=',nbUsers,'allUsers=',allUsers.map(function(u){return u.email;}));
     el.innerHTML=
       '<div style="background:#111420;border:1px solid '+(isActive?'#10b981':'#f59e0b')+';border-radius:12px;padding:20px;margin-bottom:20px">'
       +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
       +'<div><div style="font-size:15px;font-weight:700;color:#e2e5f0">Abonnement Omniscient</div>'
       +'<div style="font-size:12px;color:#6b7280;margin-top:3px">Actif jusqu\'au : <strong style="color:#e2e5f0">'+subEnd+'</strong></div></div>'
-      +'<span style="padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;background:'+(isActive?'#10b98122':'#f59e0b22')+';color:'+(isActive?'#10b981':'#f59e0b')+'">'+(isActive?'✅ Actif':'⏳ Inactif')+'</span>'
+      +'<span style="padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;background:'+(isActive?'#10b98122':'#f59e0b22')+';color:'+(isActive?'#10b981':'#f59e0b')+'">'+(isActive?'Actif':'Inactif')+'</span>'
       +'</div>'
       +'<div style="background:#0a0c12;border-radius:8px;padding:14px;margin-bottom:16px">'
       +'<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Analyses restantes par utilisateur</div>'
-      +allUsers.map(function(u){var rem=u.analyses_remaining===null||u.analyses_remaining===undefined?10:u.analyses_remaining;var pct=Math.max(0,rem)*10;return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="font-size:12px;color:#e2e5f0;width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(u._isDir?'👑 ':' ⚖ ')+u.email+'</div><div style="flex:1;height:6px;background:#1f2537;border-radius:3px"><div style="width:'+pct+'%;height:100%;background:'+(rem>5?'#10b981':rem>2?'#f59e0b':'#ef4444')+';border-radius:3px"></div></div><div style="font-size:12px;color:#e2e5f0;width:40px;text-align:right">'+rem+'/10</div></div>';}).join('')
+      +allUsers.map(function(u){
+        var rem=u.analyses_remaining!==null&&u.analyses_remaining!==undefined?u.analyses_remaining:10;
+        var pct=Math.min(100,Math.max(0,rem)*10);
+        var col=rem>5?'#10b981':rem>2?'#f59e0b':'#ef4444';
+        return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+          +'<div style="font-size:12px;color:#e2e5f0;width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(u._isDir?'[dir] ':'[jur] ')+String(u.email||'?')+'</div>'
+          +'<div style="flex:1;height:6px;background:#1f2537;border-radius:3px"><div style="width:'+pct+'%;height:100%;background:'+col+';border-radius:3px"></div></div>'
+          +'<div style="font-size:12px;color:#e2e5f0;width:50px;text-align:right">'+rem+'/10</div>'
+          +'</div>';
+      }).join('')
       +'</div>'
       +'<div style="background:#0a0c12;border-radius:8px;padding:14px;margin-bottom:16px">'
-      +'<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Détail facturation</div>'
+      +'<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Facturation</div>'
       +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#9ca3af">Utilisateurs</span><span style="color:#e2e5f0">'+nbUsers+' compte(s)</span></div>'
-      +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#9ca3af">Tarif</span><span style="color:#e2e5f0">'+pricePerUser+' DH / utilisateur'+(nbUsers>10?' <span style="color:#10b981;font-size:11px">(tarif >10 users)</span>':'')+'</span></div>'
-      +'<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;border-top:1px solid #1f2537;padding-top:10px;margin-top:6px"><span style="color:#e2e5f0">Total mensuel</span><span style="color:#c8a94b">'+total.toLocaleString('fr-FR')+' DH</span></div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#9ca3af">Tarif</span><span style="color:#e2e5f0">'+pricePerUser+' DH / utilisateur</span></div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;border-top:1px solid #1f2537;padding-top:10px;margin-top:6px"><span style="color:#e2e5f0">Total mensuel</span><span style="color:#c8a94b">'+total+' DH</span></div>'
       +'</div>'
-      +'<button onclick="initiateCMIPayment('+nbUsers+','+total+')" style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:10px;color:#0a0c12;font-size:15px;font-weight:800;cursor:pointer">💳 Payer '+total.toLocaleString('fr-FR')+' DH via CMI</button>'
+      +'<button onclick="initiateCMIPayment('+nbUsers+','+total+')" style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:10px;color:#0a0c12;font-size:15px;font-weight:800;cursor:pointer">Payer '+total+' DH via CMI</button>'
       +'</div>'
-      +'<div style="font-size:11px;color:#4a5470;text-align:center;margin-top:8px">Paiement sécurisé · Chaque utilisateur reçoit 10 nouvelles analyses · Renouvelable mensuellement</div>';
-  }catch(e){el.innerHTML='<p style="color:#ef4444;font-size:13px">Erreur: '+e.message+'</p>';}
+      +'<div style="font-size:11px;color:#4a5470;text-align:center;margin-top:8px">Paiement securise · Chaque utilisateur recoit 10 analyses · Renouvelable mensuellement</div>';
+  }catch(e){
+    console.error('[loadAbonnement] exception:', e);
+    el.innerHTML='<div style="background:#1a0a0a;border:1px solid #ef4444;border-radius:12px;padding:20px"><p style="color:#ef4444;font-size:13px">Erreur: '+String(e.message)+'</p></div>';
+  }
 }
 
 async function initiateCMIPayment(nbUsers, total){
