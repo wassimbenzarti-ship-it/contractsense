@@ -478,7 +478,7 @@ async function analyze() {
         if(accD[0]){
           var rem=accD[0].analyses_remaining;
           if(rem!==null && rem<=0){
-            showErr('form-error','❌ Vous avez atteint votre limite de 10 analyses.<br>Votre directeur doit renouveler l\'abonnement pour d\u00e9bloquer de nouvelles analyses.');
+            showErr('form-error', 'Limite de 10 analyses atteinte. Demandez a votre directeur de renouveler l\'abonnement.');
             return;
           }
         }
