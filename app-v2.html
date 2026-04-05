@@ -467,6 +467,9 @@ function buildFormData() {
 async function analyze() {
   hideErr('form-error');
 
+  // Restore session if not yet loaded
+  if(!_cu) await chkSess();
+
   // Gate : vérifier quota via backend (gère reset hebdo + is_admin)
   if(_cu){
     try{
