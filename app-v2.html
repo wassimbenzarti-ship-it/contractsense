@@ -564,6 +564,9 @@ async function analyzeWithPartie(partieName) {
   stepDone(2);
   setTimeout(function() { stepDone(3); }, 1400);
 
+  // Ensure session is restored before sending user_email
+  if (!_cu) await chkSess();
+
   try {
     var fd = buildFormData();
     fd.append('partie', partieName);
