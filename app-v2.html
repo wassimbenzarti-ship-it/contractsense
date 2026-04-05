@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <title>Omniscient</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1872,7 +1875,8 @@ async function submitForReview(id){
 // ===== PAIEMENT CMI =====
 async function loadAbonnement(){
   var el=document.getElementById('abonnement-content');
-  if(!el||!_cu)return;
+  if(!el)return;
+  if(!_cu){el.innerHTML='<p style="color:#6b7280;font-size:13px;padding:20px 0">Connectez-vous pour acceder a votre abonnement.</p>';return;}
   el.innerHTML='<div style="color:#6b7280;font-size:13px">Chargement...</div>';
   try{
     var rj=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=email,analyses_remaining,payment_status,subscription_end',
@@ -1881,7 +1885,8 @@ async function loadAbonnement(){
     var rd=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=email,analyses_remaining,payment_status,subscription_end',
       {headers:{'apikey':_sk,'Authorization':'Bearer '+_sk}});
     var dirData=rd.ok?await rd.json():[];
-    var dir=dirData[0]||{};
+    var dir=dirData[0]||{email:_cu.email};
+    if(!dir.email)dir.email=_cu.email;
     var nbUsers=juristes.length+1; // juristes + directeur
     var pricePerUser=nbUsers>10?850:950;
     var total=nbUsers*pricePerUser;
