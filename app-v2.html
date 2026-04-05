@@ -1338,21 +1338,20 @@ async function upMdl(inp){
 async function _decrementAnalyses(){
   if(!_cu)return;
   try{
-    // Décrémenter analyses_remaining atomiquement via RPC Supabase ou PATCH conditionnel
     var _uToken=localStorage.getItem('sbt')||_sk;
-    var accR=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=analyses_remaining',
-      {headers:{'apikey':_sk,'Authorization':'Bearer '+_uToken}});
-    if(accR.ok){
-      var accD=await accR.json();
-      if(accD[0]&&accD[0].analyses_remaining>0&&accD[0].analyses_remaining!==-1){
-        var newVal=accD[0].analyses_remaining-1;
-        await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email),{
-          method:'PATCH',
-          headers:{'apikey':_sk,'Authorization':'Bearer '+_uToken,'Content-Type':'application/json','Prefer':'return=minimal'},
-          body:JSON.stringify({analyses_remaining:newVal})
-        });
-      }
-    }
+    // Source de verite : backend /account/info
+    var curRem=3;
+    try{
+      var biR=await fetch(BACKEND+'/account/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email})});
+      if(biR.ok){var bi=await biR.json();if(bi.analyses_remaining===-1)return;if(bi.analyses_remaining!=null)curRem=bi.analyses_remaining;}
+    }catch(e2){}
+    if(curRem<=0)return;
+    var newVal=curRem-1;
+    await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email),{
+      method:'PATCH',
+      headers:{'apikey':_sk,'Authorization':'Bearer '+_uToken,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({analyses_remaining:newVal})
+    });
   }catch(e){console.log('Decrement error:',e);}
 }
 async function saveAna(fn,ct,pa,mods){
