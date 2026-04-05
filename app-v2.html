@@ -302,9 +302,6 @@ var savedText = "";
 
 //    Init                                                   
 document.addEventListener('DOMContentLoaded', function() {
-  // Restore session on page load/refresh
-  chkSess();
-
   // Show usage counter
   var usage = parseInt(localStorage.getItem('cs_usage') || '0');
   var remaining = 3 - usage;
@@ -994,7 +991,19 @@ async function _refreshSession(){
   if(rd.access_token){localStorage.setItem('sbt',rd.access_token);if(rd.refresh_token)localStorage.setItem('sbr',rd.refresh_token);setU(rd.user||{email:_cu&&_cu.email});return true;}
   localStorage.removeItem('sbt');localStorage.removeItem('sbr');return false;
 }
-async function chkSess(){var t=localStorage.getItem('sbt');if(!t)return;var r=await sf('/auth/v1/user');if(r.ok){setU(await r.json());return;}var ok=await _refreshSession();if(!ok)localStorage.removeItem('sbt');}
+async function chkSess(){
+  try{
+    var t=localStorage.getItem('sbt');
+    if(!t)return;
+    var r=await sf('/auth/v1/user');
+    if(r.ok){
+      var u=await r.json();
+      if(u&&u.id){setU(u);if(localStorage.getItem('cs_dash_open'))showDash();return;}
+    }
+    var ok=await _refreshSession();
+    if(!ok)localStorage.removeItem('sbt');
+  }catch(e){console.log('chkSess error:',e);}
+}
 function setU(u){_cu=u;document.getElementById('ubar').classList.add('show');var emailDisplay=(u.email||'').replace('@','[at]'); document.getElementById('ueml').textContent='>> '+emailDisplay;document.getElementById('deml').textContent=(u.email||'').replace('@','[at]');var b=document.getElementById('nlbtn');if(b)b.style.display='none';closeAuth();checkRole();}
 async function doLogin(){var e=document.getElementById('ae1').value.trim(),p=document.getElementById('ap1').value,err=document.getElementById('aerr');err.style.display='none';if(!e||!p){err.textContent='Champs requis';err.style.display='block';return;}var r=await sf('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:e,password:p})});var d=await r.json();if(d.access_token){localStorage.setItem('sbt',d.access_token);if(d.refresh_token)localStorage.setItem('sbr',d.refresh_token);setU(d.user);}else{err.textContent=d.error_description||'Erreur';err.style.display='block';}}
 async function doReg(){var e=document.getElementById('ae2').value.trim(),p=document.getElementById('ap2').value,err=document.getElementById('aerr2'),ok=document.getElementById('aok2');err.style.display='none';ok.style.display='none';if(!e||p.length<6){err.textContent='Email + mdp 6+ requis';err.style.display='block';return;}var r=await sf('/auth/v1/signup',{method:'POST',body:JSON.stringify({email:e,password:p})});var d=await r.json();if(d.id||d.user){ok.textContent='Compte cree - verifiez votre email';ok.style.display='block';}else{err.textContent=d.error_description||'Erreur';err.style.display='block';}}
@@ -1003,8 +1012,8 @@ function showAuth(){var o=document.getElementById('auth-ov');o.classList.add('sh
 function closeAuth(){var o=document.getElementById('auth-ov');o.classList.remove('show');o.style.display='none';}
 function showReg(){document.getElementById('afl').style.display='none';document.getElementById('afr').style.display='block';document.getElementById('atitle').textContent='Creer un compte';}
 function showLogin(){document.getElementById('afr').style.display='none';document.getElementById('afl').style.display='block';document.getElementById('atitle').textContent='Connexion';}
-function showDash(){document.getElementById('dash-ov').classList.add('show');loadDash();}
-function closeDash(){document.getElementById('dash-ov').classList.remove('show');}
+function showDash(){document.getElementById('dash-ov').classList.add('show');localStorage.setItem('cs_dash_open','1');loadDash();}
+function closeDash(){document.getElementById('dash-ov').classList.remove('show');localStorage.removeItem('cs_dash_open');}
 function dtab(t){var names=['analyses','models','juristes'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();}
 async function checkRole(){
   if(!_cu)return;
@@ -1856,6 +1865,9 @@ async function rejectSuggDir(id){
   if(r.ok){alert('Suggestion rejetee.');loadJuristes();}
   else alert('Erreur');
 }
+
+// Restore session immediately on script load (DOM is already ready since script is at bottom of body)
+chkSess();
 </script>
 </body>
 </html>
