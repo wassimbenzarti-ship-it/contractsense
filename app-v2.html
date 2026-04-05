@@ -304,6 +304,9 @@ var savedText = "";
 
 //    Init                                                   
 document.addEventListener('DOMContentLoaded', function() {
+  // Restore session on page load/refresh
+  chkSess();
+
   // Show usage counter
   var usage = parseInt(localStorage.getItem('cs_usage') || '0');
   var remaining = 3 - usage;
