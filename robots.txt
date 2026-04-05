@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /admin_*.html
+
+Sitemap: https://ai.westfieldavocats.com/sitemap.xml
