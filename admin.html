@@ -555,6 +555,10 @@ async function deleteDoc(source, btn) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ source: source })
     });
+    var respBody = {};
+    try { respBody = await resp.clone().json(); } catch(e) {}
+    console.log('[deleteDoc] POST /rag/delete →', resp.status, respBody);
+
     // Essai 2 : DELETE /rag/delete si POST échoue
     if (!resp.ok) {
       resp = await fetch(BACKEND + '/rag/delete', {
@@ -562,11 +566,40 @@ async function deleteDoc(source, btn) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ source: source })
       });
+      try { respBody = await resp.clone().json(); } catch(e) {}
+      console.log('[deleteDoc] DELETE /rag/delete →', resp.status, respBody);
     }
     if (!resp.ok) {
-      var errData = {};
-      try { errData = await resp.json(); } catch(e) {}
-      throw new Error(errData.error || errData.detail || 'Statut ' + resp.status);
+      throw new Error(respBody.error || respBody.detail || 'Statut ' + resp.status);
+    }
+
+    // Vérifier que le doc a bien disparu du RAG
+    var checkResp = await fetch(BACKEND + '/rag/list');
+    var checkData = await checkResp.json();
+    var stillThere = (checkData.documents || []).find(function(d) { return d.source === source; });
+    if (stillThere) {
+      // Le backend a répondu 200 mais le doc est toujours là — essayer avec filename sans extension
+      var altSource = source.replace(/\.[^.]+$/, '');
+      console.log('[deleteDoc] Toujours présent, essai avec source alternative:', altSource);
+      var resp2 = await fetch(BACKEND + '/rag/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source: altSource })
+      });
+      var body2 = {};
+      try { body2 = await resp2.clone().json(); } catch(e) {}
+      console.log('[deleteDoc] POST altSource →', resp2.status, body2);
+
+      // Re-vérifier
+      var chk2 = await fetch(BACKEND + '/rag/list');
+      var dat2 = await chk2.json();
+      var still2 = (dat2.documents || []).find(function(d) { return d.source === source || d.source === altSource; });
+      if (still2) {
+        alert('Le document est toujours dans le RAG après suppression (source: "' + source + '").\nConsultez la console (F12) pour les détails.');
+        btn.disabled = false;
+        btn.textContent = '🗑';
+        return;
+      }
     }
     loadStats(); loadRag();
   } catch(e) {
