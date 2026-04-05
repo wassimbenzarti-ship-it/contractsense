@@ -334,23 +334,42 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(function(){alert('❌ Paiement échoué ou annulé. Réessayez depuis votre tableau de bord.');},500);
     }
   })();
-  // Show usage counter
-  var usage = parseInt(localStorage.getItem('cs_usage') || '0');
-  var remaining = 3 - usage;
-  var counter = document.getElementById('usage-counter');
-  if (counter) {
+  // Update usage counter from Supabase (after chkSess) or localStorage fallback
+  (async function() {
+    var counter = document.getElementById('usage-counter');
+    if (!counter) return;
+    if (_cu) {
+      try {
+        var r = await fetch(BACKEND + '/account/info', {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({email: _cu.email})
+        });
+        if (r.ok) {
+          var acc = await r.json();
+          var rem = acc.analyses_remaining;
+          if (acc.is_admin || rem === -1) {
+            counter.textContent = '∞ Accès illimité'; counter.style.color = '#10b981';
+          } else if (rem > 0) {
+            counter.textContent = rem + ' analyse' + (rem > 1 ? 's' : '') + ' restante' + (rem > 1 ? 's' : '');
+          } else {
+            counter.textContent = '❌ Quota épuisé'; counter.style.color = '#ef4444';
+          }
+          return;
+        }
+      } catch(e) {}
+    }
+    // Fallback: non connecté → localStorage
+    var usage = parseInt(localStorage.getItem('cs_usage') || '0');
+    var remaining = 3 - usage;
     if (remaining > 0) {
       counter.textContent = remaining + ' analyse' + (remaining > 1 ? 's' : '') + ' gratuite' + (remaining > 1 ? 's' : '') + ' restante' + (remaining > 1 ? 's' : '');
     } else {
-      counter.innerHTML = '❌ Limite atteinte  <a href="mailto:contact&#64;westfieldavocats.com" style="color:#ef4444">contact&#64;westfieldavocats.com</a> 📞 +212 6 34 39 44 90';
+      counter.innerHTML = '❌ Limite atteinte';
       counter.style.color = '#ef4444';
     }
-  }
+  })();
 
-
-
-
-  // Tabs
+    // Tabs
   document.getElementById('tab-upload').addEventListener('click', function() {
     curMode = 'upload';
     this.classList.add('active');
