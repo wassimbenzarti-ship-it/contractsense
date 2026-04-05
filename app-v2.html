@@ -453,6 +453,7 @@ function buildFormData() {
   var fd = new FormData();
   fd.append('lang', 'auto');
   fd.append('type', document.getElementById('type').value);
+  if (_cu && _cu.email) fd.append('user_email', _cu.email);
   if (curMode === 'upload' && curFile) {
     fd.append('file', curFile);
   } else {
@@ -919,6 +920,7 @@ async function analyzeManualClauseInReview(){
     fd.append('file', new Blob([textToAnalyze], {type:'text/plain'}), 'clause.txt');
     fd.append('type', savedType||'general');
     fd.append('partie', selectedPartie||'');
+    if (_cu && _cu.email) fd.append('user_email', _cu.email);
     fd.append('lang','auto');
     var r = await fetch(BACKEND+'/analyze', {method:'POST', body:fd});
     var data = await r.json();
