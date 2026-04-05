@@ -131,10 +131,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <input class="ai" type="password" id="ap1" placeholder="Mot de passe"/>
 <div id="aerr" class="ae"></div>
 <button class="ab" onclick="doLogin()">Se connecter</button>
-<div style="text-align:center;font-size:13px;color:#6b7280">Pas de compte ? <span class="al" onclick="showReg()">Creer un compte</span></div>
-<div style="margin:12px 0;text-align:center;color:#6b7280;font-size:12px">-- ou --</div>
-<button class="ab" style="background:#1a2035;border:1px solid #1f2537" onclick="doGoogle()">Google</button>
-</div>
+<div style="text-align:center;font-size:13px;color:#6b7280">Pas de compte ? <span class="al" onclick="showReg()">Creer un compte</span></div></div>
 <div id="afr" style="display:none">
 <input class="ai" type="email" id="ae2" placeholder="Email"/>
 <input class="ai" type="password" id="ap2" placeholder="Mot de passe (6+)"/>
@@ -1046,7 +1043,6 @@ async function chkSess(){var t=localStorage.getItem('sbt');if(!t)return;var r=aw
 function setU(u){_cu=u;document.getElementById('ubar').classList.add('show');var emailDisplay=(u.email||'').replace('@','[at]'); document.getElementById('ueml').textContent='>> '+emailDisplay;document.getElementById('deml').textContent=(u.email||'').replace('@','[at]');var b=document.getElementById('nlbtn');if(b)b.style.display='none';closeAuth();checkRole();}
 async function doLogin(){var e=document.getElementById('ae1').value.trim(),p=document.getElementById('ap1').value,err=document.getElementById('aerr');err.style.display='none';if(!e||!p){err.textContent='Champs requis';err.style.display='block';return;}var r=await sf('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:e,password:p})});var d=await r.json();if(d.access_token){localStorage.setItem('sbt',d.access_token);if(d.refresh_token)localStorage.setItem('sbr',d.refresh_token);setU(d.user);}else{err.textContent=d.error_description||'Erreur';err.style.display='block';}}
 async function doReg(){var e=document.getElementById('ae2').value.trim(),p=document.getElementById('ap2').value,err=document.getElementById('aerr2'),ok=document.getElementById('aok2');err.style.display='none';ok.style.display='none';if(!e||p.length<6){err.textContent='Email + mdp 6+ requis';err.style.display='block';return;}var r=await sf('/auth/v1/signup',{method:'POST',body:JSON.stringify({email:e,password:p})});var d=await r.json();if(d.id||d.user){ok.textContent='Compte cree - verifiez votre email';ok.style.display='block';}else{err.textContent=d.error_description||'Erreur';err.style.display='block';}}
-function doGoogle(){window.location.href=_su+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(window.location.href);}
 async function doOut(){await sf('/auth/v1/logout',{method:'POST'});localStorage.removeItem('sbt');localStorage.removeItem('sbr');_cu=null;document.getElementById('ubar').classList.remove('show');var b=document.getElementById('nlbtn');if(b)b.style.display='';}
 function showAuth(){var o=document.getElementById('auth-ov');o.classList.add('show');o.style.display='flex';}
 function closeAuth(){var o=document.getElementById('auth-ov');o.classList.remove('show');o.style.display='none';}
