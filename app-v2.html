@@ -1920,6 +1920,57 @@ async function loadAbonnement(){
     var dirData=rd.ok?await rd.json():[];
     var dir=dirData[0]||{};
     dir.email=dir.email||_cu.email;
+
+    // Cas juriste rattaché à un directeur : vérifier si le directeur a souscrit pour lui
+    if(dir.role==='juriste'&&dir.parent_email){
+      var rdirR=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(dir.parent_email)+'&select=*',
+        {headers:{'apikey':_sk,'Authorization':'Bearer '+_sk}});
+      var rdirData=rdirR.ok?await rdirR.json():[];
+      var directorAcc=rdirData[0]||{};
+      if(directorAcc.payment_status==='active'){
+        var subEndD=directorAcc.subscription_end?new Date(directorAcc.subscription_end).toLocaleDateString('fr-FR'):'—';
+        var remD=dir.analyses_remaining!==null&&dir.analyses_remaining!==undefined?dir.analyses_remaining:20;
+        var pctD=Math.min(100,Math.max(0,remD/20*100));
+        var colD=remD>5?'#10b981':remD>2?'#f59e0b':'#ef4444';
+        el.innerHTML=
+          '<div style="background:#111420;border:1px solid #10b981;border-radius:12px;padding:20px;margin-bottom:20px">'
+          +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+          +'<div><div style="font-size:15px;font-weight:700;color:#e2e5f0">Abonnement Omniscient</div>'
+          +'<div style="font-size:12px;color:#6b7280;margin-top:3px">Actif jusqu'au : <strong style="color:#e2e5f0">'+subEndD+'</strong></div></div>'
+          +'<span style="padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;background:#10b98122;color:#10b981">Actif</span>'
+          +'</div>'
+          +'<div style="background:#0a0c12;border-radius:8px;padding:14px;margin-bottom:16px">'
+          +'<div style="font-size:12px;color:#9ca3af;margin-bottom:8px">Votre abonnement est géré par votre directeur juridique :</div>'
+          +'<div style="font-size:13px;color:#5b7cfa;font-weight:600;margin-bottom:14px">'+dir.parent_email+'</div>'
+          +'<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Vos analyses restantes ce mois</div>'
+          +'<div style="display:flex;align-items:center;gap:10px">'
+          +'<div style="flex:1;height:8px;background:#1f2537;border-radius:4px"><div style="width:'+pctD+'%;height:100%;background:'+colD+';border-radius:4px"></div></div>'
+          +'<div style="font-size:14px;font-weight:700;color:'+colD+';width:55px;text-align:right">'+remD+' / 20</div>'
+          +'</div>'
+          +'</div>'
+          +'<div style="font-size:12px;color:#4a5470;text-align:center">Pour renouveler ou modifier l'abonnement, contactez votre directeur juridique.</div>'
+          +'</div>';
+        return;
+      }
+      // Directeur inactif : proposer plan solo juriste
+      el.innerHTML=
+        '<div style="background:#111420;border:1px solid #f59e0b;border-radius:12px;padding:20px;margin-bottom:20px">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+        +'<div><div style="font-size:15px;font-weight:700;color:#e2e5f0">Abonnement Omniscient</div>'
+        +'<div style="font-size:12px;color:#6b7280;margin-top:3px">Votre directeur n'a pas encore souscrit.</div></div>'
+        +'<span style="padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;background:#f59e0b22;color:#f59e0b">Inactif</span>'
+        +'</div>'
+        +'<div style="background:#0a0c12;border-radius:8px;padding:14px;margin-bottom:16px">'
+        +'<div style="font-size:12px;color:#9ca3af;margin-bottom:8px">Votre directeur (<strong style="color:#e2e5f0">'+dir.parent_email+'</strong>) peut souscrire pour toute l'équipe. Vous pouvez aussi souscrire en solo :</div>'
+        +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;margin-top:12px"><span style="color:#9ca3af">Plan solo juriste</span><span style="color:#e2e5f0">950 DH / mois</span></div>'
+        +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#9ca3af">Inclus</span><span style="color:#e2e5f0">20 analyses / mois</span></div>'
+        +'</div>'
+        +'<button onclick="initiateCMIPayment(1,950,'juriste')" style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:10px;color:#0a0c12;font-size:15px;font-weight:800;cursor:pointer">Souscrire en solo — 950 DH via CMI</button>'
+        +'</div>'
+        +'<div style="font-size:11px;color:#4a5470;text-align:center;margin-top:8px">Paiement sécurisé · 20 analyses / mois · Renouvelable mensuellement</div>';
+      return;
+    }
+
     var isJuristeSolo=dir.role==='juriste';
     var nbUsers=isJuristeSolo?1:juristes.length+1;
     var pricePerUser=isJuristeSolo?950:850;
@@ -1954,7 +2005,7 @@ async function loadAbonnement(){
       +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#9ca3af">Tarif</span><span style="color:#e2e5f0">'+pricePerUser+' DH / utilisateur</span></div>'
       +'<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;border-top:1px solid #1f2537;padding-top:10px;margin-top:6px"><span style="color:#e2e5f0">Total mensuel</span><span style="color:#c8a94b">'+total+' DH</span></div>'
       +'</div>'
-      +'<button onclick="initiateCMIPayment('+nbUsers+','+total+',\''+dir.role+'\')"' style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:10px;color:#0a0c12;font-size:15px;font-weight:800;cursor:pointer">Payer '+total+' DH via CMI</button>'
+      +'<button onclick="initiateCMIPayment('+nbUsers+','+total+',\''+dir.role+'\')" style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:10px;color:#0a0c12;font-size:15px;font-weight:800;cursor:pointer">Payer '+total+' DH via CMI</button>'
       +'</div>'
       +'<div style="font-size:11px;color:#4a5470;text-align:center;margin-top:8px">Paiement securise · Chaque utilisateur recoit 20 analyses (HT) · Renouvelable mensuellement</div>';
   }catch(e){
