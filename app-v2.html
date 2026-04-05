@@ -1142,7 +1142,7 @@ async function loadDash(){
   var r2=await sf('/rest/v1/user_models?user_id=eq.'+_cu.id+'&order=created_at.desc&select=id,filename,created_at');
   var m=r2.ok?await r2.json():[];
   document.getElementById('stm').textContent=m.length;
-  document.getElementById('mlist').innerHTML=m.length===0
+  var mlistHtml=m.length===0
     ?'<p style="color:#6b7280;font-size:13px">Aucun modele soumis</p>'
     :m.map(function(x){
       return '<div class="ac" style="display:flex;justify-content:space-between;align-items:center">'
@@ -1150,6 +1150,49 @@ async function loadDash(){
         +'<button onclick="deleteModel(\''+x.id+'\', this)" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;flex-shrink:0">Supprimer</button>'
         +'</div>';
     }).join('');
+
+  // Si directeur : charger aussi les suggestions des juristes
+  if(_userRole==='directeur'){
+    try{
+      var rp=await fetch('https://web-production-f96f7.up.railway.app/suggestions/list-for-director?director_email='+encodeURIComponent(_cu.email));
+      var pending=rp.ok?(await rp.json()).suggestions||[]:[];
+      if(pending.length){
+        mlistHtml='<div style="font-size:11px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+pending.length+' modèle(s) en attente de validation</div>'
+          +pending.map(function(s){
+            var sid=s.id;
+            var preview=(s.content||'').substring(0,400).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            return '<div class="ac" style="border-color:#f59e0b33" data-sid="'+sid+'">'
+              +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">'
+              +'<div style="flex:1">'
+              +'<h4 style="margin-bottom:3px">'+(s.filename||'Modèle')+'</h4>'
+              +'<p style="margin-bottom:8px">Soumis par <strong style="color:#f59e0b">'+(s.suggested_by||'')+'</strong> · '+new Date(s.created_at).toLocaleDateString('fr-FR')+'</p>'
+              +'</div>'
+              +'<button onclick="this.closest(\'[data-sid]\').querySelector(\'.sugg-preview\').style.display=this.closest(\'[data-sid]\').querySelector(\'.sugg-preview\').style.display===\'none\'?\'\':\'none\'" '
+              +'style="background:#1a2035;border:1px solid #1f2537;color:#a0a8c0;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0">👁 Voir contenu</button>'
+              +'</div>'
+              +'<div class="sugg-preview" style="display:none;background:#0a0c12;border:1px solid #1f2537;border-radius:6px;padding:10px;font-size:11px;color:#9ca3af;white-space:pre-wrap;max-height:200px;overflow-y:auto;margin-bottom:10px;line-height:1.6">'
+              +(preview||'(contenu vide)')+(s.content&&s.content.length>400?'\n\n[...]':'')
+              +'</div>'
+              +'<div style="display:flex;gap:8px">'
+              +'<button class="fwd-sugg-btn" style="background:#10b98122;border:1px solid #10b981;color:#10b981;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600">✅ Valider → Admin</button>'
+              +'<button class="rej-sugg-btn" style="background:#ef444422;border:1px solid #ef4444;color:#ef4444;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer">❌ Rejeter</button>'
+              +'</div></div>';
+          }).join('')
+          +(m.length?'<div style="margin-top:20px;padding-top:16px;border-top:1px solid #1f2537"><div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Vos modèles</div>'+m.map(function(x){return '<div class="ac" style="display:flex;justify-content:space-between;align-items:center"><div><h4>'+x.filename+'</h4><p>Soumis le '+new Date(x.created_at).toLocaleDateString('fr-FR')+'</p></div><button onclick="deleteModel(\''+x.id+'\', this)" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;flex-shrink:0">Supprimer</button></div>';}).join('')+'</div>':'');
+      }
+    }catch(e){console.log('Erreur chargement suggestions directeur:',e);}
+  }
+
+  var mlistEl=document.getElementById('mlist');
+  mlistEl.innerHTML=mlistHtml;
+  // Boutons suggestions dans l'onglet Modeles
+  mlistEl.querySelectorAll('.fwd-sugg-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){forwardSugg(this.closest('[data-sid]').getAttribute('data-sid'));});
+  });
+  mlistEl.querySelectorAll('.rej-sugg-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){rejectSuggDir(this.closest('[data-sid]').getAttribute('data-sid'));});
+  });
+
   // Load juristes tab if directeur
   if(_userRole==='directeur')loadJuristes();
 }
