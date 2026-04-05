@@ -1155,6 +1155,7 @@ async function loadDash(){
 }
 async function upMdl(inp){
   if(!_cu){showAuth();return;}
+  if(!_userRole) await checkRole();
   var f=inp.files[0];if(!f)return;
   var r=await sf('/rest/v1/user_models',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify({user_id:_cu.id,user_email:_cu.email,filename:f.name,category:'contract',is_public:false})});
   if(r.ok){
