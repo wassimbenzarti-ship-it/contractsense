@@ -1234,7 +1234,7 @@ async function upMdl(inp){
           var newSuggs=(la.suggestions||[]).filter(function(s){return idsBefore.indexOf(s.id)<0;});
           if(newSuggs.length>0){
             var sid=newSuggs[0].id;
-            await fetch(BACKEND+'/suggestions/forward-to-admin/'+sid,{method:'POST'});
+            await fetch(BACKEND+'/suggestions/forward-to-admin/'+sid,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({director_email:dirEmail})});
             alertMsg='Modele soumis pour validation admin';
           } else {
             alertMsg='Modele soumis pour validation admin';
@@ -1839,14 +1839,14 @@ function filterAndShowAnalyses(juristeEmail){
 
 async function forwardSugg(id){
   if(!confirm('Transmettre cette suggestion a l\'admin ?'))return;
-  var r=await fetch(BACKEND+'/suggestions/forward-to-admin/'+id,{method:'POST'});
+  var r=await fetch(BACKEND+'/suggestions/forward-to-admin/'+id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({director_email:_cu.email})});
   if(r.ok){alert('Suggestion transmise a l\'admin !');loadJuristes();}
   else alert('Erreur');
 }
 
 async function rejectSuggDir(id){
   if(!confirm('Rejeter cette suggestion ?'))return;
-  var r=await fetch(BACKEND+'/suggestions/reject-director/'+id,{method:'POST'});
+  var r=await fetch(BACKEND+'/suggestions/reject-director/'+id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({director_email:_cu.email})});
   if(r.ok){alert('Suggestion rejetee.');loadJuristes();}
   else alert('Erreur');
 }
