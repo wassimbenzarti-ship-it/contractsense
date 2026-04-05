@@ -1338,7 +1338,6 @@ async function upMdl(inp){
 async function _decrementAnalyses(){
   if(!_cu)return;
   try{
-    var _uToken=localStorage.getItem('sbt')||_sk;
     // Source de verite : backend /account/info
     var curRem=3;
     try{
@@ -1347,10 +1346,11 @@ async function _decrementAnalyses(){
     }catch(e2){}
     if(curRem<=0)return;
     var newVal=curRem-1;
-    await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email),{
-      method:'PATCH',
-      headers:{'apikey':_sk,'Authorization':'Bearer '+_uToken,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({analyses_remaining:newVal})
+    // UPSERT : cree la ligne si elle n'existe pas (PATCH echoue silencieusement sur ligne inexistante)
+    await fetch(_su+'/rest/v1/user_accounts?on_conflict=email',{
+      method:'POST',
+      headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify({email:_cu.email,analyses_remaining:newVal})
     });
   }catch(e){console.log('Decrement error:',e);}
 }
