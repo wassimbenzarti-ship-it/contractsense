@@ -476,17 +476,18 @@ async function analyze() {
       if(accR.ok){
         var acc=await accR.json();
         if(!acc.is_admin && acc.analyses_remaining!==-1 && !acc.can_analyze){
-          var isDir=acc.role==='directeur';
           var subEnd=acc.subscription_end?new Date(acc.subscription_end).toLocaleDateString('fr-FR'):'';
-          if(acc.payment_status==='active'){
+          var reason=acc.blocked_reason||'';
+          if(acc.role==='juriste'){
+            var msg=acc.message||'Votre directeur doit souscrire un abonnement pour que vous puissiez analyser.';
+            showErr('form-error','&#128274; <strong>Accès restreint</strong><br><br>'+msg);
+          } else if(acc.payment_status==='active'){
             showErr('form-error','Vos 20 analyses de ce mois sont épuisées. Renouvellement le '+subEnd+'.');
           } else {
             showErr('form-error',
               '<strong>Vos 3 analyses gratuites de la semaine sont épuisées.</strong><br><br>'
-              +(isDir
-                ? 'Plan Directeur : 850 DH HT/mois par utilisateur · 20 analyses/user<br>'
-                : 'Plan Juriste : 950 DH HT/mois · 20 analyses/mois<br>')
-              +'<button onclick="showDash();dtab(\'abonnement\')" style="margin-top:10px;padding:10px 20px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:8px;color:#0a0c12;font-weight:700;cursor:pointer;font-size:14px">💳 Souscrire maintenant</button>'
+              +'Plan Solo/Directeur : 950 DH HT/mois · 20 analyses<br>'
+              +'<button onclick="showDash();dtab(\'abonnement\')" style="margin-top:10px;padding:10px 20px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:8px;color:#0a0c12;font-weight:700;cursor:pointer;font-size:14px">&#128179; Souscrire maintenant</button>'
             );
           }
           return;
@@ -1977,6 +1978,7 @@ async function loadAbonnement(){
     var total=nbUsers*pricePerUser;
     var subEnd=dir.subscription_end?new Date(dir.subscription_end).toLocaleDateString('fr-FR'):'—';
     var isActive=dir.payment_status==='active';
+    var isJuristeRole=dir.role==='juriste';
     var allUsers=[Object.assign({_isDir:true},dir)].concat(juristes);
     console.log('[loadAbonnement] rendering, nbUsers=',nbUsers,'allUsers=',allUsers.map(function(u){return u.email;}));
     el.innerHTML=
@@ -2005,7 +2007,9 @@ async function loadAbonnement(){
       +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#9ca3af">Tarif</span><span style="color:#e2e5f0">'+pricePerUser+' DH / utilisateur</span></div>'
       +'<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;border-top:1px solid #1f2537;padding-top:10px;margin-top:6px"><span style="color:#e2e5f0">Total mensuel</span><span style="color:#c8a94b">'+total+' DH</span></div>'
       +'</div>'
-      +'<button onclick="initiateCMIPayment('+nbUsers+','+total+',\''+dir.role+'\')" style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:10px;color:#0a0c12;font-size:15px;font-weight:800;cursor:pointer">Payer '+total+' DH via CMI</button>'
+      +(isJuristeRole
+        ? '<div style="text-align:center;padding:14px;color:#6b7280;font-size:13px">&#128274; Votre accès est géré par votre directeur juridique.</div>'
+        : '<button onclick="initiateCMIPayment('+nbUsers+','+total+',\''+dir.role+'\')" style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:10px;color:#0a0c12;font-size:15px;font-weight:800;cursor:pointer">Payer '+total+' DH via CMI</button>')
       +'</div>'
       +'<div style="font-size:11px;color:#4a5470;text-align:center;margin-top:8px">Paiement securise · Chaque utilisateur recoit 20 analyses (HT) · Renouvelable mensuellement</div>';
   }catch(e){
