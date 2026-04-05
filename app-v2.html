@@ -304,6 +304,20 @@ var savedText = "";
 
 //    Init                                                   
 document.addEventListener('DOMContentLoaded', function() {
+  // Restaurer la session apres refresh ou retour OAuth Google
+  (async function() {
+    var hash = window.location.hash;
+    if (hash && hash.indexOf('access_token=') !== -1) {
+      var params = {};
+      hash.slice(1).split('&').forEach(function(p) { var kv = p.split('='); params[kv[0]] = decodeURIComponent(kv[1] || ''); });
+      if (params.access_token) {
+        localStorage.setItem('sbt', params.access_token);
+        if (params.refresh_token) localStorage.setItem('sbr', params.refresh_token);
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    }
+    await chkSess();
+  })();
   // Show usage counter
   var usage = parseInt(localStorage.getItem('cs_usage') || '0');
   var remaining = 3 - usage;
@@ -1462,15 +1476,26 @@ async function deleteAnalysis(id, idx){
   var card = document.getElementById('ana-card-'+idx);
   if(card) card.style.opacity='0.4';
   try{
+    // Utiliser la clé anon + Prefer:return=representation pour détecter un blocage RLS silencieux
     var r = await fetch(_su+'/rest/v1/analyses?id=eq.'+id, {
       method:'DELETE',
-      headers:{'apikey':_sk,'Authorization':'Bearer '+(localStorage.getItem('sbt')||_sk),'Content-Type':'application/json'}
+      headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json','Prefer':'return=representation'}
     });
-    if(r.ok||r.status===204){
+    var deleted = [];
+    try { deleted = await r.json(); } catch(e) {}
+    if((r.ok || r.status===204) && Array.isArray(deleted) && deleted.length === 0){
+      // RLS a bloqué sans erreur — essai avec le token utilisateur
+      var r2 = await fetch(_su+'/rest/v1/analyses?id=eq.'+id, {
+        method:'DELETE',
+        headers:{'apikey':_sk,'Authorization':'Bearer '+(localStorage.getItem('sbt')||_sk),'Content-Type':'application/json','Prefer':'return=representation'}
+      });
+      try { deleted = await r2.json(); } catch(e) {}
+    }
+    if(deleted.length > 0 || r.status===204){
       window._juristesData=null;
       loadDash();
     } else {
-      alert('Erreur lors de la suppression ('+r.status+')');
+      alert('Impossible de supprimer cette analyse (droits insuffisants).');
       if(card) card.style.opacity='1';
     }
   }catch(e){
