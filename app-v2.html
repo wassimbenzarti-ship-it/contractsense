@@ -152,6 +152,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <div class="sb"><div class="sn" id="stm">0</div><div class="sl">Modeles</div></div>
 <div class="sb" id="sb-juristes" style="display:none"><div class="sn" id="stj">0</div><div class="sl">Juristes</div></div>
 <div class="sb"><div class="sn" id="stc">0</div><div class="sl">Clauses</div></div>
+<div class="sb" id="sb-quota" style="display:none"><div class="sn" id="stq">—</div><div class="sl">Analyses restantes</div></div>
 </div>
 <div class="dt">
 <div class="dtb active" id="dtb-analyses" onclick="dtab('analyses')">Analyses</div>
@@ -1094,6 +1095,8 @@ async function checkRole(){
       if(title)title.textContent='Mon espace';
       if(modelInfo)modelInfo.innerHTML='<strong style="color:#5b7cfa">Soumission de modele :</strong> Les modeles que vous soumettez sont d\'abord examines par votre directeur juridique avant integration.';
       if(modelInfo)modelInfo.style.display='';
+      var abBtnJ=document.getElementById('dtb-abonnement');
+      if(abBtnJ)abBtnJ.style.display='';
     }
   }catch(e2){console.log('checkRole UI error:',e2);}
 }
@@ -1105,6 +1108,18 @@ async function loadDash(){
   var a=[];
   try{
     if(_userRole==='juriste'){
+      // Afficher quota juriste
+      try{
+        var qr=await fetch(BACKEND+'/account/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email})});
+        if(qr.ok){
+          var qa=await qr.json();
+          var remQ=qa.analyses_remaining!==-1?qa.analyses_remaining:'∞';
+          var sqEl=document.getElementById('stq');
+          var sbqEl=document.getElementById('sb-quota');
+          if(sqEl)sqEl.textContent=remQ;
+          if(sbqEl)sbqEl.style.display='';
+        }
+      }catch(e2){}
       // Juriste: only own analyses
       var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at,modifications,user_id,status,director_notes,director_email');
       a=r1.ok?await r1.json():[];
@@ -1905,8 +1920,9 @@ async function loadAbonnement(){
     var dirData=rd.ok?await rd.json():[];
     var dir=dirData[0]||{};
     dir.email=dir.email||_cu.email;
-    var nbUsers=juristes.length+1;
-    var pricePerUser=dir.role==='juriste'?950:850;
+    var isJuristeSolo=dir.role==='juriste';
+    var nbUsers=isJuristeSolo?1:juristes.length+1;
+    var pricePerUser=isJuristeSolo?950:850;
     var total=nbUsers*pricePerUser;
     var subEnd=dir.subscription_end?new Date(dir.subscription_end).toLocaleDateString('fr-FR'):'—';
     var isActive=dir.payment_status==='active';
@@ -1938,7 +1954,7 @@ async function loadAbonnement(){
       +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#9ca3af">Tarif</span><span style="color:#e2e5f0">'+pricePerUser+' DH / utilisateur</span></div>'
       +'<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;border-top:1px solid #1f2537;padding-top:10px;margin-top:6px"><span style="color:#e2e5f0">Total mensuel</span><span style="color:#c8a94b">'+total+' DH</span></div>'
       +'</div>'
-      +'<button onclick="initiateCMIPayment('+nbUsers+','+total+')" style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:10px;color:#0a0c12;font-size:15px;font-weight:800;cursor:pointer">Payer '+total+' DH via CMI</button>'
+      +'<button onclick="initiateCMIPayment('+nbUsers+','+total+',\''+dir.role+'\')"' style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:10px;color:#0a0c12;font-size:15px;font-weight:800;cursor:pointer">Payer '+total+' DH via CMI</button>'
       +'</div>'
       +'<div style="font-size:11px;color:#4a5470;text-align:center;margin-top:8px">Paiement securise · Chaque utilisateur recoit 20 analyses (HT) · Renouvelable mensuellement</div>';
   }catch(e){
