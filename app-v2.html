@@ -600,9 +600,8 @@ async function analyzeWithPartie(partieName) {
     modifications = data.modifications || [];
     decisions = {};
     modifications.forEach(function(m) { decisions[m.id] = 'pending'; });
-    if (data.file_storage_path) {
-      window._fileStoragePath = data.file_storage_path;
-    }
+    if (data.file_storage_path) window._fileStoragePath = data.file_storage_path;
+    if (data.file_cache_id) window._fileCacheId = data.file_cache_id;
 
     // Extraire toutes les clauses du contrat pour le dropdown "ajouter une clause"
     // Utiliser savedText (mode texte) ou lire le fichier uploadé (mode fichier)
@@ -917,8 +916,8 @@ function _modsWithMeta(mods){
   if(window._allContractClauses&&window._allContractClauses.length){
     list=[{_isClauseMeta:true,clauses:window._allContractClauses}].concat(list);
   }
-  if(window._fileStoragePath){
-    list=[{_isFileMeta:true,file_storage_path:window._fileStoragePath}].concat(list);
+  if(window._fileStoragePath||window._fileCacheId){
+    list=[{_isFileMeta:true,file_storage_path:window._fileStoragePath||'',file_cache_id:window._fileCacheId||''}].concat(list);
   }
   return list;
 }
@@ -1473,6 +1472,7 @@ async function showAnaDetail(idx) {
   window._allContractClauses = clauseMeta ? (clauseMeta.clauses||[]) : [];
   var fileMeta = mods.find(function(m){ return m._isFileMeta; });
   window._fileStoragePath = fileMeta ? (fileMeta.file_storage_path||'') : '';
+  window._fileCacheId = fileMeta ? (fileMeta.file_cache_id||'') : '';
   mods = mods.filter(function(m){ return !m._isClauseMeta && !m._isFileMeta; });
   window._currentMods = mods.map(function(m){ return Object.assign({}, m); });
 
@@ -1834,9 +1834,10 @@ async function dlUserAnalysis() {
     var fd = new FormData();
     var realMods = mods.filter(function(m){ return !m._isClauseMeta && !m._isFileMeta; });
     var fileStoragePath = window._fileStoragePath || '';
-    if (fileStoragePath) {
-      fd.append('file_storage_path', fileStoragePath);
-      // Placeholder minimal pour satisfaire les validations éventuelles
+    var fileCacheId = window._fileCacheId || '';
+    if (fileStoragePath || fileCacheId) {
+      if (fileStoragePath) fd.append('file_storage_path', fileStoragePath);
+      if (fileCacheId) fd.append('file_cache_id', fileCacheId);
       fd.append('file', new Blob([''], {type:'text/plain'}), 'placeholder.txt');
     } else {
       // Fallback sans fichier stocké : envoyer le texte des modifications nommé .docx
@@ -2241,6 +2242,11 @@ async function requestRevision(id){
   var note=document.getElementById('director-note-input');
   var noteVal=note?note.value.trim():'';
   if(!confirm('Renvoyer cette analyse au juriste avec une demande de révision ?')) return;
+  // Recapturer les modifications inline (proposed-*) éditées par le directeur
+  (window._currentMods||[]).forEach(function(m){
+    var el=document.getElementById('proposed-'+m.id);
+    if(el){var t=el.innerText.trim();if(t&&t!==m.proposed)m.proposed=t;}
+  });
   // Inclure les modifications du directeur dans le patch
   var patch={status:'revision_requested',modifications:_modsWithMeta(window._currentMods)};
   if(noteVal) patch.director_notes=noteVal;
