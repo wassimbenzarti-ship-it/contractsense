@@ -600,6 +600,8 @@ async function analyzeWithPartie(partieName) {
     modifications = data.modifications || [];
     decisions = {};
     modifications.forEach(function(m) { decisions[m.id] = 'pending'; });
+    if (data.file_storage_path) window._fileStoragePath = data.file_storage_path;
+    if (data.file_cache_id) window._fileCacheId = data.file_cache_id;
 
     // Extraire toutes les clauses du contrat pour le dropdown "ajouter une clause"
     // Utiliser savedText (mode texte) ou lire le fichier uploadé (mode fichier)
@@ -910,9 +912,12 @@ function _extractContractClauses(text){
 
 // Ajoute la métadonnée des clauses dans un tableau de modifications
 function _modsWithMeta(mods){
-  var list=(mods||[]).filter(function(m){return !m._isClauseMeta;});
+  var list=(mods||[]).filter(function(m){return !m._isClauseMeta&&!m._isFileMeta;});
   if(window._allContractClauses&&window._allContractClauses.length){
     list=[{_isClauseMeta:true,clauses:window._allContractClauses}].concat(list);
+  }
+  if(window._fileStoragePath||window._fileCacheId){
+    list=[{_isFileMeta:true,file_storage_path:window._fileStoragePath||'',file_cache_id:window._fileCacheId||''}].concat(list);
   }
   return list;
 }
@@ -923,6 +928,16 @@ async function saveAndSubmitFromReview(){
   var btn = document.getElementById('btn-submit-review');
   if(btn){ btn.textContent='\u23f3 Sauvegarde...'; btn.disabled=true; }
   try{
+    // Recapture inline edits from contenteditable fields before saving
+    modifications.forEach(function(m) {
+      var el = document.getElementById('proposed-' + m.id);
+      if (el) {
+        var edited = el.innerText.trim();
+        if (edited && edited !== m.proposed) {
+          m.proposed = edited;
+        }
+      }
+    });
     await saveAna(curFile?curFile.name:'Contrat', savedType||'generic', selectedPartie||'', modifications);
     var anaId = window._lastSavedAnaId;
     if(anaId){
@@ -1216,7 +1231,7 @@ async function loadDash(){
       filterBar.style.display='';
     }
   }
-  var STATUS_LABELS={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision','validated':'Validé par directeur','final_validated':'Validé — dans le RAG'};
+  var STATUS_LABELS={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision par le directeur juridique','validated':'Validé par directeur','final_validated':'Validé — dans le RAG'};
   var STATUS_COLORS={'draft':'#4a5470','pending_review':'#f59e0b','in_review':'#5b7cfa','revision_requested':'#ef4444','validated':'#10b981','final_validated':'#10b981'};
   window._renderAnalyses=function(list){
     // Trier : analyses normales par date, [ADVERSE] insérées juste après leur originale
@@ -1455,11 +1470,14 @@ async function showAnaDetail(idx) {
   // Extraire la métadonnée des clauses si elle a été sauvegardée
   var clauseMeta = mods.find(function(m){ return m._isClauseMeta; });
   window._allContractClauses = clauseMeta ? (clauseMeta.clauses||[]) : [];
-  mods = mods.filter(function(m){ return !m._isClauseMeta; });
+  var fileMeta = mods.find(function(m){ return m._isFileMeta; });
+  window._fileStoragePath = fileMeta ? (fileMeta.file_storage_path||'') : '';
+  window._fileCacheId = fileMeta ? (fileMeta.file_cache_id||'') : '';
+  mods = mods.filter(function(m){ return !m._isClauseMeta && !m._isFileMeta; });
   window._currentMods = mods.map(function(m){ return Object.assign({}, m); });
 
   var st=ana.status||'draft';
-  var stLabels={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision','validated':'Validé par directeur','final_validated':'Validé — intégré au RAG'};
+  var stLabels={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision par le directeur juridique','validated':'Validé par directeur','final_validated':'Validé — intégré au RAG'};
   var stColors={'draft':'#4a5470','pending_review':'#f59e0b','in_review':'#5b7cfa','revision_requested':'#ef4444','validated':'#10b981','final_validated':'#10b981'};
   var stColor=stColors[st]||'#4a5470';
   var isJuriste=_userRole==='juriste';
@@ -1814,16 +1832,27 @@ async function dlUserAnalysis() {
   if(btn) { btn.textContent = 'Generation en cours...'; btn.disabled = true; }
   try {
     var fd = new FormData();
-    var contractText = mods.map(function(m){
-      return (m.clause_name||'Clause') + ' - ' + (m.original||'');
-    }).join(' | ');
-    if(!contractText.trim()) contractText = 'Contrat - ' + (ana.filename||'document');
-    fd.append('file', new Blob([contractText], {type:'text/plain'}), 'contrat.txt');
+    var realMods = mods.filter(function(m){ return !m._isClauseMeta && !m._isFileMeta; });
+    var fileStoragePath = window._fileStoragePath || '';
+    var fileCacheId = window._fileCacheId || '';
+    if (fileStoragePath || fileCacheId) {
+      if (fileStoragePath) fd.append('file_storage_path', fileStoragePath);
+      if (fileCacheId) fd.append('file_cache_id', fileCacheId);
+      fd.append('file', new Blob([''], {type:'text/plain'}), 'placeholder.txt');
+    } else {
+      // Fallback sans fichier stocké : envoyer le texte des modifications nommé .docx
+      var contractText = realMods.map(function(m){
+        return (m.clause_name||'Clause') + ' - ' + (m.original||'');
+      }).join(' | ');
+      if(!contractText.trim()) contractText = 'Contrat - ' + (ana.filename||'document');
+      var docxFilename = (ana.filename||'contrat.docx').replace(/\.[^.]+$/, '.docx');
+      fd.append('file', new Blob([contractText], {type:'text/plain'}), docxFilename);
+    }
     fd.append('lang', 'auto');
     fd.append('type', ana.contract_type||'generic');
     var decs = {};
-    mods.forEach(function(m){ decs[String(m.id)] = 'accepted'; });
-    fd.append('modifications', JSON.stringify(mods));
+    realMods.forEach(function(m){ decs[String(m.id)] = 'accepted'; });
+    fd.append('modifications', JSON.stringify(realMods));
     fd.append('decisions', JSON.stringify(decs));
     var resp = await fetch('https://web-production-f96f7.up.railway.app/export', {method:'POST', body:fd});
     if(resp.ok) {
@@ -1865,10 +1894,9 @@ async function loadJuristes(){
       juristes=r.ok?await r.json():[];
       window._juristesData=juristes;
     }
-    // Fetch director account data to know nb_juristes_max, payment_status and role
-    var rdDir=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=nb_juristes_max,payment_status,role',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk}});
-    var dirAccData=rdDir.ok?await rdDir.json():[];
-    var dirAcc=dirAccData[0]||{};
+    // Fetch director account data via backend (évite erreur 400 si colonnes manquantes)
+    var rdDir=await fetch(BACKEND+'/account/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email})});
+    var dirAcc=rdDir.ok?await rdDir.json():{};
     var isAdmin=dirAcc.role==='admin';
     var nbJuristesMax=isAdmin?9999:(dirAcc.nb_juristes_max||0);
     var isActive=isAdmin||dirAcc.payment_status==='active';
@@ -2214,6 +2242,11 @@ async function requestRevision(id){
   var note=document.getElementById('director-note-input');
   var noteVal=note?note.value.trim():'';
   if(!confirm('Renvoyer cette analyse au juriste avec une demande de révision ?')) return;
+  // Recapturer les modifications inline (proposed-*) éditées par le directeur
+  (window._currentMods||[]).forEach(function(m){
+    var el=document.getElementById('proposed-'+m.id);
+    if(el){var t=el.innerText.trim();if(t&&t!==m.proposed)m.proposed=t;}
+  });
   // Inclure les modifications du directeur dans le patch
   var patch={status:'revision_requested',modifications:_modsWithMeta(window._currentMods)};
   if(noteVal) patch.director_notes=noteVal;
