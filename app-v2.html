@@ -1233,7 +1233,7 @@ async function loadDash(){
       filterBar.style.display='';
     }
   }
-  var STATUS_LABELS={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision','validated':'Validé par directeur','final_validated':'Validé — dans le RAG'};
+  var STATUS_LABELS={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision par le directeur juridique','validated':'Validé par directeur','final_validated':'Validé — dans le RAG'};
   var STATUS_COLORS={'draft':'#4a5470','pending_review':'#f59e0b','in_review':'#5b7cfa','revision_requested':'#ef4444','validated':'#10b981','final_validated':'#10b981'};
   window._renderAnalyses=function(list){
     // Trier : analyses normales par date, [ADVERSE] insérées juste après leur originale
@@ -1476,7 +1476,7 @@ async function showAnaDetail(idx) {
   window._currentMods = mods.map(function(m){ return Object.assign({}, m); });
 
   var st=ana.status||'draft';
-  var stLabels={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision','validated':'Validé par directeur','final_validated':'Validé — intégré au RAG'};
+  var stLabels={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision par le directeur juridique','validated':'Validé par directeur','final_validated':'Validé — intégré au RAG'};
   var stColors={'draft':'#4a5470','pending_review':'#f59e0b','in_review':'#5b7cfa','revision_requested':'#ef4444','validated':'#10b981','final_validated':'#10b981'};
   var stColor=stColors[st]||'#4a5470';
   var isJuriste=_userRole==='juriste';
