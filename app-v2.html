@@ -1066,6 +1066,7 @@ var _su='https://nezxohrkikgjegnhgpyn.supabase.co';
 var _sk='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lenhvaHJraWtnamVnbmhncHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MTQxNzYsImV4cCI6MjA4OTM5MDE3Nn0.zhBCacGGmIX-rVE9E9MUcbY2RpMomfq33lyq6DNU2kI';
 var _cu=null;
 var _userRole=null;
+var _isAdmin=false;
 var _userParentEmail=null;
 async function sf(p,o){o=o||{};var t=localStorage.getItem('sbt')||_sk;var h={'apikey':_sk,'Authorization':'Bearer '+t,'Content-Type':'application/json'};if(o.headers)Object.assign(h,o.headers);return fetch(_su+p,Object.assign({},o,{headers:h}));}
 async function _refreshSession(){
@@ -1095,7 +1096,7 @@ async function checkRole(){
     var r=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=role,parent_email',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
     if(r.ok){
       var d=await r.json();
-      if(d[0]){_userRole=d[0].role;_userParentEmail=d[0].parent_email;}
+      if(d[0]){_userRole=d[0].role;_userParentEmail=d[0].parent_email;_isAdmin=!!d[0].is_admin;window._dirPayStatus=d[0].payment_status;}
       else _userRole='directeur';
     } else {
       _userRole='directeur'; // fallback si fetch échoue
@@ -1107,14 +1108,14 @@ async function checkRole(){
     var title=document.getElementById('dash-title');
     var slAna=document.getElementById('sl-analyses');
     var modelInfo=document.getElementById('model-upload-info');
-    if(_userRole==='directeur'){
+    if(_userRole==='directeur'||_isAdmin){
       var jBtn=document.getElementById('dtb-juristes');
       if(jBtn)jBtn.style.display='';
       var abBtn=document.getElementById('dtb-abonnement');
       if(abBtn)abBtn.style.display='';
       var sbJ=document.getElementById('sb-juristes');
       if(sbJ)sbJ.style.display='';
-      if(badge)badge.textContent='Direction Juridique';
+      if(badge)badge.textContent=_isAdmin?'Admin':'Direction Juridique';
       if(title)title.textContent='Tableau de bord Direction';
       if(slAna)slAna.textContent='Analyses equipe';
       if(modelInfo)modelInfo.innerHTML='<strong style="color:#5b7cfa">Soumission de modele :</strong> Les modeles que vous soumettez sont transmis a l\'admin pour integration dans la base RAG partagee.';
@@ -1307,7 +1308,7 @@ async function loadDash(){
   });
 
   // Load juristes tab if directeur
-  if(_userRole==='directeur')loadJuristes();
+  if(_userRole==='directeur'||_isAdmin)loadJuristes();
 }
 async function upMdl(inp){
   if(!_cu){showAuth();return;}
