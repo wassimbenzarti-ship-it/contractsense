@@ -923,6 +923,16 @@ async function saveAndSubmitFromReview(){
   var btn = document.getElementById('btn-submit-review');
   if(btn){ btn.textContent='\u23f3 Sauvegarde...'; btn.disabled=true; }
   try{
+    // Recapture inline edits from contenteditable fields before saving
+    modifications.forEach(function(m) {
+      var el = document.getElementById('proposed-' + m.id);
+      if (el) {
+        var edited = el.innerText.trim();
+        if (edited && edited !== m.proposed) {
+          m.proposed = edited;
+        }
+      }
+    });
     await saveAna(curFile?curFile.name:'Contrat', savedType||'generic', selectedPartie||'', modifications);
     var anaId = window._lastSavedAnaId;
     if(anaId){
@@ -1818,7 +1828,8 @@ async function dlUserAnalysis() {
       return (m.clause_name||'Clause') + ' - ' + (m.original||'');
     }).join(' | ');
     if(!contractText.trim()) contractText = 'Contrat - ' + (ana.filename||'document');
-    fd.append('file', new Blob([contractText], {type:'text/plain'}), 'contrat.txt');
+    var docxFilename = (ana.filename||'contrat.docx').replace(/\.[^.]+$/, '.docx');
+    fd.append('file', new Blob([contractText], {type:'text/plain'}), docxFilename);
     fd.append('lang', 'auto');
     fd.append('type', ana.contract_type||'generic');
     var decs = {};
