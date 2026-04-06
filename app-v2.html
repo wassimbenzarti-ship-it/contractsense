@@ -1900,10 +1900,9 @@ async function loadJuristes(){
       juristes=r.ok?await r.json():[];
       window._juristesData=juristes;
     }
-    // Fetch director account data to know nb_juristes_max, payment_status and role
-    var rdDir=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=nb_juristes_max,payment_status,role',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk}});
-    var dirAccData=rdDir.ok?await rdDir.json():[];
-    var dirAcc=dirAccData[0]||{};
+    // Fetch director account data via backend (évite erreur 400 si colonnes manquantes)
+    var rdDir=await fetch(BACKEND+'/account/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email})});
+    var dirAcc=rdDir.ok?await rdDir.json():{};
     var isAdmin=dirAcc.role==='admin';
     var nbJuristesMax=isAdmin?9999:(dirAcc.nb_juristes_max||0);
     var isActive=isAdmin||dirAcc.payment_status==='active';
