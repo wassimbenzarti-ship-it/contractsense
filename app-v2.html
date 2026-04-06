@@ -607,6 +607,12 @@ async function analyzeWithPartie(partieName) {
     if(!contractText && curFile) contractText = await _readFileText(curFile);
     if(contractText && !savedText) savedText = contractText; // cache pour saveAna
     window._allContractClauses = _extractContractClauses(contractText);
+    // Fallback: if regex-based extraction found nothing, use backend paragraph list
+    if(!window._allContractClauses.length && data._paragraphs && data._paragraphs.length) {
+      window._allContractClauses = data._paragraphs.map(function(p) {
+        return { name: p.text.slice(0, 80), text: p.text, idx: p.idx };
+      }).filter(function(c) { return c.name.length > 5; });
+    }
 
     hide('step-loading');
     renderReview();
@@ -973,6 +979,16 @@ async function exportDoc() {
   btn.textContent = '⏳ Génération en cours...';
   btn.disabled = true;
   try {
+    // Recapture all inline edits from contenteditable fields before export
+    modifications.forEach(function(m) {
+      var el = document.getElementById('proposed-' + m.id);
+      if (el) {
+        var edited = el.innerText.trim();
+        if (edited && edited !== m.proposed) {
+          m.proposed = edited;
+        }
+      }
+    });
     var fd = buildFormData();
     fd.append('modifications', JSON.stringify(modifications));
     fd.append('decisions', JSON.stringify(decisions));
