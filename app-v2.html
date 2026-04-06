@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <title>Omniscient</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -128,10 +131,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <input class="ai" type="password" id="ap1" placeholder="Mot de passe"/>
 <div id="aerr" class="ae"></div>
 <button class="ab" onclick="doLogin()">Se connecter</button>
-<div style="text-align:center;font-size:13px;color:#6b7280">Pas de compte ? <span class="al" onclick="showReg()">Creer un compte</span></div>
-<div style="margin:12px 0;text-align:center;color:#6b7280;font-size:12px">-- ou --</div>
-<button class="ab" style="background:#1a2035;border:1px solid #1f2537" onclick="doGoogle()">Google</button>
-</div>
+<div style="text-align:center;font-size:13px;color:#6b7280">Pas de compte ? <span class="al" onclick="showReg()">Creer un compte</span></div></div>
 <div id="afr" style="display:none">
 <input class="ai" type="email" id="ae2" placeholder="Email"/>
 <input class="ai" type="password" id="ap2" placeholder="Mot de passe (6+)"/>
@@ -152,11 +152,13 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <div class="sb"><div class="sn" id="stm">0</div><div class="sl">Modeles</div></div>
 <div class="sb" id="sb-juristes" style="display:none"><div class="sn" id="stj">0</div><div class="sl">Juristes</div></div>
 <div class="sb"><div class="sn" id="stc">0</div><div class="sl">Clauses</div></div>
+<div class="sb" id="sb-quota" style="display:none"><div class="sn" id="stq">—</div><div class="sl">Analyses restantes</div></div>
 </div>
 <div class="dt">
 <div class="dtb active" id="dtb-analyses" onclick="dtab('analyses')">Analyses</div>
 <div class="dtb" onclick="dtab('models')">Modeles</div>
 <div class="dtb" id="dtb-juristes" onclick="dtab('juristes')" style="display:none">Equipe</div>
+<div class="dtb" id="dtb-abonnement" onclick="dtab('abonnement')" style="display:none">💳 Abonnement</div>
 </div>
 <div id="d-analyses" class="ds active">
 <div id="juriste-filter-bar" style="display:none;margin-bottom:10px">
@@ -174,6 +176,9 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 </div>
 <div id="d-juristes" class="ds">
 <div id="juristes-list"><div style="color:#6b7280;font-size:13px;padding:20px 0">Chargement...</div></div>
+</div>
+<div id="d-abonnement" class="ds">
+<div id="abonnement-content"><div style="color:#6b7280;font-size:13px">Chargement...</div></div>
 </div>
 </div>
 </div>
@@ -302,26 +307,69 @@ var savedLang = "fr";
 var savedType = "generic";
 var savedText = "";
 
-//    Init                                                   
+//  Init 
 document.addEventListener('DOMContentLoaded', function() {
-  chkSess();
-  // Show usage counter
-  var usage = parseInt(localStorage.getItem('cs_usage') || '0');
-  var remaining = 3 - usage;
-  var counter = document.getElementById('usage-counter');
-  if (counter) {
+  // Restaurer la session apres refresh ou retour OAuth Google
+  (async function() {
+    var hash = window.location.hash;
+    if (hash && hash.indexOf('access_token=') !== -1) {
+      var params = {};
+      hash.slice(1).split('&').forEach(function(p) { var kv = p.split('='); params[kv[0]] = decodeURIComponent(kv[1] || ''); });
+      if (params.access_token) {
+        localStorage.setItem('sbt', params.access_token);
+        if (params.refresh_token) localStorage.setItem('sbr', params.refresh_token);
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+        if(params.type==='signup'||params.type==='recovery')localStorage.setItem('cs_dash_open','1');
+      }
+    }
+    await chkSess();
+    // Retour CMI paiement
+    var urlParams=new URLSearchParams(window.location.search);
+    var payStatus=urlParams.get('payment');
+    if(payStatus==='success'){
+      history.replaceState(null,'',window.location.pathname);
+      setTimeout(function(){alert('✅ Paiement confirmé ! Vos 10 analyses ont été renouvelées pour tous vos utilisateurs.');if(_cu)showDash();},500);
+    } else if(payStatus==='failed'){
+      history.replaceState(null,'',window.location.pathname);
+      setTimeout(function(){alert('❌ Paiement échoué ou annulé. Réessayez depuis votre tableau de bord.');},500);
+    }
+  })();
+  // Update usage counter from Supabase (after chkSess) or localStorage fallback
+  (async function() {
+    var counter = document.getElementById('usage-counter');
+    if (!counter) return;
+    if (_cu) {
+      try {
+        var r = await fetch(BACKEND + '/account/info', {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({email: _cu.email})
+        });
+        if (r.ok) {
+          var acc = await r.json();
+          var rem = acc.analyses_remaining;
+          if (acc.is_admin || rem === -1) {
+            counter.textContent = '∞ Accès illimité'; counter.style.color = '#10b981';
+          } else if (rem > 0) {
+            counter.textContent = rem + ' analyse' + (rem > 1 ? 's' : '') + ' restante' + (rem > 1 ? 's' : '');
+          } else {
+            counter.textContent = '❌ Quota épuisé'; counter.style.color = '#ef4444';
+          }
+          return;
+        }
+      } catch(e) {}
+    }
+    // Fallback: non connecté → localStorage
+    var usage = parseInt(localStorage.getItem('cs_usage') || '0');
+    var remaining = 3 - usage;
     if (remaining > 0) {
       counter.textContent = remaining + ' analyse' + (remaining > 1 ? 's' : '') + ' gratuite' + (remaining > 1 ? 's' : '') + ' restante' + (remaining > 1 ? 's' : '');
     } else {
-      counter.innerHTML = '❌ Limite atteinte  <a href="mailto:contact&#64;westfieldavocats.com" style="color:#ef4444">contact&#64;westfieldavocats.com</a> 📞 +212 6 34 39 44 90';
+      counter.innerHTML = '❌ Limite atteinte';
       counter.style.color = '#ef4444';
     }
-  }
+  })();
 
-
-
-
-  // Tabs
+    // Tabs
   document.getElementById('tab-upload').addEventListener('click', function() {
     curMode = 'upload';
     this.classList.add('active');
@@ -371,11 +419,11 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('btn-new').addEventListener('click', reset);
 });
 
-//    Helpers                                                
+//  Helpers 
 function show(id) { document.getElementById(id).style.display = 'block'; }
 function hide(id) { document.getElementById(id).style.display = 'none'; }
 function showFlex(id) { document.getElementById(id).style.display = 'flex'; }
-function showErr(id, msg) { var el = document.getElementById(id); el.textContent = msg; el.style.display = 'block'; }
+function showErr(id, msg) { var el = document.getElementById(id); el.innerHTML = msg; el.style.display = 'block'; }
 function hideErr(id) { document.getElementById(id).style.display = 'none'; }
 
 function showKeyBar() {
@@ -434,21 +482,50 @@ function buildFormData() {
   return fd;
 }
 
-//    Step 1: Analyze à identify parties                    
+//  Step 1: Analyze à identify parties 
 async function analyze() {
   hideErr('form-error');
 
-  // Check free usage limit  skip if valid access code
-  var hasAccess = localStorage.getItem('cs_access');
-  var usage = parseInt(localStorage.getItem('cs_usage') || '0');
-  if (usage >= 3 && !hasAccess) {
-    document.getElementById('access-code-section').style.display = 'block';
-  showErr('form-error', '⚠️ Vous avez utilisé vos 3 analyses gratuites. Pour un accès illimité, contactez Westfield :<br><br>' +
-      '📧 <a href="mailto:contact&#64;westfieldavocats.com" style="color:#5b7cfa">contact&#64;westfieldavocats.com</a><br>' +
-      '< <a href="https://westfieldmorocco.com" target="_blank" style="color:#5b7cfa">westfieldmorocco.com</a><br>' +
-      '📧 <a href="tel:+212634394490" style="color:#5b7cfa">+212 6 34 39 44 90</a><br><br>' +
-      '📧 <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="color:#10b981;font-weight:600">⬆ Souscrire en ligne</a>');
-    return;
+  // Restore session if not yet loaded
+  if(!_cu) await chkSess();
+
+  // Gate : vérifier quota via backend (gère reset hebdo + is_admin)
+  if(_cu){
+    try{
+      var accR=await fetch(BACKEND+'/account/info',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email:_cu.email})
+      });
+      if(accR.ok){
+        var acc=await accR.json();
+        if(!acc.is_admin && acc.analyses_remaining!==-1 && !acc.can_analyze){
+          var subEnd=acc.subscription_end?new Date(acc.subscription_end).toLocaleDateString('fr-FR'):'';
+          var reason=acc.blocked_reason||'';
+          if(acc.role==='juriste'){
+            var msg=acc.message||'Votre directeur doit souscrire un abonnement pour que vous puissiez analyser.';
+            showErr('form-error','&#128274; <strong>Accès restreint</strong><br><br>'+msg);
+          } else if(acc.payment_status==='active'){
+            showErr('form-error','Vos 20 analyses de ce mois sont épuisées. Renouvellement le '+subEnd+'.');
+          } else {
+            showErr('form-error',
+              '<strong>Vos 3 analyses gratuites de la semaine sont épuisées.</strong><br><br>'
+              +'Plan Solo/Directeur : 950 DH HT/mois · 20 analyses<br>'
+              +'<button onclick="showDash();dtab(\'abonnement\')" style="margin-top:10px;padding:10px 20px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:8px;color:#0a0c12;font-weight:700;cursor:pointer;font-size:14px">&#128179; Souscrire maintenant</button>'
+            );
+          }
+          return;
+        }
+      }
+    }catch(e){console.log('Gate check error:',e);}
+  }
+  // Utilisateur non connecté → limite localStorage (3/semaine)
+  if(!_cu){
+    var usage = parseInt(localStorage.getItem('cs_usage') || '0');
+    if (usage >= 3) {
+      showErr('form-error','<strong>3 analyses gratuites utilisées.</strong><br>Créez un compte pour continuer.');
+      return;
+    }
   }
 
   var txt = document.getElementById('contract-text').value;
@@ -481,7 +558,7 @@ async function analyze() {
   }
 }
 
-//    Step 2: Show parties                                   
+//  Step 2: Show parties 
 function renderParties(parties) {
   var list = document.getElementById('parties-list');
   list.innerHTML = '';
@@ -501,7 +578,7 @@ function renderParties(parties) {
   show('step-parties');
 }
 
-//    Step 3: Analyze with selected partie                  
+//  Step 3: Analyze with selected partie 
 async function analyzeWithPartie(partieName) {
   selectedPartie = partieName;
   hide('step-parties');
@@ -540,7 +617,7 @@ async function analyzeWithPartie(partieName) {
   }
 }
 
-//    Step 4: Review                                         
+//  Step 4: Review 
 function applyAccessCode() {
   var code = document.getElementById('access-code-input').value.trim().toUpperCase();
   // Valid codes stored in localStorage by admin
@@ -890,7 +967,7 @@ async function analyzeManualClauseInReview(){
   }
 }
 
-//    Export                                                 
+//  Export 
 async function exportDoc() {
   var btn = document.getElementById('btn-export');
   btn.textContent = '⏳ Génération en cours...';
@@ -923,7 +1000,7 @@ async function exportDoc() {
   }
 }
 
-//    Reset                                                  
+//  Reset 
 async function contributeToQueue() {
   // Save to user account when downloading
   try {
@@ -999,11 +1076,10 @@ async function _refreshSession(){
   if(rd.access_token){localStorage.setItem('sbt',rd.access_token);if(rd.refresh_token)localStorage.setItem('sbr',rd.refresh_token);setU(rd.user||{email:_cu&&_cu.email});return true;}
   localStorage.removeItem('sbt');localStorage.removeItem('sbr');return false;
 }
-async function chkSess(){var t=localStorage.getItem('sbt');if(!t)return;var r=await sf('/auth/v1/user');if(r.ok){setU(await r.json());return;}var ok=await _refreshSession();if(!ok)localStorage.removeItem('sbt');}
+async function chkSess(){var t=localStorage.getItem('sbt');if(!t)return;var r=await sf('/auth/v1/user');if(r.ok){setU(await r.json());return;}var ok=await _refreshSession();if(!ok){localStorage.removeItem('sbt');localStorage.removeItem('sbr');showAuth();}}
 function setU(u){_cu=u;document.getElementById('ubar').classList.add('show');var emailDisplay=(u.email||'').replace('@','[at]'); document.getElementById('ueml').textContent='>> '+emailDisplay;document.getElementById('deml').textContent=(u.email||'').replace('@','[at]');var b=document.getElementById('nlbtn');if(b)b.style.display='none';closeAuth();checkRole();}
 async function doLogin(){var e=document.getElementById('ae1').value.trim(),p=document.getElementById('ap1').value,err=document.getElementById('aerr');err.style.display='none';if(!e||!p){err.textContent='Champs requis';err.style.display='block';return;}var r=await sf('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:e,password:p})});var d=await r.json();if(d.access_token){localStorage.setItem('sbt',d.access_token);if(d.refresh_token)localStorage.setItem('sbr',d.refresh_token);setU(d.user);}else{err.textContent=d.error_description||'Erreur';err.style.display='block';}}
-async function doReg(){var e=document.getElementById('ae2').value.trim(),p=document.getElementById('ap2').value,err=document.getElementById('aerr2'),ok=document.getElementById('aok2');err.style.display='none';ok.style.display='none';if(!e||p.length<6){err.textContent='Email + mdp 6+ requis';err.style.display='block';return;}var r=await sf('/auth/v1/signup',{method:'POST',body:JSON.stringify({email:e,password:p})});var d=await r.json();if(d.id||d.user){ok.textContent='Compte cree - verifiez votre email';ok.style.display='block';}else{err.textContent=d.error_description||'Erreur';err.style.display='block';}}
-function doGoogle(){window.location.href=_su+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(window.location.href);}
+async function doReg(){var e=document.getElementById('ae2').value.trim(),p=document.getElementById('ap2').value,err=document.getElementById('aerr2'),ok=document.getElementById('aok2');err.style.display='none';ok.style.display='none';if(!e||p.length<6){err.textContent='Email + mdp 6+ requis';err.style.display='block';return;}var _redir=encodeURIComponent(window.location.origin+window.location.pathname);var r=await sf('/auth/v1/signup?redirect_to='+_redir,{method:'POST',body:JSON.stringify({email:e,password:p})});var d=await r.json();if(d.id||d.user){ok.textContent='Compte cree - verifiez votre email';ok.style.display='block';}else{err.textContent=d.error_description||'Erreur';err.style.display='block';}}
 async function doOut(){await sf('/auth/v1/logout',{method:'POST'});localStorage.removeItem('sbt');localStorage.removeItem('sbr');_cu=null;document.getElementById('ubar').classList.remove('show');var b=document.getElementById('nlbtn');if(b)b.style.display='';}
 function showAuth(){var o=document.getElementById('auth-ov');o.classList.add('show');o.style.display='flex';}
 function closeAuth(){var o=document.getElementById('auth-ov');o.classList.remove('show');o.style.display='none';}
@@ -1011,7 +1087,7 @@ function showReg(){document.getElementById('afl').style.display='none';document.
 function showLogin(){document.getElementById('afr').style.display='none';document.getElementById('afl').style.display='block';document.getElementById('atitle').textContent='Connexion';}
 function showDash(){document.getElementById('dash-ov').classList.add('show');loadDash();}
 function closeDash(){document.getElementById('dash-ov').classList.remove('show');}
-function dtab(t){var names=['analyses','models','juristes'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();}
+function dtab(t){var names=['analyses','models','juristes','abonnement'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();if(t==='abonnement')loadAbonnement();}
 async function checkRole(){
   if(!_cu)return;
   try{
@@ -1021,8 +1097,12 @@ async function checkRole(){
       var d=await r.json();
       if(d[0]){_userRole=d[0].role;_userParentEmail=d[0].parent_email;}
       else _userRole='directeur';
+    } else {
+      _userRole='directeur'; // fallback si fetch échoue
     }
-    // Update UI for role
+  }catch(e){console.log('checkRole error:',e);_userRole='directeur';}
+  // Update UI for role — toujours exécuté même en cas d'erreur
+  try{
     var badge=document.getElementById('dash-role-badge');
     var title=document.getElementById('dash-title');
     var slAna=document.getElementById('sl-analyses');
@@ -1030,6 +1110,8 @@ async function checkRole(){
     if(_userRole==='directeur'){
       var jBtn=document.getElementById('dtb-juristes');
       if(jBtn)jBtn.style.display='';
+      var abBtn=document.getElementById('dtb-abonnement');
+      if(abBtn)abBtn.style.display='';
       var sbJ=document.getElementById('sb-juristes');
       if(sbJ)sbJ.style.display='';
       if(badge)badge.textContent='Direction Juridique';
@@ -1042,8 +1124,10 @@ async function checkRole(){
       if(title)title.textContent='Mon espace';
       if(modelInfo)modelInfo.innerHTML='<strong style="color:#5b7cfa">Soumission de modele :</strong> Les modeles que vous soumettez sont d\'abord examines par votre directeur juridique avant integration.';
       if(modelInfo)modelInfo.style.display='';
+      var abBtnJ=document.getElementById('dtb-abonnement');
+      if(abBtnJ)abBtnJ.style.display='';
     }
-  }catch(e){console.log('checkRole error:',e);_userRole='directeur';}
+  }catch(e2){console.log('checkRole UI error:',e2);}
 }
 
 async function loadDash(){
@@ -1053,10 +1137,33 @@ async function loadDash(){
   var a=[];
   try{
     if(_userRole==='juriste'){
+      // Afficher quota juriste
+      try{
+        var qr=await fetch(BACKEND+'/account/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email})});
+        if(qr.ok){
+          var qa=await qr.json();
+          var remQ=qa.analyses_remaining!==-1?qa.analyses_remaining:'∞';
+          var sqEl=document.getElementById('stq');
+          var sbqEl=document.getElementById('sb-quota');
+          if(sqEl)sqEl.textContent=remQ;
+          if(sbqEl)sbqEl.style.display='';
+        }
+      }catch(e2){}
       // Juriste: only own analyses
       var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at,modifications,user_id,status,director_notes,director_email');
       a=r1.ok?await r1.json():[];
     } else {
+      // Directeur: afficher quota
+      try{
+        var qrD=await fetch(BACKEND+'/account/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email})});
+        if(qrD.ok){
+          var qaD=await qrD.json();
+          var remQD=qaD.analyses_remaining!==-1?qaD.analyses_remaining:'illim.';
+          var sqElD=document.getElementById('stq');var sbqElD=document.getElementById('sb-quota');
+          if(sqElD)sqElD.textContent=remQD;
+          if(sbqElD)sbqElD.style.display='';
+        }
+      }catch(e3){}
       // Directeur: own analyses + juristes' analyses
       var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at,modifications,user_id,status,director_notes,director_email');
       a=r1.ok?await r1.json():[];
@@ -1148,7 +1255,7 @@ async function loadDash(){
   var r2=await sf('/rest/v1/user_models?user_id=eq.'+_cu.id+'&order=created_at.desc&select=id,filename,created_at');
   var m=r2.ok?await r2.json():[];
   document.getElementById('stm').textContent=m.length;
-  document.getElementById('mlist').innerHTML=m.length===0
+  var mlistHtml=m.length===0
     ?'<p style="color:#6b7280;font-size:13px">Aucun modele soumis</p>'
     :m.map(function(x){
       return '<div class="ac" style="display:flex;justify-content:space-between;align-items:center">'
@@ -1156,11 +1263,55 @@ async function loadDash(){
         +'<button onclick="deleteModel(\''+x.id+'\', this)" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;flex-shrink:0">Supprimer</button>'
         +'</div>';
     }).join('');
+
+  // Si directeur : charger aussi les suggestions des juristes
+  if(_userRole==='directeur'){
+    try{
+      var rp=await fetch('https://web-production-f96f7.up.railway.app/suggestions/list-for-director?director_email='+encodeURIComponent(_cu.email));
+      var pending=rp.ok?(await rp.json()).suggestions||[]:[];
+      if(pending.length){
+        mlistHtml='<div style="font-size:11px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+pending.length+' modèle(s) en attente de validation</div>'
+          +pending.map(function(s){
+            var sid=s.id;
+            var preview=(s.content||'').substring(0,400).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            return '<div class="ac" style="border-color:#f59e0b33" data-sid="'+sid+'">'
+              +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">'
+              +'<div style="flex:1">'
+              +'<h4 style="margin-bottom:3px">'+(s.filename||'Modèle')+'</h4>'
+              +'<p style="margin-bottom:8px">Soumis par <strong style="color:#f59e0b">'+(s.suggested_by||'')+'</strong> · '+new Date(s.created_at).toLocaleDateString('fr-FR')+'</p>'
+              +'</div>'
+              +'<button onclick="this.closest(\'[data-sid]\').querySelector(\'.sugg-preview\').style.display=this.closest(\'[data-sid]\').querySelector(\'.sugg-preview\').style.display===\'none\'?\'\':\'none\'" '
+              +'style="background:#1a2035;border:1px solid #1f2537;color:#a0a8c0;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0">👁 Voir contenu</button>'
+              +'</div>'
+              +'<div class="sugg-preview" style="display:none;background:#0a0c12;border:1px solid #1f2537;border-radius:6px;padding:10px;font-size:11px;color:#9ca3af;white-space:pre-wrap;max-height:200px;overflow-y:auto;margin-bottom:10px;line-height:1.6">'
+              +(preview||'(contenu vide)')+(s.content&&s.content.length>400?'\n\n[...]':'')
+              +'</div>'
+              +'<div style="display:flex;gap:8px">'
+              +'<button class="fwd-sugg-btn" style="background:#10b98122;border:1px solid #10b981;color:#10b981;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600">✅ Valider → Admin</button>'
+              +'<button class="rej-sugg-btn" style="background:#ef444422;border:1px solid #ef4444;color:#ef4444;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer">❌ Rejeter</button>'
+              +'</div></div>';
+          }).join('')
+          +(m.length?'<div style="margin-top:20px;padding-top:16px;border-top:1px solid #1f2537"><div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Vos modèles</div>'+m.map(function(x){return '<div class="ac" style="display:flex;justify-content:space-between;align-items:center"><div><h4>'+x.filename+'</h4><p>Soumis le '+new Date(x.created_at).toLocaleDateString('fr-FR')+'</p></div><button onclick="deleteModel(\''+x.id+'\', this)" style="background:transparent;border:1px solid #ef4444;color:#ef4444;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;flex-shrink:0">Supprimer</button></div>';}).join('')+'</div>':'');
+      }
+    }catch(e){console.log('Erreur chargement suggestions directeur:',e);}
+  }
+
+  var mlistEl=document.getElementById('mlist');
+  mlistEl.innerHTML=mlistHtml;
+  // Boutons suggestions dans l'onglet Modeles
+  mlistEl.querySelectorAll('.fwd-sugg-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){forwardSugg(this.closest('[data-sid]').getAttribute('data-sid'));});
+  });
+  mlistEl.querySelectorAll('.rej-sugg-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){rejectSuggDir(this.closest('[data-sid]').getAttribute('data-sid'));});
+  });
+
   // Load juristes tab if directeur
   if(_userRole==='directeur')loadJuristes();
 }
 async function upMdl(inp){
   if(!_cu){showAuth();return;}
+  if(!_userRole) await checkRole();
   var f=inp.files[0];if(!f)return;
   var r=await sf('/rest/v1/user_models',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify({user_id:_cu.id,user_email:_cu.email,filename:f.name,category:'contract',is_public:false})});
   if(r.ok){
@@ -1211,6 +1362,25 @@ async function upMdl(inp){
   }else alert('Erreur upload');
 }
 
+async function _decrementAnalyses(){
+  if(!_cu)return;
+  try{
+    // Source de verite : backend /account/info
+    var curRem=3;
+    try{
+      var biR=await fetch(BACKEND+'/account/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email})});
+      if(biR.ok){var bi=await biR.json();if(bi.analyses_remaining===-1)return;if(bi.analyses_remaining!=null)curRem=bi.analyses_remaining;}
+    }catch(e2){}
+    if(curRem<=0)return;
+    var newVal=curRem-1;
+    // UPSERT : cree la ligne si elle n'existe pas (PATCH echoue silencieusement sur ligne inexistante)
+    await fetch(_su+'/rest/v1/user_accounts?on_conflict=email',{
+      method:'POST',
+      headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify({email:_cu.email,analyses_remaining:newVal})
+    });
+  }catch(e){console.log('Decrement error:',e);}
+}
 async function saveAna(fn,ct,pa,mods){
   if(!_cu) return;
   var isJuriste=_userRole==='juriste';
@@ -1219,6 +1389,7 @@ async function saveAna(fn,ct,pa,mods){
   if(r&&r.ok){
     var d=await r.json().catch(function(){return[];});
     if(d[0]) window._lastSavedAnaId=d[0].id;
+    _decrementAnalyses();
   }
   // Envoyer à l'admin queue UNIQUEMENT si directeur (le juriste doit d'abord passer par le directeur)
   if(!isJuriste){
@@ -1424,15 +1595,26 @@ async function deleteAnalysis(id, idx){
   var card = document.getElementById('ana-card-'+idx);
   if(card) card.style.opacity='0.4';
   try{
+    // Utiliser la clé anon + Prefer:return=representation pour détecter un blocage RLS silencieux
     var r = await fetch(_su+'/rest/v1/analyses?id=eq.'+id, {
       method:'DELETE',
-      headers:{'apikey':_sk,'Authorization':'Bearer '+(localStorage.getItem('sbt')||_sk),'Content-Type':'application/json'}
+      headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json','Prefer':'return=representation'}
     });
-    if(r.ok||r.status===204){
+    var deleted = [];
+    try { deleted = await r.json(); } catch(e) {}
+    if((r.ok || r.status===204) && Array.isArray(deleted) && deleted.length === 0){
+      // RLS a bloqué sans erreur — essai avec le token utilisateur
+      var r2 = await fetch(_su+'/rest/v1/analyses?id=eq.'+id, {
+        method:'DELETE',
+        headers:{'apikey':_sk,'Authorization':'Bearer '+(localStorage.getItem('sbt')||_sk),'Content-Type':'application/json','Prefer':'return=representation'}
+      });
+      try { deleted = await r2.json(); } catch(e) {}
+    }
+    if(deleted.length > 0 || r.status===204){
       window._juristesData=null;
       loadDash();
     } else {
-      alert('Erreur lors de la suppression ('+r.status+')');
+      alert('Impossible de supprimer cette analyse (droits insuffisants).');
       if(card) card.style.opacity='1';
     }
   }catch(e){
@@ -1666,19 +1848,55 @@ async function loadJuristes(){
       juristes=r.ok?await r.json():[];
       window._juristesData=juristes;
     }
+    // Fetch director account data to know nb_juristes_max and payment_status
+    var rdDir=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=nb_juristes_max,payment_status',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk}});
+    var dirAccData=rdDir.ok?await rdDir.json():[];
+    var dirAcc=dirAccData[0]||{};
+    var nbJuristesMax=dirAcc.nb_juristes_max||0;
+    var isActive=dirAcc.payment_status==='active';
+    var slotsLeft=Math.max(0,nbJuristesMax-juristes.length);
+
     var rp=await fetch('https://web-production-f96f7.up.railway.app/suggestions/list-for-director?director_email='+encodeURIComponent(_cu.email));
     var pending=[];
     if(rp.ok){var pd=await rp.json();pending=pd.suggestions||[];}
     var allAna=window._userAnalyses||[];
-    var html='<div style="font-size:10px;color:#4a5470;margin-bottom:10px;padding:6px 10px;background:#0d1017;border-radius:6px">Recherche juristes avec parent_email = <strong style="color:#6b7280">'+_cu.email+'</strong></div>';
+
+    // Slot status bar
+    var slotBar=isActive
+      ? '<div style="display:flex;justify-content:space-between;align-items:center;background:#0a0c12;border-radius:8px;padding:12px 16px;margin-bottom:12px">'
+        +'<div><div style="font-size:12px;color:#9ca3af">Slots juristes</div>'
+        +'<div style="font-size:14px;font-weight:700;color:#e2e5f0;margin-top:2px">'+juristes.length+' / '+nbJuristesMax+' utilisé(s)</div></div>'
+        +(slotsLeft>0
+          ? '<button id="btn-create-juriste" style="padding:8px 16px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">+ Créer un juriste</button>'
+          : '<span style="font-size:12px;color:#f59e0b;padding:6px 12px;border:1px solid #f59e0b33;border-radius:8px">Quota atteint — modifiez votre abonnement</span>')
+        +'</div>'
+      : '<div style="background:#1a1209;border:1px solid #f59e0b33;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#f59e0b">Souscrivez un abonnement pour créer des comptes juristes.</div>';
+
+    // Create form (hidden by default)
+    var createForm=slotsLeft>0&&isActive
+      ? '<div id="create-juriste-form" style="display:none;background:#0a0c12;border:1px solid #5b7cfa33;border-radius:10px;padding:16px;margin-bottom:12px">'
+        +'<div style="font-size:13px;font-weight:700;color:#e2e5f0;margin-bottom:14px">Nouveau compte juriste</div>'
+        +'<div style="margin-bottom:10px"><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Email</label>'
+        +'<input id="jur-email" type="email" placeholder="juriste@cabinet.com" style="width:100%;background:#111420;border:1px solid #1f2537;border-radius:8px;padding:9px 12px;color:#e2e5f0;font-size:13px"/></div>'
+        +'<div style="margin-bottom:14px"><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Mot de passe temporaire</label>'
+        +'<input id="jur-pwd" type="password" placeholder="Min. 8 caractères" style="width:100%;background:#111420;border:1px solid #1f2537;border-radius:8px;padding:9px 12px;color:#e2e5f0;font-size:13px"/></div>'
+        +'<div id="jur-err" style="display:none;color:#ef4444;font-size:12px;margin-bottom:10px"></div>'
+        +'<div id="jur-ok" style="display:none;color:#10b981;font-size:12px;margin-bottom:10px"></div>'
+        +'<div style="display:flex;gap:8px">'
+        +'<button id="btn-jur-submit" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Créer le compte</button>'
+        +'<button id="btn-jur-cancel" style="padding:10px 16px;background:none;border:1px solid #1f2537;border-radius:8px;color:#6b7280;font-size:13px;cursor:pointer">Annuler</button>'
+        +'</div></div>'
+      : '';
+
+    var html=slotBar+createForm;
     if(!juristes.length){
       html+='<div style="text-align:center;padding:30px 0">'
-        +'<div style="font-size:32px;margin-bottom:10px">⚖</div>'
+        +'<div style="font-size:32px;margin-bottom:10px">&#9878;</div>'
         +'<div style="font-size:14px;font-weight:600;color:#e2e5f0;margin-bottom:6px">Aucun juriste rattaché</div>'
-        +'<div style="font-size:12px;color:#6b7280">Demandez a l\'admin de créer les comptes juristes avec le champ <strong>parent_email = '+_cu.email+'</strong></div>'
+        +'<div style="font-size:12px;color:#6b7280">'+(slotsLeft>0?'Cliquez sur "Créer un juriste" pour ajouter votre premier juriste.':'Souscrivez un abonnement avec des juristes pour commencer.')+'</div>'
         +'</div>';
     } else {
-      html='<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+juristes.length+' juriste(s) dans votre equipe</div>';
+      html+='<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+juristes.length+' juriste(s) dans votre equipe</div>';
       html+=juristes.map(function(j){
         var juristeAna=allAna.filter(function(x){return x._juristeEmail===j.email;});
         var lastAna=juristeAna[0];
@@ -1686,7 +1904,7 @@ async function loadJuristes(){
         return '<div style="background:#111420;border:1px solid #1f2537;border-radius:10px;padding:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">'
           +'<div>'
           +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
-          +'<span style="font-size:16px">⚖</span>'
+          +'<span style="font-size:16px">&#9878;</span>'
           +'<span style="font-size:13px;font-weight:600;color:#e2e5f0">'+j.email+'</span>'
           +'</div>'
           +'<div style="font-size:11px;color:#6b7280">Membre depuis '+new Date(j.created_at).toLocaleDateString('fr-FR')+' &bull; Derniere analyse : '+lastDate+'</div>'
@@ -1714,6 +1932,49 @@ async function loadJuristes(){
       }).join('')+'</div>';
     }
     el.innerHTML=html;
+
+    // Create juriste button toggle
+    var btnCreate=el.querySelector('#btn-create-juriste');
+    var formDiv=el.querySelector('#create-juriste-form');
+    if(btnCreate&&formDiv){
+      btnCreate.addEventListener('click',function(){
+        formDiv.style.display=formDiv.style.display==='none'?'block':'none';
+      });
+      el.querySelector('#btn-jur-cancel').addEventListener('click',function(){
+        formDiv.style.display='none';
+        el.querySelector('#jur-email').value='';
+        el.querySelector('#jur-pwd').value='';
+        el.querySelector('#jur-err').style.display='none';
+        el.querySelector('#jur-ok').style.display='none';
+      });
+      el.querySelector('#btn-jur-submit').addEventListener('click',async function(){
+        var emailVal=el.querySelector('#jur-email').value.trim();
+        var pwdVal=el.querySelector('#jur-pwd').value;
+        var errDiv=el.querySelector('#jur-err');
+        var okDiv=el.querySelector('#jur-ok');
+        errDiv.style.display='none';okDiv.style.display='none';
+        if(!emailVal||!pwdVal){errDiv.textContent='Email et mot de passe requis.';errDiv.style.display='block';return;}
+        if(pwdVal.length<8){errDiv.textContent='Mot de passe trop court (min. 8 caractères).';errDiv.style.display='block';return;}
+        this.disabled=true;this.textContent='Création...';
+        try{
+          var res=await fetch(BACKEND+'/director/create-juriste',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({director_email:_cu.email,juriste_email:emailVal,juriste_password:pwdVal})
+          });
+          var d=await res.json();
+          if(!res.ok){errDiv.textContent=d.error||'Erreur création';errDiv.style.display='block';}
+          else{
+            okDiv.textContent='Compte créé avec succès pour '+emailVal;okDiv.style.display='block';
+            el.querySelector('#jur-email').value='';el.querySelector('#jur-pwd').value='';
+            window._juristesData=null;
+            setTimeout(function(){loadJuristes();},1500);
+          }
+        }catch(e2){errDiv.textContent='Erreur réseau : '+e2.message;errDiv.style.display='block';}
+        this.disabled=false;this.textContent='Créer le compte';
+      });
+    }
+
     // Attach event listeners to suggestion buttons
     el.querySelectorAll('.fwd-sugg-btn').forEach(function(btn){
       btn.addEventListener('click',function(){
@@ -1749,6 +2010,185 @@ async function submitForReview(id){
     window._juristesData=null; // reset cache
     loadDash();
   } else { alert('Erreur lors de la soumission ('+r.status+')'); }
+}
+
+// ===== PAIEMENT CMI =====
+async function loadAbonnement(){
+  var el=document.getElementById('abonnement-content');
+  console.log('[loadAbonnement] called, el=',!!el,'_cu=',_cu?_cu.email:'null');
+  if(!el)return;
+  if(!_cu){
+    el.innerHTML='<div style="background:#1a1f2e;border:1px solid #f59e0b;border-radius:12px;padding:24px;text-align:center">'
+      +'<div style="font-size:28px;margin-bottom:12px">🔐</div>'
+      +'<div style="font-size:14px;color:#e2e5f0;font-weight:600;margin-bottom:8px">Connexion requise</div>'
+      +'<div style="font-size:12px;color:#6b7280;margin-bottom:16px">Connectez-vous pour acceder a votre abonnement.</div>'
+      +'<button onclick="showAuth()" style="padding:10px 24px;background:#5b7cfa;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Se connecter</button>'
+      +'</div>';
+    return;
+  }
+  el.innerHTML='<div style="color:#6b7280;font-size:13px;padding:20px 0">Chargement de votre abonnement...</div>';
+  try{
+    // Utilise select=* pour eviter les erreurs de colonnes manquantes
+    var rj=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=*',
+      {headers:{'apikey':_sk,'Authorization':'Bearer '+_sk}});
+    console.log('[loadAbonnement] juristes status:', rj.status);
+    var juristes=rj.ok?await rj.json():[];
+    var rd=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=*',
+      {headers:{'apikey':_sk,'Authorization':'Bearer '+_sk}});
+    console.log('[loadAbonnement] dir status:', rd.status);
+    var dirData=rd.ok?await rd.json():[];
+    var dir=dirData[0]||{};
+    dir.email=dir.email||_cu.email;
+
+    // Cas juriste rattaché à un directeur : vérifier si le directeur a souscrit pour lui
+    if(dir.role==='juriste'&&dir.parent_email){
+      var rdirR=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(dir.parent_email)+'&select=*',
+        {headers:{'apikey':_sk,'Authorization':'Bearer '+_sk}});
+      var rdirData=rdirR.ok?await rdirR.json():[];
+      var directorAcc=rdirData[0]||{};
+      if(directorAcc.payment_status==='active'){
+        var subEndD=directorAcc.subscription_end?new Date(directorAcc.subscription_end).toLocaleDateString('fr-FR'):'—';
+        var remD=dir.analyses_remaining!==null&&dir.analyses_remaining!==undefined?dir.analyses_remaining:20;
+        var pctD=Math.min(100,Math.max(0,remD/20*100));
+        var colD=remD>5?'#10b981':remD>2?'#f59e0b':'#ef4444';
+        el.innerHTML=
+          '<div style="background:#111420;border:1px solid #10b981;border-radius:12px;padding:20px;margin-bottom:20px">'
+          +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+          +'<div><div style="font-size:15px;font-weight:700;color:#e2e5f0">Abonnement Omniscient</div>'
+          +'<div style="font-size:12px;color:#6b7280;margin-top:3px">Actif jusqu\'au : <strong style="color:#e2e5f0">'+subEndD+'</strong></div></div>'
+          +'<span style="padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;background:#10b98122;color:#10b981">Actif</span>'
+          +'</div>'
+          +'<div style="background:#0a0c12;border-radius:8px;padding:14px;margin-bottom:16px">'
+          +'<div style="font-size:12px;color:#9ca3af;margin-bottom:8px">Votre abonnement est géré par votre directeur juridique :</div>'
+          +'<div style="font-size:13px;color:#5b7cfa;font-weight:600;margin-bottom:14px">'+dir.parent_email+'</div>'
+          +'<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Vos analyses restantes ce mois</div>'
+          +'<div style="display:flex;align-items:center;gap:10px">'
+          +'<div style="flex:1;height:8px;background:#1f2537;border-radius:4px"><div style="width:'+pctD+'%;height:100%;background:'+colD+';border-radius:4px"></div></div>'
+          +'<div style="font-size:14px;font-weight:700;color:'+colD+';width:55px;text-align:right">'+remD+' / 20</div>'
+          +'</div>'
+          +'</div>'
+          +'<div style="font-size:12px;color:#4a5470;text-align:center">Pour renouveler ou modifier l\'abonnement, contactez votre directeur juridique.</div>'
+          +'</div>';
+        return;
+      }
+      // Directeur inactif : proposer plan solo juriste
+      el.innerHTML=
+        '<div style="background:#111420;border:1px solid #f59e0b;border-radius:12px;padding:20px;margin-bottom:20px">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+        +'<div><div style="font-size:15px;font-weight:700;color:#e2e5f0">Abonnement Omniscient</div>'
+        +'<div style="font-size:12px;color:#6b7280;margin-top:3px">Votre directeur n\'a pas encore souscrit.</div></div>'
+        +'<span style="padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;background:#f59e0b22;color:#f59e0b">Inactif</span>'
+        +'</div>'
+        +'<div style="background:#0a0c12;border-radius:8px;padding:14px;margin-bottom:16px">'
+        +'<div style="font-size:12px;color:#9ca3af;margin-bottom:8px">Votre directeur (<strong style="color:#e2e5f0">'+dir.parent_email+'</strong>) peut souscrire pour toute l\'équipe. Vous pouvez aussi souscrire en solo :</div>'
+        +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;margin-top:12px"><span style="color:#9ca3af">Plan solo juriste</span><span style="color:#e2e5f0">950 DH / mois</span></div>'
+        +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#9ca3af">Inclus</span><span style="color:#e2e5f0">20 analyses / mois</span></div>'
+        +'</div>'
+        +'<button onclick="initiateCMIPayment(1,950,\'juriste\')" style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:10px;color:#0a0c12;font-size:15px;font-weight:800;cursor:pointer">Souscrire en solo - 950 DH via CMI</button>'
+        +'</div>'
+        +'<div style="font-size:11px;color:#4a5470;text-align:center;margin-top:8px">Paiement sécurisé · 20 analyses / mois · Renouvelable mensuellement</div>';
+      return;
+    }
+
+    var isJuristeSolo=dir.role==='juriste';
+    // Nombre de juristes choisi par le directeur (défaut: nb déjà existants ou 1)
+    var _nbJuristesMax=dir.nb_juristes_max||0;
+    var _nbJuristesSuggested=Math.max(juristes.length, _nbJuristesMax, 1);
+    window._selectedNbJuristes=window._selectedNbJuristes||_nbJuristesSuggested;
+    var nbJuristes=window._selectedNbJuristes;
+    var nbUsers=isJuristeSolo?1:nbJuristes+1;
+    var pricePerUser=isJuristeSolo?950:850;
+    var total=nbUsers*pricePerUser;
+    var subEnd=dir.subscription_end?new Date(dir.subscription_end).toLocaleDateString('fr-FR'):'—';
+    var isActive=dir.payment_status==='active';
+    var isJuristeRole=dir.role==='juriste';
+    // Toujours utiliser /account/info pour les analyses restantes (source de verite backend)
+    var _backendRem=null;
+    try{
+      var _biR=await fetch(BACKEND+'/account/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email})});
+      if(_biR.ok){var _bi=await _biR.json();_backendRem=_bi.analyses_remaining;}
+    }catch(e4){}
+    var allUsers=[Object.assign({_isDir:true},dir)].concat(juristes);
+    console.log('[loadAbonnement] rendering, nbUsers=',nbUsers,'allUsers=',allUsers.map(function(u){return u.email;}));
+    el.innerHTML=
+      '<div style="background:#111420;border:1px solid '+(isActive?'#10b981':'#f59e0b')+';border-radius:12px;padding:20px;margin-bottom:20px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
+      +'<div><div style="font-size:15px;font-weight:700;color:#e2e5f0">Abonnement Omniscient</div>'
+      +'<div style="font-size:12px;color:#6b7280;margin-top:3px">Actif jusqu\'au : <strong style="color:#e2e5f0">'+subEnd+'</strong></div></div>'
+      +'<span style="padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;background:'+(isActive?'#10b98122':'#f59e0b22')+';color:'+(isActive?'#10b981':'#f59e0b')+'">'+(isActive?'Actif':'Inactif')+'</span>'
+      +'</div>'
+      +'<div style="background:#0a0c12;border-radius:8px;padding:14px;margin-bottom:16px">'
+      +'<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Analyses restantes par utilisateur</div>'
+      +allUsers.map(function(u){
+        var rem=u._isDir&&_backendRem!==null?_backendRem:(u.analyses_remaining!==null&&u.analyses_remaining!==undefined?u.analyses_remaining:0);
+        var pct=Math.min(100,Math.max(0,rem/20*100));
+        var col=rem>5?'#10b981':rem>2?'#f59e0b':'#ef4444';
+        return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+          +'<div style="font-size:12px;color:#e2e5f0;width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(u._isDir?'[dir] ':'[jur] ')+String(u.email||'?')+'</div>'
+          +'<div style="flex:1;height:6px;background:#1f2537;border-radius:3px"><div style="width:'+pct+'%;height:100%;background:'+col+';border-radius:3px"></div></div>'
+          +'<div style="font-size:12px;color:#e2e5f0;width:50px;text-align:right">'+rem+'/20</div>'
+          +'</div>';
+      }).join('')
+      +'</div>'
+      +(isJuristeRole?'':
+        '<div style="background:#0a0c12;border-radius:8px;padding:16px;margin-bottom:16px">'
+        +'<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">Nombre de juristes dans votre abonnement</div>'
+        +'<div style="display:flex;align-items:center;justify-content:center;gap:24px">'
+        +'<button onclick="window._selectedNbJuristes=Math.max(0,(window._selectedNbJuristes||1)-1);loadAbonnement();" style="width:40px;height:40px;border-radius:50%;border:1px solid #1f2537;background:#181c2a;color:#e2e5f0;font-size:24px;cursor:pointer;line-height:1;flex-shrink:0">&#8722;</button>'
+        +'<div style="text-align:center">'
+        +'<div style="font-size:40px;font-weight:800;color:#5b7cfa;min-width:60px">'+nbJuristes+'</div>'
+        +'<div style="font-size:11px;color:#6b7280;margin-top:4px">juriste(s)</div>'
+        +'</div>'
+        +'<button onclick="window._selectedNbJuristes=(window._selectedNbJuristes||0)+1;loadAbonnement();" style="width:40px;height:40px;border-radius:50%;border:1px solid #5b7cfa;background:#5b7cfa22;color:#5b7cfa;font-size:24px;cursor:pointer;line-height:1;flex-shrink:0">&#43;</button>'
+        +'</div>'
+        +'<div style="font-size:12px;color:#9ca3af;text-align:center;margin-top:12px">'
+        +(nbJuristes===0
+          ? 'Mode directeur seul &bull; <strong style="color:#c8a94b">950 DH / mois</strong>'
+          : 'Directeur + '+nbJuristes+' juriste(s) &bull; <strong style="color:#c8a94b">850 DH / utilisateur / mois</strong>')
+        +'</div>'
+        +'</div>'
+      )
+      +'<div style="background:#0a0c12;border-radius:8px;padding:14px;margin-bottom:16px">'
+      +'<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Facturation</div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#9ca3af">Utilisateurs</span><span style="color:#e2e5f0">'+nbUsers+' compte(s)</span></div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#9ca3af">Tarif</span><span style="color:#e2e5f0">'+pricePerUser+' DH / utilisateur</span></div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;border-top:1px solid #1f2537;padding-top:10px;margin-top:6px"><span style="color:#e2e5f0">Total mensuel</span><span style="color:#c8a94b">'+total+' DH</span></div>'
+      +'</div>'
+      +(isJuristeRole
+        ? '<div style="text-align:center;padding:14px;color:#6b7280;font-size:13px">&#128274; Votre accès est géré par votre directeur juridique.</div>'
+        : '<button onclick="initiateCMIPayment('+nbUsers+','+total+',\''+dir.role+'\')" style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:10px;color:#0a0c12;font-size:15px;font-weight:800;cursor:pointer">&#x1F4B3; Souscrire pour '+nbUsers+' utilisateur(s) — '+total+' DH / mois</button>')
+      +'</div>'
+      +'<div style="font-size:11px;color:#4a5470;text-align:center;margin-top:8px">Paiement securise · Chaque utilisateur recoit 20 analyses · Renouvelable mensuellement</div>';
+  }catch(e){
+    console.error('[loadAbonnement] exception:', e);
+    el.innerHTML='<div style="background:#1a0a0a;border:1px solid #ef4444;border-radius:12px;padding:20px"><p style="color:#ef4444;font-size:13px">Erreur: '+String(e.message)+'</p></div>';
+  }
+}
+
+async function initiateCMIPayment(nbUsers, total, role){
+  if(!_cu){alert('Connectez-vous pour payer.');return;}
+  var btn=event.currentTarget||event.target;
+  btn.disabled=true;btn.textContent='⏳ Redirection vers CMI...';
+  try{
+    var r=await fetch(BACKEND+'/payment/initiate',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({director_email:_cu.email,nb_users:nbUsers,role:role||'directeur'})
+    });
+    var d=await r.json();
+    if(!r.ok) throw new Error(d.error||'Erreur initiation paiement');
+    // Construire et soumettre le formulaire CMI
+    var form=document.createElement('form');
+    form.method='POST';form.action=d.form_url;form.style.display='none';
+    Object.entries(d.params).forEach(function(kv){
+      var inp=document.createElement('input');inp.type='hidden';inp.name=kv[0];inp.value=kv[1];form.appendChild(inp);
+    });
+    document.body.appendChild(form);
+    form.submit();
+  }catch(e){
+    alert('Erreur : '+e.message);
+    btn.disabled=false;btn.textContent='💳 Payer via CMI';
+  }
 }
 
 async function requestRevision(id){
