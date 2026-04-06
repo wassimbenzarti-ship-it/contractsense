@@ -1848,19 +1848,55 @@ async function loadJuristes(){
       juristes=r.ok?await r.json():[];
       window._juristesData=juristes;
     }
+    // Fetch director account data to know nb_juristes_max and payment_status
+    var rdDir=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=nb_juristes_max,payment_status',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk}});
+    var dirAccData=rdDir.ok?await rdDir.json():[];
+    var dirAcc=dirAccData[0]||{};
+    var nbJuristesMax=dirAcc.nb_juristes_max||0;
+    var isActive=dirAcc.payment_status==='active';
+    var slotsLeft=Math.max(0,nbJuristesMax-juristes.length);
+
     var rp=await fetch('https://web-production-f96f7.up.railway.app/suggestions/list-for-director?director_email='+encodeURIComponent(_cu.email));
     var pending=[];
     if(rp.ok){var pd=await rp.json();pending=pd.suggestions||[];}
     var allAna=window._userAnalyses||[];
-    var html='<div style="font-size:10px;color:#4a5470;margin-bottom:10px;padding:6px 10px;background:#0d1017;border-radius:6px">Recherche juristes avec parent_email = <strong style="color:#6b7280">'+_cu.email+'</strong></div>';
+
+    // Slot status bar
+    var slotBar=isActive
+      ? '<div style="display:flex;justify-content:space-between;align-items:center;background:#0a0c12;border-radius:8px;padding:12px 16px;margin-bottom:12px">'
+        +'<div><div style="font-size:12px;color:#9ca3af">Slots juristes</div>'
+        +'<div style="font-size:14px;font-weight:700;color:#e2e5f0;margin-top:2px">'+juristes.length+' / '+nbJuristesMax+' utilisé(s)</div></div>'
+        +(slotsLeft>0
+          ? '<button id="btn-create-juriste" style="padding:8px 16px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">+ Créer un juriste</button>'
+          : '<span style="font-size:12px;color:#f59e0b;padding:6px 12px;border:1px solid #f59e0b33;border-radius:8px">Quota atteint — modifiez votre abonnement</span>')
+        +'</div>'
+      : '<div style="background:#1a1209;border:1px solid #f59e0b33;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#f59e0b">Souscrivez un abonnement pour créer des comptes juristes.</div>';
+
+    // Create form (hidden by default)
+    var createForm=slotsLeft>0&&isActive
+      ? '<div id="create-juriste-form" style="display:none;background:#0a0c12;border:1px solid #5b7cfa33;border-radius:10px;padding:16px;margin-bottom:12px">'
+        +'<div style="font-size:13px;font-weight:700;color:#e2e5f0;margin-bottom:14px">Nouveau compte juriste</div>'
+        +'<div style="margin-bottom:10px"><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Email</label>'
+        +'<input id="jur-email" type="email" placeholder="juriste@cabinet.com" style="width:100%;background:#111420;border:1px solid #1f2537;border-radius:8px;padding:9px 12px;color:#e2e5f0;font-size:13px"/></div>'
+        +'<div style="margin-bottom:14px"><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Mot de passe temporaire</label>'
+        +'<input id="jur-pwd" type="password" placeholder="Min. 8 caractères" style="width:100%;background:#111420;border:1px solid #1f2537;border-radius:8px;padding:9px 12px;color:#e2e5f0;font-size:13px"/></div>'
+        +'<div id="jur-err" style="display:none;color:#ef4444;font-size:12px;margin-bottom:10px"></div>'
+        +'<div id="jur-ok" style="display:none;color:#10b981;font-size:12px;margin-bottom:10px"></div>'
+        +'<div style="display:flex;gap:8px">'
+        +'<button id="btn-jur-submit" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Créer le compte</button>'
+        +'<button id="btn-jur-cancel" style="padding:10px 16px;background:none;border:1px solid #1f2537;border-radius:8px;color:#6b7280;font-size:13px;cursor:pointer">Annuler</button>'
+        +'</div></div>'
+      : '';
+
+    var html=slotBar+createForm;
     if(!juristes.length){
       html+='<div style="text-align:center;padding:30px 0">'
-        +'<div style="font-size:32px;margin-bottom:10px">⚖</div>'
+        +'<div style="font-size:32px;margin-bottom:10px">&#9878;</div>'
         +'<div style="font-size:14px;font-weight:600;color:#e2e5f0;margin-bottom:6px">Aucun juriste rattaché</div>'
-        +'<div style="font-size:12px;color:#6b7280">Demandez a l\'admin de créer les comptes juristes avec le champ <strong>parent_email = '+_cu.email+'</strong></div>'
+        +'<div style="font-size:12px;color:#6b7280">'+(slotsLeft>0?'Cliquez sur "Créer un juriste" pour ajouter votre premier juriste.':'Souscrivez un abonnement avec des juristes pour commencer.')+'</div>'
         +'</div>';
     } else {
-      html='<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+juristes.length+' juriste(s) dans votre equipe</div>';
+      html+='<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+juristes.length+' juriste(s) dans votre equipe</div>';
       html+=juristes.map(function(j){
         var juristeAna=allAna.filter(function(x){return x._juristeEmail===j.email;});
         var lastAna=juristeAna[0];
@@ -1868,7 +1904,7 @@ async function loadJuristes(){
         return '<div style="background:#111420;border:1px solid #1f2537;border-radius:10px;padding:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">'
           +'<div>'
           +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
-          +'<span style="font-size:16px">⚖</span>'
+          +'<span style="font-size:16px">&#9878;</span>'
           +'<span style="font-size:13px;font-weight:600;color:#e2e5f0">'+j.email+'</span>'
           +'</div>'
           +'<div style="font-size:11px;color:#6b7280">Membre depuis '+new Date(j.created_at).toLocaleDateString('fr-FR')+' &bull; Derniere analyse : '+lastDate+'</div>'
@@ -1896,6 +1932,49 @@ async function loadJuristes(){
       }).join('')+'</div>';
     }
     el.innerHTML=html;
+
+    // Create juriste button toggle
+    var btnCreate=el.querySelector('#btn-create-juriste');
+    var formDiv=el.querySelector('#create-juriste-form');
+    if(btnCreate&&formDiv){
+      btnCreate.addEventListener('click',function(){
+        formDiv.style.display=formDiv.style.display==='none'?'block':'none';
+      });
+      el.querySelector('#btn-jur-cancel').addEventListener('click',function(){
+        formDiv.style.display='none';
+        el.querySelector('#jur-email').value='';
+        el.querySelector('#jur-pwd').value='';
+        el.querySelector('#jur-err').style.display='none';
+        el.querySelector('#jur-ok').style.display='none';
+      });
+      el.querySelector('#btn-jur-submit').addEventListener('click',async function(){
+        var emailVal=el.querySelector('#jur-email').value.trim();
+        var pwdVal=el.querySelector('#jur-pwd').value;
+        var errDiv=el.querySelector('#jur-err');
+        var okDiv=el.querySelector('#jur-ok');
+        errDiv.style.display='none';okDiv.style.display='none';
+        if(!emailVal||!pwdVal){errDiv.textContent='Email et mot de passe requis.';errDiv.style.display='block';return;}
+        if(pwdVal.length<8){errDiv.textContent='Mot de passe trop court (min. 8 caractères).';errDiv.style.display='block';return;}
+        this.disabled=true;this.textContent='Création...';
+        try{
+          var res=await fetch(BACKEND+'/director/create-juriste',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({director_email:_cu.email,juriste_email:emailVal,juriste_password:pwdVal})
+          });
+          var d=await res.json();
+          if(!res.ok){errDiv.textContent=d.error||'Erreur création';errDiv.style.display='block';}
+          else{
+            okDiv.textContent='Compte créé avec succès pour '+emailVal;okDiv.style.display='block';
+            el.querySelector('#jur-email').value='';el.querySelector('#jur-pwd').value='';
+            window._juristesData=null;
+            setTimeout(function(){loadJuristes();},1500);
+          }
+        }catch(e2){errDiv.textContent='Erreur réseau : '+e2.message;errDiv.style.display='block';}
+        this.disabled=false;this.textContent='Créer le compte';
+      });
+    }
+
     // Attach event listeners to suggestion buttons
     el.querySelectorAll('.fwd-sugg-btn').forEach(function(btn){
       btn.addEventListener('click',function(){
@@ -2012,7 +2091,12 @@ async function loadAbonnement(){
     }
 
     var isJuristeSolo=dir.role==='juriste';
-    var nbUsers=isJuristeSolo?1:juristes.length+1;
+    // Nombre de juristes choisi par le directeur (défaut: nb déjà existants ou 1)
+    var _nbJuristesMax=dir.nb_juristes_max||0;
+    var _nbJuristesSuggested=Math.max(juristes.length, _nbJuristesMax, 1);
+    window._selectedNbJuristes=window._selectedNbJuristes||_nbJuristesSuggested;
+    var nbJuristes=window._selectedNbJuristes;
+    var nbUsers=isJuristeSolo?1:nbJuristes+1;
     var pricePerUser=isJuristeSolo?950:850;
     var total=nbUsers*pricePerUser;
     var subEnd=dir.subscription_end?new Date(dir.subscription_end).toLocaleDateString('fr-FR'):'—';
@@ -2046,6 +2130,24 @@ async function loadAbonnement(){
           +'</div>';
       }).join('')
       +'</div>'
+      +(isJuristeRole?'':
+        '<div style="background:#0a0c12;border-radius:8px;padding:16px;margin-bottom:16px">'
+        +'<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">Nombre de juristes dans votre abonnement</div>'
+        +'<div style="display:flex;align-items:center;justify-content:center;gap:24px">'
+        +'<button onclick="window._selectedNbJuristes=Math.max(0,(window._selectedNbJuristes||1)-1);loadAbonnement();" style="width:40px;height:40px;border-radius:50%;border:1px solid #1f2537;background:#181c2a;color:#e2e5f0;font-size:24px;cursor:pointer;line-height:1;flex-shrink:0">&#8722;</button>'
+        +'<div style="text-align:center">'
+        +'<div style="font-size:40px;font-weight:800;color:#5b7cfa;min-width:60px">'+nbJuristes+'</div>'
+        +'<div style="font-size:11px;color:#6b7280;margin-top:4px">juriste(s)</div>'
+        +'</div>'
+        +'<button onclick="window._selectedNbJuristes=(window._selectedNbJuristes||0)+1;loadAbonnement();" style="width:40px;height:40px;border-radius:50%;border:1px solid #5b7cfa;background:#5b7cfa22;color:#5b7cfa;font-size:24px;cursor:pointer;line-height:1;flex-shrink:0">&#43;</button>'
+        +'</div>'
+        +'<div style="font-size:12px;color:#9ca3af;text-align:center;margin-top:12px">'
+        +(nbJuristes===0
+          ? 'Mode directeur seul &bull; <strong style="color:#c8a94b">950 DH / mois</strong>'
+          : 'Directeur + '+nbJuristes+' juriste(s) &bull; <strong style="color:#c8a94b">850 DH / utilisateur / mois</strong>')
+        +'</div>'
+        +'</div>'
+      )
       +'<div style="background:#0a0c12;border-radius:8px;padding:14px;margin-bottom:16px">'
       +'<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Facturation</div>'
       +'<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:#9ca3af">Utilisateurs</span><span style="color:#e2e5f0">'+nbUsers+' compte(s)</span></div>'
@@ -2054,9 +2156,9 @@ async function loadAbonnement(){
       +'</div>'
       +(isJuristeRole
         ? '<div style="text-align:center;padding:14px;color:#6b7280;font-size:13px">&#128274; Votre accès est géré par votre directeur juridique.</div>'
-        : '<button onclick="initiateCMIPayment('+nbUsers+','+total+',\''+dir.role+'\')" style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:10px;color:#0a0c12;font-size:15px;font-weight:800;cursor:pointer">Payer '+total+' DH via CMI</button>')
+        : '<button onclick="initiateCMIPayment('+nbUsers+','+total+',\''+dir.role+'\')" style="width:100%;padding:14px;background:linear-gradient(135deg,#c8a94b,#f0c060);border:none;border-radius:10px;color:#0a0c12;font-size:15px;font-weight:800;cursor:pointer">&#x1F4B3; Souscrire pour '+nbUsers+' utilisateur(s) — '+total+' DH / mois</button>')
       +'</div>'
-      +'<div style="font-size:11px;color:#4a5470;text-align:center;margin-top:8px">Paiement securise · Chaque utilisateur recoit 20 analyses (HT) · Renouvelable mensuellement</div>';
+      +'<div style="font-size:11px;color:#4a5470;text-align:center;margin-top:8px">Paiement securise · Chaque utilisateur recoit 20 analyses · Renouvelable mensuellement</div>';
   }catch(e){
     console.error('[loadAbonnement] exception:', e);
     el.innerHTML='<div style="background:#1a0a0a;border:1px solid #ef4444;border-radius:12px;padding:20px"><p style="color:#ef4444;font-size:13px">Erreur: '+String(e.message)+'</p></div>';
