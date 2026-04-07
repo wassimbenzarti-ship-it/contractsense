@@ -2313,9 +2313,8 @@ async function deleteJuriste(juristeEmail){
     });
     var d=await r.json();
     if(!r.ok) throw new Error(d.error||'Erreur serveur');
-    // Reload the team tab
-    var el=document.getElementById('tab-equipe');
-    if(el&&window.loadJuristes) loadJuristes(el);
+    window._juristesData=null;
+    loadJuristes();
   }catch(e){ alert('Erreur : '+e.message); }
 }
 
