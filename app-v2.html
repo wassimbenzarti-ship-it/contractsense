@@ -2003,6 +2003,7 @@ async function loadJuristes(){
         el.querySelector('#jur-ok').style.display='none';
       });
       el.querySelector('#btn-jur-submit').addEventListener('click',async function(){
+        if(window._juristeCreating) return;
         var emailVal=el.querySelector('#jur-email').value.trim();
         var pwdVal=el.querySelector('#jur-pwd').value;
         var errDiv=el.querySelector('#jur-err');
@@ -2010,6 +2011,7 @@ async function loadJuristes(){
         errDiv.style.display='none';okDiv.style.display='none';
         if(!emailVal||!pwdVal){errDiv.textContent='Email et mot de passe requis.';errDiv.style.display='block';return;}
         if(pwdVal.length<8){errDiv.textContent='Mot de passe trop court (min. 8 caractères).';errDiv.style.display='block';return;}
+        window._juristeCreating=true;
         this.disabled=true;this.textContent='Création...';
         try{
           var res=await fetch(BACKEND+'/director/create-juriste',{
@@ -2023,9 +2025,11 @@ async function loadJuristes(){
             okDiv.textContent='Compte créé avec succès pour '+emailVal;okDiv.style.display='block';
             el.querySelector('#jur-email').value='';el.querySelector('#jur-pwd').value='';
             window._juristesData=null;
-            setTimeout(function(){loadJuristes();},1500);
+            setTimeout(function(){window._juristeCreating=false;loadJuristes();},1500);
+            return;
           }
         }catch(e2){errDiv.textContent='Erreur réseau : '+e2.message;errDiv.style.display='block';}
+        window._juristeCreating=false;
         this.disabled=false;this.textContent='Créer le compte';
       });
     }
