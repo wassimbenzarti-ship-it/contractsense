@@ -608,6 +608,7 @@ async function analyzeWithPartie(partieName) {
     var data = await resp.json();
 
     modifications = data.modifications || [];
+    window._compliance = data.compliance || [];
     decisions = {};
     modifications.forEach(function(m) { decisions[m.id] = 'pending'; });
     if (data.file_storage_path) window._fileStoragePath = data.file_storage_path;
@@ -712,6 +713,41 @@ function updateStats() {
     '<span class="stat stat-rejected">' + r + ' refusées</span>';
 }
 
+function renderCompliance() {
+  var container = document.getElementById('compliance-section');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'compliance-section';
+    var modsList = document.getElementById('mods-list');
+    modsList.parentNode.insertBefore(container, modsList.nextSibling);
+  }
+  var items = window._compliance || [];
+  if (!items.length) {
+    container.innerHTML = '';
+    return;
+  }
+  var sevColor = { high: '#ef4444', medium: '#f59e0b', low: '#10b981' };
+  var sevLabel = { high: 'Critique', medium: 'Modéré', low: 'Faible' };
+  var typeLabel = { loi: 'LOI', doctrine: 'DOCTRINE', jurisprudence: 'JURISPRUDENCE' };
+  var html = '<div style="margin-top:24px;margin-bottom:8px;font-size:17px;font-weight:800;color:#e2e8f0;letter-spacing:0.01em;">⚖ Analyse de conformité juridique</div>';
+  html += '<div style="font-size:12px;color:#6b7280;margin-bottom:14px;">Basée sur les lois, doctrine et jurisprudences de la base documentaire RAG</div>';
+  items.forEach(function(c) {
+    var color = sevColor[c.severity] || '#6b7280';
+    var sLabel = sevLabel[c.severity] || c.severity;
+    var tLabel = typeLabel[(c.type || '').toLowerCase()] || (c.type || 'RÉFÉRENCE').toUpperCase();
+    html += '<div style="background:#0d1017;border:1px solid ' + color + '33;border-left:3px solid ' + color + ';border-radius:10px;padding:14px 16px;margin-bottom:12px;">' +
+      '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">' +
+        '<span style="background:' + color + '22;color:' + color + ';font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;">' + sLabel + '</span>' +
+        '<span style="background:#1e293b;color:#94a3b8;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;">' + tLabel + '</span>' +
+        (c.source ? '<span style="font-size:11px;color:#5b7cfa;font-style:italic;">' + _escH(c.source) + '</span>' : '') +
+      '</div>' +
+      '<div style="font-size:13px;color:#e2e8f0;margin-bottom:6px;">' + _escH(c.issue || '') + '</div>' +
+      (c.recommendation ? '<div style="font-size:12px;color:#94a3b8;border-top:1px solid #1f2537;padding-top:8px;margin-top:6px;"> Recommandation : ' + _escH(c.recommendation) + '</div>' : '') +
+    '</div>';
+  });
+  container.innerHTML = html;
+}
+
 function renderReview() {
   var list = document.getElementById('mods-list');
   list.innerHTML = '';
@@ -747,6 +783,7 @@ function renderReview() {
     : 'Un document Word sera généré avec les modifications acceptées en Track Changes.';
 
   updateStats();
+  renderCompliance();
   show('step-review');
 
   // Pour les juristes : afficher le bouton Soumettre + section "Ajouter une clause"
