@@ -1201,7 +1201,7 @@ var _cu=null;
 var _userRole=null;
 var _isAdmin=false;
 var _userParentEmail=null;
-async function sf(p,o){o=o||{};var t=localStorage.getItem('sbt')||_sk;var h={'apikey':_sk,'Authorization':'Bearer '+t,'Content-Type':'application/json'};if(o.headers)Object.assign(h,o.headers);return fetch(_su+p,Object.assign({},o,{headers:h}));}
+async function sf(p,o){o=o||{};var t=localStorage.getItem('sbt')||_sk;var h={'apikey':_sk,'Authorization':'Bearer '+t,'Content-Type':'application/json'};if(o.headers)Object.assign(h,o.headers);var r=await fetch(_su+p,Object.assign({},o,{headers:h}));if(r.status===401&&t!==_sk){var ok=await _refreshSession();if(ok){var t2=localStorage.getItem('sbt')||_sk;var h2={'apikey':_sk,'Authorization':'Bearer '+t2,'Content-Type':'application/json'};if(o.headers)Object.assign(h2,o.headers);return fetch(_su+p,Object.assign({},o,{headers:h2}));}}return r;}
 async function _refreshSession(){
   var rt=localStorage.getItem('sbr');
   if(!rt) return false;
