@@ -224,17 +224,20 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 
     <div class="opts">
       <div>
-        <label>Type</label>
-        <select id="type">
-          <option value="generic">Générique</option>
-          <option value="nda">NDA</option>
-          <option value="saas">SaaS</option>
-          <option value="purchase">Achat/Vente</option>
+        <label>Type <span id="type-detected-badge" style="display:none;font-size:10px;font-weight:600;color:#10b981;background:rgba(16,185,129,0.12);padding:1px 6px;border-radius:4px;margin-left:4px">Auto</span></label>
+        <select id="type" onchange="(function(){var b=document.getElementById('type-detected-badge'),l=document.getElementById('type-detected-label');if(b)b.style.display='none';if(l)l.style.display='none';})()">
+          <option value="auto">🔍 Détection automatique</option>
           <option value="contrat de travail CDI">CDI</option>
           <option value="contrat de travail CDD">CDD</option>
-          <option value="employment">RH / Autre</option>
-          <option value="partnership">Partenariat</option>
+          <option value="service">Prestation de services</option>
+          <option value="nda">NDA / Confidentialité</option>
+          <option value="bail">Bail commercial</option>
+          <option value="achat/vente">Achat / Vente</option>
+          <option value="partenariat">Partenariat</option>
+          <option value="saas">SaaS / Logiciel</option>
+          <option value="generic">Autre / Générique</option>
         </select>
+        <div id="type-detected-label" style="display:none;font-size:11px;color:#10b981;margin-top:4px"></div>
       </div>
     </div>
 
@@ -604,6 +607,40 @@ async function analyzeWithPartie(partieName) {
     modifications.forEach(function(m) { decisions[m.id] = 'pending'; });
     if (data.file_storage_path) window._fileStoragePath = data.file_storage_path;
     if (data.file_cache_id) window._fileCacheId = data.file_cache_id;
+
+    // Handle auto-detected contract type
+    if (data.auto_detected && data.detected_contract_type) {
+      savedType = data.detected_contract_type;
+      // Update dropdown to reflect detected type
+      var typeSelect = document.getElementById('type');
+      if (typeSelect) {
+        for (var i = 0; i < typeSelect.options.length; i++) {
+          if (typeSelect.options[i].value === data.detected_contract_type) {
+            typeSelect.selectedIndex = i;
+            break;
+          }
+        }
+      }
+      // Show detected type badge and label
+      var badge = document.getElementById('type-detected-badge');
+      var label = document.getElementById('type-detected-label');
+      if (badge) badge.style.display = 'inline';
+      if (label) {
+        var typeNames = {
+          'contrat de travail CDI': 'CDI',
+          'contrat de travail CDD': 'CDD',
+          'service': 'Prestation de services',
+          'nda': 'NDA / Confidentialité',
+          'bail': 'Bail commercial',
+          'achat/vente': 'Achat / Vente',
+          'partenariat': 'Partenariat',
+          'saas': 'SaaS / Logiciel',
+          'generic': 'Générique'
+        };
+        label.textContent = '✅ Type détecté : ' + (typeNames[data.detected_contract_type] || data.detected_contract_type);
+        label.style.display = 'block';
+      }
+    }
 
     // Extraire toutes les clauses du contrat pour le dropdown "ajouter une clause"
     // Utiliser savedText (mode texte) ou lire le fichier uploadé (mode fichier)
