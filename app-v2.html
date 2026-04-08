@@ -548,15 +548,19 @@ async function analyze() {
   try {
     var fd2 = buildFormData();
     var resp = await fetch(BACKEND + '/identify-parties', { method: 'POST', body: fd2 });
+    if (!resp.ok) {
+      var errData = {};
+      try { errData = await resp.json(); } catch(_) {}
+      throw new Error(errData.error || ('Erreur serveur (' + resp.status + ')'));
+    }
     var data = await resp.json();
-    if (!resp.ok) throw new Error(data.error || 'Erreur serveur');
 
     hide('step-loading');
     renderParties(data.parties || []);
   } catch(e) {
     hide('step-loading');
     show('step-form');
-    showErr('form-error', '✅ ' + (e.message || 'Erreur inattendue.'));
+    showErr('form-error', '&#10060; ' + (e.message || 'Erreur inattendue.'));
   }
 }
 
@@ -596,8 +600,12 @@ async function analyzeWithPartie(partieName) {
     fd.append('partie', partieName);
 
     var resp = await fetch(BACKEND + '/analyze', { method: 'POST', body: fd });
+    if (!resp.ok) {
+      var errData = {};
+      try { errData = await resp.json(); } catch(_) {}
+      throw new Error(errData.error || ('Erreur serveur (' + resp.status + ')'));
+    }
     var data = await resp.json();
-    if (!resp.ok) throw new Error(data.error || 'Erreur serveur');
 
     modifications = data.modifications || [];
     decisions = {};
