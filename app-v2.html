@@ -1322,7 +1322,7 @@ async function loadDash(){
         mlistHtml='<div style="font-size:11px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+pending.length+' modèle(s) en attente de validation</div>'
           +pending.map(function(s){
             var sid=s.id;
-            var preview=(s.content||'').substring(0,400).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            var preview=(s.content||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
             return '<div class="ac" style="border-color:#f59e0b33" data-sid="'+sid+'">'
               +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">'
               +'<div style="flex:1">'
@@ -1332,8 +1332,8 @@ async function loadDash(){
               +'<button onclick="this.closest(\'[data-sid]\').querySelector(\'.sugg-preview\').style.display=this.closest(\'[data-sid]\').querySelector(\'.sugg-preview\').style.display===\'none\'?\'\':\'none\'" '
               +'style="background:#1a2035;border:1px solid #1f2537;color:#a0a8c0;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0">👁 Voir contenu</button>'
               +'</div>'
-              +'<div class="sugg-preview" style="display:none;background:#0a0c12;border:1px solid #1f2537;border-radius:6px;padding:10px;font-size:11px;color:#9ca3af;white-space:pre-wrap;max-height:200px;overflow-y:auto;margin-bottom:10px;line-height:1.6">'
-              +(preview||'(contenu vide)')+(s.content&&s.content.length>400?'\n\n[...]':'')
+              +'<div class="sugg-preview" style="display:none;background:#0a0c12;border:1px solid #1f2537;border-radius:6px;padding:10px;font-size:11px;color:#9ca3af;white-space:pre-wrap;max-height:500px;overflow-y:auto;margin-bottom:10px;line-height:1.6">'
+              +(preview||'(contenu vide)')
               +'</div>'
               +'<div style="display:flex;gap:8px">'
               +'<button class="fwd-sugg-btn" style="background:#10b98122;border:1px solid #10b981;color:#10b981;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600">✅ Valider → Admin</button>'
@@ -1991,7 +1991,7 @@ async function loadJuristes(){
         return '<div data-sid="'+s.id+'" style="background:#111420;border:1px solid #f59e0b33;border-radius:8px;padding:12px;margin-bottom:8px">'
           +'<div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:4px">'+(s.filename||'Modele')+'</div>'
           +'<div style="font-size:11px;color:#6b7280;margin-bottom:8px">Soumis par: <strong style="color:#f59e0b">'+(s.suggested_by||'')+'</strong></div>'
-          +(preview?'<div class="sugg-preview" style="display:none;background:#0a0c12;border:1px solid #1f2537;border-radius:6px;padding:10px;font-size:11px;color:#9ca3af;white-space:pre-wrap;max-height:200px;overflow-y:auto;margin-bottom:10px;line-height:1.6">'+preview+'</div>':'')
+          +(preview?'<div class="sugg-preview" style="display:none;background:#0a0c12;border:1px solid #1f2537;border-radius:6px;padding:10px;font-size:11px;color:#9ca3af;white-space:pre-wrap;max-height:500px;overflow-y:auto;margin-bottom:10px;line-height:1.6">'+preview+'</div>':'')
           +'<div style="display:flex;gap:8px">'
           +(preview?'<button class="toggle-preview-btn" style="background:#1a2035;border:1px solid #1f2537;color:#a0a8c0;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer">👁 Voir contenu</button>':'')
           +'<button class="fwd-sugg-btn" style="background:#10b98122;border:1px solid #10b981;color:#10b981;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer">Transmettre admin</button>'
