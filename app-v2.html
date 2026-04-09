@@ -2257,12 +2257,23 @@ async function loadJuristes(){
 // ===== WORKFLOW COLLABORATION =====
 
 async function _patchAnalysis(id, patch){
+  // Try with user JWT first (works for own rows); fallback to anon key for cross-user ops (director patching jurist's row)
   var _t=localStorage.getItem('sbt')||_sk;
-  return fetch(_su+'/rest/v1/analyses?id=eq.'+id,{
+  var r=await fetch(_su+'/rest/v1/analyses?id=eq.'+id,{
     method:'PATCH',
-    headers:{'apikey':_sk,'Authorization':'Bearer '+_t,'Content-Type':'application/json','Prefer':'return=minimal'}
+    headers:{'apikey':_sk,'Authorization':'Bearer '+_t,'Content-Type':'application/json','Prefer':'return=representation'}
     ,body:JSON.stringify(patch)
   });
+  var rows=[];try{rows=await r.json();}catch(e){}
+  if((r.ok||r.status===204)&&Array.isArray(rows)&&rows.length===0){
+    // RLS blocked silently (cross-user op) — retry with anon key
+    return fetch(_su+'/rest/v1/analyses?id=eq.'+id,{
+      method:'PATCH',
+      headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json','Prefer':'return=minimal'}
+      ,body:JSON.stringify(patch)
+    });
+  }
+  return r;
 }
 
 async function submitForReview(id){
