@@ -2128,8 +2128,22 @@ async function loadJuristes(){
     var allAna=window._userAnalyses||[];
 
     // Slot status bar
-    var slotLabel=isAdmin?(''+juristes.length+' juriste(s) — accès illimité'):(juristes.length+' / '+nbJuristesMax+' utilisé(s)');
-    var slotBar=isActive
+    var slotLabel=isAdmin?('Tous les comptes — '+juristes.length+' compte(s)'):(juristes.length+' / '+nbJuristesMax+' utilisé(s)');
+    var adminToolbar=isAdmin
+      ? '<div style="background:#0a0c12;border:1px solid #1f2537;border-radius:10px;padding:14px 16px;margin-bottom:12px">'
+        +'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">'
+        +'<div style="font-size:13px;font-weight:700;color:#e2e5f0">Tous les comptes <span style="color:#6b7280;font-weight:400;font-size:12px">'+juristes.length+' compte(s) enregistré(s)</span></div>'
+        +'<button id="btn-sync-payments" style="padding:7px 14px;background:#f59e0b22;border:1px solid #f59e0b55;border-radius:8px;color:#f59e0b;font-size:12px;font-weight:700;cursor:pointer">🔄 Sync paiements</button>'
+        +'</div>'
+        +'<div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">'
+        +'<div style="flex:1;min-width:200px"><label style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:5px">Email à activer manuellement</label>'
+        +'<input id="admin-activate-email" type="email" placeholder="utilisateur@exemple.com" style="width:100%;background:#111420;border:1px solid #1f2537;border-radius:8px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box"/></div>'
+        +'<button id="btn-admin-activate" style="padding:9px 16px;background:#10b98122;border:1px solid #10b981;border-radius:8px;color:#10b981;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">Activer</button>'
+        +'</div>'
+        +'<div id="admin-activate-msg" style="display:none;margin-top:8px;font-size:12px"></div>'
+        +'</div>'
+      : '';
+    var slotBar=isAdmin ? adminToolbar : (isActive
       ? '<div style="display:flex;justify-content:space-between;align-items:center;background:#0a0c12;border-radius:8px;padding:12px 16px;margin-bottom:12px">'
         +'<div><div style="font-size:12px;color:#9ca3af">Comptes juristes</div>'
         +'<div style="font-size:14px;font-weight:700;color:#e2e5f0;margin-top:2px">'+slotLabel+'</div></div>'
@@ -2137,7 +2151,7 @@ async function loadJuristes(){
           ? '<button id="btn-create-juriste" style="padding:8px 16px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">+ Créer un juriste</button>'
           : '<span style="font-size:12px;color:#f59e0b;padding:6px 12px;border:1px solid #f59e0b33;border-radius:8px">Quota atteint — modifiez votre abonnement</span>')
         +'</div>'
-      : '<div style="background:#1a1209;border:1px solid #f59e0b33;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#f59e0b">Souscrivez un abonnement pour créer des comptes juristes.</div>';
+      : '<div style="background:#1a1209;border:1px solid #f59e0b33;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#f59e0b">Souscrivez un abonnement pour créer des comptes juristes.</div>');
 
     // Create form (hidden by default)
     var createForm=slotsLeft>0&&isActive
@@ -2228,6 +2242,50 @@ async function loadJuristes(){
       }).join('')+'</div>';
     }
     el.innerHTML=html;
+
+    // Admin: sync payments button
+    var btnSync=el.querySelector('#btn-sync-payments');
+    if(btnSync){
+      btnSync.addEventListener('click',async function(){
+        btnSync.disabled=true;btnSync.textContent='⏳ Sync...';
+        var msgDiv=el.querySelector('#admin-activate-msg');
+        try{
+          var r=await fetch(BACKEND+'/admin/sync-payments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({caller_email:_cu.email})});
+          var d=await r.json();
+          if(!r.ok) throw new Error(d.error||'Erreur');
+          var created=d.created_or_updated||[];
+          if(msgDiv){msgDiv.style.display='block';msgDiv.style.color='#10b981';msgDiv.textContent=created.length>0?'Comptes créés/mis à jour: '+created.join(', '):'Tous les comptes sont déjà à jour.';}
+          window._juristesData=null;loadJuristes();
+        }catch(e){
+          if(msgDiv){msgDiv.style.display='block';msgDiv.style.color='#ef4444';msgDiv.textContent='Erreur: '+e.message;}
+          btnSync.disabled=false;btnSync.textContent='🔄 Sync paiements';
+        }
+      });
+    }
+
+    // Admin: manual activate form
+    var btnActivate=el.querySelector('#btn-admin-activate');
+    if(btnActivate){
+      btnActivate.addEventListener('click',async function(){
+        var emailInput=el.querySelector('#admin-activate-email');
+        var msgDiv=el.querySelector('#admin-activate-msg');
+        var targetEmail=(emailInput?emailInput.value.trim():'');
+        if(!targetEmail){if(msgDiv){msgDiv.style.display='block';msgDiv.style.color='#ef4444';msgDiv.textContent='Entrez un email.';}return;}
+        btnActivate.disabled=true;btnActivate.textContent='⏳...';
+        try{
+          var r=await fetch(BACKEND+'/admin/activate-user',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({caller_email:_cu.email,target_email:targetEmail,role:'directeur',analyses_remaining:20,nb_juristes_max:5})});
+          var d=await r.json();
+          if(!r.ok) throw new Error(d.error||'Erreur');
+          if(msgDiv){msgDiv.style.display='block';msgDiv.style.color='#10b981';msgDiv.textContent=d.message||'Activé !';}
+          if(emailInput)emailInput.value='';
+          window._juristesData=null;
+          setTimeout(function(){loadJuristes();},800);
+        }catch(e){
+          if(msgDiv){msgDiv.style.display='block';msgDiv.style.color='#ef4444';msgDiv.textContent='Erreur: '+e.message;}
+        }
+        btnActivate.disabled=false;btnActivate.textContent='Activer';
+      });
+    }
 
     // Create juriste button toggle
     var btnCreate=el.querySelector('#btn-create-juriste');
