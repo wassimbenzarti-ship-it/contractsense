@@ -2257,9 +2257,10 @@ async function loadJuristes(){
 // ===== WORKFLOW COLLABORATION =====
 
 async function _patchAnalysis(id, patch){
+  var _t=localStorage.getItem('sbt')||_sk;
   return fetch(_su+'/rest/v1/analyses?id=eq.'+id,{
     method:'PATCH',
-    headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json','Prefer':'return=minimal'}
+    headers:{'apikey':_sk,'Authorization':'Bearer '+_t,'Content-Type':'application/json','Prefer':'return=minimal'}
     ,body:JSON.stringify(patch)
   });
 }
