@@ -636,18 +636,30 @@ function renderParties(parties) {
   show('step-parties');
 }
 
-//  Step 3: Analyze with selected partie 
+//  Step 3: Analyze with selected partie
 async function analyzeWithPartie(partieName) {
   selectedPartie = partieName;
   hide('step-parties');
   showFlex('step-loading');
   stepDone(2);
-  setTimeout(function() { stepDone(3); }, 1400);
 
   // Ensure session is restored before sending user_email
   if (!_cu) await chkSess();
 
   try {
+    // Quick jurisdiction detection before full analysis
+    var s2El = document.getElementById('s2');
+    if(s2El) s2El.textContent = '🔍 Détection du droit applicable...';
+    var fdJ = new FormData();
+    if(curFile) fdJ.append('file', curFile);
+    if(curFile) fdJ.append('title', curFile.name||'');
+    var jurR = await fetch(BACKEND+'/detect-jurisdiction',{method:'POST',body:fdJ});
+    var jurD = jurR.ok?await jurR.json():{jurisdiction:'universel'};
+    var jur = jurD.jurisdiction||'universel';
+    var jLabel = (_JUR_LABELS||{})[jur]||jur;
+    if(s2El) s2El.textContent = '⚖️ Analyse en ' + jLabel + '...';
+    setTimeout(function(){stepDone(2);setTimeout(function(){stepDone(3);},1400);},200);
+
     var fd = buildFormData();
     fd.append('partie', partieName);
 
@@ -1299,13 +1311,26 @@ function dAnaShowParties(parties) {
   });
 }
 
+var _JUR_LABELS = {droit_marocain:'droit marocain 🇲🇦',droit_francais:'droit français 🇫🇷',droit_anglais:'droit anglais 🇬🇧',droit_tunisien:'droit tunisien 🇹🇳',droit_algerien:'droit algérien 🇩🇿',droit_belge:'droit belge 🇧🇪',universel:'droit applicable 🌐'};
+
 async function dAnaAnalyze(partie) {
   selectedPartie = partie;
   document.getElementById('d-ana-parties').style.display = 'none';
   document.getElementById('d-ana-loading').style.display = '';
-  document.getElementById('d-ana-status').textContent = 'Analyse juridique en cours...';
+  var statusEl = document.getElementById('d-ana-status');
+  statusEl.textContent = 'Détection du droit applicable...';
   _dashAnalysis = true;
   try {
+    // Quick jurisdiction detection (no AI, fast)
+    var fdJ = new FormData();
+    fdJ.append('file', curFile);
+    fdJ.append('title', curFile.name || '');
+    var jurResp = await fetch(BACKEND+'/detect-jurisdiction', {method:'POST', body:fdJ});
+    var jurData = jurResp.ok ? await jurResp.json() : {jurisdiction:'universel'};
+    var detectedJur = jurData.jurisdiction || 'universel';
+    var jurLabel = _JUR_LABELS[detectedJur] || detectedJur;
+    statusEl.textContent = 'Analyse en ' + jurLabel + '...';
+
     var fd = new FormData();
     fd.append('file', curFile); fd.append('partie', partie); fd.append('lang','auto');
     fd.append('type', savedType || document.getElementById('d-contract-type').value);
