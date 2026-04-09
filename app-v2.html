@@ -2103,7 +2103,7 @@ async function loadJuristes(){
     // Fetch director account data via backend (évite erreur 400 si colonnes manquantes)
     var rdDir=await fetch(BACKEND+'/account/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email})});
     var dirAcc=rdDir.ok?await rdDir.json():{};
-    var isAdmin=dirAcc.role==='admin';
+    var isAdmin=dirAcc.role==='admin'||!!dirAcc.is_admin;
 
     // Admin sees all users; director sees only their juristes
     var juristes=window._juristesData;
