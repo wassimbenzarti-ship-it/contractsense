@@ -2977,7 +2977,7 @@ function cbWelcome() {
     + '<span style="color:#6b7280;font-size:12px">Exemples\u00a0:<br>'
     + '\u00b7 \u00abExplique la clause de r\u00e9siliation\u00bb<br>'
     + '\u00b7 \u00abModifie la confidentialit\u00e9 pour mieux prot\u00e9ger '
-    + _escH(selectedPartie || 'votre partie') + '\u00bb</span>'
+    + _escH((window.selectedPartie) || 'votre partie') + '\u00bb</span>'
   );
 }
 
@@ -3093,7 +3093,7 @@ async function cbSend() {
       contract_text: contractTxt,
       modifications: modifications,
       decisions:     decisions,
-      partie:        selectedPartie || '',
+      partie:        (window.selectedPartie) || '',
       jurisdiction:  window._jurisdiction || 'universel',
       file_cache_id:      currentCacheId,
       file_storage_path:  window._fileStoragePath || ''
@@ -3148,7 +3148,7 @@ async function cbSend() {
     modifications = (window._currentMods || []).slice();
     decisions = {};
     modifications.forEach(function(m) { decisions[String(m.id || '')] = 'accepted'; });
-    selectedPartie   = ana.partie        || selectedPartie || '';
+    window.selectedPartie = ana.partie || (window.selectedPartie) || '';
     if (ana.contract_type) savedType = ana.contract_type;
     savedText = ''; // raw text not available; backend will use file cache / storage
 
