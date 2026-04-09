@@ -735,7 +735,7 @@ footer {
     <!-- Presse — alignée à droite des boutons -->
     <a href="https://leseco.ma/business/legaltec-avec-omniscient-westfield-veut-industrialiser-lanalyse-contractuelle.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;padding:10px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;transition:all 0.3s;align-self:center" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(200,169,75,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.borderColor='rgba(255,255,255,0.08)'">
       <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1px">
-        <span style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase">Vu dans la presse</span>
+        <span style="font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase" data-fr="Vu dans la presse" data-en="Featured in the press">Vu dans la presse</span>
         <svg width="64" height="20" viewBox="0 0 64 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <text x="0" y="16" font-family="Georgia, serif" font-size="16" font-weight="700" fill="#c8a94b">Les</text>
           <text x="32" y="16" font-family="Georgia, serif" font-size="16" font-weight="700" fill="#e6eaf6">Éco</text>
@@ -747,11 +747,11 @@ footer {
   <div class="hero-trust">
     <div class="trust-item">
       <div class="trust-num">60<span>s</span></div>
-      <div class="trust-label">Analyse complète</div>
+      <div class="trust-label" data-fr="Analyse complète" data-en="Full analysis">Analyse complète</div>
     </div>
     <div class="trust-item">
       <div class="trust-num">5<span>+</span></div>
-      <div class="trust-label">Markups proposés</div>
+      <div class="trust-label" data-fr="Markups proposés" data-en="Proposed markups">Markups proposés</div>
     </div>
     <div class="trust-item">
       <div class="trust-num">100<span>%</span></div>
@@ -759,7 +759,7 @@ footer {
     </div>
     <div class="trust-item">
       <div class="trust-num"><span>✦</span>RAG</div>
-      <div class="trust-label">Validé par avocats</div>
+      <div class="trust-label" data-fr="Validé par avocats" data-en="Lawyer-validated">Validé par avocats</div>
     </div>
   </div>
 </section>
@@ -803,9 +803,9 @@ footer {
 
 <!-- DEMO -->
 <section id="demo">
-  <div class="section-tag reveal">Workflow interactif</div>
-  <h2 class="section-h2 reveal">Du contrat brut au DOCX validé<br/>en 6 étapes.</h2>
-  <p class="section-sub reveal">Analyse IA → clauses non traitées → validation directeur → export Word → analyse de la version adverse.</p>
+  <div class="section-tag reveal" data-fr="Workflow interactif" data-en="Interactive workflow">Workflow interactif</div>
+  <h2 class="section-h2 reveal" data-fr="Du contrat brut au DOCX validé<br/>en 6 étapes." data-en="From raw contract to validated DOCX<br/>in 6 steps.">Du contrat brut au DOCX validé<br/>en 6 étapes.</h2>
+  <p class="section-sub reveal" data-fr="Analyse IA → clauses non traitées → validation directeur → export Word → analyse de la version adverse." data-en="AI analysis → untreated clauses → director validation → Word export → counterparty version analysis.">Analyse IA → clauses non traitées → validation directeur → export Word → analyse de la version adverse.</p>
 
   <div class="demo-wrap reveal">
     <div class="demo-topbar">
@@ -816,67 +816,67 @@ footer {
 
       <!-- S1 : Upload + analyse -->
       <div class="demo-step active" id="ds1">
-        <div class="step-tag">Étape 1 — Juriste · Upload &amp; analyse automatique</div>
+        <div class="step-tag" data-fr="Étape 1 — Juriste · Upload &amp; analyse automatique" data-en="Step 1 — Lawyer · Upload &amp; automatic analysis">Étape 1 — Juriste · Upload &amp; analyse automatique</div>
         <div class="drop-zone" id="dz">
           <div class="drop-icon">📄</div>
-          <div class="drop-title">Déposez votre contrat</div>
-          <div class="drop-sub">DOCX · TXT · PDF — analyse automatique des clauses</div>
+          <div class="drop-title" data-fr="Déposez votre contrat" data-en="Drop your contract">Déposez votre contrat</div>
+          <div class="drop-sub" data-fr="DOCX · TXT · PDF — analyse automatique des clauses" data-en="DOCX · TXT · PDF — automatic clause analysis">DOCX · TXT · PDF — analyse automatique des clauses</div>
         </div>
       </div>
 
       <!-- S2 : Markups IA high-level -->
       <div class="demo-step" id="ds2">
-        <div class="step-tag">Étape 2 — Juriste · Markups juridiques proposés par l'IA</div>
+        <div class="step-tag" data-fr="Étape 2 — Juriste · Markups juridiques proposés par l'IA" data-en="Step 2 — Lawyer · AI-proposed legal markups">Étape 2 — Juriste · Markups juridiques proposés par l'IA</div>
         <div class="mods-header">
-          <div class="mods-count" id="demo-mods-count">0 clause analysée</div>
-          <div class="mods-rag-badge">🧠 Base juridique Westfield</div>
+          <div class="mods-count" id="demo-mods-count" data-fr-tpl="{n} clause{s} analysée{s}" data-en-tpl="{n} clause{s} analysed">0 clause analysée</div>
+          <div class="mods-rag-badge" data-fr="🧠 Base juridique Westfield" data-en="🧠 Westfield Legal Base">🧠 Base juridique Westfield</div>
         </div>
         <div id="mlist2">
           <div class="mod-card" data-d="0">
             <div class="mod-head">
-              <div class="mod-name">Limitation de responsabilité</div>
-              <span class="risk-tag r-h">Risque élevé</span>
+              <div class="mod-name" data-fr="Limitation de responsabilité" data-en="Limitation of liability">Limitation de responsabilité</div>
+              <span class="risk-tag r-h" data-fr="Risque élevé" data-en="High risk">Risque élevé</span>
             </div>
             <div class="mod-body">
-              <div class="mod-orig" style="font-size:11px;color:var(--muted);margin-bottom:6px">Original : <span style="color:var(--red);text-decoration:line-through">Responsabilité illimitée du Prestataire pour tout dommage.</span></div>
+              <div class="mod-orig" style="font-size:11px;color:var(--muted);margin-bottom:6px" data-fr="Original : &lt;span style='color:var(--red);text-decoration:line-through'&gt;Responsabilité illimitée du Prestataire pour tout dommage.&lt;/span&gt;" data-en="Original: &lt;span style='color:var(--red);text-decoration:line-through'&gt;Unlimited liability of the Service Provider for any damage.&lt;/span&gt;">Original : <span style="color:var(--red);text-decoration:line-through">Responsabilité illimitée du Prestataire pour tout dommage.</span></div>
               <div class="mod-proposed-wrap">
-                <div class="mod-proposed-text">La responsabilité du Prestataire est limitée au montant des honoraires des douze (12) derniers mois. Toute responsabilité pour dommages indirects, perte d'exploitation ou manque à gagner est expressément exclue.</div>
+                <div class="mod-proposed-text" data-fr="La responsabilité du Prestataire est limitée au montant des honoraires des douze (12) derniers mois. Toute responsabilité pour dommages indirects, perte d'exploitation ou manque à gagner est expressément exclue." data-en="The Service Provider's liability is limited to the fees paid in the preceding twelve (12) months. Any liability for indirect damages, loss of business or loss of profit is expressly excluded.">La responsabilité du Prestataire est limitée au montant des honoraires des douze (12) derniers mois. Toute responsabilité pour dommages indirects, perte d'exploitation ou manque à gagner est expressément exclue.</div>
               </div>
-              <div class="mod-source">🧠 RAG Westfield · 18 contrats similaires</div>
+              <div class="mod-source" data-fr="🧠 RAG Westfield · 18 contrats similaires" data-en="🧠 RAG Westfield · 18 similar contracts">🧠 RAG Westfield · 18 contrats similaires</div>
             </div>
             <div style="display:flex;gap:8px;padding:7px 16px;border-top:1px solid var(--border)">
-              <button class="btn-accept on" style="max-width:110px;padding:5px 10px;font-size:11px">✅ Accepté</button>
+              <button class="btn-accept on" style="max-width:110px;padding:5px 10px;font-size:11px" data-fr="✅ Accepté" data-en="✅ Accepted">✅ Accepté</button>
             </div>
           </div>
           <div class="mod-card" data-d="230">
             <div class="mod-head">
-              <div class="mod-name">Clause pénale &amp; résiliation anticipée</div>
-              <span class="risk-tag r-h">Risque élevé</span>
+              <div class="mod-name" data-fr="Clause pénale &amp; résiliation anticipée" data-en="Penalty clause &amp; early termination">Clause pénale &amp; résiliation anticipée</div>
+              <span class="risk-tag r-h" data-fr="Risque élevé" data-en="High risk">Risque élevé</span>
             </div>
             <div class="mod-body">
-              <div class="mod-orig" style="font-size:11px;color:var(--muted);margin-bottom:6px">Original : <span style="color:var(--red);text-decoration:line-through">Le Client peut résilier sans préavis ni indemnité.</span></div>
+              <div class="mod-orig" style="font-size:11px;color:var(--muted);margin-bottom:6px" data-fr="Original : &lt;span style='color:var(--red);text-decoration:line-through'&gt;Le Client peut résilier sans préavis ni indemnité.&lt;/span&gt;" data-en="Original: &lt;span style='color:var(--red);text-decoration:line-through'&gt;The Client may terminate without notice or compensation.&lt;/span&gt;">Original : <span style="color:var(--red);text-decoration:line-through">Le Client peut résilier sans préavis ni indemnité.</span></div>
               <div class="mod-proposed-wrap">
-                <div class="mod-proposed-text">En cas de résiliation anticipée par le Client hors inexécution fautive, une indemnité forfaitaire de trois (3) mois d'honoraires est due de plein droit, exigible dans les quinze (15) jours suivant la notification.</div>
+                <div class="mod-proposed-text" data-fr="En cas de résiliation anticipée par le Client hors inexécution fautive, une indemnité forfaitaire de trois (3) mois d'honoraires est due de plein droit, exigible dans les quinze (15) jours suivant la notification." data-en="In the event of early termination by the Client other than for breach, a lump-sum indemnity of three (3) months' fees is automatically due, payable within fifteen (15) days of notification.">En cas de résiliation anticipée par le Client hors inexécution fautive, une indemnité forfaitaire de trois (3) mois d'honoraires est due de plein droit, exigible dans les quinze (15) jours suivant la notification.</div>
               </div>
-              <div class="mod-source">⚖️ DOC Art. 230 — force obligatoire des conventions</div>
+              <div class="mod-source" data-fr="⚖️ DOC Art. 230 — force obligatoire des conventions" data-en="⚖️ DOC Art. 230 — binding force of agreements">⚖️ DOC Art. 230 — force obligatoire des conventions</div>
             </div>
             <div style="display:flex;gap:8px;padding:7px 16px;border-top:1px solid var(--border)">
-              <button class="btn-accept on" style="max-width:110px;padding:5px 10px;font-size:11px">✅ Accepté</button>
+              <button class="btn-accept on" style="max-width:110px;padding:5px 10px;font-size:11px" data-fr="✅ Accepté" data-en="✅ Accepted">✅ Accepté</button>
             </div>
           </div>
           <div class="mod-card" data-d="460">
             <div class="mod-head">
-              <div class="mod-name">Force majeure</div>
-              <span class="risk-tag r-m">Risque moyen</span>
+              <div class="mod-name" data-fr="Force majeure" data-en="Force majeure">Force majeure</div>
+              <span class="risk-tag r-m" data-fr="Risque moyen" data-en="Medium risk">Risque moyen</span>
             </div>
             <div class="mod-body">
               <div class="mod-proposed-wrap">
-                <div class="mod-proposed-text">Constitue un cas de force majeure tout événement imprévisible, irrésistible et extérieur — pandémie, acte gouvernemental, catastrophe naturelle — suspendant les obligations sans indemnité, sous réserve de notification dans les 48h.</div>
+                <div class="mod-proposed-text" data-fr="Constitue un cas de force majeure tout événement imprévisible, irrésistible et extérieur — pandémie, acte gouvernemental, catastrophe naturelle — suspendant les obligations sans indemnité, sous réserve de notification dans les 48h." data-en="Force majeure means any unforeseeable, irresistible and external event — pandemic, government act, natural disaster — suspending obligations without compensation, subject to notification within 48 hours.">Constitue un cas de force majeure tout événement imprévisible, irrésistible et extérieur — pandémie, acte gouvernemental, catastrophe naturelle — suspendant les obligations sans indemnité, sous réserve de notification dans les 48h.</div>
               </div>
-              <div class="mod-source">🧠 RAG Westfield · Jurisprudence marocaine 2023</div>
+              <div class="mod-source" data-fr="🧠 RAG Westfield · Jurisprudence marocaine 2023" data-en="🧠 RAG Westfield · Moroccan case law 2023">🧠 RAG Westfield · Jurisprudence marocaine 2023</div>
             </div>
             <div style="display:flex;gap:8px;padding:7px 16px;border-top:1px solid var(--border)">
-              <button class="btn-accept on" style="max-width:110px;padding:5px 10px;font-size:11px">✅ Accepté</button>
+              <button class="btn-accept on" style="max-width:110px;padding:5px 10px;font-size:11px" data-fr="✅ Accepté" data-en="✅ Accepted">✅ Accepté</button>
             </div>
           </div>
         </div>
@@ -884,27 +884,27 @@ footer {
 
       <!-- S3 : Clause non analysée — dropdown auto, texte snap depuis contrat -->
       <div class="demo-step" id="ds3">
-        <div class="step-tag">Étape 3 — Juriste · Approfondissement de l'analyse juridique</div>
+        <div class="step-tag" data-fr="Étape 3 — Juriste · Approfondissement de l'analyse juridique" data-en="Step 3 — Lawyer · In-depth legal analysis">Étape 3 — Juriste · Approfondissement de l'analyse juridique</div>
         <div style="background:#0d1017;border:1px dashed #2a3040;border-radius:12px;padding:18px">
-          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">+ Le juriste prend la main et approfondit l'analyse</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Le juriste sélectionne toute clause qu'il souhaite soumettre à l'IA pour analyse juridique — <strong style="color:var(--text)">5 clauses identifiées dans ce contrat</strong></div>
+          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px" data-fr="+ Le juriste prend la main et approfondit l'analyse" data-en="+ The lawyer takes over and deepens the analysis">+ Le juriste prend la main et approfondit l'analyse</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:12px" data-fr="Le juriste sélectionne toute clause qu'il souhaite soumettre à l'IA pour analyse juridique — &lt;strong style='color:var(--text)'&gt;5 clauses identifiées dans ce contrat&lt;/strong&gt;" data-en="The lawyer selects any clause to submit to AI for legal analysis — &lt;strong style='color:var(--text)'&gt;5 clauses identified in this contract&lt;/strong&gt;">Le juriste sélectionne toute clause qu'il souhaite soumettre à l'IA pour analyse juridique — <strong style="color:var(--text)">5 clauses identifiées dans ce contrat</strong></div>
           <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap">
             <select id="demo-clause-sel" style="flex:2;min-width:210px;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text)">
-              <option value="">— Sélectionner une clause du contrat —</option>
-              <option value="arb" data-text="Tout différend relatif à l'interprétation ou l'exécution de la présente convention sera soumis à l'arbitrage de la Cour d'Arbitrage de Casablanca (CAC), statuant en langue française. Les parties renoncent expressément à tout recours judiciaire ordinaire.">Clause compromissoire (arbitrage CAC)</option>
-              <option value="pi" data-text="L'ensemble des livrables réalisés dans le cadre de cette convention demeurent la propriété exclusive du Prestataire jusqu'au paiement intégral des honoraires. Toute cession fera l'objet d'un acte séparé dûment signé.">Propriété intellectuelle des livrables</option>
-              <option value="nc" data-text="Le Client s'interdit de solliciter ou recruter tout collaborateur du Prestataire ayant participé à la mission pendant vingt-quatre (24) mois suivant la fin du contrat, sous peine d'une indemnité forfaitaire de 200 000 MAD.">Non-concurrence &amp; non-sollicitation</option>
-              <option value="jur" data-text="La présente convention est soumise au droit marocain. À défaut d'accord en médiation dans les trente (30) jours, le Tribunal de Commerce de Casablanca sera seul compétent.">Droit applicable &amp; juridiction compétente</option>
-              <option value="gar" data-text="Le Prestataire garantit ses prestations contre tout défaut de conformité pendant six (6) mois à compter de la réception définitive, limitée à la correction des défauts signalés par écrit.">Garantie &amp; réception des livrables</option>
+              <option value="" data-fr="— Sélectionner une clause du contrat —" data-en="— Select a clause from the contract —">— Sélectionner une clause du contrat —</option>
+              <option value="arb" data-text="Tout différend relatif à l'interprétation ou l'exécution de la présente convention sera soumis à l'arbitrage de la Cour d'Arbitrage de Casablanca (CAC), statuant en langue française. Les parties renoncent expressément à tout recours judiciaire ordinaire." data-fr="Clause compromissoire (arbitrage CAC)" data-en="Arbitration clause (CAC)">Clause compromissoire (arbitrage CAC)</option>
+              <option value="pi" data-text="L'ensemble des livrables réalisés dans le cadre de cette convention demeurent la propriété exclusive du Prestataire jusqu'au paiement intégral des honoraires. Toute cession fera l'objet d'un acte séparé dûment signé." data-fr="Propriété intellectuelle des livrables" data-en="IP ownership of deliverables">Propriété intellectuelle des livrables</option>
+              <option value="nc" data-text="Le Client s'interdit de solliciter ou recruter tout collaborateur du Prestataire ayant participé à la mission pendant vingt-quatre (24) mois suivant la fin du contrat, sous peine d'une indemnité forfaitaire de 200 000 MAD." data-fr="Non-concurrence &amp; non-sollicitation" data-en="Non-compete &amp; non-solicitation">Non-concurrence &amp; non-sollicitation</option>
+              <option value="jur" data-text="La présente convention est soumise au droit marocain. À défaut d'accord en médiation dans les trente (30) jours, le Tribunal de Commerce de Casablanca sera seul compétent." data-fr="Droit applicable &amp; juridiction compétente" data-en="Applicable law &amp; jurisdiction">Droit applicable &amp; juridiction compétente</option>
+              <option value="gar" data-text="Le Prestataire garantit ses prestations contre tout défaut de conformité pendant six (6) mois à compter de la réception définitive, limitée à la correction des défauts signalés par écrit." data-fr="Garantie &amp; réception des livrables" data-en="Warranty &amp; acceptance of deliverables">Garantie &amp; réception des livrables</option>
             </select>
             <span id="demo-sel-arrow" style="font-size:18px;color:var(--accent);animation:pulse 1.2s infinite">←</span>
           </div>
           <div id="demo-clause-textbox" style="display:none">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px">Texte extrait automatiquement du contrat</div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px" data-fr="Texte extrait automatiquement du contrat" data-en="Text automatically extracted from the contract">Texte extrait automatiquement du contrat</div>
             <div id="demo-clause-text" style="background:#181c2a;border:1px solid var(--accent);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--text);line-height:1.65;min-height:60px;transition:opacity 0.4s"></div>
             <div style="margin-top:10px;display:flex;align-items:center;gap:12px">
-              <button style="padding:8px 18px;background:var(--accent);border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:default">Analyser avec l'IA et ajouter →</button>
-              <span id="demo-clause-status" style="font-size:11px;color:var(--green);display:none">✓ Markup ajouté à l'analyse</span>
+              <button style="padding:8px 18px;background:var(--accent);border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:default" data-fr="Analyser avec l'IA et ajouter →" data-en="Analyse with AI and add →">Analyser avec l'IA et ajouter →</button>
+              <span id="demo-clause-status" style="font-size:11px;color:var(--green);display:none" data-fr="✓ Markup ajouté à l'analyse" data-en="✓ Markup added to the analysis">✓ Markup ajouté à l'analyse</span>
             </div>
           </div>
         </div>
@@ -912,27 +912,27 @@ footer {
 
       <!-- S4 : Soumission + validation directeur -->
       <div class="demo-step" id="ds4">
-        <div class="step-tag">Étape 4 — Directeur juridique · Révision &amp; validation</div>
+        <div class="step-tag" data-fr="Étape 4 — Directeur juridique · Révision &amp; validation" data-en="Step 4 — Legal Director · Review &amp; validation">Étape 4 — Directeur juridique · Révision &amp; validation</div>
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden">
           <div style="background:#080b14;padding:12px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
             <div>
               <span style="font-size:12px;font-weight:600">contrat_prestation_nexora.docx</span>
-              <span id="demo-dir-status-badge" style="margin-left:10px;font-size:10px;padding:2px 10px;border-radius:20px;background:rgba(245,158,11,0.15);color:var(--amber)">En attente directeur</span>
+              <span id="demo-dir-status-badge" style="margin-left:10px;font-size:10px;padding:2px 10px;border-radius:20px;background:rgba(245,158,11,0.15);color:var(--amber)" data-fr="En attente directeur" data-en="Awaiting director">En attente directeur</span>
             </div>
-            <span style="font-size:11px;color:var(--muted)">soumis par m.alami@nexora.ma</span>
+            <span style="font-size:11px;color:var(--muted)" data-fr="soumis par m.alami@nexora.ma" data-en="submitted by m.alami@nexora.ma">soumis par m.alami@nexora.ma</span>
           </div>
           <div style="padding:16px 18px">
             <div id="demo-dir-mods" style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px">
-              <div class="export-row" data-d="0" style="font-size:12px"><span style="color:var(--green)">✓</span> Limitation de responsabilité — plafond 12 mois <span style="color:var(--purple);font-size:10px;margin-left:auto">Westfield</span></div>
-              <div class="export-row" data-d="90" style="font-size:12px"><span style="color:var(--green)">✓</span> Clause pénale — indemnité 3 mois</div>
-              <div class="export-row" data-d="180" style="font-size:12px"><span style="color:var(--green)">✓</span> Force majeure — définition élargie <span style="color:var(--purple);font-size:10px;margin-left:auto">Westfield</span></div>
-              <div class="export-row" data-d="270" style="font-size:12px"><span style="color:var(--accent)">+</span> Clause compromissoire CAC — ajoutée par juriste</div>
+              <div class="export-row" data-d="0" style="font-size:12px" data-fr="&lt;span style='color:var(--green)'&gt;✓&lt;/span&gt; Limitation de responsabilité — plafond 12 mois &lt;span style='color:var(--purple);font-size:10px;margin-left:auto'&gt;Westfield&lt;/span&gt;" data-en="&lt;span style='color:var(--green)'&gt;✓&lt;/span&gt; Limitation of liability — 12-month cap &lt;span style='color:var(--purple);font-size:10px;margin-left:auto'&gt;Westfield&lt;/span&gt;"><span style="color:var(--green)">✓</span> Limitation de responsabilité — plafond 12 mois <span style="color:var(--purple);font-size:10px;margin-left:auto">Westfield</span></div>
+              <div class="export-row" data-d="90" style="font-size:12px" data-fr="&lt;span style='color:var(--green)'&gt;✓&lt;/span&gt; Clause pénale — indemnité 3 mois" data-en="&lt;span style='color:var(--green)'&gt;✓&lt;/span&gt; Penalty clause — 3-month compensation"><span style="color:var(--green)">✓</span> Clause pénale — indemnité 3 mois</div>
+              <div class="export-row" data-d="180" style="font-size:12px" data-fr="&lt;span style='color:var(--green)'&gt;✓&lt;/span&gt; Force majeure — définition élargie &lt;span style='color:var(--purple);font-size:10px;margin-left:auto'&gt;Westfield&lt;/span&gt;" data-en="&lt;span style='color:var(--green)'&gt;✓&lt;/span&gt; Force majeure — expanded definition &lt;span style='color:var(--purple);font-size:10px;margin-left:auto'&gt;Westfield&lt;/span&gt;"><span style="color:var(--green)">✓</span> Force majeure — définition élargie <span style="color:var(--purple);font-size:10px;margin-left:auto">Westfield</span></div>
+              <div class="export-row" data-d="270" style="font-size:12px" data-fr="&lt;span style='color:var(--accent)'&gt;+&lt;/span&gt; Clause compromissoire CAC — ajoutée par juriste" data-en="&lt;span style='color:var(--accent)'&gt;+&lt;/span&gt; CAC arbitration clause — added by lawyer"><span style="color:var(--accent)">+</span> Clause compromissoire CAC — ajoutée par juriste</div>
             </div>
             <div style="display:flex;gap:10px" id="demo-dir-btns">
-              <button style="flex:1;padding:10px;background:var(--green);border:none;border-radius:8px;color:#05070e;font-weight:700;font-size:12px;cursor:default">Valider → admin</button>
-              <button style="flex:1;padding:10px;background:rgba(255,69,96,0.1);border:1px solid rgba(255,69,96,0.25);border-radius:8px;color:var(--red);font-size:12px;cursor:default">Demander révision</button>
+              <button style="flex:1;padding:10px;background:var(--green);border:none;border-radius:8px;color:#05070e;font-weight:700;font-size:12px;cursor:default" data-fr="Valider → admin" data-en="Validate → admin">Valider → admin</button>
+              <button style="flex:1;padding:10px;background:rgba(255,69,96,0.1);border:1px solid rgba(255,69,96,0.25);border-radius:8px;color:var(--red);font-size:12px;cursor:default" data-fr="Demander révision" data-en="Request revision">Demander révision</button>
             </div>
-            <div id="demo-dir-done" style="display:none;margin-top:12px;padding:12px;background:rgba(13,207,138,0.07);border:1px solid rgba(13,207,138,0.2);border-radius:8px;font-size:12px;color:var(--green)">
+            <div id="demo-dir-done" style="display:none;margin-top:12px;padding:12px;background:rgba(13,207,138,0.07);border:1px solid rgba(13,207,138,0.2);border-radius:8px;font-size:12px;color:var(--green)" data-fr="✅ Validé par le directeur — transmis à l'admin Westfield" data-en="✅ Validated by director — forwarded to Westfield admin">
               ✅ Validé par le directeur — transmis à l'admin Westfield
             </div>
           </div>
@@ -941,23 +941,23 @@ footer {
 
       <!-- S5 : Export DOCX + déclenchement upload adverse -->
       <div class="demo-step" id="ds5">
-        <div class="step-tag">Étape 5 — Export Word avec Track Changes · Envoi à la contrepartie</div>
+        <div class="step-tag" data-fr="Étape 5 — Export Word avec Track Changes · Envoi à la contrepartie" data-en="Step 5 — Word Export with Track Changes · Send to counterparty">Étape 5 — Export Word avec Track Changes · Envoi à la contrepartie</div>
         <div style="display:flex;flex-direction:column;gap:12px">
           <div style="background:rgba(13,207,138,0.05);border:1px solid rgba(13,207,138,0.2);border-radius:12px;padding:18px">
-            <div style="font-size:13px;font-weight:600;margin-bottom:4px">✅ Document prêt à envoyer</div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:14px">4 markups intégrés · Track Changes natifs Word · validé par le directeur</div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:4px" data-fr="✅ Document prêt à envoyer" data-en="✅ Document ready to send">✅ Document prêt à envoyer</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:14px" data-fr="4 markups intégrés · Track Changes natifs Word · validé par le directeur" data-en="4 markups integrated · Native Word Track Changes · validated by director">4 markups intégrés · Track Changes natifs Word · validé par le directeur</div>
             <div id="demo-export-rows" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">
-              <div class="export-row" data-d="0" style="font-size:12px"><span style="color:var(--green)">✓</span> Limitation de responsabilité <span style="color:var(--purple);font-size:10px;margin-left:auto">Westfield</span></div>
-              <div class="export-row" data-d="100" style="font-size:12px"><span style="color:var(--green)">✓</span> Clause pénale — 3 mois d'honoraires</div>
-              <div class="export-row" data-d="200" style="font-size:12px"><span style="color:var(--green)">✓</span> Force majeure élargie <span style="color:var(--purple);font-size:10px;margin-left:auto">Westfield</span></div>
-              <div class="export-row" data-d="300" style="font-size:12px"><span style="color:var(--accent)">+</span> Clause compromissoire CAC</div>
+              <div class="export-row" data-d="0" style="font-size:12px" data-fr="&lt;span style='color:var(--green)'&gt;✓&lt;/span&gt; Limitation de responsabilité &lt;span style='color:var(--purple);font-size:10px;margin-left:auto'&gt;Westfield&lt;/span&gt;" data-en="&lt;span style='color:var(--green)'&gt;✓&lt;/span&gt; Limitation of liability &lt;span style='color:var(--purple);font-size:10px;margin-left:auto'&gt;Westfield&lt;/span&gt;"><span style="color:var(--green)">✓</span> Limitation de responsabilité <span style="color:var(--purple);font-size:10px;margin-left:auto">Westfield</span></div>
+              <div class="export-row" data-d="100" style="font-size:12px" data-fr="&lt;span style='color:var(--green)'&gt;✓&lt;/span&gt; Clause pénale — 3 mois d'honoraires" data-en="&lt;span style='color:var(--green)'&gt;✓&lt;/span&gt; Penalty clause — 3 months' fees"><span style="color:var(--green)">✓</span> Clause pénale — 3 mois d'honoraires</div>
+              <div class="export-row" data-d="200" style="font-size:12px" data-fr="&lt;span style='color:var(--green)'&gt;✓&lt;/span&gt; Force majeure élargie &lt;span style='color:var(--purple);font-size:10px;margin-left:auto'&gt;Westfield&lt;/span&gt;" data-en="&lt;span style='color:var(--green)'&gt;✓&lt;/span&gt; Expanded force majeure &lt;span style='color:var(--purple);font-size:10px;margin-left:auto'&gt;Westfield&lt;/span&gt;"><span style="color:var(--green)">✓</span> Force majeure élargie <span style="color:var(--purple);font-size:10px;margin-left:auto">Westfield</span></div>
+              <div class="export-row" data-d="300" style="font-size:12px" data-fr="&lt;span style='color:var(--accent)'&gt;+&lt;/span&gt; Clause compromissoire CAC" data-en="&lt;span style='color:var(--accent)'&gt;+&lt;/span&gt; CAC arbitration clause"><span style="color:var(--accent)">+</span> Clause compromissoire CAC</div>
             </div>
-            <button class="export-btn" style="font-size:13px;padding:14px">⬇ Télécharger DOCX avec Track Changes natifs Word</button>
+            <button class="export-btn" style="font-size:13px;padding:14px" data-fr="⬇ Télécharger DOCX avec Track Changes natifs Word" data-en="⬇ Download DOCX with native Word Track Changes">⬇ Télécharger DOCX avec Track Changes natifs Word</button>
           </div>
           <div id="demo-adverse-trigger" style="display:none;border:1px solid rgba(124,92,252,0.35);border-radius:12px;padding:16px;background:rgba(124,92,252,0.04)">
-            <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:6px">⚔️ La contrepartie a retourné sa version — importez-la</div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Omniscient compare automatiquement leur document avec vos clauses validées et propose des contre-rédactions pour chaque modification.</div>
-            <label style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(124,92,252,0.15);border:1px solid rgba(124,92,252,0.4);border-radius:7px;color:var(--purple);font-size:12px;font-weight:600;cursor:default">
+            <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:6px" data-fr="⚔️ La contrepartie a retourné sa version — importez-la" data-en="⚔️ The counterparty has returned their version — import it">⚔️ La contrepartie a retourné sa version — importez-la</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:10px" data-fr="Omniscient compare automatiquement leur document avec vos clauses validées et propose des contre-rédactions pour chaque modification." data-en="Omniscient automatically compares their document with your validated clauses and suggests counter-drafts for each change.">Omniscient compare automatiquement leur document avec vos clauses validées et propose des contre-rédactions pour chaque modification.</div>
+            <label style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(124,92,252,0.15);border:1px solid rgba(124,92,252,0.4);border-radius:7px;color:var(--purple);font-size:12px;font-weight:600;cursor:default" data-fr="⚔️ Importer la version adverse (DOCX / TXT)" data-en="⚔️ Import counterparty version (DOCX / TXT)">
               ⚔️ Importer la version adverse (DOCX / TXT)
             </label>
           </div>
@@ -966,45 +966,45 @@ footer {
 
       <!-- S6 : Analyse adverse -->
       <div class="demo-step" id="ds6">
-        <div class="step-tag">Étape 6 — Juriste · Analyse de la version adverse</div>
+        <div class="step-tag" data-fr="Étape 6 — Juriste · Analyse de la version adverse" data-en="Step 6 — Lawyer · Counterparty version analysis">Étape 6 — Juriste · Analyse de la version adverse</div>
         <div id="demo-adverse-scanning" style="text-align:center;padding:24px 0">
           <div style="font-size:28px;margin-bottom:10px">⏳</div>
           <div style="font-size:13px;font-weight:600;color:var(--purple)">contrat_adverse_atlas.docx</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px">Comparaison clause par clause en cours…</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px" data-fr="Comparaison clause par clause en cours…" data-en="Clause-by-clause comparison in progress…">Comparaison clause par clause en cours…</div>
           <div style="margin-top:14px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;max-width:260px;margin-left:auto;margin-right:auto">
             <div id="demo-adv-pbar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--purple),var(--accent));transition:width 1.4s ease;border-radius:2px"></div>
           </div>
         </div>
         <div id="demo-adverse-result" style="display:none">
-          <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:10px">⚔️ Résultats — version adverse vs. vos clauses validées</div>
+          <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:10px" data-fr="⚔️ Résultats — version adverse vs. vos clauses validées" data-en="⚔️ Results — counterparty version vs. your validated clauses">⚔️ Résultats — version adverse vs. vos clauses validées</div>
           <div style="display:flex;flex-direction:column;gap:8px">
             <div class="adv-row" data-d="0" style="opacity:0;transform:translateX(-12px);transition:all 0.35s;background:#0d1017;border:1px solid rgba(13,207,138,0.25);border-radius:8px;padding:10px 14px">
               <div style="display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:12px;font-weight:600">Limitation de responsabilité</span>
-                <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(13,207,138,0.12);color:var(--green);font-weight:600">✓ Acceptée telle quelle</span>
+                <span style="font-size:12px;font-weight:600" data-fr="Limitation de responsabilité" data-en="Limitation of liability">Limitation de responsabilité</span>
+                <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(13,207,138,0.12);color:var(--green);font-weight:600" data-fr="✓ Acceptée telle quelle" data-en="✓ Accepted as is">✓ Acceptée telle quelle</span>
               </div>
-              <div style="font-size:11px;color:var(--muted);margin-top:3px">L'adverse a conservé votre rédaction intégralement.</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px" data-fr="L'adverse a conservé votre rédaction intégralement." data-en="The counterparty kept your draft in full.">L'adverse a conservé votre rédaction intégralement.</div>
             </div>
             <div class="adv-row" data-d="160" style="opacity:0;transform:translateX(-12px);transition:all 0.35s;background:#0d1017;border:1px solid rgba(255,69,96,0.3);border-radius:8px;padding:10px 14px">
               <div style="display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:12px;font-weight:600">Clause pénale &amp; résiliation</span>
-                <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(255,69,96,0.12);color:var(--red);font-weight:600">⚠ Modifiée par l'adverse</span>
+                <span style="font-size:12px;font-weight:600" data-fr="Clause pénale &amp; résiliation" data-en="Penalty clause &amp; termination">Clause pénale &amp; résiliation</span>
+                <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(255,69,96,0.12);color:var(--red);font-weight:600" data-fr="⚠ Modifiée par l'adverse" data-en="⚠ Modified by counterparty">⚠ Modifiée par l'adverse</span>
               </div>
-              <div style="font-size:11px;color:var(--muted);margin-top:3px">Indemnité réduite à 1 mois (vs 3 mois validés). <strong style="color:var(--text)">→ Contre-rédaction IA générée.</strong></div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px" data-fr="Indemnité réduite à 1 mois (vs 3 mois validés). &lt;strong style='color:var(--text)'&gt;→ Contre-rédaction IA générée.&lt;/strong&gt;" data-en="Compensation reduced to 1 month (vs. 3 validated). &lt;strong style='color:var(--text)'&gt;→ AI counter-draft generated.&lt;/strong&gt;">Indemnité réduite à 1 mois (vs 3 mois validés). <strong style="color:var(--text)">→ Contre-rédaction IA générée.</strong></div>
             </div>
             <div class="adv-row" data-d="320" style="opacity:0;transform:translateX(-12px);transition:all 0.35s;background:#0d1017;border:1px solid rgba(255,69,96,0.3);border-radius:8px;padding:10px 14px">
               <div style="display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:12px;font-weight:600">Clause compromissoire CAC</span>
-                <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(255,69,96,0.12);color:var(--red);font-weight:600">⚠ Supprimée par l'adverse</span>
+                <span style="font-size:12px;font-weight:600" data-fr="Clause compromissoire CAC" data-en="CAC arbitration clause">Clause compromissoire CAC</span>
+                <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(255,69,96,0.12);color:var(--red);font-weight:600" data-fr="⚠ Supprimée par l'adverse" data-en="⚠ Removed by counterparty">⚠ Supprimée par l'adverse</span>
               </div>
-              <div style="font-size:11px;color:var(--muted);margin-top:3px">L'adverse a retiré la clause d'arbitrage. <strong style="color:var(--text)">→ Réintégration proposée, formulation renforcée.</strong></div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px" data-fr="L'adverse a retiré la clause d'arbitrage. &lt;strong style='color:var(--text)'&gt;→ Réintégration proposée, formulation renforcée.&lt;/strong&gt;" data-en="The counterparty removed the arbitration clause. &lt;strong style='color:var(--text)'&gt;→ Reintegration proposed, strengthened wording.&lt;/strong&gt;">L'adverse a retiré la clause d'arbitrage. <strong style="color:var(--text)">→ Réintégration proposée, formulation renforcée.</strong></div>
             </div>
             <div class="adv-row" data-d="480" style="opacity:0;transform:translateX(-12px);transition:all 0.35s;background:#0d1017;border:1px solid rgba(13,207,138,0.25);border-radius:8px;padding:10px 14px">
               <div style="display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:12px;font-weight:600">Force majeure</span>
-                <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(13,207,138,0.12);color:var(--green);font-weight:600">✓ Acceptée telle quelle</span>
+                <span style="font-size:12px;font-weight:600" data-fr="Force majeure" data-en="Force majeure">Force majeure</span>
+                <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(13,207,138,0.12);color:var(--green);font-weight:600" data-fr="✓ Acceptée telle quelle" data-en="✓ Accepted as is">✓ Acceptée telle quelle</span>
               </div>
-              <div style="font-size:11px;color:var(--muted);margin-top:3px">Votre rédaction conservée sans modification.</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px" data-fr="Votre rédaction conservée sans modification." data-en="Your draft kept without modification.">Votre rédaction conservée sans modification.</div>
             </div>
           </div>
         </div>
@@ -1025,44 +1025,44 @@ footer {
 
 <!-- EDIT FEATURE HIGHLIGHT -->
 <section id="edit-feature">
-  <div class="section-tag reveal">Fonctionnalité exclusive</div>
-  <h2 class="section-h2 reveal">Modifiez les markups<br/>avant d'exporter.</h2>
-  <p class="section-sub reveal">L'IA propose, vous décidez. Chaque markup est directement éditable — affinez la rédaction selon votre style avant de générer le document final.</p>
+  <div class="section-tag reveal" data-fr="Fonctionnalité exclusive" data-en="Exclusive feature">Fonctionnalité exclusive</div>
+  <h2 class="section-h2 reveal" data-fr="Modifiez les markups<br/>avant d'exporter." data-en="Edit markups<br/>before exporting.">Modifiez les markups<br/>avant d'exporter.</h2>
+  <p class="section-sub reveal" data-fr="L'IA propose, vous décidez. Chaque markup est directement éditable — affinez la rédaction selon votre style avant de générer le document final." data-en="AI proposes, you decide. Every markup is directly editable — refine the wording to match your style before generating the final document.">L'IA propose, vous décidez. Chaque markup est directement éditable — affinez la rédaction selon votre style avant de générer le document final.</p>
 
   <div class="edit-showcase reveal">
     <div class="edit-header">
       <div class="win-dots"><span></span><span></span><span></span></div>
-      <div style="font-size:12px;color:var(--muted);margin-left:8px">Révision des markups — Contrat de prestation · favorable Prestataire</div>
+      <div style="font-size:12px;color:var(--muted);margin-left:8px" data-fr="Révision des markups — Contrat de prestation · favorable Prestataire" data-en="Markup review — Service contract · favoring Contractor">Révision des markups — Contrat de prestation · favorable Prestataire</div>
     </div>
     <div class="edit-body">
       <div class="clause-edit-card">
         <div class="clause-edit-head">
-          <div style="font-weight:600;font-size:13px">Clause de paiement</div>
-          <span style="padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(255,69,96,0.12);color:var(--red)">Risque élevé</span>
+          <div style="font-weight:600;font-size:13px" data-fr="Clause de paiement" data-en="Payment clause">Clause de paiement</div>
+          <span style="padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(255,69,96,0.12);color:var(--red)" data-fr="Risque élevé" data-en="High risk">Risque élevé</span>
         </div>
         <div class="clause-edit-body">
-          <div class="label-small">Texte original</div>
-          <div class="original-text">Le Client s'engage à payer les factures dans un délai raisonnable.</div>
-          <div class="label-small" style="color:var(--green)">Markup proposé — cliquez pour éditer</div>
+          <div class="label-small" data-fr="Texte original" data-en="Original text">Texte original</div>
+          <div class="original-text" data-fr="Le Client s'engage à payer les factures dans un délai raisonnable." data-en="The Client undertakes to pay invoices within a reasonable time.">Le Client s'engage à payer les factures dans un délai raisonnable.</div>
+          <div class="label-small" style="color:var(--green)" data-fr="Markup proposé — cliquez pour éditer" data-en="Proposed markup — click to edit">Markup proposé — cliquez pour éditer</div>
           <div class="mod-proposed-wrap">
             <div class="editable-proposed" id="editable-demo">
               Le Client s'engage à régler les factures dans un délai de trente (30) jours calendaires à compter de leur date d'émission. Tout retard de paiement entraînera de plein droit l'application d'intérêts de retard au taux de 1,5% par mois<span class="cursor-blink" id="typed-cursor"></span>
             </div>
-            <div class="edit-label-float">✏ Éditable</div>
+            <div class="edit-label-float" data-fr="✏ Éditable" data-en="✏ Editable">✏ Éditable</div>
           </div>
-          <div style="font-size:11px;color:var(--purple);display:flex;align-items:center;gap:6px;margin-top:10px">
+          <div style="font-size:11px;color:var(--purple);display:flex;align-items:center;gap:6px;margin-top:10px" data-fr="🧠 Basé sur clause validée RAG — Westfield · 12 contrats de prestation similaires" data-en="🧠 Based on RAG-validated clause — Westfield · 12 similar service contracts">
             🧠 Basé sur clause validée RAG — Westfield · 12 contrats de prestation similaires
           </div>
         </div>
         <div class="clause-edit-footer">
-          <div class="rag-ref">
+          <div class="rag-ref" data-fr="&lt;span&gt;📚&lt;/span&gt; Art. 78 Loi 15-95 — délai de paiement max 60 jours" data-en="&lt;span&gt;📚&lt;/span&gt; Art. 78 Law 15-95 — max payment period 60 days">
             <span>📚</span> Art. 78 Loi 15-95 — délai de paiement max 60 jours
           </div>
-          <button class="btn-accept on" style="max-width:120px">✅ Accepter</button>
+          <button class="btn-accept on" style="max-width:120px" data-fr="✅ Accepter" data-en="✅ Accept">✅ Accepter</button>
         </div>
       </div>
 
-      <div style="background:rgba(61,107,255,0.06);border:1px solid rgba(61,107,255,0.2);border-radius:12px;padding:16px 20px;font-size:13px;line-height:1.6">
+      <div style="background:rgba(61,107,255,0.06);border:1px solid rgba(61,107,255,0.2);border-radius:12px;padding:16px 20px;font-size:13px;line-height:1.6" data-fr="💡 &lt;strong&gt;Vous gardez le contrôle total.&lt;/strong&gt; Chaque markup proposé par l'IA est éditable — affinez la rédaction selon votre style avant d'accepter. L'IA assiste, le juriste décide." data-en="💡 &lt;strong&gt;You keep full control.&lt;/strong&gt; Every AI-proposed markup is editable — refine the wording to match your style before accepting. The AI assists, the lawyer decides.">
         💡 <strong>Vous gardez le contrôle total.</strong> Chaque markup proposé par l'IA est éditable — affinez la rédaction selon votre style avant d'accepter. L'IA assiste, le juriste décide.
       </div>
     </div>
@@ -1071,9 +1071,9 @@ footer {
 
 <!-- WORKFLOW SUPERVISE -->
 <section id="workflow" style="padding:120px 48px;display:flex;flex-direction:column;align-items:center">
-  <div class="section-tag reveal">Nouveau — Workflow juridique complet</div>
-  <h2 class="section-h2 reveal">Un circuit de validation<br/>rigoureux à chaque étape.</h2>
-  <p class="section-sub reveal">Omniscient structure la collaboration entre juristes, directeurs juridiques et l'équipe Westfield — chaque analyse suit un circuit de validation avant d'être finalisée.</p>
+  <div class="section-tag reveal" data-fr="Nouveau — Workflow juridique complet" data-en="New — Complete legal workflow">Nouveau — Workflow juridique complet</div>
+  <h2 class="section-h2 reveal" data-fr="Un circuit de validation<br/>rigoureux à chaque étape." data-en="A rigorous validation circuit<br/>at every step.">Un circuit de validation<br/>rigoureux à chaque étape.</h2>
+  <p class="section-sub reveal" data-fr="Omniscient structure la collaboration entre juristes, directeurs juridiques et l'équipe Westfield — chaque analyse suit un circuit de validation avant d'être finalisée." data-en="Omniscient structures collaboration between lawyers, legal directors and the Westfield team — every analysis follows a validation circuit before being finalised.">Omniscient structure la collaboration entre juristes, directeurs juridiques et l'équipe Westfield — chaque analyse suit un circuit de validation avant d'être finalisée.</p>
 
   <!-- Pipeline visuel -->
   <div class="reveal" style="width:100%;max-width:1000px;margin-bottom:72px">
@@ -1084,29 +1084,29 @@ footer {
       <!-- Étape 1 -->
       <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 12px;position:relative;z-index:1">
         <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1a2680,#3d6bff22);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">📄</div>
-        <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--accent)">Juriste</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.6">Upload du contrat, analyse IA, révision des markups, approfondissement juridique clause par clause</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--accent)" data-fr="Juriste" data-en="Lawyer">Juriste</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6" data-fr="Upload du contrat, analyse IA, révision des markups, approfondissement juridique clause par clause" data-en="Contract upload, AI analysis, markup review, in-depth legal analysis clause by clause">Upload du contrat, analyse IA, révision des markups, approfondissement juridique clause par clause</div>
       </div>
 
       <!-- Étape 2 -->
       <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 12px;position:relative;z-index:1">
         <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1a1040,#7c5cfc22);border:2px solid var(--purple);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">🔍</div>
-        <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--purple)">Directeur juridique</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.6">Révision des markups, demande de révision au juriste, validation finale</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--purple)" data-fr="Directeur juridique" data-en="Legal Director">Directeur juridique</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6" data-fr="Révision des markups, demande de révision au juriste, validation finale" data-en="Markup review, revision requests to the lawyer, final validation">Révision des markups, demande de révision au juriste, validation finale</div>
       </div>
 
       <!-- Étape 3 -->
       <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 12px;position:relative;z-index:1">
         <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1a1200,#c8a94b22);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">✅</div>
-        <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--gold)">Admin Westfield</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.6">Contrôle qualité final, validation et archivage selon les standards Westfield</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--gold)" data-fr="Admin Westfield" data-en="Westfield Admin">Admin Westfield</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6" data-fr="Contrôle qualité final, validation et archivage selon les standards Westfield" data-en="Final quality control, validation and archiving according to Westfield standards">Contrôle qualité final, validation et archivage selon les standards Westfield</div>
       </div>
 
       <!-- Étape 4 -->
       <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 12px;position:relative;z-index:1">
         <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#001a10,#0dcf8a22);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">🧠</div>
-        <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--green)">Base Westfield</div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.6">Les markups proposés s'appuient sur une base juridique construite et maintenue par l'équipe Westfield</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px;color:var(--green)" data-fr="Base Westfield" data-en="Westfield Knowledge Base">Base Westfield</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6" data-fr="Les markups proposés s'appuient sur une base juridique construite et maintenue par l'équipe Westfield" data-en="Proposed markups are grounded in a legal knowledge base built and maintained by the Westfield team">Les markups proposés s'appuient sur une base juridique construite et maintenue par l'équipe Westfield</div>
       </div>
     </div>
   </div>
@@ -1116,38 +1116,38 @@ footer {
 
     <div class="feat-card reveal" style="border-color:rgba(91,124,250,0.25)">
       <span class="feat-icon">🔎</span>
-      <div class="feat-title">Le juriste prend la main</div>
-      <p class="feat-text">À tout moment, le juriste peut approfondir l'analyse sur les clauses de son choix. Il sélectionne une clause dans le contrat — son texte s'affiche automatiquement — et la soumet à l'IA pour obtenir un markup juridique ciblé.</p>
+      <div class="feat-title" data-fr="Le juriste prend la main" data-en="The lawyer takes over">Le juriste prend la main</div>
+      <p class="feat-text" data-fr="À tout moment, le juriste peut approfondir l'analyse sur les clauses de son choix. Il sélectionne une clause dans le contrat — son texte s'affiche automatiquement — et la soumet à l'IA pour obtenir un markup juridique ciblé." data-en="At any time, the lawyer can deepen the analysis on chosen clauses. They select a clause from the contract — its text appears automatically — and submit it to the AI for a targeted legal markup.">À tout moment, le juriste peut approfondir l'analyse sur les clauses de son choix. Il sélectionne une clause dans le contrat — son texte s'affiche automatiquement — et la soumet à l'IA pour obtenir un markup juridique ciblé.</p>
     </div>
 
     <div class="feat-card reveal" style="border-color:rgba(124,92,252,0.25)">
       <span class="feat-icon">↔️</span>
-      <div class="feat-title">Circuit juriste → directeur</div>
-      <p class="feat-text">Le juriste soumet l'analyse à son directeur juridique en un clic. Le directeur révise, peut demander des corrections, puis valide. Chaque statut est visible en temps réel sur le tableau de bord.</p>
+      <div class="feat-title" data-fr="Circuit juriste → directeur" data-en="Lawyer → director circuit">Circuit juriste → directeur</div>
+      <p class="feat-text" data-fr="Le juriste soumet l'analyse à son directeur juridique en un clic. Le directeur révise, peut demander des corrections, puis valide. Chaque statut est visible en temps réel sur le tableau de bord." data-en="The lawyer submits the analysis to their legal director in one click. The director reviews, can request corrections, then validates. Every status is visible in real time on the dashboard.">Le juriste soumet l'analyse à son directeur juridique en un clic. Le directeur révise, peut demander des corrections, puis valide. Chaque statut est visible en temps réel sur le tableau de bord.</p>
     </div>
 
     <div class="feat-card reveal" style="border-color:rgba(200,169,75,0.25)">
       <span class="feat-icon">⚔️</span>
-      <div class="feat-title">Analyse version adverse</div>
-      <p class="feat-text">Importez la version modifiée de la partie adverse. Omniscient compare automatiquement, identifie les clauses modifiées et propose des contre-rédactions — les clauses acceptées par l'adverse sont filtrées.</p>
+      <div class="feat-title" data-fr="Analyse version adverse" data-en="Counterparty version analysis">Analyse version adverse</div>
+      <p class="feat-text" data-fr="Importez la version modifiée de la partie adverse. Omniscient compare automatiquement, identifie les clauses modifiées et propose des contre-rédactions — les clauses acceptées par l'adverse sont filtrées." data-en="Import the counterparty's revised version. Omniscient automatically compares, identifies modified clauses and proposes counter-drafts — clauses accepted by the counterparty are filtered out.">Importez la version modifiée de la partie adverse. Omniscient compare automatiquement, identifie les clauses modifiées et propose des contre-rédactions — les clauses acceptées par l'adverse sont filtrées.</p>
     </div>
 
     <div class="feat-card reveal">
       <span class="feat-icon">📂</span>
-      <div class="feat-title">Historique & gestion</div>
-      <p class="feat-text">Toutes vos analyses sont sauvegardées. Dépliez une analyse pour voir les markups, supprimez une entrée erronée avec confirmation, retrouvez le nom du contrat en tête de chaque carte.</p>
+      <div class="feat-title" data-fr="Historique &amp; gestion" data-en="History &amp; management">Historique &amp; gestion</div>
+      <p class="feat-text" data-fr="Toutes vos analyses sont sauvegardées. Dépliez une analyse pour voir les markups, supprimez une entrée erronée avec confirmation, retrouvez le nom du contrat en tête de chaque carte." data-en="All your analyses are saved. Expand an analysis to see the markups, delete an incorrect entry with confirmation, find the contract name at the top of each card.">Toutes vos analyses sont sauvegardées. Dépliez une analyse pour voir les markups, supprimez une entrée erronée avec confirmation, retrouvez le nom du contrat en tête de chaque carte.</p>
     </div>
 
     <div class="feat-card reveal">
       <span class="feat-icon">🔁</span>
-      <div class="feat-title">Cycle de révision intégré</div>
-      <p class="feat-text">Le directeur peut renvoyer une analyse au juriste pour correction sans sortir de la plateforme. Chaque cycle est tracé — statut, date, commentaires — jusqu'à validation définitive.</p>
+      <div class="feat-title" data-fr="Cycle de révision intégré" data-en="Built-in revision cycle">Cycle de révision intégré</div>
+      <p class="feat-text" data-fr="Le directeur peut renvoyer une analyse au juriste pour correction sans sortir de la plateforme. Chaque cycle est tracé — statut, date, commentaires — jusqu'à validation définitive." data-en="The director can send an analysis back to the lawyer for correction without leaving the platform. Every cycle is tracked — status, date, comments — until final validation.">Le directeur peut renvoyer une analyse au juriste pour correction sans sortir de la plateforme. Chaque cycle est tracé — statut, date, commentaires — jusqu'à validation définitive.</p>
     </div>
 
     <div class="feat-card reveal">
       <span class="feat-icon">📋</span>
-      <div class="feat-title">Tableau de bord unifié</div>
-      <p class="feat-text">Juriste et directeur disposent chacun d'une vue centralisée de toutes leurs analyses en cours — filtrage par statut, accès direct aux markups, historique complet par contrat.</p>
+      <div class="feat-title" data-fr="Tableau de bord unifié" data-en="Unified dashboard">Tableau de bord unifié</div>
+      <p class="feat-text" data-fr="Juriste et directeur disposent chacun d'une vue centralisée de toutes leurs analyses en cours — filtrage par statut, accès direct aux markups, historique complet par contrat." data-en="Lawyers and directors each have a centralised view of all their ongoing analyses — filter by status, direct access to markups, full history per contract.">Juriste et directeur disposent chacun d'une vue centralisée de toutes leurs analyses en cours — filtrage par statut, accès direct aux markups, historique complet par contrat.</p>
     </div>
 
   </div>
@@ -1155,30 +1155,30 @@ footer {
 
 <!-- FEATURES -->
 <section id="features">
-  <div class="section-tag reveal">Les fondamentaux</div>
-  <h2 class="section-h2 reveal">Conçu par des juristes,<br/>pour des juristes.</h2>
-  <p class="section-sub reveal">Chaque fonctionnalité répond à un besoin réel de la pratique contractuelle.</p>
+  <div class="section-tag reveal" data-fr="Les fondamentaux" data-en="The essentials">Les fondamentaux</div>
+  <h2 class="section-h2 reveal" data-fr="Conçu par des juristes,<br/>pour des juristes." data-en="Designed by lawyers,<br/>for lawyers.">Conçu par des juristes,<br/>pour des juristes.</h2>
+  <p class="section-sub reveal" data-fr="Chaque fonctionnalité répond à un besoin réel de la pratique contractuelle." data-en="Every feature addresses a real need in contract practice.">Chaque fonctionnalité répond à un besoin réel de la pratique contractuelle.</p>
 
   <div class="feat-grid">
     <div class="feat-card reveal">
       <span class="feat-icon">🎯</span>
-      <div class="feat-title">Markups ciblés par partie</div>
-      <p class="feat-text">L'IA identifie automatiquement les parties et adapte chaque modification pour défendre vos intérêts — prestataire, client, employeur ou autre.</p>
+      <div class="feat-title" data-fr="Markups ciblés par partie" data-en="Party-targeted markups">Markups ciblés par partie</div>
+      <p class="feat-text" data-fr="L'IA identifie automatiquement les parties et adapte chaque modification pour défendre vos intérêts — prestataire, client, employeur ou autre." data-en="The AI automatically identifies parties and tailors every edit to defend your interests — service provider, client, employer or other.">L'IA identifie automatiquement les parties et adapte chaque modification pour défendre vos intérêts — prestataire, client, employeur ou autre.</p>
     </div>
     <div class="feat-card reveal">
       <span class="feat-icon">✏️</span>
-      <div class="feat-title">Édition en ligne des markups</div>
-      <p class="feat-text">Modifiez directement le texte proposé par l'IA avant d'accepter. Votre style rédactionnel est préservé — l'IA assiste, vous décidez.</p>
+      <div class="feat-title" data-fr="Édition en ligne des markups" data-en="Inline markup editing">Édition en ligne des markups</div>
+      <p class="feat-text" data-fr="Modifiez directement le texte proposé par l'IA avant d'accepter. Votre style rédactionnel est préservé — l'IA assiste, vous décidez." data-en="Edit the AI-proposed text directly before accepting. Your drafting style is preserved — the AI assists, you decide.">Modifiez directement le texte proposé par l'IA avant d'accepter. Votre style rédactionnel est préservé — l'IA assiste, vous décidez.</p>
     </div>
     <div class="feat-card reveal">
       <span class="feat-icon">📝</span>
-      <div class="feat-title">Track Changes natifs Word</div>
-      <p class="feat-text">Export DOCX avec de vraies Track Changes Word — acceptez ou refusez directement dans votre traitement de texte. Prêt à envoyer à la contrepartie.</p>
+      <div class="feat-title" data-fr="Track Changes natifs Word" data-en="Native Word Track Changes">Track Changes natifs Word</div>
+      <p class="feat-text" data-fr="Export DOCX avec de vraies Track Changes Word — acceptez ou refusez directement dans votre traitement de texte. Prêt à envoyer à la contrepartie." data-en="DOCX export with real Word Track Changes — accept or reject directly in your word processor. Ready to send to the counterparty.">Export DOCX avec de vraies Track Changes Word — acceptez ou refusez directement dans votre traitement de texte. Prêt à envoyer à la contrepartie.</p>
     </div>
     <div class="feat-card reveal">
       <span class="feat-icon">🧠</span>
-      <div class="feat-title">RAG validé par avocats</div>
-      <p class="feat-text">La base de connaissances est alimentée uniquement par des contrats et clauses validés par des avocats. Zéro hallucination juridique.</p>
+      <div class="feat-title" data-fr="RAG validé par avocats" data-en="Lawyer-validated RAG">RAG validé par avocats</div>
+      <p class="feat-text" data-fr="La base de connaissances est alimentée uniquement par des contrats et clauses validés par des avocats. Zéro hallucination juridique." data-en="The knowledge base is fed exclusively by contracts and clauses validated by lawyers. Zero legal hallucination.">La base de connaissances est alimentée uniquement par des contrats et clauses validés par des avocats. Zéro hallucination juridique.</p>
     </div>
     <div class="feat-card reveal">
       <span class="feat-icon">🌍</span>
@@ -1196,10 +1196,10 @@ footer {
 <!-- CTA -->
 <section id="cta">
   <div class="cta-glow"></div>
-  <div class="section-tag reveal">Commencer maintenant</div>
-  <h2 class="cta-h2 reveal">Votre premier contrat<br/><em>analysé en 60 secondes.</em></h2>
-  <p class="cta-sub reveal">Gratuit, sans inscription. Uploadez un contrat et obtenez des markups professionnels basés sur les standards Westfield.</p>
-  <a href="app-v2.html" class="btn-gold reveal">Analyser un contrat gratuitement →</a>
+  <div class="section-tag reveal" data-fr="Commencer maintenant" data-en="Get started now">Commencer maintenant</div>
+  <h2 class="cta-h2 reveal" data-fr="Votre premier contrat<br/>&lt;em&gt;analysé en 60 secondes.&lt;/em&gt;" data-en="Your first contract<br/>&lt;em&gt;analysed in 60 seconds.&lt;/em&gt;">Votre premier contrat<br/><em>analysé en 60 secondes.</em></h2>
+  <p class="cta-sub reveal" data-fr="Gratuit, sans inscription. Uploadez un contrat et obtenez des markups professionnels basés sur les standards Westfield." data-en="Free, no sign-up required. Upload a contract and get professional markups based on Westfield standards.">Gratuit, sans inscription. Uploadez un contrat et obtenez des markups professionnels basés sur les standards Westfield.</p>
+  <a href="app-v2.html" class="btn-gold reveal" data-fr="Analyser un contrat gratuitement →" data-en="Analyse a contract for free →">Analyser un contrat gratuitement →</a>
 </section>
 
 <footer>
@@ -1210,10 +1210,17 @@ footer {
 
 <script>
 // ── Language switcher ──────────────────────────────────────────────
+var _lang = 'fr';
+function t(fr, en) { return _lang === 'en' ? en : fr; }
 function setLang(l) {
+  _lang = l;
   document.querySelectorAll('[data-fr]').forEach(function(el) {
-    var t = l === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-fr');
-    if (t) { if (el.tagName === 'A' || el.tagName === 'BUTTON') el.textContent = t; else el.innerHTML = t; }
+    var val = l === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-fr');
+    if (val) {
+      if (el.tagName === 'OPTION') { el.textContent = val; }
+      else if (el.tagName === 'A' || el.tagName === 'BUTTON') { el.textContent = val; }
+      else { el.innerHTML = val; }
+    }
   });
   document.getElementById('lang-fr').style.background = l === 'fr' ? 'rgba(200,169,75,0.15)' : 'transparent';
   document.getElementById('lang-fr').style.color = l === 'fr' ? 'var(--amber)' : 'var(--muted)';
@@ -1250,7 +1257,7 @@ function gotoStep(n) {
   document.getElementById('ds' + n).classList.add('active');
   document.querySelectorAll('.step-dot')[n-1].classList.add('on');
   var rl = document.getElementById('demo-role-label');
-  if (rl) rl.textContent = n === 4 ? 'directeur juridique' : n === 5 ? 'juriste' : n === 6 ? 'juriste' : 'juriste';
+  if (rl) rl.textContent = n === 4 ? t('directeur juridique', 'legal director') : t('juriste', 'lawyer');
   cur = n;
   [null, animS1, animS2, animS3, animS4, animS5, animS6][n]();
   timer = setTimeout(function() { gotoStep(n < 6 ? n + 1 : 1); }, STEP_DUR[n]);
@@ -1262,13 +1269,13 @@ function _t(fn, ms) { var id = setTimeout(fn, ms); _sTimers.push(id); return id;
 function animS1() {
   var dz = document.getElementById('dz');
   dz.className = 'drop-zone';
-  dz.innerHTML = '<div class="drop-icon">📄</div><div class="drop-title">Déposez votre contrat</div><div class="drop-sub">DOCX · TXT · PDF — analyse automatique des clauses</div>';
+  dz.innerHTML = '<div class="drop-icon">📄</div><div class="drop-title">' + t('Déposez votre contrat', 'Drop your contract') + '</div><div class="drop-sub">' + t('DOCX · TXT · PDF — analyse automatique des clauses', 'DOCX · TXT · PDF — automatic clause analysis') + '</div>';
   _t(function() { dz.classList.add('lit'); }, 500);
   _t(function() {
-    dz.innerHTML = '<div class="drop-icon">⏳</div><div class="drop-title">contrat_prestation_nexora.docx</div><div class="drop-sub">47 paragraphes détectés · Analyse IA en cours…</div>';
+    dz.innerHTML = '<div class="drop-icon">⏳</div><div class="drop-title">contrat_prestation_nexora.docx</div><div class="drop-sub">' + t('47 paragraphes détectés · Analyse IA en cours…', '47 paragraphs detected · AI analysis in progress…') + '</div>';
   }, 1200);
   _t(function() {
-    dz.innerHTML = '<div class="drop-icon">✅</div><div class="drop-title">contrat_prestation_nexora.docx</div><div class="drop-sub">3 clauses analysées · <span style="color:var(--amber)">5 clauses non traitées identifiées</span></div>';
+    dz.innerHTML = '<div class="drop-icon">✅</div><div class="drop-title">contrat_prestation_nexora.docx</div><div class="drop-sub">' + t('3 clauses analysées · ', '3 clauses analysed · ') + '<span style="color:var(--amber)">' + t('5 clauses non traitées identifiées', '5 untreated clauses identified') + '</span></div>';
   }, 2600);
 }
 
@@ -1277,12 +1284,14 @@ function animS2() {
   var cnt = document.getElementById('demo-mods-count');
   var cards = document.querySelectorAll('#mlist2 .mod-card');
   cards.forEach(function(c) { c.classList.remove('vis'); });
-  if (cnt) cnt.textContent = '0 clause analysée';
+  if (cnt) cnt.textContent = t('0 clause analysée', '0 clause analysed');
   var n = 0;
   cards.forEach(function(c) {
     _t(function() {
       c.classList.add('vis'); n++;
-      if (cnt) cnt.textContent = n + ' clause' + (n > 1 ? 's' : '') + ' analysée' + (n > 1 ? 's' : '');
+      if (cnt) cnt.textContent = _lang === 'en'
+        ? n + ' clause' + (n > 1 ? 's' : '') + ' analysed'
+        : n + ' clause' + (n > 1 ? 's' : '') + ' analysée' + (n > 1 ? 's' : '');
     }, parseInt(c.dataset.d) + 200);
   });
 }
@@ -1325,7 +1334,7 @@ function animS4() {
   var done = document.getElementById('demo-dir-done');
   var badge = document.getElementById('demo-dir-status-badge');
   if (done) done.style.display = 'none';
-  if (badge) { badge.textContent = 'En attente directeur'; badge.style.background = 'rgba(245,158,11,0.15)'; badge.style.color = 'var(--amber)'; }
+  if (badge) { badge.textContent = t('En attente directeur', 'Awaiting director'); badge.style.background = 'rgba(245,158,11,0.15)'; badge.style.color = 'var(--amber)'; }
   rows.forEach(function(r) { r.classList.remove('vis'); });
   rows.forEach(function(r) {
     _t(function() { r.classList.add('vis'); }, parseInt(r.dataset.d) + 200);
@@ -1333,7 +1342,7 @@ function animS4() {
   // 3.8s : le directeur valide
   _t(function() {
     if (done) done.style.display = 'block';
-    if (badge) { badge.textContent = 'Validé ✓'; badge.style.background = 'rgba(13,207,138,0.15)'; badge.style.color = 'var(--green)'; }
+    if (badge) { badge.textContent = t('Validé ✓', 'Validated ✓'); badge.style.background = 'rgba(13,207,138,0.15)'; badge.style.color = 'var(--green)'; }
   }, 3800);
 }
 
