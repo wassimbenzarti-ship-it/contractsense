@@ -2770,5 +2770,245 @@ function appSetLang(l) {
 }
 if (_appLang === 'en') appSetLang('en');
 </script>
+
+<!-- ════════════════ CHATBOT ════════════════ -->
+<style>
+#cb-btn{position:fixed;bottom:28px;right:28px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;cursor:pointer;z-index:8000;display:none;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(91,124,250,.45);transition:transform .2s;}
+#cb-btn.show{display:flex;}
+#cb-btn:hover{transform:scale(1.08);}
+#cb-btn svg{width:26px;height:26px;fill:#fff;}
+#cb-panel{position:fixed;bottom:96px;right:28px;width:380px;max-height:560px;background:#0f1320;border:1px solid #1f2537;border-radius:16px;z-index:8000;display:none;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.6);overflow:hidden;}
+#cb-panel.show{display:flex;}
+#cb-head{padding:14px 18px;border-bottom:1px solid #1f2537;display:flex;align-items:center;gap:10px;background:#111420;}
+#cb-head-ico{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#cb-head-ico svg{width:17px;height:17px;fill:#fff;}
+#cb-head-title{font-weight:700;font-size:14px;color:#e2e5f0;flex:1;}
+#cb-head-sub{font-size:11px;color:#6b7280;}
+#cb-close{background:none;border:none;color:#6b7280;font-size:20px;cursor:pointer;padding:0 2px;line-height:1;}
+#cb-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-height:180px;}
+#cb-msgs::-webkit-scrollbar{width:4px;}
+#cb-msgs::-webkit-scrollbar-track{background:transparent;}
+#cb-msgs::-webkit-scrollbar-thumb{background:#2a3040;border-radius:4px;}
+.cb-msg{max-width:86%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.55;word-wrap:break-word;}
+.cb-msg.user{align-self:flex-end;background:#5b7cfa;color:#fff;border-bottom-right-radius:3px;}
+.cb-msg.bot{align-self:flex-start;background:#181c2a;color:#e2e5f0;border:1px solid #1f2537;border-bottom-left-radius:3px;}
+.cb-msg.bot a{color:#5b7cfa;}
+.cb-mod-card{background:#0d1017;border:1px solid rgba(16,185,129,.25);border-radius:10px;padding:12px;margin-top:8px;font-size:12px;}
+.cb-mod-card .cb-mod-title{font-weight:700;color:#10b981;margin-bottom:6px;}
+.cb-mod-card .cb-mod-orig{color:#ef4444;margin-bottom:4px;}
+.cb-mod-card .cb-mod-prop{color:#10b981;margin-bottom:8px;}
+.cb-apply-btn{width:100%;padding:7px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);border-radius:7px;color:#10b981;font-size:12px;font-weight:700;cursor:pointer;}
+.cb-apply-btn:hover{background:rgba(16,185,129,.25);}
+.cb-apply-btn.applied{background:#10b981;color:#fff;cursor:default;}
+.cb-typing{align-self:flex-start;background:#181c2a;border:1px solid #1f2537;border-radius:12px;border-bottom-left-radius:3px;padding:10px 14px;display:flex;gap:5px;align-items:center;}
+.cb-typing span{width:6px;height:6px;border-radius:50%;background:#5b7cfa;animation:cb-bounce .9s infinite;}
+.cb-typing span:nth-child(2){animation-delay:.15s;}
+.cb-typing span:nth-child(3){animation-delay:.3s;}
+@keyframes cb-bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+#cb-footer{padding:12px 14px;border-top:1px solid #1f2537;display:flex;gap:8px;background:#111420;}
+#cb-input{flex:1;background:#181c2a;border:1px solid #1f2537;border-radius:9px;padding:9px 12px;color:#e2e5f0;font-size:13px;font-family:inherit;resize:none;min-height:38px;max-height:90px;outline:none;line-height:1.4;}
+#cb-input:focus{border-color:#5b7cfa;}
+#cb-send{width:36px;height:36px;background:#5b7cfa;border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;align-self:flex-end;}
+#cb-send:hover{background:#4a6be8;}
+#cb-send svg{width:16px;height:16px;fill:#fff;}
+@media(max-width:440px){#cb-panel{width:calc(100vw - 20px);right:10px;bottom:80px;}#cb-btn{right:16px;bottom:16px;}}
+</style>
+
+<!-- Floating button -->
+<button id="cb-btn" title="Assistant contractuel" onclick="cbToggle()">
+  <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.526 3.66 1.438 5.168L2.05 21.95l4.782-1.387A9.953 9.953 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm1 14H7v-2h6v2zm2-4H7v-2h8v2zm0-4H7V6h8v2z"/></svg>
+</button>
+
+<!-- Chat panel -->
+<div id="cb-panel">
+  <div id="cb-head">
+    <div id="cb-head-ico">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.526 3.66 1.438 5.168L2.05 21.95l4.782-1.387A9.953 9.953 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+    </div>
+    <div>
+      <div id="cb-head-title">Assistant contractuel</div>
+      <div id="cb-head-sub">Posez vos questions sur le contrat</div>
+    </div>
+    <button id="cb-close" onclick="cbToggle()" title="Fermer">&#x2715;</button>
+  </div>
+  <div id="cb-msgs"></div>
+  <div id="cb-footer">
+    <textarea id="cb-input" placeholder="Posez une question ou demandez une modification..." rows="1" onkeydown="cbKey(event)" oninput="cbResize(this)"></textarea>
+    <button id="cb-send" onclick="cbSend()" title="Envoyer">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// ── Chatbot state ─────────────────────────────────────────────────────────
+var _cbHistory = [];
+var _cbOpen = false;
+var _cbWelcomed = false;
+
+function cbToggle() {
+  _cbOpen = !_cbOpen;
+  var panel = document.getElementById('cb-panel');
+  if (_cbOpen) {
+    panel.classList.add('show');
+    document.getElementById('cb-input').focus();
+    if (!_cbWelcomed) { _cbWelcomed = true; cbWelcome(); }
+    cbScrollBottom();
+  } else {
+    panel.classList.remove('show');
+  }
+}
+
+function cbShowBtn() {
+  document.getElementById('cb-btn').classList.add('show');
+}
+
+function cbWelcome() {
+  cbAddMsg('bot',
+    'Bonjour ! Je suis votre assistant juridique. Vous pouvez me poser des questions sur ce contrat '
+    + 'ou me demander d\'appliquer des modifications. Exemple :<br>'
+    + '<em>"Explique la clause de résiliation"</em><br>'
+    + '<em>"Modifie la clause de confidentialité pour protéger davantage ' + (selectedPartie || 'votre partie') + '"</em>'
+  );
+}
+
+function cbKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); cbSend(); }
+}
+
+function cbResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 90) + 'px';
+}
+
+function cbAddMsg(role, html, modObj) {
+  var msgs = document.getElementById('cb-msgs');
+  var div = document.createElement('div');
+  div.className = 'cb-msg ' + role;
+  div.innerHTML = html;
+
+  if (role === 'bot' && modObj) {
+    var card = document.createElement('div');
+    card.className = 'cb-mod-card';
+    var modId = 'cb-mod-' + Date.now();
+    card.innerHTML =
+      '<div class="cb-mod-title"> ' + _escH(modObj.clause_name || 'Modification') + '</div>' +
+      (modObj.original ? '<div class="cb-mod-orig"><strong>Original :</strong> ' + _escH(modObj.original.slice(0,150)) + (modObj.original.length>150?'...':'') + '</div>' : '') +
+      '<div class="cb-mod-prop"><strong>Proposé :</strong> ' + _escH((modObj.proposed||'').slice(0,150)) + ((modObj.proposed||'').length>150?'...':'') + '</div>' +
+      '<button class="cb-apply-btn" id="' + modId + '" onclick="cbApplyMod(this,' + JSON.stringify(JSON.stringify(modObj)) + ')">+ Ajouter au contrat</button>';
+    div.appendChild(card);
+  }
+
+  msgs.appendChild(div);
+  cbScrollBottom();
+  return div;
+}
+
+function cbScrollBottom() {
+  var msgs = document.getElementById('cb-msgs');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function cbShowTyping() {
+  var msgs = document.getElementById('cb-msgs');
+  var t = document.createElement('div');
+  t.className = 'cb-typing';
+  t.id = 'cb-typing';
+  t.innerHTML = '<span></span><span></span><span></span>';
+  msgs.appendChild(t);
+  cbScrollBottom();
+}
+
+function cbHideTyping() {
+  var t = document.getElementById('cb-typing');
+  if (t) t.remove();
+}
+
+function cbApplyMod(btn, modJsonStr) {
+  if (btn.classList.contains('applied')) return;
+  try {
+    var mod = JSON.parse(modJsonStr);
+    var newId = Date.now();
+    var newMod = {
+      id: newId,
+      clause_name: mod.clause_name || 'Clause (chatbot)',
+      original: mod.original || '',
+      proposed: mod.proposed || '',
+      risk: mod.risk || 'medium',
+      reason: mod.reason || 'Modification suggérée par l\'assistant'
+    };
+    modifications.push(newMod);
+    decisions[String(newId)] = 'pending';
+    renderReview();
+    btn.textContent = '✅ Ajouté au contrat';
+    btn.classList.add('applied');
+    // Scroll to the new modification card
+    setTimeout(function() {
+      var card = document.getElementById('card-' + newId);
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 200);
+  } catch(e) {
+    alert('Erreur lors de l\'application : ' + e.message);
+  }
+}
+
+async function cbSend() {
+  var input = document.getElementById('cb-input');
+  var msg = input.value.trim();
+  if (!msg) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  cbAddMsg('user', _escH(msg));
+
+  _cbHistory.push({ role: 'user', content: msg });
+
+  cbShowTyping();
+  document.getElementById('cb-send').disabled = true;
+
+  try {
+    var payload = {
+      message: msg,
+      history: _cbHistory.slice(-10),
+      contract_text: savedText || '',
+      modifications: modifications,
+      decisions: decisions,
+      partie: selectedPartie || '',
+      jurisdiction: window._jurisdiction || 'universel',
+      file_cache_id: window._fileCacheId || ''
+    };
+    if (_cu && _cu.email) payload.user_email = _cu.email;
+
+    var r = await fetch(BACKEND + '/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    var data = await r.json();
+    cbHideTyping();
+
+    if (!r.ok) throw new Error(data.error || 'Erreur serveur');
+
+    var reply = data.reply || '';
+    _cbHistory.push({ role: 'assistant', content: reply });
+    cbAddMsg('bot', reply.replace(/\n/g, '<br>'), data.modification || null);
+  } catch(e) {
+    cbHideTyping();
+    cbAddMsg('bot', '❌ ' + _escH(e.message || 'Erreur inattendue.'));
+  } finally {
+    document.getElementById('cb-send').disabled = false;
+    document.getElementById('cb-input').focus();
+  }
+}
+
+// Show chatbot button when analysis is done (hook into renderReview)
+(function() {
+  var _origRenderReview = renderReview;
+  renderReview = function() {
+    _origRenderReview.apply(this, arguments);
+    cbShowBtn();
+  };
+})();
+</script>
 </body>
 </html>
