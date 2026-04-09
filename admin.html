@@ -181,10 +181,18 @@ select { appearance: none; }
           <span id="link-msg" style="display:none;margin-left:12px;font-size:12px"></span>
         </div>
         <div style="background:#111420;border:1px solid #1f2537;border-radius:12px;padding:20px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
             <h3 style="font-size:15px;font-weight:600;color:#e2e5f0">Tous les comptes</h3>
-            <span id="sc-stats" style="font-size:12px;color:#6b7280">Chargement...</span>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <span id="sc-stats" style="font-size:12px;color:#6b7280">Chargement...</span>
+              <button id="btn-sync-pay" onclick="syncPayments()" style="padding:7px 14px;background:#f59e0b22;border:1px solid #f59e0b55;border-radius:8px;color:#f59e0b;font-size:12px;font-weight:700;cursor:pointer">🔄 Sync paiements</button>
+            </div>
           </div>
+          <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+            <input id="manual-activate-email" type="email" placeholder="email@utilisateur.com — activer manuellement" style="flex:1;min-width:200px;background:#0d1017;border:1px solid #1f2537;border-radius:6px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box;margin-bottom:0"/>
+            <button onclick="manualActivate()" style="padding:8px 16px;background:#10b98122;border:1px solid #10b981;border-radius:8px;color:#10b981;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">Activer</button>
+          </div>
+          <div id="sync-msg" style="display:none;margin-bottom:10px;font-size:12px;padding:8px 12px;border-radius:6px"></div>
           <div id="sc-list">Chargement...</div>
         </div>
       </div>
@@ -671,6 +679,56 @@ async function rejectSugg(id) {
 }
 
 // ===== SOUS-COMPTES =====
+async function syncPayments() {
+  var btn = document.getElementById('btn-sync-pay');
+  var msg = document.getElementById('sync-msg');
+  if(btn){btn.disabled=true;btn.textContent='⏳ Sync...';}
+  msg.style.display='none';
+  try {
+    var r = await fetch(BACKEND + '/admin/sync-payments', {
+      method: 'POST', headers: {'Content-Type':'application/json','X-Admin-Pass':'westfield2026'},
+      body: JSON.stringify({})
+    });
+    var d = await r.json();
+    if(!r.ok) throw new Error(d.error || 'Erreur');
+    var created = d.created_or_updated || [];
+    msg.style.display = 'block';
+    msg.style.background = 'rgba(16,185,129,0.08)'; msg.style.border = '1px solid rgba(16,185,129,0.3)'; msg.style.color = '#10b981';
+    msg.textContent = created.length > 0 ? '✅ Comptes créés/mis à jour : ' + created.join(', ') : '✅ Tous les comptes sont déjà à jour.';
+    loadSousComptes();
+  } catch(e) {
+    msg.style.display = 'block';
+    msg.style.background = 'rgba(239,68,68,0.08)'; msg.style.border = '1px solid rgba(239,68,68,0.3)'; msg.style.color = '#ef4444';
+    msg.textContent = 'Erreur: ' + e.message;
+  }
+  if(btn){btn.disabled=false;btn.textContent='🔄 Sync paiements';}
+}
+
+async function manualActivate() {
+  var emailInput = document.getElementById('manual-activate-email');
+  var msg = document.getElementById('sync-msg');
+  var email = emailInput ? emailInput.value.trim() : '';
+  if(!email) { alert('Entrez un email.'); return; }
+  msg.style.display = 'none';
+  try {
+    var r = await fetch(BACKEND + '/admin/activate-user', {
+      method: 'POST', headers: {'Content-Type': 'application/json', 'X-Admin-Pass': 'westfield2026'},
+      body: JSON.stringify({target_email: email, role: 'directeur', analyses_remaining: 20, nb_juristes_max: 5})
+    });
+    var d = await r.json();
+    if(!r.ok) throw new Error(d.error || 'Erreur');
+    msg.style.display = 'block';
+    msg.style.background = 'rgba(16,185,129,0.08)'; msg.style.border = '1px solid rgba(16,185,129,0.3)'; msg.style.color = '#10b981';
+    msg.textContent = '✅ ' + (d.message || email + ' activé !');
+    if(emailInput) emailInput.value = '';
+    loadSousComptes();
+  } catch(e) {
+    msg.style.display = 'block';
+    msg.style.background = 'rgba(239,68,68,0.08)'; msg.style.border = '1px solid rgba(239,68,68,0.3)'; msg.style.color = '#ef4444';
+    msg.textContent = 'Erreur: ' + e.message;
+  }
+}
+
 async function loadSousComptes() {
   var list = document.getElementById('sc-list');
   if(!list) return;
