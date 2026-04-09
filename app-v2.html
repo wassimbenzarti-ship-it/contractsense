@@ -2777,7 +2777,7 @@ if (_appLang === 'en') appSetLang('en');
 #cb-sidebar{
   position:fixed;top:0;right:-310px;width:340px;height:100vh;
   background:#0f1320;border-left:1px solid #1f2537;
-  z-index:500;display:flex;flex-direction:column;
+  z-index:1001;display:flex;flex-direction:column;
   transition:right .32s cubic-bezier(.4,0,.2,1);
   box-shadow:-6px 0 36px rgba(0,0,0,.55);
 }
@@ -2871,43 +2871,41 @@ if (_appLang === 'en') appSetLang('en');
 
   <!-- Tab trigger -->
   <button id="cb-tab" onclick="cbToggle()" title="Assistant Omniscient">
-    <svg width="26" height="26" viewBox="0 0 36 36" fill="none">
+    <svg width="26" height="28" viewBox="0 0 32 36" fill="none">
       <defs>
-        <linearGradient id="omg0" x1="2" y1="10" x2="34" y2="26" gradientUnits="userSpaceOnUse">
+        <linearGradient id="gh0" x1="0" y1="0" x2="32" y2="36" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stop-color="#5b7cfa"/><stop offset="100%" stop-color="#8b5cf6"/>
         </linearGradient>
       </defs>
-      <path d="M2 18C7 8 29 8 34 18C29 28 7 28 2 18Z" stroke="url(#omg0)" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
-      <circle cx="18" cy="18" r="6.5" fill="url(#omg0)"/>
-      <circle cx="18" cy="18" r="2.8" fill="#0a0c12"/>
-      <circle cx="20.2" cy="15.8" r="1.1" fill="white" opacity="0.5"/>
+      <!-- Ghost body: rounded dome + wavy skirt -->
+      <path d="M5 18C5 10.27 9.93 4 16 4C22.07 4 27 10.27 27 18V33L23.5 30L20 33L16 29.5L12 33L8.5 30L5 33V18Z" fill="url(#gh0)"/>
+      <!-- Eyes -->
+      <ellipse cx="12" cy="18" rx="2.2" ry="2.8" fill="#0a0c12"/>
+      <ellipse cx="20" cy="18" rx="2.2" ry="2.8" fill="#0a0c12"/>
+      <circle cx="12.9" cy="16.7" r="0.9" fill="white" opacity="0.6"/>
+      <circle cx="20.9" cy="16.7" r="0.9" fill="white" opacity="0.6"/>
     </svg>
     <span id="cb-tab-lbl">Assistant</span>
   </button>
 
   <!-- Header -->
   <div id="cb-head">
-    <!-- Omniscient logo: eye inside a circle -->
+    <!-- Ghost logo in circle -->
     <svg id="cb-logo" viewBox="0 0 38 38" fill="none">
       <defs>
-        <linearGradient id="omg1" x1="2" y1="8" x2="36" y2="30" gradientUnits="userSpaceOnUse">
+        <linearGradient id="gh1" x1="2" y1="2" x2="36" y2="36" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stop-color="#5b7cfa"/><stop offset="100%" stop-color="#8b5cf6"/>
         </linearGradient>
-        <filter id="omglow1">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="b"/>
-          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
       </defs>
       <!-- Outer ring -->
-      <circle cx="19" cy="19" r="17.5" fill="rgba(91,124,250,0.07)" stroke="url(#omg1)" stroke-width="1.1"/>
-      <!-- Eye shape -->
-      <path d="M5 19C9 12 29 12 33 19C29 26 9 26 5 19Z" stroke="url(#omg1)" stroke-width="1.4" fill="rgba(91,124,250,0.06)"/>
-      <!-- Iris with glow -->
-      <circle cx="19" cy="19" r="5.5" fill="url(#omg1)" filter="url(#omglow1)"/>
-      <!-- Pupil -->
-      <circle cx="19" cy="19" r="2.2" fill="#0a0c12"/>
-      <!-- Gleam -->
-      <circle cx="20.8" cy="17.2" r="1.1" fill="white" opacity="0.55"/>
+      <circle cx="19" cy="19" r="17.5" fill="rgba(91,124,250,0.07)" stroke="url(#gh1)" stroke-width="1.1"/>
+      <!-- Ghost body -->
+      <path d="M10 21C10 15.48 14.03 11 19 11C23.97 11 28 15.48 28 21V30L25.5 28L23 30L19 27L15 30L12.5 28L10 30V21Z" fill="url(#gh1)"/>
+      <!-- Eyes -->
+      <ellipse cx="16" cy="21" rx="1.8" ry="2.2" fill="#0a0c12"/>
+      <ellipse cx="22" cy="21" rx="1.8" ry="2.2" fill="#0a0c12"/>
+      <circle cx="16.8" cy="19.9" r="0.8" fill="white" opacity="0.6"/>
+      <circle cx="22.8" cy="19.9" r="0.8" fill="white" opacity="0.6"/>
     </svg>
     <div>
       <div id="cb-head-title">Omniscient</div>
@@ -2928,10 +2926,11 @@ if (_appLang === 'en') appSetLang('en');
 
 <script>
 // ── Chatbot state ─────────────────────────────────────────────────
-var _cbHistory  = [];
-var _cbOpen     = false;
-var _cbWelcomed = false;
-var _cbModStore = {};   // key → modObj  (avoids inline JSON in onclick)
+var _cbHistory       = [];
+var _cbOpen          = false;
+var _cbWelcomed      = false;
+var _cbModStore      = {};   // key → modObj  (avoids inline JSON in onclick)
+var _cbLastCacheId   = null; // tracks the current analysis session
 
 function cbToggle() {
   _cbOpen = !_cbOpen;
@@ -2951,10 +2950,30 @@ function cbToggle() {
 
 function cbOpen() { if (!_cbOpen) cbToggle(); }
 
+// Called when a new analysis is complete — resets chatbot context
+function cbNewAnalysis() {
+  _cbHistory   = [];
+  _cbWelcomed  = false;
+  _cbModStore  = {};
+  _cbLastCacheId = window._fileCacheId || null;
+  // In dashboard mode savedText may still contain a previous contract: clear it
+  if (_dashAnalysis) savedText = '';
+  document.getElementById('cb-msgs').innerHTML = '';
+  cbOpen();
+}
+
 function cbWelcome() {
+  var hasContract = modifications.length > 0 || window._fileCacheId;
+  if (!hasContract) {
+    cbAddMsg('bot',
+      '<span style="color:#6b7280">Aucun contrat charg\u00e9 pour le moment.<br>'
+      + 'Analysez un contrat d\u2019abord, puis revenez\u00a0!</span>'
+    );
+    return;
+  }
   cbAddMsg('bot',
     'Bonjour\u00a0! Je suis <strong>Omniscient</strong>, votre assistant juridique IA.<br>'
-    + 'Posez vos questions sur ce contrat ou demandez-moi d\'y apporter des modifications.<br><br>'
+    + 'Posez vos questions sur ce contrat ou demandez-moi d\u2019y apporter des modifications.<br><br>'
     + '<span style="color:#6b7280;font-size:12px">Exemples\u00a0:<br>'
     + '\u00b7 \u00abExplique la clause de r\u00e9siliation\u00bb<br>'
     + '\u00b7 \u00abModifie la confidentialit\u00e9 pour mieux prot\u00e9ger '
@@ -3064,15 +3083,19 @@ async function cbSend() {
   document.getElementById('cb-send').disabled = true;
 
   try {
+    // Only send savedText if it belongs to the current analysis session
+    var currentCacheId = window._fileCacheId || '';
+    var contractTxt = (currentCacheId === _cbLastCacheId && currentCacheId) ? (savedText || '') : '';
+
     var payload = {
       message:       msg,
       history:       _cbHistory.slice(-10),
-      contract_text: savedText || '',
+      contract_text: contractTxt,
       modifications: modifications,
       decisions:     decisions,
       partie:        selectedPartie || '',
       jurisdiction:  window._jurisdiction || 'universel',
-      file_cache_id: window._fileCacheId  || ''
+      file_cache_id: currentCacheId
     };
     if (_cu && _cu.email) payload.user_email = _cu.email;
 
@@ -3097,12 +3120,20 @@ async function cbSend() {
   }
 }
 
-// Auto-open sidebar when analysis is complete
+// Hook renderReview: only trigger a full chatbot reset when a new analysis
+// has completed (detected by a new _fileCacheId different from the last known one).
 (function() {
   var _orig = renderReview;
   renderReview = function() {
     _orig.apply(this, arguments);
-    cbOpen();
+    var newCacheId = window._fileCacheId || null;
+    if (newCacheId && newCacheId !== _cbLastCacheId) {
+      // Genuinely new analysis — reset chatbot context
+      cbNewAnalysis();
+    } else {
+      // Just re-render (clause added, etc.) — open sidebar without resetting
+      cbOpen();
+    }
   };
 })();
 </script>
