@@ -3095,7 +3095,8 @@ async function cbSend() {
       decisions:     decisions,
       partie:        selectedPartie || '',
       jurisdiction:  window._jurisdiction || 'universel',
-      file_cache_id: currentCacheId
+      file_cache_id:      currentCacheId,
+      file_storage_path:  window._fileStoragePath || ''
     };
     if (_cu && _cu.email) payload.user_email = _cu.email;
 
@@ -3128,11 +3129,37 @@ async function cbSend() {
     _orig.apply(this, arguments);
     var newCacheId = window._fileCacheId || null;
     if (newCacheId && newCacheId !== _cbLastCacheId) {
-      // Genuinely new analysis — reset chatbot context
       cbNewAnalysis();
     } else {
-      // Just re-render (clause added, etc.) — open sidebar without resetting
       cbOpen();
+    }
+  };
+})();
+
+// Hook showAnaDetail: sync past analysis data into chatbot context
+(function() {
+  var _origShow = showAnaDetail;
+  showAnaDetail = async function(idx) {
+    await _origShow.apply(this, arguments);
+    var ana = (window._userAnalyses || [])[idx];
+    if (!ana) return;
+
+    // Sync global modifications with the past analysis
+    modifications = (window._currentMods || []).slice();
+    decisions = {};
+    modifications.forEach(function(m) { decisions[String(m.id || '')] = 'accepted'; });
+    selectedPartie   = ana.partie        || selectedPartie || '';
+    if (ana.contract_type) savedType = ana.contract_type;
+    savedText = ''; // raw text not available; backend will use file cache / storage
+
+    // Build a stable identifier for this past analysis
+    // If the in-memory file cache has expired, fall back to a synthetic ID
+    // so the chatbot still resets its history for each different analysis.
+    var pastId = 'past__' + (ana.id || idx);
+    if (!window._fileCacheId) window._fileCacheId = pastId;
+
+    if (window._fileCacheId !== _cbLastCacheId) {
+      cbNewAnalysis();
     }
   };
 })();
