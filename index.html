@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Omniscient by Westfield — Analyse de contrats par IA pour juristes au Maroc</title>
+<title>Omniscient by Westfield — AI Contract Analysis | Multi-jurisdiction Legal Intelligence</title>
 
 <!-- SEO -->
-<meta name="description" content="Omniscient est l'IA juridique supervisée de Westfield Avocats. Analysez, modifiez et exportez vos contrats en quelques secondes. Conçu pour les juristes et directeurs juridiques au Maroc."/>
-<meta name="keywords" content="analyse contrat IA, juriste Maroc, intelligence artificielle juridique, contrat droit marocain, Westfield Avocats, DOCX juridique, révision contrat automatique"/>
+<meta name="description" content="Omniscient is Westfield's supervised legal AI. Analyze, annotate and export contracts in seconds. Supports Moroccan, French, English, Tunisian law and more — automatically detected."/>
+<meta name="keywords" content="AI contract analysis, legal AI, multi-jurisdiction, droit marocain, droit français, English law, Westfield Avocats, DOCX legal, contract review, LegalTech"/>
 <meta name="author" content="Westfield Avocats"/>
 <link rel="canonical" href="https://ai.westfieldavocats.com/"/>
 
@@ -29,7 +29,7 @@
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Omniscient by Westfield",
-  "description": "Outil d'analyse de contrats par intelligence artificielle, conçu pour les juristes et cabinets d'avocats au Maroc.",
+  "description": "AI-powered contract analysis tool for lawyers and legal teams. Supports Moroccan, French, English, Tunisian law and more — jurisdiction detected automatically.",
   "applicationCategory": "LegalApplication",
   "operatingSystem": "Web",
   "url": "https://ai.westfieldavocats.com",
@@ -710,24 +710,27 @@ footer {
     </div>
     <div class="nav-by">by Westfield Avocats</div>
   </div>
-  <div style="display:flex;align-items:center;gap:20px">
-    <a href="#workflow" style="font-size:13px;color:var(--muted);text-decoration:none;display:none" class="nav-workflow-link">Workflow</a>
-    <a href="app-v2.html" class="nav-cta">Analyser un contrat →</a>
+  <div style="display:flex;align-items:center;gap:16px">
+    <div style="display:flex;border:1px solid rgba(255,255,255,0.12);border-radius:8px;overflow:hidden;font-size:12px;font-weight:700">
+      <button id="lang-fr" onclick="setLang('fr')" style="padding:5px 11px;background:rgba(200,169,75,0.15);color:var(--amber);border:none;cursor:pointer;transition:all .2s">FR</button>
+      <button id="lang-en" onclick="setLang('en')" style="padding:5px 11px;background:transparent;color:var(--muted);border:none;cursor:pointer;transition:all .2s">EN</button>
+    </div>
+    <a href="app-v2.html" class="nav-cta" data-fr="Analyser un contrat →" data-en="Analyze a contract →">Analyser un contrat →</a>
   </div>
 </nav>
 
 <!-- HERO -->
 <section id="hero">
-  <div class="hero-eyebrow">IA juridique supervisée par des avocats</div>
+  <div class="hero-eyebrow" data-fr="IA juridique supervisée par des avocats" data-en="Lawyer-supervised legal AI">IA juridique supervisée par des avocats</div>
   <h1 class="hero-h1">
-    L'intelligence<br/>
-    <em>au service du droit.</em>
+    <span data-fr="L'intelligence" data-en="Intelligence">L'intelligence</span><br/>
+    <em data-fr="au service du droit." data-en="at the service of the law.">au service du droit.</em>
   </h1>
-  <p class="hero-sub">Omniscient analyse vos contrats et propose des modifications professionnelles basées sur une base de connaissances juridique construite et validée par des avocats Westfield.</p>
+  <p class="hero-sub" data-fr="Omniscient analyse vos contrats et propose des modifications professionnelles basées sur une base de connaissances juridique construite et validée par des avocats Westfield." data-en="Omniscient analyzes your contracts and suggests professional edits based on a legal knowledge base built and validated by Westfield lawyers — across all major jurisdictions.">Omniscient analyse vos contrats et propose des modifications professionnelles basées sur une base de connaissances juridique construite et validée par des avocats Westfield.</p>
   <div style="display:flex;justify-content:center;align-items:flex-start;gap:24px;flex-wrap:wrap;animation:fadeUp 1s 0.3s ease both">
     <div class="hero-btns" style="margin-top:0">
-      <a href="app-v2.html" class="btn-gold">Analyser un contrat gratuitement</a>
-      <a href="#workflow" class="btn-outline">Voir le workflow →</a>
+      <a href="app-v2.html" class="btn-gold" data-fr="Analyser un contrat gratuitement" data-en="Analyze a contract for free">Analyser un contrat gratuitement</a>
+      <a href="#workflow" class="btn-outline" data-fr="Voir le workflow →" data-en="See the workflow →">Voir le workflow →</a>
     </div>
     <!-- Presse — alignée à droite des boutons -->
     <a href="https://leseco.ma/business/legaltec-avec-omniscient-westfield-veut-industrialiser-lanalyse-contractuelle.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;padding:10px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;transition:all 0.3s;align-self:center" onmouseover="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(200,169,75,0.35)'" onmouseout="this.style.background='rgba(255,255,255,0.03)';this.style.borderColor='rgba(255,255,255,0.08)'">
@@ -763,21 +766,21 @@ footer {
 
 <!-- VS CHATGPT -->
 <section id="vs">
-  <div class="section-tag reveal">Pourquoi Omniscient ?</div>
-  <h2 class="section-h2 reveal">Fait pour les juristes.<br/>Pas pour tout le monde.</h2>
-  <p class="section-sub reveal">ChatGPT et les IA génériques sont des outils puissants — mais pas conçus pour l'analyse contractuelle professionnelle.</p>
+  <div class="section-tag reveal" data-fr="Pourquoi Omniscient ?" data-en="Why Omniscient?">Pourquoi Omniscient ?</div>
+  <h2 class="section-h2 reveal" data-fr="Fait pour les juristes.<br/>Pas pour tout le monde." data-en="Built for lawyers.<br/>Not for everyone.">Fait pour les juristes.<br/>Pas pour tout le monde.</h2>
+  <p class="section-sub reveal" data-fr="ChatGPT et les IA génériques sont des outils puissants — mais pas conçus pour l'analyse contractuelle professionnelle." data-en="ChatGPT and generic AI are powerful tools — but not designed for professional contract analysis.">ChatGPT et les IA génériques sont des outils puissants — mais pas conçus pour l'analyse contractuelle professionnelle.</p>
 
   <div class="vs-grid reveal">
     <div class="vs-col winner">
       <div class="vs-badge gold">✦ Omniscient by Westfield</div>
-      <div class="vs-title">IA supervisée par des avocats</div>
-      <div class="vs-item"><span class="vs-icon">✅</span><span>Modifications rédigées en style juridique soutenu, niveau avocat d'affaires senior</span></div>
-      <div class="vs-item"><span class="vs-icon">✅</span><span>Base de connaissances créée et validée par des juristes — jamais par des non-spécialistes</span></div>
-      <div class="vs-item"><span class="vs-icon">✅</span><span>Droit marocain intégré — Code du Travail, DOC, lois spéciales — clauses illégales jamais proposées</span></div>
-      <div class="vs-item"><span class="vs-icon">✅</span><span>Markups directement éditables en ligne avant export — vous gardez le contrôle total</span></div>
-      <div class="vs-item"><span class="vs-icon">✅</span><span>Export DOCX avec Track Changes natifs Word — prêt à envoyer au client ou à la contrepartie</span></div>
-      <div class="vs-item"><span class="vs-icon">✅</span><span>Base de connaissances alimentée exclusivement par des clauses sélectionnées et validées par des avocats Westfield</span></div>
-      <div class="vs-item"><span class="vs-icon">✅</span><span>Identifie automatiquement les parties et adapte les modifications selon vos intérêts</span></div>
+      <div class="vs-title" data-fr="IA supervisée par des avocats" data-en="Lawyer-supervised AI">IA supervisée par des avocats</div>
+      <div class="vs-item"><span class="vs-icon">✅</span><span data-fr="Modifications rédigées en style juridique soutenu, niveau avocat d'affaires senior" data-en="Edits drafted in formal legal style, at senior business lawyer level">Modifications rédigées en style juridique soutenu, niveau avocat d'affaires senior</span></div>
+      <div class="vs-item"><span class="vs-icon">✅</span><span data-fr="Base de connaissances créée et validée par des juristes — jamais par des non-spécialistes" data-en="Knowledge base created and validated by lawyers — never by non-specialists">Base de connaissances créée et validée par des juristes — jamais par des non-spécialistes</span></div>
+      <div class="vs-item"><span class="vs-icon">✅</span><span data-fr="Multi-juridictionnel — détection automatique du droit applicable (marocain, français, anglais, tunisien…) — clauses illégales jamais proposées" data-en="Multi-jurisdiction — automatic detection of applicable law (Moroccan, French, English, Tunisian…) — illegal clauses never suggested">Multi-juridictionnel — détection automatique du droit applicable (marocain, français, anglais, tunisien…) — clauses illégales jamais proposées</span></div>
+      <div class="vs-item"><span class="vs-icon">✅</span><span data-fr="Markups directement éditables en ligne avant export — vous gardez le contrôle total" data-en="Markups directly editable inline before export — you keep full control">Markups directement éditables en ligne avant export — vous gardez le contrôle total</span></div>
+      <div class="vs-item"><span class="vs-icon">✅</span><span data-fr="Export DOCX avec Track Changes natifs Word — prêt à envoyer au client ou à la contrepartie" data-en="DOCX export with native Word Track Changes — ready to send to the client or counterparty">Export DOCX avec Track Changes natifs Word — prêt à envoyer au client ou à la contrepartie</span></div>
+      <div class="vs-item"><span class="vs-icon">✅</span><span data-fr="Base de connaissances alimentée exclusivement par des clauses sélectionnées et validées par des avocats Westfield" data-en="Knowledge base fed exclusively by clauses selected and validated by Westfield lawyers">Base de connaissances alimentée exclusivement par des clauses sélectionnées et validées par des avocats Westfield</span></div>
+      <div class="vs-item"><span class="vs-icon">✅</span><span data-fr="Identifie automatiquement les parties et adapte les modifications selon vos intérêts" data-en="Automatically identifies parties and adapts edits to your interests">Identifie automatiquement les parties et adapte les modifications selon vos intérêts</span></div>
     </div>
 
     <div class="vs-separator">
@@ -785,15 +788,15 @@ footer {
     </div>
 
     <div class="vs-col loser">
-      <div class="vs-badge grey">ChatGPT / IA générique</div>
-      <div class="vs-title">IA généraliste non supervisée</div>
-      <div class="vs-item"><span class="vs-icon">❌</span><span>Rédaction approximative, vocabulaire juridique parfois incorrect ou inadapté</span></div>
-      <div class="vs-item"><span class="vs-icon">❌</span><span>Aucune validation par des juristes — hallucinations fréquentes sur des points de droit précis</span></div>
-      <div class="vs-item"><span class="vs-icon">❌</span><span>Ignore le droit local — peut proposer des clauses illégales selon le droit marocain</span></div>
-      <div class="vs-item"><span class="vs-icon">❌</span><span>Pas d'interface dédiée — copier-coller manuel vers Word, mise en forme perdue</span></div>
-      <div class="vs-item"><span class="vs-icon">❌</span><span>Aucun export Track Changes — impossible d'envoyer directement le document à la contrepartie</span></div>
-      <div class="vs-item"><span class="vs-icon">❌</span><span>Ne s'améliore pas — chaque session repart de zéro, sans mémoire de vos standards</span></div>
-      <div class="vs-item"><span class="vs-icon">❌</span><span>Ne sait pas quelle partie vous représentez — modifications non ciblées</span></div>
+      <div class="vs-badge grey">ChatGPT / Generic AI</div>
+      <div class="vs-title" data-fr="IA généraliste non supervisée" data-en="Unsupervised generalist AI">IA généraliste non supervisée</div>
+      <div class="vs-item"><span class="vs-icon">❌</span><span data-fr="Rédaction approximative, vocabulaire juridique parfois incorrect ou inadapté" data-en="Approximate drafting, sometimes incorrect or inappropriate legal vocabulary">Rédaction approximative, vocabulaire juridique parfois incorrect ou inadapté</span></div>
+      <div class="vs-item"><span class="vs-icon">❌</span><span data-fr="Aucune validation par des juristes — hallucinations fréquentes sur des points de droit précis" data-en="No lawyer validation — frequent hallucinations on specific legal points">Aucune validation par des juristes — hallucinations fréquentes sur des points de droit précis</span></div>
+      <div class="vs-item"><span class="vs-icon">❌</span><span data-fr="Ignore le droit applicable — risque de proposer des clauses illégales dans votre juridiction" data-en="Ignores applicable law — risk of suggesting clauses illegal in your jurisdiction">Ignore le droit applicable — risque de proposer des clauses illégales dans votre juridiction</span></div>
+      <div class="vs-item"><span class="vs-icon">❌</span><span data-fr="Pas d'interface dédiée — copier-coller manuel vers Word, mise en forme perdue" data-en="No dedicated interface — manual copy-paste to Word, formatting lost">Pas d'interface dédiée — copier-coller manuel vers Word, mise en forme perdue</span></div>
+      <div class="vs-item"><span class="vs-icon">❌</span><span data-fr="Aucun export Track Changes — impossible d'envoyer directement le document à la contrepartie" data-en="No Track Changes export — impossible to send the document directly to the counterparty">Aucun export Track Changes — impossible d'envoyer directement le document à la contrepartie</span></div>
+      <div class="vs-item"><span class="vs-icon">❌</span><span data-fr="Ne s'améliore pas — chaque session repart de zéro, sans mémoire de vos standards" data-en="Doesn't improve — each session starts from scratch, no memory of your standards">Ne s'améliore pas — chaque session repart de zéro, sans mémoire de vos standards</span></div>
+      <div class="vs-item"><span class="vs-icon">❌</span><span data-fr="Ne sait pas quelle partie vous représentez — modifications non ciblées" data-en="Doesn't know which party you represent — untargeted edits">Ne sait pas quelle partie vous représentez — modifications non ciblées</span></div>
     </div>
   </div>
 </section>
@@ -1178,14 +1181,14 @@ footer {
       <p class="feat-text">La base de connaissances est alimentée uniquement par des contrats et clauses validés par des avocats. Zéro hallucination juridique.</p>
     </div>
     <div class="feat-card reveal">
-      <span class="feat-icon">⚖️</span>
-      <div class="feat-title">Droit marocain intégré</div>
-      <p class="feat-text">Code du Travail, DOC, lois spéciales — les règles impératives marocaines sont intégrées. L'IA ne propose jamais de clauses illégales ou abusives.</p>
+      <span class="feat-icon">🌍</span>
+      <div class="feat-title" data-fr="Multi-juridictionnel" data-en="Multi-jurisdiction">Multi-juridictionnel</div>
+      <p class="feat-text" data-fr="Détection automatique du droit applicable — marocain, français, anglais, tunisien, belge… Les règles impératives de chaque juridiction sont intégrées. Nouvelle juridiction ? Elle est créée automatiquement." data-en="Automatic detection of applicable law — Moroccan, French, English, Tunisian, Belgian… Mandatory rules for each jurisdiction are built in. New jurisdiction? It's created automatically.">Détection automatique du droit applicable — marocain, français, anglais, tunisien, belge… Les règles impératives de chaque juridiction sont intégrées. Nouvelle juridiction ? Elle est créée automatiquement.</p>
     </div>
     <div class="feat-card reveal">
       <span class="feat-icon">🔄</span>
-      <div class="feat-title">Base juridique vivante</div>
-      <p class="feat-text">La base de connaissances Westfield est continuellement enrichie par l'équipe d'avocats — nouvelles jurisprudences, évolutions législatives, standards de place — pour que les propositions restent toujours à jour.</p>
+      <div class="feat-title" data-fr="Base juridique vivante" data-en="Living legal knowledge base">Base juridique vivante</div>
+      <p class="feat-text" data-fr="La base de connaissances Westfield est continuellement enrichie par l'équipe d'avocats — nouvelles jurisprudences, évolutions législatives, standards de place — pour que les propositions restent toujours à jour." data-en="Westfield's knowledge base is continuously enriched by the legal team — new case law, legislative changes, market standards — so that suggestions always remain up to date.">La base de connaissances Westfield est continuellement enrichie par l'équipe d'avocats — nouvelles jurisprudences, évolutions législatives, standards de place — pour que les propositions restent toujours à jour.</p>
     </div>
   </div>
 </section>
@@ -1201,11 +1204,26 @@ footer {
 
 <footer>
   <div class="footer-brand">Omniscient</div>
-  <div>Intelligence juridique supervisée par des avocats</div>
+  <div data-fr="Intelligence juridique supervisée par des avocats" data-en="Lawyer-supervised legal intelligence">Intelligence juridique supervisée par des avocats</div>
   <div>© 2026 Westfield Avocats</div>
 </footer>
 
 <script>
+// ── Language switcher ──────────────────────────────────────────────
+function setLang(l) {
+  document.querySelectorAll('[data-fr]').forEach(function(el) {
+    var t = l === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-fr');
+    if (t) { if (el.tagName === 'A' || el.tagName === 'BUTTON') el.textContent = t; else el.innerHTML = t; }
+  });
+  document.getElementById('lang-fr').style.background = l === 'fr' ? 'rgba(200,169,75,0.15)' : 'transparent';
+  document.getElementById('lang-fr').style.color = l === 'fr' ? 'var(--amber)' : 'var(--muted)';
+  document.getElementById('lang-en').style.background = l === 'en' ? 'rgba(200,169,75,0.15)' : 'transparent';
+  document.getElementById('lang-en').style.color = l === 'en' ? 'var(--amber)' : 'var(--muted)';
+  document.documentElement.lang = l;
+  localStorage.setItem('omniscient_lang', l);
+}
+(function() { var saved = localStorage.getItem('omniscient_lang'); if (saved === 'en') setLang('en'); })();
+
 // Progress
 window.addEventListener('scroll', function() {
   var p = window.scrollY / (document.body.scrollHeight - innerHeight);
