@@ -2100,17 +2100,24 @@ async function loadJuristes(){
   if(!el||!_cu)return;
   el.innerHTML='<div style="color:#6b7280;font-size:13px">Chargement...</div>';
   try{
-    // Réutiliser les données déjà chargées par loadDash pour éviter l'incohérence
-    var juristes=window._juristesData;
-    if(!juristes){
-      var r=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email,role,created_at',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
-      juristes=r.ok?await r.json():[];
-      window._juristesData=juristes;
-    }
     // Fetch director account data via backend (évite erreur 400 si colonnes manquantes)
     var rdDir=await fetch(BACKEND+'/account/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email})});
     var dirAcc=rdDir.ok?await rdDir.json():{};
     var isAdmin=dirAcc.role==='admin';
+
+    // Admin sees all users; director sees only their juristes
+    var juristes=window._juristesData;
+    if(!juristes){
+      if(isAdmin){
+        var ra=await fetch(BACKEND+'/admin/users?caller_email='+encodeURIComponent(_cu.email));
+        var ad=ra.ok?await ra.json():{users:[]};
+        juristes=ad.users||[];
+      } else {
+        var r=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email,role,created_at,payment_status,analyses_remaining,subscription_end',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
+        juristes=r.ok?await r.json():[];
+      }
+      window._juristesData=juristes;
+    }
     var nbJuristesMax=isAdmin?9999:(dirAcc.nb_juristes_max||0);
     var isActive=isAdmin||dirAcc.payment_status==='active';
     var slotsLeft=isAdmin?9999:Math.max(0,nbJuristesMax-juristes.length);
@@ -2149,7 +2156,32 @@ async function loadJuristes(){
       : '';
 
     var html=slotBar+createForm;
-    if(!juristes.length){
+    if(isAdmin && juristes.length){
+      // Admin view: full user table
+      var statusColor={active:'#10b981',free:'#f59e0b',expired:'#ef4444'};
+      html+='<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+juristes.length+' compte(s) enregistré(s)</div>';
+      html+=juristes.map(function(u){
+        var sc=statusColor[u.payment_status]||'#6b7280';
+        var roleLabel={directeur:'Directeur',juriste:'Juriste',admin:'Admin'}[u.role]||u.role||'?';
+        var subEnd=u.subscription_end?new Date(u.subscription_end).toLocaleDateString('fr-FR'):'—';
+        var createdAt=u.created_at?new Date(u.created_at).toLocaleDateString('fr-FR'):'—';
+        return '<div style="background:#111420;border:1px solid #1f2537;border-radius:10px;padding:12px 16px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'
+          +'<div>'
+          +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">'
+          +'<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:'+(u.role==='admin'?'#8b5cf633':u.role==='directeur'?'#5b7cfa22':'#1f2537')+';color:'+(u.role==='admin'?'#a78bfa':u.role==='directeur'?'#5b7cfa':'#9ca3af')+'">'+roleLabel+'</span>'
+          +'<span style="font-size:13px;font-weight:600;color:#e2e5f0">'+u.email+'</span>'
+          +(u.parent_email?'<span style="font-size:10px;color:#6b7280">↳ '+u.parent_email+'</span>':'')
+          +'</div>'
+          +'<div style="font-size:11px;color:#6b7280">Créé: '+createdAt+' &bull; Abonnement jusqu\'au: '+subEnd+'</div>'
+          +'</div>'
+          +'<div style="display:flex;align-items:center;gap:10px">'
+          +'<span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;background:'+sc+'22;color:'+sc+';border:1px solid '+sc+'44">'+(u.payment_status||'?')+'</span>'
+          +'<span style="font-size:11px;color:#6b7280">'+((u.analyses_remaining||0)+' analyses'+'</span>')
+          +(u.payment_status!=='active'?'<button onclick="adminActivateUser(\''+u.email+'\',\''+u.role+'\')" style="background:#10b98122;border:1px solid #10b981;color:#10b981;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap">Activer</button>':'')
+          +'</div>'
+          +'</div>';
+      }).join('');
+    } else if(!juristes.length){
       html+='<div style="text-align:center;padding:30px 0">'
         +'<div style="font-size:32px;margin-bottom:10px">&#9878;</div>'
         +'<div style="font-size:14px;font-weight:600;color:#e2e5f0;margin-bottom:6px">Aucun juriste rattaché</div>'
@@ -2557,6 +2589,22 @@ function filterAndShowAnalyses(juristeEmail){
   dtab('analyses');
   var sel=document.getElementById('juriste-filter');
   if(sel){sel.value=juristeEmail;if(window.filterAnalysesByJuriste)window.filterAnalysesByJuriste(juristeEmail);}
+}
+
+async function adminActivateUser(targetEmail, role){
+  if(!confirm('Activer l\'abonnement de '+targetEmail+' (30 jours) ?')) return;
+  try{
+    var r=await fetch(BACKEND+'/admin/activate-user',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({caller_email:_cu.email, target_email:targetEmail, role:role||'directeur', analyses_remaining:20, nb_juristes_max:role==='directeur'?5:0})
+    });
+    var d=await r.json();
+    if(!r.ok) throw new Error(d.error||'Erreur serveur');
+    alert(d.message||'Utilisateur activé !');
+    window._juristesData=null;
+    loadJuristes();
+  }catch(e){ alert('Erreur : '+e.message); }
 }
 
 async function deleteJuriste(juristeEmail){
