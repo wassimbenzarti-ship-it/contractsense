@@ -1,85 +1,83 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" width="200" height="220">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="200" height="240">
   <defs>
-    <linearGradient id="ghostGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#2d1b69"/>
-      <stop offset="100%" stop-color="#6d28d9"/>
-    </linearGradient>
-    <linearGradient id="wigTop" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#fdf6e8"/>
-      <stop offset="100%" stop-color="#e8d4a0"/>
-    </linearGradient>
-    <linearGradient id="wigSide" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#e8d4a0"/>
-      <stop offset="100%" stop-color="#c8b07a"/>
-    </linearGradient>
-    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+    <!-- Clip au contour du fantôme -->
+    <clipPath id="ghostClip">
+      <path d="M 32 192 C 32 66 168 66 168 192
+               Q 154 177 141 192 Q 127 207 114 192
+               Q 100 177 86 192 Q 72 207 59 192
+               Q 45 177 32 192 Z"/>
+    </clipPath>
+    <!-- Ombre portée douce -->
+    <filter id="shadow" x="-15%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0a0a2a" flood-opacity="0.25"/>
     </filter>
   </defs>
 
-  <!-- ── FANTÔME ─────────────────────────────────────── -->
-  <path d="M 32 178
-           C 32 68 168 68 168 178
-           Q 154 163 141 178
-           Q 127 193 114 178
-           Q 100 163 86 178
-           Q 72 193 59 178
-           Q 46 163 32 178 Z"
-        fill="url(#ghostGrad)" filter="url(#softGlow)"/>
+  <!-- ── CORPS DU FANTÔME ───────────────────────────── -->
+  <path d="M 32 192 C 32 66 168 66 168 192
+           Q 154 177 141 192 Q 127 207 114 192
+           Q 100 177 86 192 Q 72 207 59 192
+           Q 45 177 32 192 Z"
+        fill="#f0f2ff" stroke="#d0d4f0" stroke-width="1.5"
+        filter="url(#shadow)"/>
 
-  <!-- ── PERRUQUE D'AVOCAT ───────────────────────────── -->
-  <!-- Bouclettes gauche -->
-  <ellipse cx="29" cy="104" rx="14" ry="30" fill="url(#wigSide)" transform="rotate(-14 29 104)"/>
-  <ellipse cx="26" cy="136" rx="12" ry="23" fill="#c8b07a" transform="rotate(-8 26 136)"/>
+  <!-- ── COSTUME (clipé dans le fantôme) ───────────────── -->
+  <g clip-path="url(#ghostClip)">
+    <!-- Corps du costume (veste navy) -->
+    <rect x="0" y="118" width="200" height="90" fill="#1c2b4a"/>
 
-  <!-- Bouclettes droite -->
-  <ellipse cx="171" cy="104" rx="14" ry="30" fill="url(#wigSide)" transform="rotate(14 171 104)"/>
-  <ellipse cx="174" cy="136" rx="12" ry="23" fill="#c8b07a" transform="rotate(8 174 136)"/>
+    <!-- Chemise blanche visible dans le V -->
+    <polygon points="100,108 76,148 124,148" fill="#ffffff"/>
+    <!-- Chemise prolongée vers le bas -->
+    <rect x="84" y="146" width="32" height="46" fill="#ffffff"/>
 
-  <!-- Corps de la perruque -->
-  <ellipse cx="100" cy="84" rx="64" ry="20" fill="#e8d4a0"/>
-  <!-- Dôme supérieur -->
-  <ellipse cx="100" cy="70" rx="52" ry="22" fill="#f0e0ba"/>
-  <ellipse cx="100" cy="58" rx="40" ry="18" fill="url(#wigTop)"/>
-  <!-- Rainures de la perruque (effet textile) -->
-  <path d="M 68 62 Q 100 54 132 62" fill="none" stroke="#d4be90" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
-  <path d="M 72 70 Q 100 63 128 70" fill="none" stroke="#d4be90" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+    <!-- Cravate bordeaux -->
+    <path d="M 96,115 L 100,107 L 104,115 L 101.5,162 L 100,165 L 98.5,162 Z"
+          fill="#7b1d1d"/>
+    <!-- Nœud de cravate -->
+    <polygon points="96,115 104,115 102,120 98,120" fill="#9b2d2d"/>
+    <!-- Rayure subtile sur la cravate -->
+    <line x1="99" y1="125" x2="101" y2="155" stroke="#6b0d0d" stroke-width="0.8" opacity="0.5"/>
 
-  <!-- ── LUNETTES RONDES ──────────────────────────────── -->
-  <!-- Monture gauche -->
-  <circle cx="76" cy="128" r="18" fill="rgba(255,255,255,0.07)" stroke="#c9a84c" stroke-width="2.8"/>
-  <!-- Monture droite -->
-  <circle cx="124" cy="128" r="18" fill="rgba(255,255,255,0.07)" stroke="#c9a84c" stroke-width="2.8"/>
-  <!-- Pont central -->
-  <path d="M 94 127 Q 100 124 106 127" fill="none" stroke="#c9a84c" stroke-width="2.2"/>
-  <!-- Branches latérales -->
-  <line x1="58" y1="125" x2="50" y2="122" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
-  <line x1="142" y1="125" x2="150" y2="122" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
+    <!-- Revers gauche (lapel) -->
+    <path d="M 76 148 L 52 128 L 68 118 L 84 146 Z" fill="#1c2b4a"/>
+    <!-- Revers droit -->
+    <path d="M 124 148 L 148 128 L 132 118 L 116 146 Z" fill="#1c2b4a"/>
 
-  <!-- ── YEUX ─────────────────────────────────────────── -->
-  <ellipse cx="76" cy="128" rx="9" ry="11" fill="rgba(255,255,255,0.92)"/>
-  <ellipse cx="124" cy="128" rx="9" ry="11" fill="rgba(255,255,255,0.92)"/>
-  <!-- Pupilles -->
-  <circle cx="78" cy="129" r="5" fill="#1a0f3e"/>
-  <circle cx="126" cy="129" r="5" fill="#1a0f3e"/>
-  <!-- Reflets -->
-  <circle cx="80" cy="127" r="2" fill="white" opacity="0.9"/>
-  <circle cx="128" cy="127" r="2" fill="white" opacity="0.9"/>
+    <!-- Poche poitrine gauche (pochette) -->
+    <rect x="58" y="132" width="18" height="10" rx="1" fill="#243556"/>
+    <!-- Pochette blanche -->
+    <polygon points="59,132 67,128 75,132" fill="#ffffff" opacity="0.85"/>
 
-  <!-- ── SOURIRE SUBTIL ───────────────────────────────── -->
-  <path d="M 86 150 Q 100 160 114 150"
-        fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2" stroke-linecap="round"/>
+    <!-- Bouton de veste -->
+    <circle cx="100" cy="168" r="3" fill="#243556" stroke="#1c2b4a" stroke-width="0.5"/>
+  </g>
 
-  <!-- ── CRAVATE DORÉE ────────────────────────────────── -->
-  <!-- Col -->
-  <path d="M 87 155 L 100 164 L 113 155" fill="none" stroke="rgba(220,200,155,0.65)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Nœud de cravate -->
-  <polygon points="97,160 100,154 103,160 101,161 99,161" fill="#c9a84c"/>
-  <!-- Corps de la cravate -->
-  <path d="M 99 161 L 97 176 L 100 180 L 103 176 L 101 161 Z" fill="#b8962e"/>
+  <!-- ── COL BLANC DE CHEMISE (au-dessus du clip) ──────── -->
+  <!-- Col gauche -->
+  <path d="M 88 118 L 76 136 L 88 140 L 98 116 Z"
+        fill="white" opacity="0.95"/>
+  <!-- Col droit -->
+  <path d="M 112 118 L 124 136 L 112 140 L 102 116 Z"
+        fill="white" opacity="0.95"/>
+
+  <!-- ── ÉPAULES DE LA VESTE ────────────────────────────── -->
+  <!-- Épaule gauche -->
+  <path d="M 32 155 C 35 135 50 122 68 118 L 68 125 C 52 129 40 140 38 155 Z"
+        fill="#1c2b4a" clip-path="url(#ghostClip)"/>
+  <!-- Épaule droite -->
+  <path d="M 168 155 C 165 135 150 122 132 118 L 132 125 C 148 129 160 140 162 155 Z"
+        fill="#1c2b4a" clip-path="url(#ghostClip)"/>
+
+  <!-- ── YEUX DU FANTÔME ────────────────────────────────── -->
+  <!-- Œil gauche -->
+  <ellipse cx="76" cy="92" rx="14" ry="18" fill="#1a1a3e"/>
+  <ellipse cx="78" cy="94" rx="8" ry="10" fill="#0d0d28"/>
+  <circle cx="81" cy="90" r="3.5" fill="white" opacity="0.8"/>
+
+  <!-- Œil droit -->
+  <ellipse cx="124" cy="92" rx="14" ry="18" fill="#1a1a3e"/>
+  <ellipse cx="126" cy="94" rx="8" ry="10" fill="#0d0d28"/>
+  <circle cx="129" cy="90" r="3.5" fill="white" opacity="0.8"/>
 
 </svg>
