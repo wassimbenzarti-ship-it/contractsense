@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" width="200" height="220">
+  <defs>
+    <linearGradient id="ghostGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2d1b69"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+    <linearGradient id="wigTop" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fdf6e8"/>
+      <stop offset="100%" stop-color="#e8d4a0"/>
+    </linearGradient>
+    <linearGradient id="wigSide" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8d4a0"/>
+      <stop offset="100%" stop-color="#c8b07a"/>
+    </linearGradient>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- ── FANTÔME ─────────────────────────────────────── -->
+  <path d="M 32 178
+           C 32 68 168 68 168 178
+           Q 154 163 141 178
+           Q 127 193 114 178
+           Q 100 163 86 178
+           Q 72 193 59 178
+           Q 46 163 32 178 Z"
+        fill="url(#ghostGrad)" filter="url(#softGlow)"/>
+
+  <!-- ── PERRUQUE D'AVOCAT ───────────────────────────── -->
+  <!-- Bouclettes gauche -->
+  <ellipse cx="29" cy="104" rx="14" ry="30" fill="url(#wigSide)" transform="rotate(-14 29 104)"/>
+  <ellipse cx="26" cy="136" rx="12" ry="23" fill="#c8b07a" transform="rotate(-8 26 136)"/>
+
+  <!-- Bouclettes droite -->
+  <ellipse cx="171" cy="104" rx="14" ry="30" fill="url(#wigSide)" transform="rotate(14 171 104)"/>
+  <ellipse cx="174" cy="136" rx="12" ry="23" fill="#c8b07a" transform="rotate(8 174 136)"/>
+
+  <!-- Corps de la perruque -->
+  <ellipse cx="100" cy="84" rx="64" ry="20" fill="#e8d4a0"/>
+  <!-- Dôme supérieur -->
+  <ellipse cx="100" cy="70" rx="52" ry="22" fill="#f0e0ba"/>
+  <ellipse cx="100" cy="58" rx="40" ry="18" fill="url(#wigTop)"/>
+  <!-- Rainures de la perruque (effet textile) -->
+  <path d="M 68 62 Q 100 54 132 62" fill="none" stroke="#d4be90" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+  <path d="M 72 70 Q 100 63 128 70" fill="none" stroke="#d4be90" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- ── LUNETTES RONDES ──────────────────────────────── -->
+  <!-- Monture gauche -->
+  <circle cx="76" cy="128" r="18" fill="rgba(255,255,255,0.07)" stroke="#c9a84c" stroke-width="2.8"/>
+  <!-- Monture droite -->
+  <circle cx="124" cy="128" r="18" fill="rgba(255,255,255,0.07)" stroke="#c9a84c" stroke-width="2.8"/>
+  <!-- Pont central -->
+  <path d="M 94 127 Q 100 124 106 127" fill="none" stroke="#c9a84c" stroke-width="2.2"/>
+  <!-- Branches latérales -->
+  <line x1="58" y1="125" x2="50" y2="122" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
+  <line x1="142" y1="125" x2="150" y2="122" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- ── YEUX ─────────────────────────────────────────── -->
+  <ellipse cx="76" cy="128" rx="9" ry="11" fill="rgba(255,255,255,0.92)"/>
+  <ellipse cx="124" cy="128" rx="9" ry="11" fill="rgba(255,255,255,0.92)"/>
+  <!-- Pupilles -->
+  <circle cx="78" cy="129" r="5" fill="#1a0f3e"/>
+  <circle cx="126" cy="129" r="5" fill="#1a0f3e"/>
+  <!-- Reflets -->
+  <circle cx="80" cy="127" r="2" fill="white" opacity="0.9"/>
+  <circle cx="128" cy="127" r="2" fill="white" opacity="0.9"/>
+
+  <!-- ── SOURIRE SUBTIL ───────────────────────────────── -->
+  <path d="M 86 150 Q 100 160 114 150"
+        fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- ── CRAVATE DORÉE ────────────────────────────────── -->
+  <!-- Col -->
+  <path d="M 87 155 L 100 164 L 113 155" fill="none" stroke="rgba(220,200,155,0.65)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Nœud de cravate -->
+  <polygon points="97,160 100,154 103,160 101,161 99,161" fill="#c9a84c"/>
+  <!-- Corps de la cravate -->
+  <path d="M 99 161 L 97 176 L 100 180 L 103 176 L 101 161 Z" fill="#b8962e"/>
+
+</svg>
