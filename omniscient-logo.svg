@@ -5,7 +5,7 @@
       <stop offset="100%" stop-color="#8b5cf6"/>
     </linearGradient>
   </defs>
-  <!-- Ghost body: rounded dome + wavy skirt -->
+  <!-- Ghost body -->
   <path d="M5 18C5 10.27 9.93 4 16 4C22.07 4 27 10.27 27 18V33L23.5 30L20 33L16 29.5L12 33L8.5 30L5 33V18Z" fill="url(#gh0)"/>
   <!-- Eyes -->
   <ellipse cx="12" cy="18" rx="2.2" ry="2.8" fill="#0a0c12"/>
@@ -13,9 +13,10 @@
   <circle cx="12.9" cy="16.7" r="0.9" fill="white" opacity="0.6"/>
   <circle cx="20.9" cy="16.7" r="0.9" fill="white" opacity="0.6"/>
   <!-- Col blanc -->
-  <polygon points="14,23 16,26 16,23" fill="white" opacity="0.9"/>
-  <polygon points="18,23 16,26 16,23" fill="white" opacity="0.9"/>
-  <!-- Cravate -->
-  <path d="M 14.8 24.5 L 16 22.5 L 17.2 24.5 L 16.6 30.5 L 16 31.5 L 15.4 30.5 Z" fill="#1c2b4a"/>
-  <polygon points="14.8,24.5 17.2,24.5 16.8,26 15.2,26" fill="#243556"/>
+  <polygon points="13,23 16,27 16,23" fill="white"/>
+  <polygon points="19,23 16,27 16,23" fill="white"/>
+  <!-- Nœud cravate blanc -->
+  <polygon points="14.5,24 17.5,24 17,26 15,26" fill="white" opacity="0.85"/>
+  <!-- Corps cravate blanc -->
+  <path d="M 15,26 L 14.2,29 L 16,30.5 L 17.8,29 L 17,26 Z" fill="white" opacity="0.85"/>
 </svg>
