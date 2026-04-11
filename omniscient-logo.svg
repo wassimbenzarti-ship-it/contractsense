@@ -1,83 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="200" height="240">
-  <defs>
-    <!-- Clip au contour du fantôme -->
-    <clipPath id="ghostClip">
-      <path d="M 32 192 C 32 66 168 66 168 192
-               Q 154 177 141 192 Q 127 207 114 192
-               Q 100 177 86 192 Q 72 207 59 192
-               Q 45 177 32 192 Z"/>
-    </clipPath>
-    <!-- Ombre portée douce -->
-    <filter id="shadow" x="-15%" y="-10%" width="130%" height="130%">
-      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0a0a2a" flood-opacity="0.25"/>
-    </filter>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100" height="120">
 
-  <!-- ── CORPS DU FANTÔME ───────────────────────────── -->
-  <path d="M 32 192 C 32 66 168 66 168 192
-           Q 154 177 141 192 Q 127 207 114 192
-           Q 100 177 86 192 Q 72 207 59 192
-           Q 45 177 32 192 Z"
-        fill="#f0f2ff" stroke="#d0d4f0" stroke-width="1.5"
-        filter="url(#shadow)"/>
+  <!-- Corps fantôme mauve -->
+  <path d="M 12 95
+           C 12 18 88 18 88 95
+           Q 78 85 68 95
+           Q 58 105 50 95
+           Q 42 85 32 95
+           Q 22 105 12 95 Z"
+        fill="#7c3aed"/>
 
-  <!-- ── COSTUME (clipé dans le fantôme) ───────────────── -->
-  <g clip-path="url(#ghostClip)">
-    <!-- Corps du costume (veste navy) -->
-    <rect x="0" y="118" width="200" height="90" fill="#1c2b4a"/>
-
-    <!-- Chemise blanche visible dans le V -->
-    <polygon points="100,108 76,148 124,148" fill="#ffffff"/>
-    <!-- Chemise prolongée vers le bas -->
-    <rect x="84" y="146" width="32" height="46" fill="#ffffff"/>
-
-    <!-- Cravate bordeaux -->
-    <path d="M 96,115 L 100,107 L 104,115 L 101.5,162 L 100,165 L 98.5,162 Z"
-          fill="#7b1d1d"/>
-    <!-- Nœud de cravate -->
-    <polygon points="96,115 104,115 102,120 98,120" fill="#9b2d2d"/>
-    <!-- Rayure subtile sur la cravate -->
-    <line x1="99" y1="125" x2="101" y2="155" stroke="#6b0d0d" stroke-width="0.8" opacity="0.5"/>
-
-    <!-- Revers gauche (lapel) -->
-    <path d="M 76 148 L 52 128 L 68 118 L 84 146 Z" fill="#1c2b4a"/>
-    <!-- Revers droit -->
-    <path d="M 124 148 L 148 128 L 132 118 L 116 146 Z" fill="#1c2b4a"/>
-
-    <!-- Poche poitrine gauche (pochette) -->
-    <rect x="58" y="132" width="18" height="10" rx="1" fill="#243556"/>
-    <!-- Pochette blanche -->
-    <polygon points="59,132 67,128 75,132" fill="#ffffff" opacity="0.85"/>
-
-    <!-- Bouton de veste -->
-    <circle cx="100" cy="168" r="3" fill="#243556" stroke="#1c2b4a" stroke-width="0.5"/>
-  </g>
-
-  <!-- ── COL BLANC DE CHEMISE (au-dessus du clip) ──────── -->
-  <!-- Col gauche -->
-  <path d="M 88 118 L 76 136 L 88 140 L 98 116 Z"
-        fill="white" opacity="0.95"/>
-  <!-- Col droit -->
-  <path d="M 112 118 L 124 136 L 112 140 L 102 116 Z"
-        fill="white" opacity="0.95"/>
-
-  <!-- ── ÉPAULES DE LA VESTE ────────────────────────────── -->
-  <!-- Épaule gauche -->
-  <path d="M 32 155 C 35 135 50 122 68 118 L 68 125 C 52 129 40 140 38 155 Z"
-        fill="#1c2b4a" clip-path="url(#ghostClip)"/>
-  <!-- Épaule droite -->
-  <path d="M 168 155 C 165 135 150 122 132 118 L 132 125 C 148 129 160 140 162 155 Z"
-        fill="#1c2b4a" clip-path="url(#ghostClip)"/>
-
-  <!-- ── YEUX DU FANTÔME ────────────────────────────────── -->
   <!-- Œil gauche -->
-  <ellipse cx="76" cy="92" rx="14" ry="18" fill="#1a1a3e"/>
-  <ellipse cx="78" cy="94" rx="8" ry="10" fill="#0d0d28"/>
-  <circle cx="81" cy="90" r="3.5" fill="white" opacity="0.8"/>
+  <ellipse cx="36" cy="58" rx="9" ry="12" fill="white"/>
+  <ellipse cx="38" cy="60" rx="5" ry="7" fill="#1a0a3e"/>
+  <circle  cx="40" cy="57" r="2"  fill="white" opacity="0.7"/>
 
   <!-- Œil droit -->
-  <ellipse cx="124" cy="92" rx="14" ry="18" fill="#1a1a3e"/>
-  <ellipse cx="126" cy="94" rx="8" ry="10" fill="#0d0d28"/>
-  <circle cx="129" cy="90" r="3.5" fill="white" opacity="0.8"/>
+  <ellipse cx="64" cy="58" rx="9" ry="12" fill="white"/>
+  <ellipse cx="66" cy="60" rx="5" ry="7" fill="#1a0a3e"/>
+  <circle  cx="68" cy="57" r="2"  fill="white" opacity="0.7"/>
+
+  <!-- Col de chemise -->
+  <polygon points="44,78 50,72 56,78 53,78 50,75 47,78" fill="white" opacity="0.9"/>
+
+  <!-- Cravate -->
+  <path d="M 48,78 L 50,73 L 52,78 L 51,88 L 50,90 L 49,88 Z" fill="#1c2b4a"/>
 
 </svg>
