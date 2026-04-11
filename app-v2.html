@@ -109,8 +109,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 .ac p{font-size:12px;color:#6b7280}
 .mz{border:2px dashed #1f2537;border-radius:10px;padding:20px;text-align:center;cursor:pointer;margin-bottom:14px;color:#6b7280;display:block;font-size:13px}
 .mz:hover{border-color:#5b7cfa;color:#5b7cfa}
-
-
+.dclose{position:fixed;top:18px;right:18px;background:#1a2035;border:1px solid #1f2537;border-radius:8px;padding:8px 16px;color:#e2e5f0;cursor:pointer;font-size:13px}
 .ana-detail{background:#0f1320;border:1px solid #1f2537;border-radius:12px;padding:20px;margin-top:16px;display:none}
 .ana-detail.show{display:block}
 .mod-user-card{background:#181c2a;border:1px solid #1f2537;border-radius:8px;padding:12px;margin-bottom:10px}
@@ -647,16 +646,16 @@ async function analyzeWithPartie(partieName) {
   if (!_cu) await chkSess();
 
   try {
-    // Quick jurisdiction detection — isolated so failure never blocks analysis
-    var detectedJur2 = 'universel';
-    try {
-      var fdJ2 = new FormData();
-      if(curFile){ fdJ2.append('file', curFile); fdJ2.append('title', curFile.name||''); }
-      var jurR = await fetch(BACKEND+'/detect-jurisdiction',{method:'POST',body:fdJ2});
-      if(jurR.ok){ var jurD = await jurR.json(); detectedJur2 = jurD.jurisdiction||'universel'; }
-    } catch(e2) { /* fallback silencieux */ }
-    var jLabel = (_JUR_LABELS||{})[detectedJur2]||detectedJur2;
+    // Quick jurisdiction detection before full analysis
     var s2El = document.getElementById('s2');
+    if(s2El) s2El.textContent = '🔍 Détection du droit applicable...';
+    var fdJ = new FormData();
+    if(curFile) fdJ.append('file', curFile);
+    if(curFile) fdJ.append('title', curFile.name||'');
+    var jurR = await fetch(BACKEND+'/detect-jurisdiction',{method:'POST',body:fdJ});
+    var jurD = jurR.ok?await jurR.json():{jurisdiction:'universel'};
+    var jur = jurD.jurisdiction||'universel';
+    var jLabel = (_JUR_LABELS||{})[jur]||jur;
     if(s2El) s2El.textContent = '⚖️ Analyse en ' + jLabel + '...';
     setTimeout(function(){stepDone(2);setTimeout(function(){stepDone(3);},1400);},200);
 
@@ -1321,15 +1320,13 @@ async function dAnaAnalyze(partie) {
   statusEl.textContent = 'Détection du droit applicable...';
   _dashAnalysis = true;
   try {
-    // Quick jurisdiction detection — isolated so failure never blocks analysis
-    var detectedJur = 'universel';
-    try {
-      var fdJ = new FormData();
-      fdJ.append('file', curFile);
-      fdJ.append('title', curFile.name || '');
-      var jurResp = await fetch(BACKEND+'/detect-jurisdiction', {method:'POST', body:fdJ});
-      if(jurResp.ok){ var jurData = await jurResp.json(); detectedJur = jurData.jurisdiction || 'universel'; }
-    } catch(e2) { /* fallback silencieux */ }
+    // Quick jurisdiction detection (no AI, fast)
+    var fdJ = new FormData();
+    fdJ.append('file', curFile);
+    fdJ.append('title', curFile.name || '');
+    var jurResp = await fetch(BACKEND+'/detect-jurisdiction', {method:'POST', body:fdJ});
+    var jurData = jurResp.ok ? await jurResp.json() : {jurisdiction:'universel'};
+    var detectedJur = jurData.jurisdiction || 'universel';
     var jurLabel = _JUR_LABELS[detectedJur] || detectedJur;
     statusEl.textContent = 'Analyse en ' + jurLabel + '...';
 
@@ -2773,10 +2770,10 @@ function appSetLang(l) {
 if (_appLang === 'en') appSetLang('en');
 </script>
 
-function applyBg(val){
-  if(!val)return;
-  document.body.style.background=val;
-}
+<!-- ════════════════ CHATBOT SIDEBAR ════════════════ -->
+<style>
+/* ── Shrink dashboard when sidebar opens ── */
+body.cb-sidebar-open #dash-ov{padding-right:340px;}
 
 /* ── Sidebar container ── */
 #cb-sidebar{
@@ -2864,9 +2861,6 @@ function applyBg(val){
 #cb-send:hover{background:#4a6be8;}
 #cb-send svg{width:15px;height:15px;fill:#fff;}
 
-@media(max-width:860px){
-  body.cb-sidebar-open{padding-right:0;}
-}
 @media(max-width:640px){
   #cb-sidebar{width:100vw;right:-100vw;}
   #cb-sidebar.cb-open{right:0;}
@@ -2892,10 +2886,6 @@ function applyBg(val){
       <ellipse cx="20" cy="18" rx="2.2" ry="2.8" fill="#0a0c12"/>
       <circle cx="12.9" cy="16.7" r="0.9" fill="white" opacity="0.6"/>
       <circle cx="20.9" cy="16.7" r="0.9" fill="white" opacity="0.6"/>
-      <polygon points="14,23 16,26 16,23" fill="white" opacity="0.9"/>
-      <polygon points="18,23 16,26 16,23" fill="white" opacity="0.9"/>
-      <path d="M 14.8 24.5 L 16 22.5 L 17.2 24.5 L 16.6 30.5 L 16 31.5 L 15.4 30.5 Z" fill="#1c2b4a"/>
-      <polygon points="14.8,24.5 17.2,24.5 16.8,26 15.2,26" fill="#243556"/>
     </svg>
     <span id="cb-tab-lbl">Assistant</span>
   </button>
