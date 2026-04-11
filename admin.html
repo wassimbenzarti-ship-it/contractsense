@@ -613,7 +613,7 @@ async function loadSuggestions() {
       var date = new Date(s.submitted_at).toLocaleDateString('fr-FR');
       var statusColor = s.status === 'approved' ? '#10b981' : s.status === 'rejected' ? '#ef4444' : '#f59e0b';
       var previewUrl = BACKEND + '/suggestions/preview/' + s.id;
-      return '<div style="background:#111420;border:1px solid #1f2537;border-radius:10px;padding:16px;margin-bottom:10px">'
+      return '<div data-sugg-id="' + s.id + '" style="background:#111420;border:1px solid #1f2537;border-radius:10px;padding:16px;margin-bottom:10px">'
         + '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">'
         + '<div>'
         + '<strong style="color:#e2e5f0;font-size:14px">' + (s.filename && s.filename !== 'inconnu' ? s.filename : 'Modele suggere') + '</strong>'
@@ -666,16 +666,18 @@ async function approveSugg(id) {
 
 async function rejectSugg(id) {
   if(!confirm('Rejeter cette suggestion ?')) return;
-  var SB_URL = 'https://nezxohrkikgjegnhgpyn.supabase.co';
-  var SK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lenhvaHJraWtnamVnbmhncHluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4MTQxNzYsImV4cCI6MjA4OTM5MDE3Nn0.zhBCacGGmIX-rVE9E9MUcbY2RpMomfq33lyq6DNU2kI';
-  var sbHeaders = {'apikey': SK, 'Authorization': 'Bearer ' + SK, 'Content-Type': 'application/json'};
-  var r = await fetch(SB_URL + '/rest/v1/pending_suggestions?id=eq.' + id, {
-    method: 'PATCH',
-    headers: sbHeaders,
-    body: JSON.stringify({status: 'rejected'})
-  });
-  if(r.ok) { alert('Suggestion rejetée.'); loadSuggestions(); }
-  else { alert('Erreur lors du rejet: ' + r.status); }
+  var r = await fetch(BACKEND + '/suggestions/reject/' + id, { method: 'POST' });
+  if(r.ok) {
+    // Supprimer la carte immédiatement du DOM
+    var card = document.querySelector('[data-sugg-id="' + id + '"]');
+    if(card) card.remove();
+    // Vérifier si la liste est vide
+    var list = document.getElementById('suggestions-list');
+    if(list && !list.querySelector('[data-sugg-id]'))
+      list.innerHTML = '<p style="color:#6b7280">Aucune suggestion en attente.</p>';
+  } else {
+    alert('Erreur lors du rejet: ' + r.status);
+  }
 }
 
 // ===== SOUS-COMPTES =====
