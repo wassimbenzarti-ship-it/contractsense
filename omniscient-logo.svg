@@ -1,28 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100" height="120">
-
-  <!-- Corps fantôme mauve -->
-  <path d="M 12 95
-           C 12 18 88 18 88 95
-           Q 78 85 68 95
-           Q 58 105 50 95
-           Q 42 85 32 95
-           Q 22 105 12 95 Z"
-        fill="#7c3aed"/>
-
-  <!-- Œil gauche -->
-  <ellipse cx="36" cy="58" rx="9" ry="12" fill="white"/>
-  <ellipse cx="38" cy="60" rx="5" ry="7" fill="#1a0a3e"/>
-  <circle  cx="40" cy="57" r="2"  fill="white" opacity="0.7"/>
-
-  <!-- Œil droit -->
-  <ellipse cx="64" cy="58" rx="9" ry="12" fill="white"/>
-  <ellipse cx="66" cy="60" rx="5" ry="7" fill="#1a0a3e"/>
-  <circle  cx="68" cy="57" r="2"  fill="white" opacity="0.7"/>
-
-  <!-- Col de chemise -->
-  <polygon points="44,78 50,72 56,78 53,78 50,75 47,78" fill="white" opacity="0.9"/>
-
-  <!-- Cravate -->
-  <path d="M 48,78 L 50,73 L 52,78 L 51,88 L 50,90 L 49,88 Z" fill="#1c2b4a"/>
-
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 36" width="128" height="144">
+  <defs>
+    <linearGradient id="gh0" x1="0" y1="0" x2="32" y2="36" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#5b7cfa"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <!-- Ghost body: rounded dome + wavy skirt -->
+  <path d="M5 18C5 10.27 9.93 4 16 4C22.07 4 27 10.27 27 18V33L23.5 30L20 33L16 29.5L12 33L8.5 30L5 33V18Z" fill="url(#gh0)"/>
+  <!-- Eyes -->
+  <ellipse cx="12" cy="18" rx="2.2" ry="2.8" fill="#0a0c12"/>
+  <ellipse cx="20" cy="18" rx="2.2" ry="2.8" fill="#0a0c12"/>
+  <circle cx="12.9" cy="16.7" r="0.9" fill="white" opacity="0.6"/>
+  <circle cx="20.9" cy="16.7" r="0.9" fill="white" opacity="0.6"/>
 </svg>
