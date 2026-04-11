@@ -2276,8 +2276,7 @@ var _BG_PRESETS=[
 
 function applyBg(val){
   if(!val)return;
-  if(val.startsWith('linear-gradient')){document.body.style.backgroundImage=val;document.body.style.backgroundColor='';}
-  else{document.body.style.backgroundImage='';document.body.style.backgroundColor=val;}
+  document.body.style.background=val;
 }
 
 (function(){var saved=localStorage.getItem('cs_bg');if(saved)applyBg(saved);})();
