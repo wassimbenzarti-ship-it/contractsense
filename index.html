@@ -1122,6 +1122,143 @@ footer {
   </div>
 </section>
 
+<!-- CHATBOT DEMO -->
+<section id="chatbot-demo" style="padding:120px 48px 80px;display:flex;flex-direction:column;align-items:center">
+  <div class="section-tag reveal" data-fr="Assistant juridique IA" data-en="AI Legal Assistant">Assistant juridique IA</div>
+  <h2 class="section-h2 reveal" data-fr="Posez n'importe quelle question<br/>sur votre contrat." data-en="Ask any question<br/>about your contract.">Posez n'importe quelle question<br/>sur votre contrat.</h2>
+  <p class="section-sub reveal" data-fr="L'assistant analyse le contexte, cite les articles de loi applicables, et propose des modifications directement intégrables au document." data-en="The assistant analyzes the context, cites applicable legal articles, and suggests modifications directly insertable into the document.">L'assistant analyse le contexte, cite les articles de loi applicables, et propose des modifications directement intégrables au document.</p>
+
+  <div class="demo-wrap reveal" style="max-width:680px;width:100%">
+    <div class="demo-topbar">
+      <div class="win-dots"><span></span><span></span><span></span></div>
+      <div class="demo-url-bar" data-fr="Omniscient · Assistant contractuel" data-en="Omniscient · Contract assistant">Omniscient · Assistant contractuel</div>
+    </div>
+    <div style="display:flex;height:440px;overflow:hidden">
+
+      <!-- Left: contract context panel -->
+      <div style="width:200px;flex-shrink:0;border-right:1px solid var(--border);background:#07090f;padding:16px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:4px" data-fr="Contrat chargé" data-en="Contract loaded">Contrat chargé</div>
+        <div style="background:#111830;border:1px solid var(--border);border-radius:8px;padding:10px">
+          <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px">📄 <span data-fr="Contrat de prestation.docx" data-en="Service_agreement.docx">Contrat de prestation.docx</span></div>
+          <div style="font-size:10px;color:var(--muted)" data-fr="12 clauses · Droit marocain" data-en="12 clauses · Moroccan law">12 clauses · Droit marocain</div>
+        </div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-top:8px;margin-bottom:4px" data-fr="Risques détectés" data-en="Risks detected">Risques détectés</div>
+        <div style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0"></span><span style="font-size:11px;color:#ef4444" data-fr="3 élevés" data-en="3 high">3 élevés</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0"></span><span style="font-size:11px;color:#f59e0b" data-fr="2 moyens" data-en="2 medium">2 moyens</span></div>
+        <div style="display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:#10b981;flex-shrink:0"></span><span style="font-size:11px;color:#10b981" data-fr="7 OK" data-en="7 OK">7 OK</span></div>
+      </div>
+
+      <!-- Right: chat area -->
+      <div style="flex:1;display:flex;flex-direction:column;background:#07090f">
+        <div id="cbd-msgs" style="flex:1;overflow:hidden;padding:16px;display:flex;flex-direction:column;gap:10px">
+          <!-- Messages injected by JS -->
+        </div>
+        <div style="padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;background:#0a0d1a">
+          <div style="flex:1;background:#111830;border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--muted)" id="cbd-input-demo">|</div>
+          <div style="width:32px;height:32px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;opacity:.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.cbd-msg{max-width:88%;padding:9px 13px;border-radius:12px;font-size:12px;line-height:1.6;word-wrap:break-word;opacity:0;transition:opacity .4s,transform .4s;transform:translateY(8px);}
+.cbd-msg.show{opacity:1;transform:translateY(0);}
+.cbd-msg.bot{align-self:flex-start;background:#111830;color:var(--text);border:1px solid var(--border);border-bottom-left-radius:3px;}
+.cbd-msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border-bottom-right-radius:3px;}
+.cbd-card{background:#0d1624;border:1px solid rgba(16,185,129,.3);border-radius:8px;padding:10px;margin-top:8px;}
+.cbd-card-label{font-size:10px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.cbd-card-orig{font-size:11px;color:#ef4444;margin-bottom:4px;line-height:1.5;}
+.cbd-card-prop{font-size:11px;color:#10b981;line-height:1.5;}
+.cbd-typing{align-self:flex-start;padding:10px 14px;background:#111830;border:1px solid var(--border);border-radius:12px;border-bottom-left-radius:3px;display:flex;gap:4px;align-items:center;}
+.cbd-typing span{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:cbd-b .9s infinite;}
+.cbd-typing span:nth-child(2){animation-delay:.15s;}
+.cbd-typing span:nth-child(3){animation-delay:.3s;}
+@keyframes cbd-b{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-4px);}}
+#cbd-input-demo{animation:blink-cursor 1s step-end infinite;}
+@keyframes blink-cursor{50%{opacity:0;}}
+</style>
+
+<script>
+(function(){
+  var SCRIPTS={
+    fr:[
+      {role:'user',text:'Explique la clause de résiliation',delay:800},
+      {role:'bot',text:'⚠️ La clause actuelle prévoit un préavis de <strong>7 jours</strong>, ce qui est en dessous du minimum légal de <strong>30 jours</strong> prévu par le DOC marocain (Art. 230). Voici la modification recommandée :',delay:2000,card:{orig:'Le contrat pourra être résilié avec un préavis de 7 jours.',prop:'Le contrat pourra être résilié par l\'une des parties avec un préavis de 30 jours, par lettre recommandée avec AR, conformément à l\'Art. 230 DOC.'}},
+      {role:'user',text:'Renforce la clause de confidentialité',delay:6500},
+      {role:'bot',text:'✅ Durée étendue à <strong>5 ans</strong> post-contrat · Pénalité conventionnelle de <strong>500 000 MAD</strong> ajoutée · Référence à la loi 09-08 (protection des données personnelles) insérée.',delay:8000,card:{orig:'Les parties s\'engagent à ne pas divulguer les informations confidentielles.',prop:'Les parties s\'engagent à garder strictement confidentielles toutes informations pendant 5 ans après expiration, sous peine de 500 000 MAD, conformément à la loi 09-08.'}},
+    ],
+    en:[
+      {role:'user',text:'Explain the termination clause',delay:800},
+      {role:'bot',text:'⚠️ The current clause provides a <strong>7-day</strong> notice period, below the legal minimum of <strong>30 days</strong> under Moroccan DOC (Art. 230). Here\'s the recommended modification:',delay:2000,card:{orig:'The contract may be terminated with 7 days notice.',prop:'The contract may be terminated by either party with 30 days written notice by registered mail, pursuant to Art. 230 DOC.'}},
+      {role:'user',text:'Strengthen the confidentiality clause',delay:6500},
+      {role:'bot',text:'✅ Duration extended to <strong>5 years</strong> post-contract · Conventional penalty of <strong>500,000 MAD</strong> added · Reference to law 09-08 (personal data protection) inserted.',delay:8000,card:{orig:'The parties agree not to disclose confidential information.',prop:'The parties agree to keep all information strictly confidential for 5 years post-expiry, under penalty of 500,000 MAD, pursuant to law 09-08.'}},
+    ]
+  };
+
+  var _started=false;
+  function startDemo(){
+    if(_started)return;_started=true;
+    var lang=window._lang||'fr';
+    var steps=SCRIPTS[lang]||SCRIPTS.fr;
+    var msgs=document.getElementById('cbd-msgs');
+    if(!msgs)return;
+
+    // Animate fake input typing before user messages
+    var inputEl=document.getElementById('cbd-input-demo');
+    steps.forEach(function(step,i){
+      setTimeout(function(){
+        if(step.role==='user'&&inputEl){
+          // Type into fake input
+          var txt=step.text;var ci=0;
+          var timer=setInterval(function(){
+            if(ci<=txt.length){inputEl.textContent=txt.slice(0,ci)+'|';ci++;}
+            else{clearInterval(timer);inputEl.textContent='|';addMsg(step,msgs);}
+          },40);
+        } else {
+          // Show typing indicator, then message
+          var typ=document.createElement('div');
+          typ.className='cbd-typing';
+          typ.innerHTML='<span></span><span></span><span></span>';
+          msgs.appendChild(typ);msgs.scrollTop=msgs.scrollHeight;
+          setTimeout(function(){typ.remove();addMsg(step,msgs);},900);
+        }
+      },step.delay);
+    });
+  }
+
+  function addMsg(step,msgs){
+    var d=document.createElement('div');
+    d.className='cbd-msg '+step.role;
+    d.innerHTML=step.text;
+    if(step.card){
+      var card=document.createElement('div');card.className='cbd-card';
+      var lang=window._lang||'fr';
+      card.innerHTML='<div class="cbd-card-label">'+(lang==='en'?'Suggested modification':'Modification suggérée')+'</div>'
+        +'<div class="cbd-card-orig"><strong>'+(lang==='en'?'Original:':'Original :')+'</strong> '+step.card.orig+'</div>'
+        +'<div class="cbd-card-prop"><strong>'+(lang==='en'?'Proposed:':'Proposé :')+'</strong> '+step.card.prop+'</div>';
+      d.appendChild(card);
+    }
+    msgs.appendChild(d);
+    msgs.scrollTop=msgs.scrollHeight;
+    setTimeout(function(){d.classList.add('show');},30);
+  }
+
+  // Start when section enters viewport
+  var sec=document.getElementById('chatbot-demo');
+  if(sec&&'IntersectionObserver' in window){
+    new IntersectionObserver(function(entries){
+      if(entries[0].isIntersecting)startDemo();
+    },{threshold:0.3}).observe(sec);
+  } else {
+    setTimeout(startDemo,1000);
+  }
+})();
+</script>
+
 <!-- EDIT FEATURE HIGHLIGHT -->
 <section id="edit-feature">
   <div class="section-tag reveal" data-fr="Fonctionnalité exclusive" data-en="Exclusive feature">Fonctionnalité exclusive</div>
