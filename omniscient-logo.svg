@@ -1,22 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 36" width="128" height="144">
-  <defs>
-    <linearGradient id="gh0" x1="0" y1="0" x2="32" y2="36" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#5b7cfa"/>
-      <stop offset="100%" stop-color="#8b5cf6"/>
-    </linearGradient>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105 135" width="105" height="135">
   <!-- Ghost body -->
-  <path d="M5 18C5 10.27 9.93 4 16 4C22.07 4 27 10.27 27 18V33L23.5 30L20 33L16 29.5L12 33L8.5 30L5 33V18Z" fill="url(#gh0)"/>
-  <!-- Eyes -->
-  <ellipse cx="12" cy="18" rx="2.2" ry="2.8" fill="#0a0c12"/>
-  <ellipse cx="20" cy="18" rx="2.2" ry="2.8" fill="#0a0c12"/>
-  <circle cx="12.9" cy="16.7" r="0.9" fill="white" opacity="0.6"/>
-  <circle cx="20.9" cy="16.7" r="0.9" fill="white" opacity="0.6"/>
-  <!-- Col blanc -->
-  <polygon points="13,23 16,27 16,23" fill="white"/>
-  <polygon points="19,23 16,27 16,23" fill="white"/>
-  <!-- Nœud cravate blanc -->
-  <polygon points="14.5,24 17.5,24 17,26 15,26" fill="white" opacity="0.85"/>
-  <!-- Corps cravate blanc -->
-  <path d="M 15,26 L 14.2,29 L 16,30.5 L 17.8,29 L 17,26 Z" fill="white" opacity="0.85"/>
+  <path d="M52 8 C80 8 95 30 95 52 C95 74 83 90 70 96 C62 101 60 107 64 113 C67 119 74 117 72 123 C68 129 58 127 54 119 C50 111 42 113 32 121 C20 131 6 125 8 115 C10 105 22 107 24 115 C26 123 18 119 16 109 C14 97 14 78 14 58 C14 30 30 8 52 8 Z"
+    fill="#9b7ec8" stroke="#1a1a1a" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- Scales: vertical post -->
+  <line x1="52" y1="24" x2="52" y2="40" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Scales: horizontal beam -->
+  <line x1="22" y1="40" x2="82" y2="40" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Left attachment ring -->
+  <circle cx="22" cy="40" r="3.5" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+
+  <!-- Left chains -->
+  <line x1="20" y1="43" x2="15" y2="56" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+  <line x1="24" y1="43" x2="29" y2="56" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Left pan -->
+  <line x1="12" y1="56" x2="32" y2="56" stroke="#1a1a1a" stroke-width="2.5"/>
+  <path d="M 12 56 Q 22 70 32 56" fill="#7b5fa0" stroke="#1a1a1a" stroke-width="2.5"/>
+
+  <!-- Right attachment ring -->
+  <circle cx="82" cy="40" r="3.5" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+
+  <!-- Right chains -->
+  <line x1="80" y1="43" x2="75" y2="56" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+  <line x1="84" y1="43" x2="89" y2="56" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Right pan -->
+  <line x1="72" y1="56" x2="92" y2="56" stroke="#1a1a1a" stroke-width="2.5"/>
+  <path d="M 72 56 Q 82 70 92 56" fill="#7b5fa0" stroke="#1a1a1a" stroke-width="2.5"/>
 </svg>
