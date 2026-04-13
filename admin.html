@@ -773,9 +773,9 @@ async function createSubAccount() {
   var btn = document.getElementById('sc-create-btn');
   btn.disabled = true; btn.textContent = 'Création...';
   try {
-    var resp = await fetch('https://web-production-f96f7.up.railway.app/admin/create-user', {
+    var resp = await fetch(BACKEND + '/admin/create-user', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: {'Content-Type': 'application/json', 'X-Admin-Pass': 'westfield2026'},
       body: JSON.stringify({email: email, password: password, role: role, parent_email: role === 'juriste' ? parentEmail : ''})
     });
     var result = await resp.json();
