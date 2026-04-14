@@ -753,7 +753,9 @@ function renderReview() {
 function _renderReviewJuristeBar(){
   var jAct = document.getElementById('review-juriste-bar');
   if(!jAct) return;
-  if(_userRole && _userRole !== 'juriste') { jAct.innerHTML=''; return; }
+  var isJuriste = _userRole === 'juriste';
+  var isDirecteur = _userRole === 'directeur';
+  if(_userRole && !isJuriste && !isDirecteur) { jAct.innerHTML=''; return; }
   var alreadyNames = modifications.map(function(m){ return (m.clause_name||'').toLowerCase(); });
   var contractClauses = window._allContractClauses||[];
   var remaining = contractClauses.filter(function(c){ return alreadyNames.indexOf((c.name||'').toLowerCase())<0; });
@@ -767,11 +769,11 @@ function _renderReviewJuristeBar(){
     : '';
   jAct.innerHTML =
     '<div style="background:#0d1017;border:1px solid #1f2537;border-radius:12px;padding:16px;margin-bottom:16px">'
-    +'<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">'
-    +'<button id="btn-submit-review" onclick="saveAndSubmitFromReview()" style="padding:10px 20px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur pour validation →</button>'
-    +'<span style="font-size:11px;color:#4a5470">Vous pouvez aussi télécharger le DOCX ci-dessous.</span>'
-    +'</div>'
-    +'<div style="border-top:1px solid #1f2537;padding-top:12px">'
+    +(isJuriste?'<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">'
+      +'<button id="btn-submit-review" onclick="saveAndSubmitFromReview()" style="padding:10px 20px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur pour validation →</button>'
+      +'<span style="font-size:11px;color:#4a5470">Vous pouvez aussi télécharger le DOCX ci-dessous.</span>'
+      +'</div>':'')
+    +'<div style="'+(isJuriste?'border-top:1px solid #1f2537;padding-top:12px':'padding-top:4px')+'">'
     +'<div style="font-size:12px;font-weight:700;color:#5b7cfa;margin-bottom:4px">+ Signaler une clause inacceptable non détectée</div>'
     +(hasContractClauses?'<div style="font-size:11px;color:#6b7280;margin-bottom:8px">'+remaining.length+' clause(s) du contrat non analysée(s)</div>':'')
     +(!hasContractClauses?'<label style="display:inline-flex;align-items:center;gap:8px;padding:7px 12px;background:#181c2a;border:1px solid #2a3040;border-radius:7px;color:#6b7280;font-size:11px;cursor:pointer;margin-bottom:10px">'
