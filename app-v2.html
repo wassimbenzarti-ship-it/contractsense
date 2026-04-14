@@ -719,37 +719,53 @@ async function analyzeWithPartie(partieName) {
     if (sLive) { sLive.style.display = 'block'; }
     if (sLiveLog) { sLiveLog.innerHTML = ''; }
 
-    var resp = await fetch(BACKEND + '/analyze/stream', { method: 'POST', body: fd });
-    if (!resp.ok) {
-      var errData = {};
-      try { errData = await resp.json(); } catch(_) {}
-      throw new Error(errData.error || ('Erreur serveur (' + resp.status + ')'));
-    }
-    var reader = resp.body.getReader();
-    var decoder = new TextDecoder();
-    var buf = '';
     var data = null;
-    while (true) {
-      var chunk = await reader.read();
-      if (chunk.done) break;
-      buf += decoder.decode(chunk.value, {stream: true});
-      var lines = buf.split('\n');
-      buf = lines.pop();
-      for (var li = 0; li < lines.length; li++) {
-        var line = lines[li].trim();
-        if (!line.startsWith('data: ')) continue;
-        try {
-          var evt = JSON.parse(line.slice(6));
-          if (evt.type === 'progress') {
-            if (sLiveMsg) sLiveMsg.textContent = evt.message;
-            if (sLiveLog) sLiveLog.innerHTML = '<div>' + _escH(evt.message) + '</div>' + sLiveLog.innerHTML;
-          } else if (evt.type === 'result') {
-            data = evt.data;
-          } else if (evt.type === 'error') {
-            throw new Error(evt.message);
-          }
-        } catch(parseErr) { if (parseErr.message && parseErr.message.indexOf('Erreur') !== -1) throw parseErr; }
+    var streamOk = false;
+    try {
+      var resp = await fetch(BACKEND + '/analyze/stream', { method: 'POST', body: fd });
+      if (!resp.ok) {
+        var errData = {};
+        try { errData = await resp.json(); } catch(_) {}
+        throw new Error(errData.error || ('Erreur serveur (' + resp.status + ')'));
       }
+      var reader = resp.body.getReader();
+      var decoder = new TextDecoder();
+      var buf = '';
+      while (true) {
+        var chunk = await reader.read();
+        if (chunk.done) break;
+        buf += decoder.decode(chunk.value, {stream: true});
+        var lines = buf.split('\n');
+        buf = lines.pop();
+        for (var li = 0; li < lines.length; li++) {
+          var line = lines[li].trim();
+          if (!line.startsWith('data: ')) continue;
+          try {
+            var evt = JSON.parse(line.slice(6));
+            if (evt.type === 'progress') {
+              if (sLiveMsg) sLiveMsg.textContent = evt.message;
+              if (sLiveLog) sLiveLog.innerHTML = '<div>' + _escH(evt.message) + '</div>' + sLiveLog.innerHTML;
+            } else if (evt.type === 'result') {
+              data = evt.data; streamOk = true;
+            } else if (evt.type === 'error') {
+              throw new Error(evt.message);
+            }
+          } catch(parseErr) { if (parseErr.message && parseErr.message.indexOf('Erreur') !== -1) throw parseErr; }
+        }
+      }
+    } catch(streamErr) {
+      // Fallback: SSE failed (e.g. HTTP/2 protocol error), use regular endpoint
+      console.warn('Stream failed, falling back to /analyze:', streamErr.message);
+      if (sLiveMsg) sLiveMsg.textContent = '⏳ Analyse en cours...';
+      var fd2 = buildFormData();
+      fd2.append('partie', partieName);
+      var resp2 = await fetch(BACKEND + '/analyze', { method: 'POST', body: fd2 });
+      if (!resp2.ok) {
+        var ed2 = {}; try { ed2 = await resp2.json(); } catch(_) {}
+        throw new Error(ed2.error || ('Erreur serveur (' + resp2.status + ')'));
+      }
+      data = await resp2.json();
+      streamOk = true;
     }
     if (!data) throw new Error('Pas de résultat reçu.');
 
@@ -1417,34 +1433,47 @@ async function dAnaAnalyze(partie) {
     if (dLive) { dLive.style.display = 'block'; }
     if (dLiveLog) { dLiveLog.innerHTML = ''; }
 
-    var resp = await fetch(BACKEND+'/analyze/stream', {method:'POST', body:fd});
-    if (!resp.ok) { var ed={}; try{ed=await resp.json();}catch(x){} throw new Error(ed.error||'Erreur '+resp.status); }
-    var reader2 = resp.body.getReader();
-    var decoder2 = new TextDecoder();
-    var buf2 = '';
     var data = null;
-    while (true) {
-      var chunk2 = await reader2.read();
-      if (chunk2.done) break;
-      buf2 += decoder2.decode(chunk2.value, {stream: true});
-      var lines2 = buf2.split('\n');
-      buf2 = lines2.pop();
-      for (var li2 = 0; li2 < lines2.length; li2++) {
-        var line2 = lines2[li2].trim();
-        if (!line2.startsWith('data: ')) continue;
-        try {
-          var evt2 = JSON.parse(line2.slice(6));
-          if (evt2.type === 'progress') {
-            statusEl.textContent = evt2.message;
-            if (dLiveMsg) dLiveMsg.textContent = evt2.message;
-            if (dLiveLog) dLiveLog.innerHTML = '<div>' + _escH(evt2.message) + '</div>' + dLiveLog.innerHTML;
-          } else if (evt2.type === 'result') {
-            data = evt2.data;
-          } else if (evt2.type === 'error') {
-            throw new Error(evt2.message);
-          }
-        } catch(parseErr2) { if (parseErr2.message && parseErr2.message.indexOf('Erreur') !== -1) throw parseErr2; }
+    try {
+      var resp = await fetch(BACKEND+'/analyze/stream', {method:'POST', body:fd});
+      if (!resp.ok) { var ed={}; try{ed=await resp.json();}catch(x){} throw new Error(ed.error||'Erreur '+resp.status); }
+      var reader2 = resp.body.getReader();
+      var decoder2 = new TextDecoder();
+      var buf2 = '';
+      while (true) {
+        var chunk2 = await reader2.read();
+        if (chunk2.done) break;
+        buf2 += decoder2.decode(chunk2.value, {stream: true});
+        var lines2 = buf2.split('\n');
+        buf2 = lines2.pop();
+        for (var li2 = 0; li2 < lines2.length; li2++) {
+          var line2 = lines2[li2].trim();
+          if (!line2.startsWith('data: ')) continue;
+          try {
+            var evt2 = JSON.parse(line2.slice(6));
+            if (evt2.type === 'progress') {
+              statusEl.textContent = evt2.message;
+              if (dLiveMsg) dLiveMsg.textContent = evt2.message;
+              if (dLiveLog) dLiveLog.innerHTML = '<div>' + _escH(evt2.message) + '</div>' + dLiveLog.innerHTML;
+            } else if (evt2.type === 'result') {
+              data = evt2.data;
+            } else if (evt2.type === 'error') {
+              throw new Error(evt2.message);
+            }
+          } catch(parseErr2) { if (parseErr2.message && parseErr2.message.indexOf('Erreur') !== -1) throw parseErr2; }
+        }
       }
+    } catch(streamErr2) {
+      // Fallback: SSE failed (e.g. HTTP/2 protocol error on Railway), use regular endpoint
+      console.warn('Stream failed, falling back to /analyze:', streamErr2.message);
+      statusEl.textContent = 'Analyse en cours...';
+      var fd3 = new FormData();
+      fd3.append('file', curFile); fd3.append('partie', partie); fd3.append('lang','auto');
+      fd3.append('type', savedType || document.getElementById('d-contract-type').value);
+      if (_cu && _cu.email) fd3.append('user_email', _cu.email);
+      var resp3 = await fetch(BACKEND+'/analyze', {method:'POST', body:fd3});
+      if (!resp3.ok) { var ed3={}; try{ed3=await resp3.json();}catch(x){} throw new Error(ed3.error||'Erreur '+resp3.status); }
+      data = await resp3.json();
     }
     if (!data) throw new Error('Pas de résultat reçu.');
     modifications = data.modifications || []; window._compliance = data.compliance || [];
