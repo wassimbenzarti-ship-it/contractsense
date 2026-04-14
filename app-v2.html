@@ -620,26 +620,24 @@ async function analyze() {
   }
 }
 
-//  Step 2: Show parties
-function renderParties(parties) {
-  var list = document.getElementById('parties-list');
-  list.innerHTML = '';
+// ─── Shared party-selection UI builder ───────────────────────────────────────
+// onConfirm(partieLabel) is called when the user clicks the confirm button.
+// All coalition logic lives here once; both flows call this.
+function _buildPartiesUI(listEl, parties, onConfirm) {
+  listEl.innerHTML = '';
+  var arr = parties.length ? parties : [{name:'Analyser (générique)', party_label:'Partie', description:''}];
   var selected = [];
 
-  // Hint text
+  // Hint
   var hint = document.createElement('p');
   hint.style.cssText = 'font-size:12px;color:#6b7280;margin:0 0 14px;text-align:center;line-height:1.6';
   hint.innerHTML = 'Cliquez sur <strong style="color:#e2e5f0">1 partie</strong> pour la défendre seule &nbsp;·&nbsp; ou sélectionnez <strong style="color:#e2e5f0">2 parties</strong> pour former une coalition';
-  list.appendChild(hint);
+  listEl.appendChild(hint);
 
-  // Confirm button (shown when ≥1 party selected)
+  // Confirm button
   var confirmBtn = document.createElement('button');
   confirmBtn.style.cssText = 'display:none;width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:opacity 0.2s';
-  confirmBtn.textContent = 'Analyser →';
-  confirmBtn.onclick = function() {
-    if (!selected.length) return;
-    analyzeWithPartie(selected.join(' et '));
-  };
+  confirmBtn.onclick = function() { if (selected.length) onConfirm(selected.join(' et ')); };
 
   function updateConfirm() {
     if (!selected.length) {
@@ -653,30 +651,30 @@ function renderParties(parties) {
     }
   }
 
-  parties.forEach(function(p) {
-    var label = p.party_label || p.description || p.name;
-    var roleLabel = p.party_label || p.description || p.role || '';
+  arr.forEach(function(p) {
+    var label = p.party_label || p.description || p.name || p;
     var btn = document.createElement('button');
     btn.className = 'partie-btn';
     btn.innerHTML =
-      '<div class="name">' + p.name + '</div>' +
-      '<div class="desc2">' + p.description + '</div>' +
-      (roleLabel ? '<div style="margin-top:4px;font-size:11px;color:#5b7cfa;font-weight:600">' + roleLabel + '</div>' : '');
-    btn.addEventListener('click', function() {
+      '<div class="name">'  + _escH(p.name || p) + '</div>' +
+      (p.description ? '<div class="desc2">' + _escH(p.description) + '</div>' : '') +
+      (p.party_label ? '<div style="margin-top:4px;font-size:11px;color:#5b7cfa;font-weight:600">' + _escH(p.party_label) + '</div>' : '');
+    btn.onclick = function() {
       var idx = selected.indexOf(label);
-      if (idx === -1) {
-        selected.push(label);
-        btn.classList.add('selected');
-      } else {
-        selected.splice(idx, 1);
-        btn.classList.remove('selected');
-      }
+      if (idx === -1) { selected.push(label);   btn.classList.add('selected'); }
+      else            { selected.splice(idx, 1); btn.classList.remove('selected'); }
       updateConfirm();
-    });
-    list.appendChild(btn);
+    };
+    listEl.appendChild(btn);
   });
 
-  list.appendChild(confirmBtn);
+  listEl.appendChild(confirmBtn);
+}
+
+//  Step 2: Show parties (home flow)
+function renderParties(parties) {
+  var list = document.getElementById('parties-list');
+  _buildPartiesUI(list, parties, analyzeWithPartie);
   show('step-parties');
 }
 
@@ -1342,59 +1340,8 @@ async function dAnaStart() {
 
 function dAnaShowParties(parties) {
   document.getElementById('d-ana-parties').style.display = '';
-  var list = document.getElementById('d-parties-list'); list.innerHTML = '';
-  var arr = parties.length ? parties : [{name:'Analyser (générique)', party_label:'Partie', description:''}];
-  var selected = [];
-
-  // Hint text
-  var hint = document.createElement('p');
-  hint.style.cssText = 'font-size:12px;color:#6b7280;margin:0 0 14px;text-align:center;line-height:1.6';
-  hint.innerHTML = 'Cliquez sur <strong style="color:#e2e5f0">1 partie</strong> pour la défendre seule &nbsp;·&nbsp; ou sélectionnez <strong style="color:#e2e5f0">2 parties</strong> pour former une coalition';
-  list.appendChild(hint);
-
-  // Confirm button
-  var confirmBtn = document.createElement('button');
-  confirmBtn.style.cssText = 'display:none;width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:opacity 0.2s';
-  confirmBtn.textContent = 'Analyser →';
-  confirmBtn.onclick = function() {
-    if (!selected.length) return;
-    dAnaAnalyze(selected.join(' et '));
-  };
-
-  function updateConfirm() {
-    if (!selected.length) {
-      confirmBtn.style.display = 'none';
-    } else if (selected.length === 1) {
-      confirmBtn.style.display = 'block';
-      confirmBtn.textContent = 'Défendre ' + selected[0] + ' →';
-    } else {
-      confirmBtn.style.display = 'block';
-      confirmBtn.textContent = 'Défendre la coalition : ' + selected.join(' + ') + ' →';
-    }
-  }
-
-  arr.forEach(function(p) {
-    var label = p.party_label || p.description || p.name || p;
-    var btn = document.createElement('button');
-    btn.className = 'partie-btn';
-    btn.innerHTML = '<div class="name">' + _escH(p.name||p) + '</div>' +
-      (p.description ? '<div class="desc2">' + _escH(p.description) + '</div>' : '') +
-      (p.party_label ? '<div style="margin-top:3px;font-size:11px;color:#5b7cfa;font-weight:600">' + _escH(p.party_label) + '</div>' : '');
-    btn.onclick = function() {
-      var idx = selected.indexOf(label);
-      if (idx === -1) {
-        selected.push(label);
-        btn.classList.add('selected');
-      } else {
-        selected.splice(idx, 1);
-        btn.classList.remove('selected');
-      }
-      updateConfirm();
-    };
-    list.appendChild(btn);
-  });
-
-  list.appendChild(confirmBtn);
+  var list = document.getElementById('d-parties-list');
+  _buildPartiesUI(list, parties, dAnaAnalyze);
 }
 
 var _JUR_LABELS = {droit_marocain:'droit marocain 🇲🇦',droit_francais:'droit français 🇫🇷',droit_anglais:'droit anglais 🇬🇧',droit_tunisien:'droit tunisien 🇹🇳',droit_algerien:'droit algérien 🇩🇿',droit_belge:'droit belge 🇧🇪',universel:'droit applicable 🌐'};
