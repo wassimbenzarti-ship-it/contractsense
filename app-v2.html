@@ -617,23 +617,69 @@ async function analyze() {
   }
 }
 
-//  Step 2: Show parties 
+//  Step 2: Show parties
+var _selectedCoalition = [];
 function renderParties(parties) {
   var list = document.getElementById('parties-list');
+  _selectedCoalition = [];
   list.innerHTML = '';
+  // Coalition mode header (shown when 3+ parties)
+  if (parties.length >= 3) {
+    var hint = document.createElement('p');
+    hint.style.cssText = 'font-size:12px;color:#6b7280;margin-bottom:12px;text-align:center';
+    hint.textContent = 'Cliquez sur une partie pour la défendre seule, ou sélectionnez-en 2 pour former une coalition.';
+    list.appendChild(hint);
+  }
   parties.forEach(function(p) {
     var btn = document.createElement('button');
     btn.className = 'partie-btn';
-    // Show name + generic role
+    btn.dataset.label = p.party_label || p.description || p.name;
     var roleLabel = p.party_label || p.description || p.role || '';
-    btn.innerHTML = 
+    btn.innerHTML =
       '<div class="name">' + p.name + '</div>' +
       '<div class="desc2">' + p.description + '</div>' +
       (roleLabel ? '<div style="margin-top:4px;font-size:11px;color:#5b7cfa;font-weight:600">' + roleLabel + '</div>' : '');
-    // Pass party_label (generic role) not company name
-    btn.addEventListener('click', function() { analyzeWithPartie(p.party_label || p.description || p.name); });
+    if (parties.length >= 3) {
+      // Multi-select mode for 3+ parties
+      btn.addEventListener('click', function() {
+        var label = btn.dataset.label;
+        var idx = _selectedCoalition.indexOf(label);
+        if (idx >= 0) {
+          _selectedCoalition.splice(idx, 1);
+          btn.style.outline = '';
+          btn.style.background = '';
+        } else if (_selectedCoalition.length < 2) {
+          _selectedCoalition.push(label);
+          btn.style.outline = '2px solid #5b7cfa';
+          btn.style.background = 'rgba(91,124,250,0.08)';
+        }
+        var coalBtn = document.getElementById('btn-coalition');
+        if (coalBtn) {
+          if (_selectedCoalition.length === 1) {
+            coalBtn.textContent = 'Défendre ' + _selectedCoalition[0];
+            coalBtn.style.display = 'block';
+          } else if (_selectedCoalition.length === 2) {
+            coalBtn.textContent = 'Défendre la coalition : ' + _selectedCoalition.join(' + ');
+            coalBtn.style.display = 'block';
+          } else {
+            coalBtn.style.display = 'none';
+          }
+        }
+      });
+    } else {
+      btn.addEventListener('click', function() { analyzeWithPartie(btn.dataset.label); });
+    }
     list.appendChild(btn);
   });
+  if (parties.length >= 3) {
+    var coalBtn = document.createElement('button');
+    coalBtn.id = 'btn-coalition';
+    coalBtn.style.cssText = 'display:none;margin:16px auto 0;padding:11px 24px;background:#5b7cfa;border:none;border-radius:9px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;width:100%';
+    coalBtn.addEventListener('click', function() {
+      if (_selectedCoalition.length > 0) analyzeWithPartie(_selectedCoalition.join(' et '));
+    });
+    list.appendChild(coalBtn);
+  }
   show('step-parties');
 }
 
@@ -1795,8 +1841,8 @@ async function showAnaDetail(idx) {
     +(isJuriste&&(st==='draft'||st==='revision_requested')?'<button onclick="submitForReview(\''+ana.id+'\')" style="flex:2;padding:11px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur →</button>':'')
     +(isDirecteur&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'?'<button onclick="validateByDirector(\''+ana.id+'\')" style="flex:2;padding:11px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Valider → admin</button>':'')
     +'</div>'
-    // Section "Ajouter une clause" pour juriste en révision
-    +(isJuriste&&(st==='draft'||st==='revision_requested')?
+    // Section "Ajouter une clause" pour juriste en révision OU directeur sur ses propres analyses
+    +((isJuriste&&(st==='draft'||st==='revision_requested'))||(isDirecteur&&!ana._juristeEmail)?
       (function(){
         var doneNames=(window._currentMods||[]).map(function(m){return (m.clause_name||'').toLowerCase();});
         var contractClauses=window._allContractClauses||[];
