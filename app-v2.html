@@ -935,7 +935,6 @@ function renderReview() {
 function _renderReviewJuristeBar(){
   var jAct = document.getElementById('review-juriste-bar');
   if(!jAct) return;
-  // Visible pour tous les rôles (juriste, directeur, solo, admin, non connecté)
   var alreadyNames = modifications.map(function(m){ return (m.clause_name||'').toLowerCase(); });
   var contractClauses = window._allContractClauses||[];
   var remaining = contractClauses.filter(function(c){ return alreadyNames.indexOf((c.name||'').toLowerCase())<0; });
@@ -947,10 +946,25 @@ function _renderReviewJuristeBar(){
         return '<option value="'+safe+'" data-text="'+safeT+'">'+_escH(c.name)+'</option>';
       }).join('')
     : '';
+
+  // Role-based action buttons
+  var isDir = (_userRole==='directeur'||_isAdmin);
+  var isJur = (_userRole==='juriste');
+  var actionBtns = '';
+  if(isJur){
+    actionBtns = '<button id="btn-submit-review" onclick="saveAndSubmitFromReview()" style="padding:10px 20px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur pour validation →</button>';
+  } else {
+    // Directeur, admin, solo, non-connecté
+    actionBtns = '<button id="btn-validate-review" onclick="validateFromReview()" style="padding:10px 20px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">✅ Valider et enregistrer dans le RAG</button>';
+    if(isDir){
+      actionBtns += '<button id="btn-send-juriste-review" onclick="sendToJuristeFromReview()" style="padding:10px 18px;background:none;border:1px solid #f59e0b;border-radius:8px;color:#f59e0b;font-weight:700;font-size:13px;cursor:pointer">↩ Renvoyer au juriste pour revue</button>';
+    }
+  }
+
   jAct.innerHTML =
     '<div style="background:#0d1017;border:1px solid #1f2537;border-radius:12px;padding:16px;margin-bottom:16px">'
     +'<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">'
-    +'<button id="btn-submit-review" onclick="saveAndSubmitFromReview()" style="padding:10px 20px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur pour validation →</button>'
+    +actionBtns
     +'<span style="font-size:11px;color:#4a5470">Vous pouvez aussi télécharger le DOCX ci-dessous.</span>'
     +'</div>'
     +'<div style="border-top:1px solid #1f2537;padding-top:12px">'
@@ -1134,6 +1148,75 @@ async function saveAndSubmitFromReview(){
   }catch(e){
     alert('Erreur : '+e.message);
     if(btn){ btn.textContent='Soumettre au directeur \u2192'; btn.disabled=false; }
+  }
+}
+
+async function validateFromReview(){
+  if(!_cu){ showAuth(); return; }
+  if(!_userRole) await checkRole();
+  var btn = document.getElementById('btn-validate-review');
+  if(btn){ btn.textContent = '⏳ Validation...'; btn.disabled = true; }
+  try{
+    modifications.forEach(function(m){
+      var el = document.getElementById('proposed-'+m.id);
+      if(el){ var ed=el.innerText.trim(); if(ed&&ed!==m.proposed) m.proposed=ed; }
+    });
+    await saveAna(curFile?curFile.name:'Contrat', savedType||'generic', selectedPartie||'', modifications);
+    var anaId = window._lastSavedAnaId;
+    if(!anaId){ alert('Analyse sauvegardée.'); showDash(); return; }
+    // Validate directly → sends to RAG queue
+    var r = await fetch(BACKEND+'/analyses/validate-by-director/'+anaId, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({modifications: _modsWithMeta(modifications), director_email: (_cu&&_cu.email)||''})
+    });
+    var d = r.ok ? (await r.json().catch(function(){return{};})) : {};
+    if(r.ok && d.status==='ok'){
+      var decs = {};
+      modifications.forEach(function(m,i){ decs[String(m.id||i+1)]='accepted'; });
+      await fetch(BACKEND+'/queue/add', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          filename: curFile?curFile.name:'Contrat',
+          contract_type: savedType||'',
+          partie: selectedPartie||'',
+          accepted_modifications: JSON.stringify(modifications),
+          decisions: JSON.stringify(decs),
+          submitted_by: (_cu&&_cu.email)||'',
+          score: 80,
+          analysis_id: anaId
+        })
+      });
+      alert('Analyse validée et enregistrée dans le RAG.');
+      showDash();
+    } else {
+      throw new Error(d.error||'Erreur validation');
+    }
+  }catch(e){
+    alert('Erreur : '+e.message);
+    if(btn){ btn.textContent='✅ Valider et enregistrer dans le RAG'; btn.disabled=false; }
+  }
+}
+
+async function sendToJuristeFromReview(){
+  if(!_cu){ showAuth(); return; }
+  if(!_userRole) await checkRole();
+  var btn = document.getElementById('btn-send-juriste-review');
+  if(btn){ btn.textContent='⏳ Envoi...'; btn.disabled=true; }
+  try{
+    modifications.forEach(function(m){
+      var el = document.getElementById('proposed-'+m.id);
+      if(el){ var ed=el.innerText.trim(); if(ed&&ed!==m.proposed) m.proposed=ed; }
+    });
+    await saveAna(curFile?curFile.name:'Contrat', savedType||'generic', selectedPartie||'', modifications);
+    var anaId = window._lastSavedAnaId;
+    if(anaId){
+      await _patchAnalysis(anaId, {status:'revision_requested', director_notes:'Revue IA insuffisante — merci de compléter l\'analyse manuellement.'});
+    }
+    alert('Document renvoyé au juriste pour revue approfondie.');
+    showDash();
+  }catch(e){
+    alert('Erreur : '+e.message);
+    if(btn){ btn.textContent='↩ Renvoyer au juriste pour revue'; btn.disabled=false; }
   }
 }
 
