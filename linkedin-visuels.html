@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<title>Omniscient — Visuels LinkedIn</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #111;
+  font-family: 'Inter', sans-serif;
+  padding: 40px;
+  display: flex; flex-direction: column; gap: 40px; align-items: center;
+}
+h2 {
+  color: #888; font-size: 0.8rem; letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 12px; width: 1080px;
+}
+
+/* ── SLIDE BASE ── */
+.slide {
+  width: 1080px; height: 1080px;
+  position: relative; overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════
+   SÉRIE 1 — LANCEMENT DU SITE (fond sombre)
+   ══════════════════════════════════════════ */
+.s1 {
+  background: #05070e;
+  color: #e6eaf6;
+}
+.s1::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 100% 80% at 50% -10%, rgba(61,107,255,0.18) 0%, transparent 65%);
+}
+.s1 .noise {
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.4;
+}
+.s1 .inner { position: relative; z-index: 1; padding: 80px; height: 100%; display: flex; flex-direction: column; }
+.s1 .logo-row { display: flex; align-items: center; gap: 16px; margin-bottom: auto; }
+.s1 .logo-name { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; color: #e6eaf6; }
+.s1 .logo-sub { font-size: 0.75rem; color: #4a5470; letter-spacing: 0.1em; }
+.s1 .badge {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: rgba(61,107,255,0.12); border: 1px solid rgba(61,107,255,0.3);
+  border-radius: 100px; padding: 10px 22px;
+  font-size: 0.9rem; color: #7a9bff; font-weight: 500;
+  margin-bottom: 40px; align-self: flex-start;
+}
+.s1 .main-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 7rem; font-weight: 700; line-height: 0.95;
+  margin-bottom: 40px;
+}
+.s1 .main-title em { font-style: italic; color: #c8a94b; }
+.s1 .subtitle { font-size: 1.5rem; color: rgba(230,234,246,0.6); line-height: 1.5; max-width: 700px; }
+.s1 .url {
+  margin-top: auto;
+  font-size: 1.1rem; color: #3d6bff; font-weight: 600; letter-spacing: 0.05em;
+}
+.s1 .corner-line {
+  position: absolute; bottom: 0; right: 0;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle at 100% 100%, rgba(61,107,255,0.12), transparent 70%);
+}
+
+/* ══════════════════════════════════════════
+   SÉRIE 2 — PME (accroche chiffres)
+   ══════════════════════════════════════════ */
+.s2 {
+  background: #05070e;
+  color: #e6eaf6;
+}
+.s2::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 80% at 80% 80%, rgba(200,169,75,0.08) 0%, transparent 60%);
+}
+.s2 .inner { position: relative; z-index: 1; padding: 80px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
+.s2 .top { display: flex; justify-content: space-between; align-items: flex-start; }
+.s2 .tag { font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: #c8a94b; font-weight: 600; }
+.s2 .slide-num { font-size: 0.85rem; color: #4a5470; }
+.s2 .question {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 5.5rem; font-weight: 700; line-height: 1.05;
+}
+.s2 .question em { font-style: italic; color: #c8a94b; }
+.s2 .answer { font-size: 1.4rem; color: rgba(230,234,246,0.55); line-height: 1.6; max-width: 800px; }
+.s2 .bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+.s2 .brand { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: #4a5470; }
+.s2 .cta-pill {
+  background: #c8a94b; color: #05070e; border-radius: 100px;
+  padding: 12px 28px; font-size: 1rem; font-weight: 700;
+}
+
+/* ══════════════════════════════════════════
+   SÉRIE 3 — TIMELINE (avant/après)
+   ══════════════════════════════════════════ */
+.s3 {
+  background: #05070e;
+  color: #e6eaf6;
+}
+.s3::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 100% 0%, rgba(124,92,252,0.1) 0%, transparent 60%);
+}
+.s3 .inner { position: relative; z-index: 1; padding: 80px; height: 100%; display: flex; flex-direction: column; }
+.s3 .label { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: #7c5cfc; font-weight: 600; margin-bottom: 24px; }
+.s3 .title { font-family: 'Cormorant Garamond', serif; font-size: 4rem; font-weight: 700; line-height: 1.1; margin-bottom: 48px; }
+.s3 .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; flex: 1; }
+.s3 .col { display: flex; flex-direction: column; gap: 20px; }
+.s3 .col-head { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; padding-bottom: 12px; border-bottom: 1px solid; }
+.s3 .col-head.bad { color: #ff4560; border-color: rgba(255,69,96,0.3); }
+.s3 .col-head.good { color: #0dcf8a; border-color: rgba(13,207,138,0.3); }
+.s3 .item { display: flex; gap: 14px; align-items: flex-start; }
+.s3 .item-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+.s3 .item-text { font-size: 1rem; color: rgba(230,234,246,0.75); line-height: 1.4; }
+.s3 .bottom { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 32px; }
+.s3 .stat-big { font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; font-weight: 700; color: #0dcf8a; line-height: 1; }
+.s3 .stat-label { font-size: 0.85rem; color: rgba(230,234,246,0.4); margin-top: 4px; }
+.s3 .brand-sm { font-size: 0.85rem; color: #4a5470; font-family: 'Cormorant Garamond', serif; }
+
+/* ══════════════════════════════════════════
+   SÉRIE 4 — STAT CARDS
+   ══════════════════════════════════════════ */
+.s4 {
+  background: #0c0f1a;
+  color: #e6eaf6;
+}
+.s4 .inner { padding: 72px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
+.s4 .top-label { font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; color: #3d6bff; font-weight: 600; }
+.s4 .headline { font-family: 'Cormorant Garamond', serif; font-size: 3.8rem; font-weight: 700; line-height: 1.1; margin: 24px 0; }
+.s4 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.s4 .card {
+  background: #05070e; border: 1px solid #161c2e;
+  border-radius: 20px; padding: 32px;
+}
+.s4 .card-num { font-family: 'Cormorant Garamond', serif; font-size: 4rem; font-weight: 700; color: #c8a94b; line-height: 1; }
+.s4 .card-label { font-size: 0.95rem; color: rgba(230,234,246,0.5); margin-top: 8px; line-height: 1.4; }
+.s4 .footer { display: flex; justify-content: space-between; align-items: center; }
+.s4 .url { color: #3d6bff; font-size: 1rem; font-weight: 600; }
+.s4 .by { font-size: 0.85rem; color: #4a5470; }
+
+/* ══════════════════════════════════════════
+   SÉRIE 5 — CITATION (avocats)
+   ══════════════════════════════════════════ */
+.s5 {
+  background: linear-gradient(135deg, #05070e 0%, #0c0f1a 100%);
+  color: #e6eaf6;
+}
+.s5::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 70% at 20% 50%, rgba(200,169,75,0.06) 0%, transparent 60%);
+}
+.s5 .inner { position: relative; z-index: 1; padding: 80px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
+.s5 .guillemets { font-family: 'Cormorant Garamond', serif; font-size: 14rem; color: rgba(200,169,75,0.15); line-height: 0.7; }
+.s5 .quote-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4.2rem; font-weight: 600; line-height: 1.15;
+  margin-top: -60px;
+}
+.s5 .quote-text em { font-style: italic; color: #c8a94b; }
+.s5 .bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+.s5 .source { font-size: 1rem; color: rgba(230,234,246,0.4); }
+.s5 .cta { background: rgba(200,169,75,0.12); border: 1px solid rgba(200,169,75,0.3); border-radius: 12px; padding: 16px 28px; font-size: 1rem; color: #c8a94b; font-weight: 600; }
+
+/* ══════════════════════════════════════════
+   SÉRIE 6 — LANCEMENT (annonce)
+   ══════════════════════════════════════════ */
+.s6 {
+  background: #05070e;
+  color: #e6eaf6;
+}
+.s6::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 60% at 30% 30%, rgba(61,107,255,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 80% 80%, rgba(124,92,252,0.1) 0%, transparent 60%);
+}
+.s6 .line-decor {
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, #3d6bff, #7c5cfc, #c8a94b);
+}
+.s6 .inner { position: relative; z-index: 1; padding: 90px 80px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 32px; }
+.s6 .eyebrow { font-size: 0.85rem; letter-spacing: 0.2em; text-transform: uppercase; color: #7a9bff; font-weight: 600; }
+.s6 .big { font-family: 'Cormorant Garamond', serif; font-size: 8rem; font-weight: 900; line-height: 0.9; }
+.s6 .big span { color: #c8a94b; }
+.s6 .desc { font-size: 1.6rem; color: rgba(230,234,246,0.6); line-height: 1.5; max-width: 720px; }
+.s6 .pill {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(61,107,255,0.12); border: 1px solid rgba(61,107,255,0.3);
+  border-radius: 100px; padding: 14px 32px;
+  font-size: 1.1rem; color: #e6eaf6; font-weight: 500;
+}
+.s6 .pill strong { color: #3d6bff; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ SLIDE 1 — LANCEMENT ════════════════════ -->
+<h2>Slide 1 — Annonce de lancement (post principal)</h2>
+<div class="slide s1">
+  <div class="corner-line"></div>
+  <div class="noise"></div>
+  <div class="inner">
+    <div class="logo-row">
+      <svg width="32" height="36" viewBox="0 0 32 36" fill="none">
+        <ellipse cx="16" cy="13" rx="10" ry="10" fill="#1a2340" stroke="#3d6bff" stroke-width="1.5"/>
+        <circle cx="16" cy="13" r="4" fill="#3d6bff" opacity="0.9"/>
+        <polygon points="10,22 16,29 16,22" fill="white"/>
+        <polygon points="22,22 16,29 16,22" fill="white"/>
+        <polygon points="13,23 19,23 18,27 14,27" fill="white" opacity="0.9"/>
+        <path d="M 14,27 L 12.5,32 L 16,34 L 19.5,32 L 18,27 Z" fill="white" opacity="0.9"/>
+      </svg>
+      <div>
+        <div class="logo-name">Omniscient</div>
+        <div class="logo-sub">by Westfield Avocats</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="badge">🚀 Disponible maintenant</div>
+      <div class="main-title">L'IA juridique<br/>supervisée <em>est là.</em></div>
+      <div class="subtitle">Analysez vos contrats en 60 secondes.<br/>Droit marocain, français, anglais.</div>
+    </div>
+
+    <div class="url">ai.westfieldavocats.com</div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 2 — PME ACCROCHE ════════════════════ -->
+<h2>Slide 2 — PME (accroche négociation)</h2>
+<div class="slide s2">
+  <div class="inner">
+    <div class="top">
+      <div class="tag">Pour les dirigeants PME · Maroc</div>
+      <div class="slide-num">01 / 05</div>
+    </div>
+    <div>
+      <div class="question">15 jours<br/>pour signer <em>un contrat</em><br/>standard.</div>
+    </div>
+    <div class="answer">C'est le délai moyen de négociation contractuelle au Maroc. Sans outil. Sans juriste interne.</div>
+    <div class="bottom">
+      <div class="brand">Omniscient — ai.westfieldavocats.com</div>
+      <div class="cta-pill">Et avec Omniscient ?</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 3 — PME SOLUTION ════════════════════ -->
+<h2>Slide 3 — PME (solution en 3 jours)</h2>
+<div class="slide s2">
+  <div class="inner">
+    <div class="top">
+      <div class="tag">Pour les dirigeants PME · Maroc</div>
+      <div class="slide-num">02 / 05</div>
+    </div>
+    <div>
+      <div class="question">Avec Omniscient :<br/><em>3 jours.</em></div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:16px">
+      <div style="display:flex;gap:14px;align-items:center"><span style="color:#0dcf8a;font-size:1.3rem">✓</span><span style="font-size:1.2rem;color:rgba(230,234,246,0.8)">Analyse complète en 60 secondes</span></div>
+      <div style="display:flex;gap:14px;align-items:center"><span style="color:#0dcf8a;font-size:1.3rem">✓</span><span style="font-size:1.2rem;color:rgba(230,234,246,0.8)">Clauses à risque identifiées</span></div>
+      <div style="display:flex;gap:14px;align-items:center"><span style="color:#0dcf8a;font-size:1.3rem">✓</span><span style="font-size:1.2rem;color:rgba(230,234,246,0.8)">Modifications rédigées, articles cités</span></div>
+      <div style="display:flex;gap:14px;align-items:center"><span style="color:#0dcf8a;font-size:1.3rem">✓</span><span style="font-size:1.2rem;color:rgba(230,234,246,0.8)">Export Word Track Changes prêt</span></div>
+    </div>
+    <div class="bottom">
+      <div class="brand">Omniscient — ai.westfieldavocats.com</div>
+      <div class="cta-pill">Basé sur le droit marocain</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 4 — AVANT/APRÈS ════════════════════ -->
+<h2>Slide 4 — Avant / Après (Direction juridique)</h2>
+<div class="slide s3">
+  <div class="inner">
+    <div class="label">Direction Juridique</div>
+    <div class="title">Ce que change<br/>Omniscient pour<br/>votre équipe</div>
+    <div class="cols">
+      <div class="col">
+        <div class="col-head bad">❌ Sans Omniscient</div>
+        <div class="item"><span class="item-icon">→</span><span class="item-text">2 à 4h par contrat de revue standard</span></div>
+        <div class="item"><span class="item-icon">→</span><span class="item-text">File d'attente sur les contrats courants</span></div>
+        <div class="item"><span class="item-icon">→</span><span class="item-text">"Le juridique nous ralentit"</span></div>
+        <div class="item"><span class="item-icon">→</span><span class="item-text">Délai de signature : 10 à 15 jours</span></div>
+      </div>
+      <div class="col">
+        <div class="col-head good">✓ Avec Omniscient</div>
+        <div class="item"><span class="item-icon">→</span><span class="item-text">60 secondes par contrat</span></div>
+        <div class="item"><span class="item-icon">→</span><span class="item-text">Zéro file d'attente</span></div>
+        <div class="item"><span class="item-icon">→</span><span class="item-text">La DJ devient un accélérateur de deals</span></div>
+        <div class="item"><span class="item-icon">→</span><span class="item-text">Délai de signature : 2 à 3 jours</span></div>
+      </div>
+    </div>
+    <div class="bottom">
+      <div>
+        <div class="stat-big">80%</div>
+        <div class="stat-label">du temps de revue récupéré</div>
+      </div>
+      <div class="brand-sm">Omniscient by Westfield Avocats</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 5 — STATS ════════════════════ -->
+<h2>Slide 5 — Stats chiffres clés</h2>
+<div class="slide s4">
+  <div class="inner">
+    <div class="top-label">Omniscient by Westfield Avocats</div>
+    <div class="headline">La négociation contractuelle<br/>en chiffres</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-num">60s</div>
+        <div class="card-label">Pour analyser un contrat complet</div>
+      </div>
+      <div class="card">
+        <div class="card-num">3j</div>
+        <div class="card-label">Délai de signature au lieu de 15</div>
+      </div>
+      <div class="card">
+        <div class="card-num">80%</div>
+        <div class="card-label">Du temps de revue récupéré</div>
+      </div>
+      <div class="card">
+        <div class="card-num">3</div>
+        <div class="card-label">Juridictions couvertes nativement</div>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="url">ai.westfieldavocats.com</div>
+      <div class="by">Supervisé par Westfield Avocats</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 6 — CITATION AVOCAT ════════════════════ -->
+<h2>Slide 6 — Citation (cabinets d'avocats)</h2>
+<div class="slide s5">
+  <div class="inner">
+    <div class="guillemets">"</div>
+    <div class="quote-text">
+      Facturez la stratégie.<br/>
+      <em>Pas la relecture.</em>
+    </div>
+    <div class="bottom">
+      <div class="source">Omniscient by Westfield Avocats</div>
+      <div class="cta">ai.westfieldavocats.com</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 7 — ANNONCE LANCEMENT V2 ════════════════════ -->
+<h2>Slide 7 — Post d'annonce de lancement (visuel fort)</h2>
+<div class="slide s6">
+  <div class="line-decor"></div>
+  <div class="inner">
+    <div class="eyebrow">Westfield Avocats lance</div>
+    <div class="big">OMN<span>I</span><br/>SCIENT</div>
+    <div class="desc">L'IA juridique supervisée par des avocats.<br/>Droit marocain · Français · Anglais.</div>
+    <div class="pill">
+      <svg width="20" height="20" viewBox="0 0 32 36" fill="none">
+        <ellipse cx="16" cy="13" rx="10" ry="10" fill="#1a2340" stroke="#3d6bff" stroke-width="1.5"/>
+        <circle cx="16" cy="13" r="4" fill="#3d6bff"/>
+      </svg>
+      <strong>ai.westfieldavocats.com</strong> — Disponible maintenant
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 8 — CABINET AVOCAT ════════════════════ -->
+<h2>Slide 8 — Cabinet d'avocats (objection ChatGPT)</h2>
+<div class="slide s2">
+  <div class="inner">
+    <div class="top">
+      <div class="tag">Pour les cabinets d'avocats</div>
+      <div class="slide-num">03 / 05</div>
+    </div>
+    <div>
+      <div class="question">ChatGPT ne<br/>connaît pas<br/><em>l'Art. 23 du DOC.</em></div>
+    </div>
+    <div class="answer">Omniscient si. Base documentaire constituée par Westfield Avocats. Chaque suggestion citée sur un article précis.</div>
+    <div class="bottom">
+      <div class="brand">Omniscient — ai.westfieldavocats.com</div>
+      <div class="cta-pill">Zéro hallucination</div>
+    </div>
+  </div>
+</div>
+
+<div style="height:80px"></div>
+</body>
+</html>
