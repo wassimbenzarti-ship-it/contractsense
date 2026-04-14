@@ -1346,9 +1346,15 @@ function dAnaShowParties(parties) {
   var arr = parties.length ? parties : [{name:'Analyser (générique)', party_label:'Partie', description:''}];
   var selected = [];
 
+  // Hint text
+  var hint = document.createElement('p');
+  hint.style.cssText = 'font-size:12px;color:#6b7280;margin:0 0 14px;text-align:center;line-height:1.6';
+  hint.innerHTML = 'Cliquez sur <strong style="color:#e2e5f0">1 partie</strong> pour la défendre seule &nbsp;·&nbsp; ou sélectionnez <strong style="color:#e2e5f0">2 parties</strong> pour former une coalition';
+  list.appendChild(hint);
+
   // Confirm button
   var confirmBtn = document.createElement('button');
-  confirmBtn.style.cssText = 'display:none;width:100%;margin-top:14px;padding:12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:14px;cursor:pointer';
+  confirmBtn.style.cssText = 'display:none;width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:opacity 0.2s';
   confirmBtn.textContent = 'Analyser →';
   confirmBtn.onclick = function() {
     if (!selected.length) return;
@@ -1356,10 +1362,15 @@ function dAnaShowParties(parties) {
   };
 
   function updateConfirm() {
-    confirmBtn.style.display = selected.length ? '' : 'none';
-    confirmBtn.textContent = selected.length >= 2
-      ? 'Analyser la coalition (' + selected.length + ' parties) →'
-      : 'Analyser →';
+    if (!selected.length) {
+      confirmBtn.style.display = 'none';
+    } else if (selected.length === 1) {
+      confirmBtn.style.display = 'block';
+      confirmBtn.textContent = 'Défendre ' + selected[0] + ' →';
+    } else {
+      confirmBtn.style.display = 'block';
+      confirmBtn.textContent = 'Défendre la coalition : ' + selected.join(' + ') + ' →';
+    }
   }
 
   arr.forEach(function(p) {
@@ -1373,12 +1384,10 @@ function dAnaShowParties(parties) {
       var idx = selected.indexOf(label);
       if (idx === -1) {
         selected.push(label);
-        btn.style.outline = '2px solid #5b7cfa';
-        btn.style.background = '#1a2040';
+        btn.classList.add('selected');
       } else {
         selected.splice(idx, 1);
-        btn.style.outline = '';
-        btn.style.background = '';
+        btn.classList.remove('selected');
       }
       updateConfirm();
     };
