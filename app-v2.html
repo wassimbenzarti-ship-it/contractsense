@@ -45,8 +45,10 @@ select { appearance: none; }
 h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.05; margin-bottom: 10px; }
 .accent { background: linear-gradient(135deg, #5b7cfa, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .desc { color: #6b7280; font-size: 14px; line-height: 1.65; max-width: 420px; margin-bottom: 28px; }
-.partie-btn { text-align: left; padding: 18px 20px; background: #111420; border: 1px solid #1f2537; border-radius: 13px; color: #e2e5f0; cursor: pointer; transition: all 0.2s; width: 100%; margin-bottom: 10px; }
+.partie-btn { text-align: left; padding: 18px 20px; background: #111420; border: 1px solid #1f2537; border-radius: 13px; color: #e2e5f0; cursor: pointer; transition: all 0.2s; width: 100%; margin-bottom: 10px; position:relative; }
 .partie-btn:hover { border-color: #5b7cfa; background: rgba(91,124,250,0.08); }
+.partie-btn.selected { border-color: #5b7cfa !important; background: rgba(91,124,250,0.22) !important; box-shadow: 0 0 0 2px rgba(91,124,250,0.4); }
+.partie-btn.selected::after { content: '✓'; position: absolute; top: 10px; right: 14px; color: #5b7cfa; font-size: 18px; font-weight: 900; }
 .partie-btn .name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
 .partie-btn .desc2 { color: #6b7280; font-size: 13px; }
 .mod-card { background: #111420; border: 1px solid #1f2537; border-radius: 14px; margin-bottom: 16px; overflow: hidden; }
@@ -620,23 +622,76 @@ async function analyze() {
   }
 }
 
-//  Step 2: Show parties 
+//  Step 2: Show parties
+var _selectedCoalition = [];
+
 function renderParties(parties) {
   var list = document.getElementById('parties-list');
+  _selectedCoalition = [];
   list.innerHTML = '';
+
+  var multiSelect = parties.length >= 3;
+
+  if (multiSelect) {
+    var hint = document.createElement('p');
+    hint.style.cssText = 'font-size:12px;color:#6b7280;margin-bottom:14px;text-align:center;line-height:1.5';
+    hint.innerHTML = 'Cliquez sur <strong style="color:#e2e5f0">1 partie</strong> pour la défendre seule &nbsp;·&nbsp; ou <strong style="color:#e2e5f0">2 parties</strong> pour une coalition';
+    list.appendChild(hint);
+  }
+
   parties.forEach(function(p) {
     var btn = document.createElement('button');
     btn.className = 'partie-btn';
-    // Show name + generic role
+    btn.dataset.label = p.party_label || p.description || p.name;
     var roleLabel = p.party_label || p.description || p.role || '';
-    btn.innerHTML = 
+    btn.innerHTML =
       '<div class="name">' + p.name + '</div>' +
       '<div class="desc2">' + p.description + '</div>' +
       (roleLabel ? '<div style="margin-top:4px;font-size:11px;color:#5b7cfa;font-weight:600">' + roleLabel + '</div>' : '');
-    // Pass party_label (generic role) not company name
-    btn.addEventListener('click', function() { analyzeWithPartie(p.party_label || p.description || p.name); });
+
+    if (multiSelect) {
+      btn.addEventListener('click', function() {
+        var label = btn.dataset.label;
+        var idx = _selectedCoalition.indexOf(label);
+        if (idx >= 0) {
+          _selectedCoalition.splice(idx, 1);
+          btn.classList.remove('selected');
+        } else if (_selectedCoalition.length < 2) {
+          _selectedCoalition.push(label);
+          btn.classList.add('selected');
+        }
+        updateConfirmBtn();
+      });
+    } else {
+      btn.addEventListener('click', function() { analyzeWithPartie(btn.dataset.label); });
+    }
     list.appendChild(btn);
   });
+
+  if (multiSelect) {
+    var confirmBtn = document.createElement('button');
+    confirmBtn.id = 'btn-coalition';
+    confirmBtn.style.cssText = 'display:none;margin:14px 0 0;padding:14px 24px;background:#5b7cfa;border:none;border-radius:10px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;width:100%;transition:opacity 0.2s';
+    confirmBtn.addEventListener('click', function() {
+      if (_selectedCoalition.length > 0) analyzeWithPartie(_selectedCoalition.join(' et '));
+    });
+    list.appendChild(confirmBtn);
+  }
+
+  function updateConfirmBtn() {
+    var btn = document.getElementById('btn-coalition');
+    if (!btn) return;
+    if (_selectedCoalition.length === 0) {
+      btn.style.display = 'none';
+    } else if (_selectedCoalition.length === 1) {
+      btn.style.display = 'block';
+      btn.textContent = 'Défendre ' + _selectedCoalition[0] + ' →';
+    } else {
+      btn.style.display = 'block';
+      btn.textContent = 'Défendre la coalition : ' + _selectedCoalition.join(' + ') + ' →';
+    }
+  }
+
   show('step-parties');
 }
 
