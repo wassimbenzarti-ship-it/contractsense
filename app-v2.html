@@ -45,8 +45,10 @@ select { appearance: none; }
 h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.05; margin-bottom: 10px; }
 .accent { background: linear-gradient(135deg, #5b7cfa, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .desc { color: #6b7280; font-size: 14px; line-height: 1.65; max-width: 420px; margin-bottom: 28px; }
-.partie-btn { text-align: left; padding: 18px 20px; background: #111420; border: 1px solid #1f2537; border-radius: 13px; color: #e2e5f0; cursor: pointer; transition: all 0.2s; width: 100%; margin-bottom: 10px; }
-.partie-btn:hover { border-color: #5b7cfa; background: rgba(91,124,250,0.08); }
+.partie-btn { text-align: left; padding: 18px 20px; background: #111420; border: 1px solid #1f2537; border-radius: 13px; color: #e2e5f0; cursor: pointer; transition: all 0.2s; width: 100%; margin-bottom: 10px; position: relative; }
+.partie-btn:hover { border-color: #5b7cfa; background: rgba(91,124,250,0.12); }
+.partie-btn.selected { border-color: #5b7cfa !important; background: rgba(91,124,250,0.22) !important; box-shadow: 0 0 0 2px rgba(91,124,250,0.4); }
+.partie-btn.selected::after { content: '✓'; position: absolute; top: 10px; right: 14px; color: #5b7cfa; font-size: 18px; font-weight: 900; }
 .partie-btn .name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
 .partie-btn .desc2 { color: #6b7280; font-size: 13px; }
 .mod-card { background: #111420; border: 1px solid #1f2537; border-radius: 14px; margin-bottom: 16px; overflow: hidden; }
@@ -619,67 +621,106 @@ async function analyze() {
 
 //  Step 2: Show parties
 var _selectedCoalition = [];
+var _coalitionMode = false;
+
 function renderParties(parties) {
   var list = document.getElementById('parties-list');
   _selectedCoalition = [];
+  _coalitionMode = false;
   list.innerHTML = '';
-  // Coalition mode header (shown when 3+ parties)
-  if (parties.length >= 3) {
-    var hint = document.createElement('p');
-    hint.style.cssText = 'font-size:12px;color:#6b7280;margin-bottom:12px;text-align:center';
-    hint.textContent = 'Cliquez sur une partie pour la défendre seule, ou sélectionnez-en 2 pour former une coalition.';
-    list.appendChild(hint);
-  }
-  parties.forEach(function(p) {
-    var btn = document.createElement('button');
-    btn.className = 'partie-btn';
-    btn.dataset.label = p.party_label || p.description || p.name;
-    var roleLabel = p.party_label || p.description || p.role || '';
-    btn.innerHTML =
-      '<div class="name">' + p.name + '</div>' +
-      '<div class="desc2">' + p.description + '</div>' +
-      (roleLabel ? '<div style="margin-top:4px;font-size:11px;color:#5b7cfa;font-weight:600">' + roleLabel + '</div>' : '');
-    if (parties.length >= 3) {
-      // Multi-select mode for 3+ parties
+
+  // Build party buttons
+  function buildButtons() {
+    // Remove old buttons (keep coalition toggle row and confirm button if present)
+    var oldBtns = list.querySelectorAll('.partie-btn');
+    oldBtns.forEach(function(b) { b.remove(); });
+    var oldConfirm = document.getElementById('btn-coalition');
+    if (oldConfirm) oldConfirm.remove();
+
+    parties.forEach(function(p) {
+      var btn = document.createElement('button');
+      btn.className = 'partie-btn';
+      btn.dataset.label = p.party_label || p.description || p.name;
+      var roleLabel = p.party_label || p.description || p.role || '';
+      btn.innerHTML =
+        '<div class="name">' + p.name + '</div>' +
+        '<div class="desc2">' + p.description + '</div>' +
+        (roleLabel ? '<div style="margin-top:4px;font-size:11px;color:#5b7cfa;font-weight:600">' + roleLabel + '</div>' : '');
+
       btn.addEventListener('click', function() {
-        var label = btn.dataset.label;
-        var idx = _selectedCoalition.indexOf(label);
-        if (idx >= 0) {
-          _selectedCoalition.splice(idx, 1);
-          btn.style.outline = '';
-          btn.style.background = '';
-        } else if (_selectedCoalition.length < 2) {
-          _selectedCoalition.push(label);
-          btn.style.outline = '2px solid #5b7cfa';
-          btn.style.background = 'rgba(91,124,250,0.08)';
-        }
-        var coalBtn = document.getElementById('btn-coalition');
-        if (coalBtn) {
-          if (_selectedCoalition.length === 1) {
-            coalBtn.textContent = 'Défendre ' + _selectedCoalition[0];
-            coalBtn.style.display = 'block';
-          } else if (_selectedCoalition.length === 2) {
-            coalBtn.textContent = 'Défendre la coalition : ' + _selectedCoalition.join(' + ');
-            coalBtn.style.display = 'block';
-          } else {
-            coalBtn.style.display = 'none';
+        if (!_coalitionMode) {
+          // Normal mode: immediate analysis
+          analyzeWithPartie(btn.dataset.label);
+        } else {
+          // Coalition mode: toggle selection
+          var label = btn.dataset.label;
+          var idx = _selectedCoalition.indexOf(label);
+          if (idx >= 0) {
+            _selectedCoalition.splice(idx, 1);
+            btn.classList.remove('selected');
+          } else if (_selectedCoalition.length < 2) {
+            _selectedCoalition.push(label);
+            btn.classList.add('selected');
           }
+          updateCoalitionBtn();
         }
       });
-    } else {
-      btn.addEventListener('click', function() { analyzeWithPartie(btn.dataset.label); });
-    }
-    list.appendChild(btn);
-  });
-  if (parties.length >= 3) {
-    var coalBtn = document.createElement('button');
-    coalBtn.id = 'btn-coalition';
-    coalBtn.style.cssText = 'display:none;margin:16px auto 0;padding:11px 24px;background:#5b7cfa;border:none;border-radius:9px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;width:100%';
-    coalBtn.addEventListener('click', function() {
-      if (_selectedCoalition.length > 0) analyzeWithPartie(_selectedCoalition.join(' et '));
+      list.appendChild(btn);
     });
-    list.appendChild(coalBtn);
+
+    // Confirm button (coalition mode only)
+    if (_coalitionMode) {
+      var coalBtn = document.createElement('button');
+      coalBtn.id = 'btn-coalition';
+      coalBtn.style.cssText = 'display:none;margin:12px 0 0;padding:13px 24px;background:#5b7cfa;border:none;border-radius:9px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;width:100%';
+      coalBtn.addEventListener('click', function() {
+        if (_selectedCoalition.length > 0) analyzeWithPartie(_selectedCoalition.join(' et '));
+      });
+      list.appendChild(coalBtn);
+    }
   }
+
+  function updateCoalitionBtn() {
+    var coalBtn = document.getElementById('btn-coalition');
+    if (!coalBtn) return;
+    if (_selectedCoalition.length === 0) {
+      coalBtn.style.display = 'none';
+    } else if (_selectedCoalition.length === 1) {
+      coalBtn.style.display = 'block';
+      coalBtn.textContent = 'Défendre ' + _selectedCoalition[0] + ' →';
+    } else {
+      coalBtn.style.display = 'block';
+      coalBtn.textContent = 'Défendre la coalition : ' + _selectedCoalition.join(' + ') + ' →';
+    }
+  }
+
+  // Coalition toggle button (only shown when 3+ parties)
+  if (parties.length >= 3) {
+    var toggleRow = document.createElement('div');
+    toggleRow.style.cssText = 'display:flex;align-items:center;justify-content:flex-end;margin-bottom:12px;';
+    var toggleBtn = document.createElement('button');
+    toggleBtn.id = 'btn-toggle-coalition';
+    toggleBtn.style.cssText = 'background:none;border:1px solid #1f2537;border-radius:7px;color:#6b7280;font-size:12px;cursor:pointer;padding:5px 10px;display:flex;align-items:center;gap:5px;';
+    toggleBtn.innerHTML = '<span style="font-size:14px">⚡</span> Mode coalition';
+    toggleBtn.addEventListener('click', function() {
+      _coalitionMode = !_coalitionMode;
+      _selectedCoalition = [];
+      if (_coalitionMode) {
+        toggleBtn.style.borderColor = '#5b7cfa';
+        toggleBtn.style.color = '#5b7cfa';
+        toggleBtn.innerHTML = '<span style="font-size:14px">⚡</span> Annuler coalition';
+      } else {
+        toggleBtn.style.borderColor = '#1f2537';
+        toggleBtn.style.color = '#6b7280';
+        toggleBtn.innerHTML = '<span style="font-size:14px">⚡</span> Mode coalition';
+      }
+      buildButtons();
+    });
+    toggleRow.appendChild(toggleBtn);
+    list.appendChild(toggleRow);
+  }
+
+  buildButtons();
   show('step-parties');
 }
 
