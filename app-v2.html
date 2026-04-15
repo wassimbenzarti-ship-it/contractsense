@@ -228,6 +228,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
     </div>
     <div id="d-mods-list"></div>
     <div id="d-compliance-section"></div>
+    <div id="d-review-juriste-bar"></div>
     <div style="margin-top:18px;padding-top:14px;border-top:1px solid #1f2537;display:flex;gap:8px;flex-wrap:wrap">
       <button onclick="exportDoc()" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger avec Track Changes</button>
       <button onclick="dAnaReset()" style="padding:10px 14px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:12px;cursor:pointer">🔄 Nouvelle</button>
@@ -916,7 +917,12 @@ function renderReview() {
 
   updateStats();
   renderCompliance();
-  if (_dashAnalysis) { document.getElementById('d-ana-review').style.display = ''; return; }
+  if (_dashAnalysis) {
+    document.getElementById('d-ana-review').style.display = '';
+    var dBar = document.getElementById('d-review-juriste-bar');
+    if(dBar){ if(!_userRole){ checkRole().then(function(){ _renderReviewJuristeBar('d-review-juriste-bar'); }); } else { _renderReviewJuristeBar('d-review-juriste-bar'); } }
+    return;
+  }
   show('step-review');
 
   // Pour les juristes : afficher le bouton Soumettre + section "Ajouter une clause"
@@ -932,8 +938,8 @@ function renderReview() {
   else { _renderReviewJuristeBar(); }
 }
 
-function _renderReviewJuristeBar(){
-  var jAct = document.getElementById('review-juriste-bar');
+function _renderReviewJuristeBar(targetId){
+  var jAct = document.getElementById(targetId||'review-juriste-bar');
   if(!jAct) return;
   var alreadyNames = modifications.map(function(m){ return (m.clause_name||'').toLowerCase(); });
   var contractClauses = window._allContractClauses||[];
