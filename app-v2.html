@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v20260414-coalition -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
@@ -11,6 +12,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #0a0c12; color: #e2e5f0; font-family: system-ui, sans-serif; min-height: 100vh; }
 @keyframes spin { to { transform: rotate(360deg); } }
+@keyframes omniPulse { 0%,100%{transform:scale(1);filter:drop-shadow(0 0 8px rgba(91,124,250,0.5));} 50%{transform:scale(1.08);filter:drop-shadow(0 0 18px rgba(91,124,250,0.85));} }
 @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 .fadein { animation: fadeIn 0.35s ease; }
 .wrap { max-width: 820px; margin: 0 auto; padding: 36px 20px 80px; }
@@ -47,8 +49,8 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 .desc { color: #6b7280; font-size: 14px; line-height: 1.65; max-width: 420px; margin-bottom: 28px; }
 .partie-btn { text-align: left; padding: 18px 20px; background: #111420; border: 1px solid #1f2537; border-radius: 13px; color: #e2e5f0; cursor: pointer; transition: all 0.2s; width: 100%; margin-bottom: 10px; position:relative; }
 .partie-btn:hover { border-color: #5b7cfa; background: rgba(91,124,250,0.08); }
-.partie-btn.selected { border-color: #5b7cfa !important; background: rgba(91,124,250,0.22) !important; box-shadow: 0 0 0 2px rgba(91,124,250,0.4); }
-.partie-btn.selected::after { content: '✓'; position: absolute; top: 10px; right: 14px; color: #5b7cfa; font-size: 18px; font-weight: 900; }
+.partie-btn.selected { border-color: #5b7cfa !important; background: rgba(91,124,250,0.18) !important; box-shadow: 0 0 0 2px rgba(91,124,250,0.35); }
+.partie-btn.selected::after { content: '✓'; position:absolute; top:12px; right:16px; color:#5b7cfa; font-size:18px; font-weight:900; }
 .partie-btn .name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
 .partie-btn .desc2 { color: #6b7280; font-size: 13px; }
 .mod-card { background: #111420; border: 1px solid #1f2537; border-radius: 14px; margin-bottom: 16px; overflow: hidden; }
@@ -112,7 +114,6 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 .mz{border:2px dashed #1f2537;border-radius:10px;padding:20px;text-align:center;cursor:pointer;margin-bottom:14px;color:#6b7280;display:block;font-size:13px}
 .mz:hover{border-color:#5b7cfa;color:#5b7cfa}
 .dclose{position:fixed;top:18px;right:18px;background:#1a2035;border:1px solid #1f2537;border-radius:8px;padding:8px 16px;color:#e2e5f0;cursor:pointer;font-size:13px}
-
 .ana-detail{background:#0f1320;border:1px solid #1f2537;border-radius:12px;padding:20px;margin-top:16px;display:none}
 .ana-detail.show{display:block}
 .mod-user-card{background:#181c2a;border:1px solid #1f2537;border-radius:8px;padding:12px;margin-bottom:10px}
@@ -162,7 +163,6 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <div class="dtb" id="dtb-juristes" onclick="dtab('juristes')" style="display:none">Equipe</div>
 <div class="dtb" id="dtb-abonnement" onclick="dtab('abonnement')" style="display:none">💳 Abonnement</div>
 <div class="dtb" id="dtb-nouvelle" onclick="dtab('nouvelle')">➕ Analyse</div>
-<div class="dtb" onclick="dtab('profil')">&#128100; Profil</div>
 </div>
 <div id="d-analyses" class="ds active">
 <div id="juriste-filter-bar" style="display:none;margin-bottom:10px">
@@ -183,9 +183,6 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 </div>
 <div id="d-abonnement" class="ds">
 <div id="abonnement-content"><div style="color:#6b7280;font-size:13px">Chargement...</div></div>
-</div>
-<div id="d-profil" class="ds">
-<div id="profil-content"></div>
 </div>
 </div>
 <div id="d-nouvelle" class="ds">
@@ -211,8 +208,12 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
     <div id="d-ana-error" style="display:none;color:#ef4444;font-size:12px;margin-top:8px;padding:8px 12px;background:rgba(239,68,68,0.08);border-radius:7px"></div>
   </div>
   <div id="d-ana-loading" style="display:none;text-align:center;padding:32px 0">
-    <div style="width:30px;height:30px;border:3px solid #1f2537;border-top-color:#5b7cfa;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px"></div>
-    <div id="d-ana-status" style="font-size:13px;color:#6b7280">Analyse en cours...</div>
+    <img src="/westfield-ghost.png" style="width:56px;height:56px;object-fit:contain;border-radius:12px;animation:omniPulse 1.8s ease-in-out infinite;margin:0 auto 12px;display:block;" alt="Analyse en cours">
+    <div id="d-ana-status" style="font-size:13px;color:#6b7280;margin-bottom:10px">Analyse en cours...</div>
+    <div id="d-ana-live" style="display:none;margin:0 auto;max-width:320px;background:rgba(91,124,250,0.07);border:1px solid rgba(91,124,250,0.18);border-radius:9px;padding:10px 14px;font-size:12px;color:#8b9ac8;line-height:1.7;text-align:left">
+      <div id="d-ana-live-msg" style="color:#a5b4fc;font-weight:600;margin-bottom:4px"></div>
+      <div id="d-ana-live-log" style="color:#6b7280;font-size:11px;max-height:80px;overflow:hidden"></div>
+    </div>
   </div>
   <div id="d-ana-parties" style="display:none">
     <div style="font-size:14px;font-weight:700;margin-bottom:5px">Quelle partie représentez-vous ?</div>
@@ -244,7 +245,9 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <body>
 <div class="wrap">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0">
-    <div class="logo"><div class="dot"></div>Omniscient</div>
+    <div class="logo">
+      <img src="/westfield-ghost.png" style="height:44px;width:auto;display:block;border-radius:8px;" alt="Omniscient">
+      Omniscient</div>
     <div style="display:flex;border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;font-size:11px;font-weight:700">
       <button id="app-lang-fr" onclick="appSetLang('fr')" style="padding:4px 10px;background:rgba(200,169,75,0.15);color:#c8a94b;border:none;cursor:pointer">FR</button>
       <button id="app-lang-en" onclick="appSetLang('en')" style="padding:4px 10px;background:transparent;color:#6b7280;border:none;cursor:pointer">EN</button>
@@ -322,12 +325,12 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 
   <!-- STEP 3: Loading -->
   <div id="step-loading" style="display:none" class="loading">
-    <div class="spinner"></div>
-    <div class="steps">
-      <div class="step" id="s0">⏳ Lecture du document...</div>
-      <div class="step" id="s1">⏳ Identification des parties...</div>
-      <div class="step" id="s2">⏳ Analyse des risques...</div>
-      <div class="step" id="s3">⏳ Rédaction des modifications...</div>
+    <img src="/westfield-ghost.png" style="width:72px;height:72px;object-fit:contain;border-radius:16px;animation:omniPulse 1.8s ease-in-out infinite;" alt="Analyse en cours">
+    <!-- Hidden step labels kept for JS null-checks (stepDone) -->
+    <span id="s0" style="display:none"></span><span id="s1" style="display:none"></span><span id="s2" style="display:none"></span><span id="s3" style="display:none"></span>
+    <div id="s-live" style="width:100%;max-width:340px;min-height:44px;background:rgba(91,124,250,0.07);border:1px solid rgba(91,124,250,0.18);border-radius:9px;padding:10px 14px;font-size:12px;color:#8b9ac8;line-height:1.7;display:none">
+      <div id="s-live-msg" style="color:#a5b4fc;font-weight:600;margin-bottom:4px"></div>
+      <div id="s-live-log" style="color:#6b7280;font-size:11px;max-height:80px;overflow:hidden"></div>
     </div>
   </div>
 
@@ -622,76 +625,61 @@ async function analyze() {
   }
 }
 
-//  Step 2: Show parties
-var _selectedCoalition = [];
+// ─── Shared party-selection UI builder ───────────────────────────────────────
+// onConfirm(partieLabel) is called when the user clicks the confirm button.
+// All coalition logic lives here once; both flows call this.
+function _buildPartiesUI(listEl, parties, onConfirm) {
+  listEl.innerHTML = '';
+  var arr = parties.length ? parties : [{name:'Analyser (générique)', party_label:'Partie', description:''}];
+  var selected = [];
 
-function renderParties(parties) {
-  var list = document.getElementById('parties-list');
-  _selectedCoalition = [];
-  list.innerHTML = '';
+  // Hint
+  var hint = document.createElement('p');
+  hint.style.cssText = 'font-size:12px;color:#6b7280;margin:0 0 14px;text-align:center;line-height:1.6';
+  hint.innerHTML = 'Cliquez sur <strong style="color:#e2e5f0">1 partie</strong> pour la défendre seule &nbsp;·&nbsp; ou sélectionnez <strong style="color:#e2e5f0">2 parties</strong> pour former une coalition';
+  listEl.appendChild(hint);
 
-  var multiSelect = parties.length >= 3;
+  // Confirm button
+  var confirmBtn = document.createElement('button');
+  confirmBtn.style.cssText = 'display:none;width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:opacity 0.2s';
+  confirmBtn.onclick = function() { if (selected.length) onConfirm(selected.join(' et ')); };
 
-  if (multiSelect) {
-    var hint = document.createElement('p');
-    hint.style.cssText = 'font-size:12px;color:#6b7280;margin-bottom:14px;text-align:center;line-height:1.5';
-    hint.innerHTML = 'Cliquez sur <strong style="color:#e2e5f0">1 partie</strong> pour la défendre seule &nbsp;·&nbsp; ou <strong style="color:#e2e5f0">2 parties</strong> pour une coalition';
-    list.appendChild(hint);
+  function updateConfirm() {
+    if (!selected.length) {
+      confirmBtn.style.display = 'none';
+    } else if (selected.length === 1) {
+      confirmBtn.style.display = 'block';
+      confirmBtn.textContent = 'Défendre ' + selected[0] + ' →';
+    } else {
+      confirmBtn.style.display = 'block';
+      confirmBtn.textContent = 'Défendre la coalition : ' + selected.join(' + ') + ' →';
+    }
   }
 
-  parties.forEach(function(p) {
+  arr.forEach(function(p) {
+    var label = p.party_label || p.description || p.name || p;
     var btn = document.createElement('button');
     btn.className = 'partie-btn';
-    btn.dataset.label = p.party_label || p.description || p.name;
-    var roleLabel = p.party_label || p.description || p.role || '';
     btn.innerHTML =
-      '<div class="name">' + p.name + '</div>' +
-      '<div class="desc2">' + p.description + '</div>' +
-      (roleLabel ? '<div style="margin-top:4px;font-size:11px;color:#5b7cfa;font-weight:600">' + roleLabel + '</div>' : '');
-
-    if (multiSelect) {
-      btn.addEventListener('click', function() {
-        var label = btn.dataset.label;
-        var idx = _selectedCoalition.indexOf(label);
-        if (idx >= 0) {
-          _selectedCoalition.splice(idx, 1);
-          btn.classList.remove('selected');
-        } else if (_selectedCoalition.length < 2) {
-          _selectedCoalition.push(label);
-          btn.classList.add('selected');
-        }
-        updateConfirmBtn();
-      });
-    } else {
-      btn.addEventListener('click', function() { analyzeWithPartie(btn.dataset.label); });
-    }
-    list.appendChild(btn);
+      '<div class="name">'  + _escH(p.name || p) + '</div>' +
+      (p.description ? '<div class="desc2">' + _escH(p.description) + '</div>' : '') +
+      (p.party_label ? '<div style="margin-top:4px;font-size:11px;color:#5b7cfa;font-weight:600">' + _escH(p.party_label) + '</div>' : '');
+    btn.onclick = function() {
+      var idx = selected.indexOf(label);
+      if (idx === -1) { selected.push(label);   btn.classList.add('selected'); }
+      else            { selected.splice(idx, 1); btn.classList.remove('selected'); }
+      updateConfirm();
+    };
+    listEl.appendChild(btn);
   });
 
-  if (multiSelect) {
-    var confirmBtn = document.createElement('button');
-    confirmBtn.id = 'btn-coalition';
-    confirmBtn.style.cssText = 'display:none;margin:14px 0 0;padding:14px 24px;background:#5b7cfa;border:none;border-radius:10px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;width:100%;transition:opacity 0.2s';
-    confirmBtn.addEventListener('click', function() {
-      if (_selectedCoalition.length > 0) analyzeWithPartie(_selectedCoalition.join(' et '));
-    });
-    list.appendChild(confirmBtn);
-  }
+  listEl.appendChild(confirmBtn);
+}
 
-  function updateConfirmBtn() {
-    var btn = document.getElementById('btn-coalition');
-    if (!btn) return;
-    if (_selectedCoalition.length === 0) {
-      btn.style.display = 'none';
-    } else if (_selectedCoalition.length === 1) {
-      btn.style.display = 'block';
-      btn.textContent = 'Défendre ' + _selectedCoalition[0] + ' →';
-    } else {
-      btn.style.display = 'block';
-      btn.textContent = 'Défendre la coalition : ' + _selectedCoalition.join(' + ') + ' →';
-    }
-  }
-
+//  Step 2: Show parties (home flow)
+function renderParties(parties) {
+  var list = document.getElementById('parties-list');
+  _buildPartiesUI(list, parties, analyzeWithPartie);
   show('step-parties');
 }
 
@@ -706,28 +694,42 @@ async function analyzeWithPartie(partieName) {
   if (!_cu) await chkSess();
 
   try {
-    // Quick jurisdiction detection — isolated so failure never blocks analysis
-    var detectedJur2 = 'universel';
-    try {
-      var fdJ2 = new FormData();
-      if(curFile){ fdJ2.append('file', curFile); fdJ2.append('title', curFile.name||''); }
-      var jurR = await fetch(BACKEND+'/detect-jurisdiction',{method:'POST',body:fdJ2});
-      if(jurR.ok){ var jurD = await jurR.json(); detectedJur2 = jurD.jurisdiction||'universel'; }
-    } catch(e2) { /* fallback silencieux */ }
-    var jLabel = (_JUR_LABELS||{})[detectedJur2]||detectedJur2;
-    var s2El = document.getElementById('s2');
-    if(s2El) s2El.textContent = '⚖️ Analyse en ' + jLabel + '...';
-    setTimeout(function(){stepDone(2);setTimeout(function(){stepDone(3);},1400);},200);
+    // Show live status box immediately so jurisdiction message is visible
+    var sLive = document.getElementById('s-live');
+    var sLiveMsg = document.getElementById('s-live-msg');
+    var sLiveLog = document.getElementById('s-live-log');
+    if (sLive) { sLive.style.display = 'block'; }
+    if (sLiveLog) { sLiveLog.innerHTML = ''; }
+    if (sLiveMsg) sLiveMsg.textContent = '🔍 Détection du droit applicable...';
+
+    // Quick jurisdiction detection before full analysis
+    var fdJ = new FormData();
+    if(curFile) fdJ.append('file', curFile);
+    if(curFile) fdJ.append('title', curFile.name||'');
+    var jurR = await fetch(BACKEND+'/detect-jurisdiction',{method:'POST',body:fdJ});
+    var jurD = jurR.ok?await jurR.json():{jurisdiction:'universel'};
+    var jur = jurD.jurisdiction||'universel';
+    var jLabel = (_JUR_LABELS||{})[jur]||jur;
+    if (sLiveMsg) { sLiveMsg.textContent = '⚖️ Analyse en ' + jLabel + '...'; if (sLiveLog) sLiveLog.innerHTML = '<div>' + _escH('⚖️ Analyse en ' + jLabel + '...') + '</div>' + sLiveLog.innerHTML; }
 
     var fd = buildFormData();
     fd.append('partie', partieName);
 
+    // Progress animation (cycling messages while waiting for /analyze)
+    var _pMsgs = ['📚 Consultation de la base légale...', '🤖 Analyse IA en cours...', '🔍 Analyse des clauses contractuelles...', '⚖️ Application du droit applicable...', '✍️ Génération des modifications...', '🔍 Analyse de la clause de résiliation...', '⚖️ Vérification des responsabilités...', '📋 Finalisation du rapport...'];
+    var _pIdx = 0;
+    function _showP(msg) { if (sLiveMsg) sLiveMsg.textContent = msg; if (sLiveLog) sLiveLog.innerHTML = '<div>' + _escH(msg) + '</div>' + sLiveLog.innerHTML; }
+    _showP(_pMsgs[0]);
+    var _pTimer = setInterval(function() { _pIdx = (_pIdx + 1) % _pMsgs.length; _showP(_pMsgs[_pIdx]); }, 3500);
+
     var resp = await fetch(BACKEND + '/analyze', { method: 'POST', body: fd });
+    clearInterval(_pTimer);
     if (!resp.ok) {
       var errData = {};
       try { errData = await resp.json(); } catch(_) {}
       throw new Error(errData.error || ('Erreur serveur (' + resp.status + ')'));
     }
+    if (sLiveMsg) sLiveMsg.textContent = '✅ Résultats prêts...';
     var data = await resp.json();
 
     modifications = data.modifications || [];
@@ -740,7 +742,7 @@ async function analyzeWithPartie(partieName) {
 
     // Extraire toutes les clauses du contrat pour le dropdown "ajouter une clause"
     // Utiliser savedText (mode texte) ou lire le fichier uploadé (mode fichier)
-    var contractText = savedText || data.text || data.document_text || '';
+    var contractText = savedText || data.contract_text || data.text || data.document_text || '';
     if(!contractText && curFile) contractText = await _readFileText(curFile);
     if(contractText && !savedText) savedText = contractText; // cache pour saveAna
     window._allContractClauses = _extractContractClauses(contractText);
@@ -933,9 +935,6 @@ function renderReview() {
 function _renderReviewJuristeBar(){
   var jAct = document.getElementById('review-juriste-bar');
   if(!jAct) return;
-  var isJuriste   = _userRole === 'juriste';
-  var isDirecteur = _userRole === 'directeur';
-  if(_userRole && !isJuriste && !isDirecteur) { jAct.innerHTML=''; return; }
   var alreadyNames = modifications.map(function(m){ return (m.clause_name||'').toLowerCase(); });
   var contractClauses = window._allContractClauses||[];
   var remaining = contractClauses.filter(function(c){ return alreadyNames.indexOf((c.name||'').toLowerCase())<0; });
@@ -947,15 +946,28 @@ function _renderReviewJuristeBar(){
         return '<option value="'+safe+'" data-text="'+safeT+'">'+_escH(c.name)+'</option>';
       }).join('')
     : '';
+
+  // Role-based action buttons
+  var isDir = (_userRole==='directeur'||_isAdmin);
+  var isJur = (_userRole==='juriste');
+  var actionBtns = '';
+  if(isJur){
+    actionBtns = '<button id="btn-submit-review" onclick="saveAndSubmitFromReview()" style="padding:10px 20px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur pour validation →</button>';
+  } else {
+    // Directeur, admin, solo, non-connecté
+    actionBtns = '<button id="btn-validate-review" onclick="validateFromReview()" style="padding:10px 20px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">✅ Valider et enregistrer dans le RAG</button>';
+    if(isDir){
+      actionBtns += '<button id="btn-send-juriste-review" onclick="sendToJuristeFromReview()" style="padding:10px 18px;background:none;border:1px solid #f59e0b;border-radius:8px;color:#f59e0b;font-weight:700;font-size:13px;cursor:pointer">↩ Renvoyer au juriste pour revue</button>';
+    }
+  }
+
   jAct.innerHTML =
     '<div style="background:#0d1017;border:1px solid #1f2537;border-radius:12px;padding:16px;margin-bottom:16px">'
-    +(isJuriste
-      ? '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">'
-        +'<button id="btn-submit-review" onclick="saveAndSubmitFromReview()" style="padding:10px 20px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur pour validation →</button>'
-        +'<span style="font-size:11px;color:#4a5470">Vous pouvez aussi télécharger le DOCX ci-dessous.</span>'
-        +'</div>'
-      : '')
-    +'<div style="'+(isJuriste?'border-top:1px solid #1f2537;padding-top:12px':'padding-top:4px')+'">'
+    +'<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">'
+    +actionBtns
+    +'<span style="font-size:11px;color:#4a5470">Vous pouvez aussi télécharger le DOCX ci-dessous.</span>'
+    +'</div>'
+    +'<div style="border-top:1px solid #1f2537;padding-top:12px">'
     +'<div style="font-size:12px;font-weight:700;color:#5b7cfa;margin-bottom:4px">+ Signaler une clause inacceptable non détectée</div>'
     +(hasContractClauses?'<div style="font-size:11px;color:#6b7280;margin-bottom:8px">'+remaining.length+' clause(s) du contrat non analysée(s)</div>':'')
     +(!hasContractClauses?'<label style="display:inline-flex;align-items:center;gap:8px;padding:7px 12px;background:#181c2a;border:1px solid #2a3040;border-radius:7px;color:#6b7280;font-size:11px;cursor:pointer;margin-bottom:10px">'
@@ -979,7 +991,10 @@ function _syncClause(sel){
   var inp=document.getElementById('add-clause-name-r');
   var ta=document.getElementById('add-clause-orig-r');
   if(inp&&opt.value) inp.value=opt.value;
-  if(ta&&opt.dataset.text) ta.value=opt.dataset.text;
+  if(ta&&opt.value){
+    var found=(window._allContractClauses||[]).filter(function(c){return c.name===opt.value;})[0];
+    ta.value=found?(found.text||opt.dataset.text||''):(opt.dataset.text||'');
+  }
   sel.value='';
 }
 function _syncClauseDash(sel){
@@ -987,7 +1002,10 @@ function _syncClauseDash(sel){
   var inp=document.getElementById('add-clause-name');
   var ta=document.getElementById('add-clause-orig');
   if(inp&&opt.value) inp.value=opt.value;
-  if(ta&&opt.dataset.text) ta.value=opt.dataset.text;
+  if(ta&&opt.value){
+    var found=(window._allContractClauses||[]).filter(function(c){return c.name===opt.value;})[0];
+    ta.value=found?(found.text||opt.dataset.text||''):(opt.dataset.text||'');
+  }
   sel.value='';
 }
 // Re-extraction des clauses depuis un fichier rechargé (tableau de bord)
@@ -1084,11 +1102,9 @@ function _extractContractClauses(text){
       curName=t; curLines=[];
     } else if(curName){
       curLines.push(t);
-      // Limiter le texte stocké à 600 caractères
-      if(curLines.join('\n').length>600) return;
     }
   });
-  if(curName) clauses.push({name:curName,text:curLines.join('\n').trim().slice(0,600)});
+  if(curName) clauses.push({name:curName,text:curLines.join('\n').trim()});
   return clauses.filter(function(c){return c.name.length>2;}).slice(0,80);
 }
 
@@ -1132,6 +1148,75 @@ async function saveAndSubmitFromReview(){
   }catch(e){
     alert('Erreur : '+e.message);
     if(btn){ btn.textContent='Soumettre au directeur \u2192'; btn.disabled=false; }
+  }
+}
+
+async function validateFromReview(){
+  if(!_cu){ showAuth(); return; }
+  if(!_userRole) await checkRole();
+  var btn = document.getElementById('btn-validate-review');
+  if(btn){ btn.textContent = '⏳ Validation...'; btn.disabled = true; }
+  try{
+    modifications.forEach(function(m){
+      var el = document.getElementById('proposed-'+m.id);
+      if(el){ var ed=el.innerText.trim(); if(ed&&ed!==m.proposed) m.proposed=ed; }
+    });
+    await saveAna(curFile?curFile.name:'Contrat', savedType||'generic', selectedPartie||'', modifications);
+    var anaId = window._lastSavedAnaId;
+    if(!anaId){ alert('Analyse sauvegardée.'); showDash(); return; }
+    // Validate directly → sends to RAG queue
+    var r = await fetch(BACKEND+'/analyses/validate-by-director/'+anaId, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({modifications: _modsWithMeta(modifications), director_email: (_cu&&_cu.email)||''})
+    });
+    var d = r.ok ? (await r.json().catch(function(){return{};})) : {};
+    if(r.ok && d.status==='ok'){
+      var decs = {};
+      modifications.forEach(function(m,i){ decs[String(m.id||i+1)]='accepted'; });
+      await fetch(BACKEND+'/queue/add', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          filename: curFile?curFile.name:'Contrat',
+          contract_type: savedType||'',
+          partie: selectedPartie||'',
+          accepted_modifications: JSON.stringify(modifications),
+          decisions: JSON.stringify(decs),
+          submitted_by: (_cu&&_cu.email)||'',
+          score: 80,
+          analysis_id: anaId
+        })
+      });
+      alert('Analyse validée et enregistrée dans le RAG.');
+      showDash();
+    } else {
+      throw new Error(d.error||'Erreur validation');
+    }
+  }catch(e){
+    alert('Erreur : '+e.message);
+    if(btn){ btn.textContent='✅ Valider et enregistrer dans le RAG'; btn.disabled=false; }
+  }
+}
+
+async function sendToJuristeFromReview(){
+  if(!_cu){ showAuth(); return; }
+  if(!_userRole) await checkRole();
+  var btn = document.getElementById('btn-send-juriste-review');
+  if(btn){ btn.textContent='⏳ Envoi...'; btn.disabled=true; }
+  try{
+    modifications.forEach(function(m){
+      var el = document.getElementById('proposed-'+m.id);
+      if(el){ var ed=el.innerText.trim(); if(ed&&ed!==m.proposed) m.proposed=ed; }
+    });
+    await saveAna(curFile?curFile.name:'Contrat', savedType||'generic', selectedPartie||'', modifications);
+    var anaId = window._lastSavedAnaId;
+    if(anaId){
+      await _patchAnalysis(anaId, {status:'revision_requested', director_notes:'Revue IA insuffisante — merci de compléter l\'analyse manuellement.'});
+    }
+    alert('Document renvoyé au juriste pour revue approfondie.');
+    showDash();
+  }catch(e){
+    alert('Erreur : '+e.message);
+    if(btn){ btn.textContent='↩ Renvoyer au juriste pour revue'; btn.disabled=false; }
   }
 }
 
@@ -1194,10 +1279,12 @@ async function exportDoc() {
       }
     });
     var fd = buildFormData();
+    if (window._fileCacheId) fd.append('file_cache_id', window._fileCacheId);
+    if (window._fileStoragePath) fd.append('file_storage_path', window._fileStoragePath);
     fd.append('modifications', JSON.stringify(modifications));
     fd.append('decisions', JSON.stringify(decisions));
     var resp = await fetch(BACKEND + '/export', { method: 'POST', body: fd });
-    if (!resp.ok) { var e = await resp.json(); throw new Error(e.error); }
+    if (!resp.ok) { var ed={}; try{ed=await resp.json();}catch(x){} throw new Error(ed.error||'Erreur serveur '+resp.status); }
     var blob = await resp.blob();
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -1361,17 +1448,8 @@ async function dAnaStart() {
 
 function dAnaShowParties(parties) {
   document.getElementById('d-ana-parties').style.display = '';
-  var list = document.getElementById('d-parties-list'); list.innerHTML = '';
-  var arr = parties.length ? parties : [{name:'Analyser (générique)', party_label:'Partie', description:''}];
-  arr.forEach(function(p) {
-    var btn = document.createElement('button');
-    btn.className = 'partie-btn';
-    btn.innerHTML = '<div class="name">' + _escH(p.name||p) + '</div>' +
-      (p.description ? '<div class="desc2">' + _escH(p.description) + '</div>' : '') +
-      (p.party_label ? '<div style="margin-top:3px;font-size:11px;color:#5b7cfa;font-weight:600">' + _escH(p.party_label) + '</div>' : '');
-    btn.onclick = (function(role){ return function(){ dAnaAnalyze(role); }; })(p.party_label || p.description || p.name || p);
-    list.appendChild(btn);
-  });
+  var list = document.getElementById('d-parties-list');
+  _buildPartiesUI(list, parties, dAnaAnalyze);
 }
 
 var _JUR_LABELS = {droit_marocain:'droit marocain 🇲🇦',droit_francais:'droit français 🇫🇷',droit_anglais:'droit anglais 🇬🇧',droit_tunisien:'droit tunisien 🇹🇳',droit_algerien:'droit algérien 🇩🇿',droit_belge:'droit belge 🇧🇪',universel:'droit applicable 🌐'};
@@ -1384,15 +1462,13 @@ async function dAnaAnalyze(partie) {
   statusEl.textContent = 'Détection du droit applicable...';
   _dashAnalysis = true;
   try {
-    // Quick jurisdiction detection — isolated so failure never blocks analysis
-    var detectedJur = 'universel';
-    try {
-      var fdJ = new FormData();
-      fdJ.append('file', curFile);
-      fdJ.append('title', curFile.name || '');
-      var jurResp = await fetch(BACKEND+'/detect-jurisdiction', {method:'POST', body:fdJ});
-      if(jurResp.ok){ var jurData = await jurResp.json(); detectedJur = jurData.jurisdiction || 'universel'; }
-    } catch(e2) { /* fallback silencieux */ }
+    // Quick jurisdiction detection (no AI, fast)
+    var fdJ = new FormData();
+    fdJ.append('file', curFile);
+    fdJ.append('title', curFile.name || '');
+    var jurResp = await fetch(BACKEND+'/detect-jurisdiction', {method:'POST', body:fdJ});
+    var jurData = jurResp.ok ? await jurResp.json() : {jurisdiction:'universel'};
+    var detectedJur = jurData.jurisdiction || 'universel';
     var jurLabel = _JUR_LABELS[detectedJur] || detectedJur;
     statusEl.textContent = 'Analyse en ' + jurLabel + '...';
 
@@ -1400,14 +1476,40 @@ async function dAnaAnalyze(partie) {
     fd.append('file', curFile); fd.append('partie', partie); fd.append('lang','auto');
     fd.append('type', savedType || document.getElementById('d-contract-type').value);
     if (_cu && _cu.email) fd.append('user_email', _cu.email);
+
+    var dLive = document.getElementById('d-ana-live');
+    var dLiveMsg = document.getElementById('d-ana-live-msg');
+    var dLiveLog = document.getElementById('d-ana-live-log');
+    if (dLive) { dLive.style.display = 'block'; }
+    if (dLiveLog) { dLiveLog.innerHTML = ''; }
+
+    // Progress animation (cycling messages while waiting for /analyze)
+    var _pMsgs2 = ['📄 Lecture du document...', '📚 Consultation de la base légale...', '🤖 Analyse IA en cours...', '🔍 Analyse des clauses contractuelles...', '⚖️ Application du droit applicable...', '✍️ Génération des modifications...', '🔍 Analyse de la clause de résiliation...', '⚖️ Vérification des responsabilités...', '📋 Finalisation du rapport...'];
+    var _pIdx2 = 0;
+    function _showP2(msg) { statusEl.textContent = msg; if (dLiveMsg) dLiveMsg.textContent = msg; if (dLiveLog) dLiveLog.innerHTML = '<div>' + _escH(msg) + '</div>' + dLiveLog.innerHTML; }
+    _showP2(_pMsgs2[0]);
+    var _pTimer2 = setInterval(function() { _pIdx2 = (_pIdx2 + 1) % _pMsgs2.length; _showP2(_pMsgs2[_pIdx2]); }, 3500);
+
     var resp = await fetch(BACKEND+'/analyze', {method:'POST', body:fd});
+    clearInterval(_pTimer2);
     if (!resp.ok) { var ed={}; try{ed=await resp.json();}catch(x){} throw new Error(ed.error||'Erreur '+resp.status); }
+    if (dLiveMsg) dLiveMsg.textContent = '✅ Résultats prêts...';
     var data = await resp.json();
+    if (!data) throw new Error('Pas de résultat reçu.');
     modifications = data.modifications || []; window._compliance = data.compliance || [];
     window._jurisdiction = data._jurisdiction || 'universel';
     decisions = {}; modifications.forEach(function(m){ decisions[m.id]='pending'; });
     if (data.file_cache_id) window._fileCacheId = data.file_cache_id;
     if (data.file_storage_path) window._fileStoragePath = data.file_storage_path;
+    if (data.contract_text) {
+      savedText = data.contract_text;
+      window._allContractClauses = _extractContractClauses(savedText);
+      if (!window._allContractClauses.length && data._paragraphs && data._paragraphs.length) {
+        window._allContractClauses = data._paragraphs.map(function(p) {
+          return { name: p.text.slice(0, 80), text: p.text, idx: p.idx };
+        }).filter(function(c) { return c.name.length > 5; });
+      }
+    }
     document.getElementById('d-ana-loading').style.display = 'none';
     renderReview();
   } catch(e) {
@@ -1421,7 +1523,7 @@ async function dAnaAnalyze(partie) {
 
 function showDash(){document.getElementById('dash-ov').classList.add('show');loadDash();}
 function closeDash(){document.getElementById('dash-ov').classList.remove('show');}
-function dtab(t){var names=['analyses','models','juristes','abonnement','nouvelle','profil'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();if(t==='abonnement')loadAbonnement();if(t==='nouvelle')dAnaReset();if(t==='profil')loadProfil();}
+function dtab(t){var names=['analyses','models','juristes','abonnement','nouvelle'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();if(t==='abonnement')loadAbonnement();if(t==='nouvelle')dAnaReset();}
 async function checkRole(){
   if(!_cu)return;
   try{
@@ -2838,12 +2940,16 @@ if (_appLang === 'en') appSetLang('en');
 
 <!-- ════════════════ CHATBOT SIDEBAR ════════════════ -->
 <style>
-/* ── Page push when sidebar opens ── */
-body{
-  transition:padding-right .32s cubic-bezier(.4,0,.2,1);
-  overflow-x:hidden;
+/* ── Shrink content when sidebar opens ── */
+@media(min-width:861px){
+  body.chatbot-open #dash-ov{right:340px;}
+  body.chatbot-open .wrap{padding-right:340px;}
+  body.chatbot-open #ubar{margin-right:340px;}
+  body.chatbot-open .dclose{right:392px;}
 }
-body.cb-sidebar-open{padding-right:340px;}
+.wrap{transition:padding-right .3s ease;}
+#ubar{transition:margin-right .3s ease;}
+.dclose{transition:right .3s ease;}
 
 /* ── Sidebar container ── */
 #cb-sidebar{
@@ -2931,9 +3037,6 @@ body.cb-sidebar-open{padding-right:340px;}
 #cb-send:hover{background:#4a6be8;}
 #cb-send svg{width:15px;height:15px;fill:#fff;}
 
-@media(max-width:860px){
-  body.cb-sidebar-open{padding-right:0;}
-}
 @media(max-width:640px){
   #cb-sidebar{width:100vw;right:-100vw;}
   #cb-sidebar.cb-open{right:0;}
@@ -2946,46 +3049,14 @@ body.cb-sidebar-open{padding-right:340px;}
 
   <!-- Tab trigger -->
   <button id="cb-tab" onclick="cbToggle()" title="Assistant Omniscient">
-    <svg width="26" height="28" viewBox="0 0 32 36" fill="none">
-      <defs>
-        <linearGradient id="gh0" x1="0" y1="0" x2="32" y2="36" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#5b7cfa"/><stop offset="100%" stop-color="#8b5cf6"/>
-        </linearGradient>
-      </defs>
-      <!-- Ghost body: rounded dome + wavy skirt -->
-      <path d="M5 18C5 10.27 9.93 4 16 4C22.07 4 27 10.27 27 18V33L23.5 30L20 33L16 29.5L12 33L8.5 30L5 33V18Z" fill="url(#gh0)"/>
-      <!-- Eyes -->
-      <ellipse cx="12" cy="18" rx="2.2" ry="2.8" fill="#0a0c12"/>
-      <ellipse cx="20" cy="18" rx="2.2" ry="2.8" fill="#0a0c12"/>
-      <circle cx="12.9" cy="16.7" r="0.9" fill="white" opacity="0.6"/>
-      <circle cx="20.9" cy="16.7" r="0.9" fill="white" opacity="0.6"/>
-      <polygon points="13,23 16,27 16,23" fill="white"/>
-      <polygon points="19,23 16,27 16,23" fill="white"/>
-      <polygon points="14.5,24 17.5,24 17,26 15,26" fill="white" opacity="0.85"/>
-      <path d="M 15,26 L 14.2,29 L 16,30.5 L 17.8,29 L 17,26 Z" fill="white" opacity="0.85"/>
-    </svg>
+    <img src="/westfield-ghost.png" style="width:28px;height:28px;object-fit:contain;border-radius:6px;display:block;" alt="Omniscient">
     <span id="cb-tab-lbl">Assistant</span>
   </button>
 
   <!-- Header -->
   <div id="cb-head">
-    <!-- Ghost logo in circle -->
-    <svg id="cb-logo" viewBox="0 0 38 38" fill="none">
-      <defs>
-        <linearGradient id="gh1" x1="2" y1="2" x2="36" y2="36" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#5b7cfa"/><stop offset="100%" stop-color="#8b5cf6"/>
-        </linearGradient>
-      </defs>
-      <!-- Outer ring -->
-      <circle cx="19" cy="19" r="17.5" fill="rgba(91,124,250,0.07)" stroke="url(#gh1)" stroke-width="1.1"/>
-      <!-- Ghost body -->
-      <path d="M10 21C10 15.48 14.03 11 19 11C23.97 11 28 15.48 28 21V30L25.5 28L23 30L19 27L15 30L12.5 28L10 30V21Z" fill="url(#gh1)"/>
-      <!-- Eyes -->
-      <ellipse cx="16" cy="21" rx="1.8" ry="2.2" fill="#0a0c12"/>
-      <ellipse cx="22" cy="21" rx="1.8" ry="2.2" fill="#0a0c12"/>
-      <circle cx="16.8" cy="19.9" r="0.8" fill="white" opacity="0.6"/>
-      <circle cx="22.8" cy="19.9" r="0.8" fill="white" opacity="0.6"/>
-    </svg>
+    <!-- Ghost + scales logo -->
+    <img id="cb-logo" src="/westfield-ghost.png" style="border-radius:8px;object-fit:contain;" alt="Omniscient">
     <div>
       <div id="cb-head-title">Omniscient</div>
       <div id="cb-head-sub">Assistant contractuel IA</div>
@@ -3018,16 +3089,15 @@ function cbToggle() {
   _cbOpen = !_cbOpen;
   var sb = document.getElementById('cb-sidebar');
   var sh = document.getElementById('cb-shrink');
+  document.body.classList.toggle('chatbot-open', _cbOpen);
   if (_cbOpen) {
     sb.classList.add('cb-open');
-    document.body.classList.add('cb-sidebar-open');
     if (sh) sh.innerHTML = '&#8250;';
     document.getElementById('cb-input').focus();
     if (!_cbWelcomed) { _cbWelcomed = true; cbWelcome(); }
     cbScrollBottom();
   } else {
     sb.classList.remove('cb-open');
-    document.body.classList.remove('cb-sidebar-open');
     if (sh) sh.innerHTML = '&#8249;';
   }
 }
@@ -3040,8 +3110,6 @@ function cbNewAnalysis() {
   _cbWelcomed  = false;
   _cbModStore  = {};
   _cbLastCacheId = window._fileCacheId || null;
-  // In dashboard mode savedText may still contain a previous contract: clear it
-  if (_dashAnalysis) savedText = '';
   document.getElementById('cb-msgs').innerHTML = '';
   cbOpen();
 }
@@ -3074,32 +3142,35 @@ function cbResize(el) {
   el.style.height = Math.min(el.scrollHeight, 100) + 'px';
 }
 
-function cbAddMsg(role, html, modObj) {
+function cbAddMsg(role, html, modObjs) {
   var msgs = document.getElementById('cb-msgs');
   var div  = document.createElement('div');
   div.className = 'cb-msg ' + role;
   div.innerHTML  = html;
 
-  if (role === 'bot' && modObj) {
-    // Store mod object by key to avoid JSON injection in onclick attributes
-    var sk = 'cbm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-    _cbModStore[sk] = modObj;
+  if (role === 'bot' && modObjs) {
+    var list = Array.isArray(modObjs) ? modObjs : [modObjs];
+    list.forEach(function(modObj) {
+      if (!modObj) return;
+      var sk = 'cbm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+      _cbModStore[sk] = modObj;
 
-    var card = document.createElement('div');
-    card.className = 'cb-mod-card';
+      var card = document.createElement('div');
+      card.className = 'cb-mod-card';
 
-    var origTxt  = (modObj.original || '').slice(0, 130);
-    var propTxt  = (modObj.proposed || '').slice(0, 130);
-    var origMore = (modObj.original || '').length > 130 ? '\u2026' : '';
-    var propMore = (modObj.proposed || '').length > 130 ? '\u2026' : '';
+      var origTxt  = (modObj.original || '').slice(0, 130);
+      var propTxt  = (modObj.proposed || '').slice(0, 130);
+      var origMore = (modObj.original || '').length > 130 ? '\u2026' : '';
+      var propMore = (modObj.proposed || '').length > 130 ? '\u2026' : '';
 
-    card.innerHTML =
-      '<div class="cb-mod-name">\u2726 ' + _escH(modObj.clause_name || 'Modification propos\u00e9e') + '</div>' +
-      (modObj.original ? '<div class="cb-mod-orig">\u26a0 Original\u00a0: ' + _escH(origTxt) + origMore + '</div>' : '') +
-      '<div class="cb-mod-prop">\u2713 Propos\u00e9\u00a0: ' + _escH(propTxt) + propMore + '</div>' +
-      '<button class="cb-apply-btn" data-sk="' + sk + '" onclick="cbApplyMod(this)">+ Ajouter au contrat</button>';
+      card.innerHTML =
+        '<div class="cb-mod-name">\u2726 ' + _escH(modObj.clause_name || 'Modification propos\u00e9e') + '</div>' +
+        (modObj.original ? '<div class="cb-mod-orig">\u26a0 Original\u00a0: ' + _escH(origTxt) + origMore + '</div>' : '') +
+        '<div class="cb-mod-prop">\u2713 Propos\u00e9\u00a0: ' + _escH(propTxt) + propMore + '</div>' +
+        '<button class="cb-apply-btn" data-sk="' + sk + '" onclick="cbApplyMod(this)">+ Ajouter au contrat</button>';
 
-    div.appendChild(card);
+      div.appendChild(card);
+    });
   }
 
   msgs.appendChild(div);
@@ -3142,9 +3213,9 @@ function cbApplyMod(btn) {
       reason:       mod.reason      || 'Modification sugg\u00e9r\u00e9e par Omniscient'
     };
     modifications.push(newMod);
-    decisions[String(newId)] = 'pending';
+    decisions[String(newId)] = 'accepted';
     renderReview();
-    btn.textContent = '\u2705 Ajout\u00e9 au contrat';
+    btn.textContent = '\u2705 Ajout\u00e9 et accept\u00e9';
     btn.classList.add('applied');
     setTimeout(function() {
       var card = document.getElementById('card-' + newId);
@@ -3167,9 +3238,10 @@ async function cbSend() {
   document.getElementById('cb-send').disabled = true;
 
   try {
-    // Only send savedText if it belongs to the current analysis session
+    // Send contract text if available in this session
+    var contractTxt = savedText || '';
+    // Also pass cache/storage IDs so backend can recover if savedText is empty
     var currentCacheId = window._fileCacheId || '';
-    var contractTxt = (currentCacheId === _cbLastCacheId && currentCacheId) ? (savedText || '') : '';
 
     var payload = {
       message:       msg,
@@ -3195,7 +3267,8 @@ async function cbSend() {
 
     var reply = data.reply || '';
     _cbHistory.push({ role: 'assistant', content: reply });
-    cbAddMsg('bot', reply.replace(/\n/g, '<br>'), data.modification || null);
+    var modObjs = data.modifications && data.modifications.length ? data.modifications : (data.modification ? [data.modification] : null);
+    cbAddMsg('bot', reply.replace(/\n/g, '<br>'), modObjs);
   } catch(e) {
     cbHideTyping();
     cbAddMsg('bot', '\u274c ' + _escH(e.message || 'Erreur inattendue.'));
@@ -3247,111 +3320,6 @@ async function cbSend() {
     }
   };
 })();
-
-// ===== PROFIL =====
-var _BG_PRESETS=[
-  {label:'Défaut',value:'#0a0c12'},
-  {label:'Bleu nuit',value:'linear-gradient(135deg,#060d1f,#0d1a3a)'},
-  {label:'Violet',value:'linear-gradient(135deg,#0e0814,#1a0d2e)'},
-  {label:'Vert nuit',value:'linear-gradient(135deg,#050f0a,#0a1f14)'},
-  {label:'Bordeaux',value:'linear-gradient(135deg,#130608,#220a10)'},
-  {label:'Anthracite',value:'linear-gradient(135deg,#0d0d0d,#1a1a1f)'},
-];
-function applyBg(val){if(!val)return;document.body.style.background=val;}
-(function(){var s=localStorage.getItem('cs_bg');if(s)applyBg(s);})();
-
-async function loadProfil(){
-  var el=document.getElementById('profil-content');
-  if(!el||!_cu)return;
-  var savedAvatar=localStorage.getItem('cs_avatar_'+_cu.id)||'';
-  var savedBg=localStorage.getItem('cs_bg')||'#0a0c12';
-  var initials=(_cu.email||'?')[0].toUpperCase();
-  var avatarHtml=savedAvatar
-    ?'<img id="av-preview" src="'+savedAvatar+'" style="width:88px;height:88px;border-radius:50%;object-fit:cover;border:2px solid #5b7cfa"/>'
-    :'<div id="av-preview" style="width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:#fff">'+initials+'</div>';
-  el.innerHTML=
-    '<div style="background:#111420;border:1px solid #1f2537;border-radius:12px;padding:20px;margin-bottom:16px">'
-    +'<div style="font-size:13px;font-weight:700;color:#e2e5f0;margin-bottom:16px">Photo de profil</div>'
-    +'<div style="display:flex;align-items:center;gap:20px">'
-    +avatarHtml
-    +'<div><label for="av-inp" style="display:inline-block;padding:9px 18px;background:#5b7cfa22;border:1px solid #5b7cfa55;border-radius:8px;color:#5b7cfa;font-size:13px;font-weight:600;cursor:pointer">Choisir une photo</label>'
-    +'<input type="file" id="av-inp" accept="image/*" style="display:none"/>'
-    +'<div style="font-size:11px;color:#4a5470;margin-top:8px">JPG, PNG · max 2 MB · redimensionnée auto</div>'
-    +(savedAvatar?'<button id="av-rm" style="margin-top:8px;background:none;border:none;color:#ef4444;font-size:12px;cursor:pointer;padding:0">Supprimer</button>':'')
-    +'</div></div>'
-    +'<div id="av-msg" style="font-size:12px;margin-top:10px;display:none"></div>'
-    +'</div>'
-    +'<div style="background:#111420;border:1px solid #1f2537;border-radius:12px;padding:20px;margin-bottom:16px">'
-    +'<div style="font-size:13px;font-weight:700;color:#e2e5f0;margin-bottom:16px">Changer le mot de passe</div>'
-    +'<div style="margin-bottom:10px"><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Nouveau mot de passe</label>'
-    +'<input id="pw-new" type="password" placeholder="Min. 8 caractères" style="width:100%;background:#181c2a;border:1px solid #1f2537;border-radius:8px;padding:9px 12px;color:#e2e5f0;font-size:13px"/></div>'
-    +'<div style="margin-bottom:14px"><label style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Confirmer</label>'
-    +'<input id="pw-conf" type="password" placeholder="Répétez" style="width:100%;background:#181c2a;border:1px solid #1f2537;border-radius:8px;padding:9px 12px;color:#e2e5f0;font-size:13px"/></div>'
-    +'<div id="pw-msg" style="font-size:12px;margin-bottom:10px;display:none"></div>'
-    +'<button id="pw-btn" style="padding:10px 20px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Enregistrer</button>'
-    +'</div>'
-    +'<div style="background:#111420;border:1px solid #1f2537;border-radius:12px;padding:20px">'
-    +'<div style="font-size:13px;font-weight:700;color:#e2e5f0;margin-bottom:16px">Fond d\'écran</div>'
-    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">'
-    +_BG_PRESETS.map(function(p){
-      var active=savedBg===p.value;
-      return '<div data-bg="'+p.value+'" class="bg-swatch" style="border-radius:10px;padding:16px 8px;cursor:pointer;text-align:center;background:'+p.value+';border:2px solid '+(active?'#5b7cfa':'#1f2537')+';">'
-        +'<div style="font-size:11px;color:'+(active?'#5b7cfa':'#9ca3af')+';font-weight:'+(active?'700':'400')+'">'+p.label+'</div>'
-        +(active?'<div style="font-size:14px;color:#5b7cfa">&#10003;</div>':'')
-        +'</div>';
-    }).join('')
-    +'</div>'
-    +'<div style="display:flex;align-items:center;gap:10px">'
-    +'<label style="font-size:12px;color:#6b7280">Couleur personnalisée :</label>'
-    +'<input type="color" id="bg-custom" value="#0a0c12" style="width:44px;height:32px;border:1px solid #1f2537;border-radius:6px;cursor:pointer;background:none;padding:2px"/>'
-    +'</div></div>';
-
-  // Avatar upload
-  el.querySelector('#av-inp').addEventListener('change',function(){
-    var file=this.files[0];if(!file)return;
-    if(file.size>2*1024*1024){showAvMsg('Fichier trop lourd (max 2 MB).','#ef4444');return;}
-    var reader=new FileReader();
-    reader.onload=function(e){
-      var img=new Image();
-      img.onload=function(){
-        var MAX=160,scale=Math.min(MAX/img.width,MAX/img.height,1);
-        var c=document.createElement('canvas');c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);
-        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-        var dataUrl=c.toDataURL('image/jpeg',0.88);
-        localStorage.setItem('cs_avatar_'+_cu.id,dataUrl);
-        var prev=el.querySelector('#av-preview');
-        if(prev.tagName==='IMG'){prev.src=dataUrl;}
-        else{var ni=document.createElement('img');ni.id='av-preview';ni.src=dataUrl;ni.style.cssText='width:88px;height:88px;border-radius:50%;object-fit:cover;border:2px solid #5b7cfa';prev.replaceWith(ni);}
-        showAvMsg('Photo mise à jour !','#10b981');
-      };img.src=e.target.result;
-    };reader.readAsDataURL(file);
-  });
-  var avRm=el.querySelector('#av-rm');
-  if(avRm)avRm.addEventListener('click',function(){localStorage.removeItem('cs_avatar_'+_cu.id);loadProfil();});
-  function showAvMsg(txt,col){var d=el.querySelector('#av-msg');d.textContent=txt;d.style.color=col;d.style.display='block';setTimeout(function(){d.style.display='none';},3000);}
-
-  // Password
-  el.querySelector('#pw-btn').addEventListener('click',async function(){
-    var np=el.querySelector('#pw-new').value,cp=el.querySelector('#pw-conf').value;
-    var msg=el.querySelector('#pw-msg');msg.style.display='none';
-    if(!np||np.length<8){msg.textContent='Minimum 8 caractères.';msg.style.color='#ef4444';msg.style.display='block';return;}
-    if(np!==cp){msg.textContent='Les mots de passe ne correspondent pas.';msg.style.color='#ef4444';msg.style.display='block';return;}
-    this.disabled=true;this.textContent='Enregistrement...';
-    try{
-      var tok=localStorage.getItem('sbt')||'';
-      var r=await fetch(_su+'/auth/v1/user',{method:'PUT',headers:{'apikey':_sk,'Authorization':'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({password:np})});
-      if(r.ok){msg.textContent='Mot de passe mis à jour !';msg.style.color='#10b981';msg.style.display='block';el.querySelector('#pw-new').value='';el.querySelector('#pw-conf').value='';}
-      else{var err=await r.json();msg.textContent='Erreur : '+(err.message||err.error||r.status);msg.style.color='#ef4444';msg.style.display='block';}
-    }catch(e){msg.textContent='Erreur réseau.';msg.style.color='#ef4444';msg.style.display='block';}
-    this.disabled=false;this.textContent='Enregistrer';
-  });
-
-  // Background swatches
-  el.querySelectorAll('.bg-swatch').forEach(function(sw){
-    sw.addEventListener('click',function(){var val=this.getAttribute('data-bg');localStorage.setItem('cs_bg',val);applyBg(val);loadProfil();});
-  });
-  el.querySelector('#bg-custom').addEventListener('input',function(){localStorage.setItem('cs_bg',this.value);applyBg(this.value);});
-}
 </script>
 </body>
 </html>

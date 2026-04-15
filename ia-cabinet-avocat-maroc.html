@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IA pour Cabinets d'Avocats au Maroc — Omniscient by Westfield</title>
+<meta name="description" content="Omniscient permet aux cabinets d'avocats de traiter plus de dossiers avec la même équipe. Revue contractuelle en 60s, markups prêts à envoyer, droit marocain et français."/>
+<meta name="keywords" content="logiciel avocat maroc, IA cabinet avocat, automatiser revue contrats avocat, legaltech maroc, outil négociation contrats avocat casablanca"/>
+<meta name="author" content="Westfield Avocats"/>
+<link rel="canonical" href="https://ai.westfieldavocats.com/ia-cabinet-avocat-maroc"/>
+<link rel="icon" type="image/svg+xml" href="/omniscient-logo.svg"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://ai.westfieldavocats.com/ia-cabinet-avocat-maroc"/>
+<meta property="og:title" content="Omniscient — L'IA juridique pour les cabinets d'avocats au Maroc"/>
+<meta property="og:description" content="Traitez plus de dossiers avec la même équipe. Revue contractuelle en 60s, supervisée par Westfield Avocats."/>
+<meta property="og:image" content="https://ai.westfieldavocats.com/og-image.png"/>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap');
+:root {
+  --bg: #05070e; --surface: #0c0f1a; --border: #161c2e;
+  --accent: #3d6bff; --gold: #c8a94b; --green: #0dcf8a;
+  --red: #ff4560; --purple: #7c5cfc;
+  --text: #e6eaf6; --muted: #4a5470;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(200,169,75,0.05) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 22px 56px; z-index: 100;
+  backdrop-filter: blur(24px); background: rgba(5,7,14,0.8);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.nav-brand span { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 700; color: var(--text); }
+.nav-cta {
+  background: var(--gold); color: #05070e; border: none; border-radius: 8px;
+  padding: 10px 22px; font-size: 0.875rem; font-weight: 600; cursor: pointer;
+  text-decoration: none; transition: opacity 0.2s;
+}
+.nav-cta:hover { opacity: 0.85; }
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: center; align-items: center; text-align: center;
+  padding: 120px 24px 80px; position: relative; z-index: 1;
+}
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(200,169,75,0.1); border: 1px solid rgba(200,169,75,0.25);
+  border-radius: 100px; padding: 6px 16px; font-size: 0.8rem;
+  color: var(--gold); margin-bottom: 32px; letter-spacing: 0.05em;
+}
+h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 700; line-height: 1.1;
+  max-width: 860px; margin-bottom: 24px;
+}
+h1 em { font-style: italic; color: var(--gold); }
+.hero-sub {
+  font-size: 1.15rem; color: rgba(230,234,246,0.65);
+  max-width: 580px; line-height: 1.7; margin-bottom: 48px;
+}
+.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+.btn-gold {
+  background: var(--gold); color: #05070e; border: none; border-radius: 10px;
+  padding: 16px 32px; font-size: 1rem; font-weight: 700; cursor: pointer;
+  text-decoration: none; transition: transform 0.2s, opacity 0.2s;
+}
+.btn-gold:hover { transform: translateY(-2px); opacity: 0.9; }
+.btn-secondary {
+  background: transparent; color: var(--text); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 32px; font-size: 1rem; font-weight: 500;
+  cursor: pointer; text-decoration: none; transition: border-color 0.2s;
+}
+.btn-secondary:hover { border-color: var(--gold); }
+.section { padding: 80px 24px; position: relative; z-index: 1; }
+.container { max-width: 1000px; margin: 0 auto; }
+.section-label {
+  font-size: 0.75rem; font-weight: 600; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 16px;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700;
+  margin-bottom: 16px; line-height: 1.2;
+}
+.section-sub { color: rgba(230,234,246,0.6); font-size: 1rem; line-height: 1.7; max-width: 600px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 48px; }
+.stat {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 28px 20px; text-align: center;
+}
+.stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2.8rem; font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 8px; }
+.stat-label { font-size: 0.8rem; color: rgba(230,234,246,0.55); line-height: 1.4; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 48px; }
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px; transition: border-color 0.2s, transform 0.2s;
+}
+.card:hover { border-color: rgba(200,169,75,0.3); transform: translateY(-4px); }
+.card-icon { font-size: 2rem; margin-bottom: 16px; }
+.card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; }
+.card p { font-size: 0.875rem; color: rgba(230,234,246,0.55); line-height: 1.6; }
+.scenario {
+  margin-top: 48px; display: flex; flex-direction: column; gap: 20px;
+}
+.scenario-item {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px 32px;
+  display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: start;
+}
+.scenario-num {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(200,169,75,0.1); border: 1px solid rgba(200,169,75,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--gold);
+  flex-shrink: 0;
+}
+.scenario-item h3 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+.scenario-item p { font-size: 0.875rem; color: rgba(230,234,246,0.55); line-height: 1.6; }
+.scenario-item .gain {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 10px; padding: 4px 12px; border-radius: 100px;
+  background: rgba(13,207,138,0.1); border: 1px solid rgba(13,207,138,0.2);
+  font-size: 0.78rem; color: var(--green); font-weight: 600;
+}
+.faq { margin-top: 48px; display: flex; flex-direction: column; gap: 12px; }
+.faq-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.faq-q { padding: 20px 24px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+.faq-q::after { content: '+'; font-size: 1.3rem; color: var(--muted); transition: transform 0.2s; }
+.faq-item.open .faq-q::after { transform: rotate(45deg); }
+.faq-a { padding: 0 24px; max-height: 0; overflow: hidden; font-size: 0.875rem; color: rgba(230,234,246,0.6); line-height: 1.7; transition: max-height 0.3s, padding 0.3s; }
+.faq-item.open .faq-a { max-height: 200px; padding: 0 24px 20px; }
+.cta-section {
+  max-width: 1000px; margin: 0 auto 80px; padding: 64px 40px;
+  background: linear-gradient(135deg, rgba(200,169,75,0.1), rgba(61,107,255,0.06));
+  border: 1px solid rgba(200,169,75,0.2); border-radius: 24px;
+  text-align: center; position: relative; z-index: 1;
+}
+.cta-section h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 700; margin-bottom: 16px; }
+.cta-section p { color: rgba(230,234,246,0.6); margin-bottom: 32px; }
+footer { text-align: center; padding: 32px 24px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.8rem; position: relative; z-index: 1; }
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="/">
+    <svg width="26" height="28" viewBox="0 0 32 36" fill="none">
+      <ellipse cx="16" cy="13" rx="10" ry="10" fill="#1a2340" stroke="#3d6bff" stroke-width="1.5"/>
+      <circle cx="16" cy="13" r="4" fill="#3d6bff" opacity="0.9"/>
+      <polygon points="10,22 16,29 16,22" fill="white"/>
+      <polygon points="22,22 16,29 16,22" fill="white"/>
+      <polygon points="13,23 19,23 18,27 14,27" fill="white" opacity="0.9"/>
+      <path d="M 14,27 L 12.5,32 L 16,34 L 19.5,32 L 18,27 Z" fill="white" opacity="0.9"/>
+    </svg>
+    <span>Omniscient</span>
+  </a>
+  <a class="nav-cta" href="/">Essayer gratuitement</a>
+</nav>
+
+<section class="hero">
+  <div class="badge">Construit par des avocats, pour des avocats</div>
+  <h1>Facturez la stratégie.<br/><em>Pas la relecture.</em></h1>
+  <p class="hero-sub">
+    Omniscient fait la revue contractuelle en 60 secondes. Vous arrivez en réunion
+    avec les vrais enjeux identifiés. Vous négociez. Vous conseillez. Vous créez de la valeur.
+  </p>
+  <div class="hero-actions">
+    <a class="btn-gold" href="/">Essayer sur un contrat</a>
+    <a class="btn-secondary" href="#scenarios">Voir les cas d'usage</a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="stats">
+      <div class="stat"><div class="stat-num">60s</div><div class="stat-label">Revue d'un contrat standard</div></div>
+      <div class="stat"><div class="stat-num">3×</div><div class="stat-label">Plus de dossiers traités avec la même équipe</div></div>
+      <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Supervisé par Westfield Avocats</div></div>
+      <div class="stat"><div class="stat-num">0</div><div class="stat-label">Hallucination — chaque suggestion citée sur un article</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="scenarios">
+  <div class="container">
+    <div class="section-label">Cas d'usage</div>
+    <h2 class="section-title">Comment les cabinets<br/>utilisent Omniscient</h2>
+    <div class="scenario">
+      <div class="scenario-item">
+        <div class="scenario-num">1</div>
+        <div>
+          <h3>Préparation de réunion de négociation</h3>
+          <p>Le client envoie le contrat la veille. En 60 secondes, l'associé a la liste complète des clauses déséquilibrées avec les modifications à proposer et les articles du droit marocain à citer. Il arrive préparé.</p>
+          <span class="gain">⚡ De 3h de préparation à 10 minutes</span>
+        </div>
+      </div>
+      <div class="scenario-item">
+        <div class="scenario-num">2</div>
+        <div>
+          <h3>Revue de contrats standard pour clients PME</h3>
+          <p>Un client PME envoie régulièrement des contrats de prestation, des CDI, des NDA. Le cabinet peut traiter ces dossiers à haute valeur ajoutée perçue sans mobiliser des collaborateurs seniors sur de la relecture.</p>
+          <span class="gain">⚡ Marge améliorée, client satisfait, volume augmenté</span>
+        </div>
+      </div>
+      <div class="scenario-item">
+        <div class="scenario-num">3</div>
+        <div>
+          <h3>Veille contractuelle pour grands comptes</h3>
+          <p>Un grand compte envoie des contrats de sous-traitants ou fournisseurs en flux continu. Omniscient traite la revue de routine, le cabinet intervient uniquement sur les cas complexes.</p>
+          <span class="gain">⚡ Relation client renforcée sans surcharge équipe</span>
+        </div>
+      </div>
+      <div class="scenario-item">
+        <div class="scenario-num">4</div>
+        <div>
+          <h3>Formation et montée en compétences des collaborateurs</h3>
+          <p>Les jeunes collaborateurs utilisent Omniscient comme outil pédagogique : comparer leur analyse avec celle de l'IA, comprendre les références légales, progresser sur la négociation contractuelle.</p>
+          <span class="gain">⚡ Collaborateurs plus rapides, moins de corrections par les associés</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background: rgba(12,15,26,0.5);">
+  <div class="container">
+    <div class="section-label">Différenciation</div>
+    <h2 class="section-title">Pourquoi Omniscient<br/>et pas ChatGPT ?</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">📚</div>
+        <h3>Base juridique marocaine</h3>
+        <p>Code du Travail, DOC, Code de Commerce, lois spéciales. ChatGPT ne connaît pas l'article 23 du DOC. Omniscient, si.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <h3>Analyse de partie</h3>
+        <p>Omniscient adapte son analyse selon la position : acheteur, vendeur, employeur, prestataire. Pas une revue générique.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚖️</div>
+        <h3>Supervisé par des avocats</h3>
+        <p>Construit et maintenu par Westfield Avocats. Chaque suggestion est vérifiable. Vous pouvez valider et engager votre responsabilité.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📝</div>
+        <h3>Export Track Changes natif</h3>
+        <p>Les modifications sont directement intégrées dans le DOCX avec Track Changes. Prêt à envoyer à la partie adverse.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-label">Questions</div>
+    <h2 class="section-title">Ce que les avocats<br/>nous demandent</h2>
+    <div class="faq">
+      <div class="faq-item">
+        <div class="faq-q">Puis-je engager ma responsabilité sur une analyse Omniscient ?</div>
+        <div class="faq-a">Omniscient est un outil d'assistance. La validation finale reste du ressort de l'avocat. Comme tout outil juridique, vous vérifiez, validez et signez. Omniscient vous donne la matière — vous exercez le jugement.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Omniscient est-il à jour avec les dernières lois marocaines ?</div>
+        <div class="faq-a">Oui. La base documentaire est mise à jour régulièrement par l'équipe de Westfield Avocats. Vous pouvez également nous signaler tout texte manquant.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Puis-je l'utiliser pour du droit français également ?</div>
+        <div class="faq-a">Oui. Omniscient couvre le droit marocain, français et anglais nativement. La juridiction est détectée automatiquement dans le contrat.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Quelle est la confidentialité des documents traités ?</div>
+        <div class="faq-a">Les documents ne sont pas stockés au-delà de l'analyse. Westfield Avocats est soumis au secret professionnel. L'infrastructure est conforme aux standards de sécurité professionnels.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="cta-section">
+  <h2>Testez Omniscient<br/>sur un vrai contrat maintenant</h2>
+  <p>Déposez un contrat. Comparez avec votre propre analyse. Voyez la différence.</p>
+  <a class="btn-gold" href="/" style="font-size:1.05rem; padding: 18px 40px;">Analyser un contrat gratuitement</a>
+</div>
+
+<footer>
+  <p>© 2025 Westfield Avocats — <a href="/">Omniscient</a> — IA juridique supervisée par des avocats</p>
+  <p style="margin-top:8px"><a href="/negociation-contrat-pme-maroc">PME Maroc</a> · <a href="/negociation-contrats-direction-juridique">Directions juridiques</a></p>
+</footer>
+
+<script>
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => q.parentElement.classList.toggle('open'));
+});
+</script>
+</body>
+</html>
