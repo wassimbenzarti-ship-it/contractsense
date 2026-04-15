@@ -115,10 +115,25 @@ select { appearance: none; }
         <div class="card-title">📄 Ajouter un document manuellement</div>
         <label>Type de document</label>
         <select id="doc-type">
-          <option value="law">📚 Code de loi / Texte législatif</option>
-          <option value="contract">📝 Modèle de contrat</option>
-          <option value="jurisprudence">⚖️ Jurisprudence</option>
-          <option value="doctrine">📖 Doctrine</option>
+          <optgroup label="— Lois (tous types de contrats)">
+            <option value="law">📚 Loi générale (COC, Code civil, Code commercial…)</option>
+            <option value="law_employment">👷 Droit du travail (Code du travail, loi 65-99…)</option>
+            <option value="law_commercial">🏢 Droit commercial / OHADA / sociétés</option>
+            <option value="law_civil">⚖️ Droit civil / obligations / contrats</option>
+          </optgroup>
+          <optgroup label="— Modèles de contrats (domaine spécifique)">
+            <option value="contract">📝 Modèle générique (tous types)</option>
+            <option value="contract_employment">👔 Modèle CDI / CDD / contrat de travail</option>
+            <option value="contract_nda">🔒 Modèle NDA / confidentialité</option>
+            <option value="contract_service">🛠 Modèle prestation de services</option>
+            <option value="contract_purchase">📦 Modèle vente / achat / fourniture</option>
+            <option value="contract_saas">💻 Modèle SaaS / licence logiciel</option>
+            <option value="contract_partnership">🤝 Modèle partenariat / joint-venture</option>
+          </optgroup>
+          <optgroup label="— Références juridiques">
+            <option value="jurisprudence">⚖️ Jurisprudence</option>
+            <option value="doctrine">📖 Doctrine / commentaires</option>
+          </optgroup>
         </select>
         <label>Nom / Référence</label>
         <input type="text" id="source-name" placeholder="Ex: Code des Obligations et Contrats — Art. 230-350"/>
