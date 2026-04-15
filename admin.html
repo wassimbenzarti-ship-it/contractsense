@@ -136,6 +136,12 @@ select { appearance: none; }
         <button class="btn" id="btn-upload" style="width:100%">⬆ Indexer le document</button>
         <div id="upload-msg" style="display:none;margin-top:12px"></div>
       </div>
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">🔄 Ré-indexer les documents existants</div>
+        <p style="color:#9ca3af;font-size:13px;margin:0 0 12px">Si des documents ont été uploadés avant le fix du 2026-04-15 (bug embedding_vector manquant), clique ici pour ré-indexer tous les docs existants dans pgvector — sans re-uploader.</p>
+        <button class="btn" id="btn-reindex" style="width:100%;background:#1f2537;border:1px solid #374151" onclick="reindexAll()">🔄 Ré-indexer tous les documents manquants</button>
+        <div id="reindex-msg" style="display:none;margin-top:12px"></div>
+      </div>
     </div>
 
     <!-- Suggestions -->
@@ -514,6 +520,30 @@ function setFile(f) {
   document.getElementById('file-ok').style.display = 'flex';
   if (!document.getElementById('source-name').value)
     document.getElementById('source-name').value = f.name.replace(/\.[^.]+$/, '');
+}
+
+async function reindexAll() {
+  var btn = document.getElementById('btn-reindex');
+  var msg = document.getElementById('reindex-msg');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-sm"></span>Ré-indexation en cours…';
+  msg.style.display = 'none';
+  try {
+    var resp = await fetch(BACKEND + '/rag/reindex', { method: 'POST' });
+    var data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Erreur serveur');
+    msg.className = 'success';
+    msg.textContent = '✅ ' + data.fixed + ' documents ré-indexés, ' + data.skipped + ' déjà OK, ' + data.errors + ' erreurs';
+    msg.style.display = 'block';
+    loadStats(); loadRag();
+  } catch(e) {
+    msg.className = 'error';
+    msg.textContent = '⚠ ' + (e.message || 'Erreur');
+    msg.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🔄 Ré-indexer tous les documents manquants';
+  }
 }
 
 async function uploadDoc() {
