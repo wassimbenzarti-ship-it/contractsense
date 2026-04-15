@@ -106,6 +106,33 @@ select { appearance: none; }
 
     <!-- RAG tab -->
     <div id="tab-rag" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <input type="text" id="rag-filter-text" placeholder="🔍 Rechercher par nom…" oninput="filterRag()" style="flex:1;min-width:160px;padding:7px 12px;background:#111420;border:1px solid #1f2537;border-radius:8px;color:#e2e8f0;font-size:13px"/>
+        <select id="rag-filter-cat" onchange="filterRag()" style="padding:7px 10px;background:#111420;border:1px solid #1f2537;border-radius:8px;color:#e2e8f0;font-size:13px">
+          <option value="">Toutes catégories</option>
+          <option value="law">Loi générale</option>
+          <option value="law_employment">Droit du travail</option>
+          <option value="law_commercial">Droit commercial</option>
+          <option value="law_civil">Droit civil</option>
+          <option value="contract">Contrat générique</option>
+          <option value="contract_employment">CDI/CDD</option>
+          <option value="contract_nda">NDA</option>
+          <option value="contract_service">Service</option>
+          <option value="contract_purchase">Achat/Vente</option>
+          <option value="contract_saas">SaaS</option>
+          <option value="contract_partnership">Partenariat</option>
+          <option value="jurisprudence">Jurisprudence</option>
+          <option value="doctrine">Doctrine</option>
+        </select>
+        <select id="rag-filter-jur" onchange="filterRag()" style="padding:7px 10px;background:#111420;border:1px solid #1f2537;border-radius:8px;color:#e2e8f0;font-size:13px">
+          <option value="">Toutes juridictions</option>
+          <option value="droit_marocain">🇲🇦 Droit marocain</option>
+          <option value="droit_francais">🇫🇷 Droit français</option>
+          <option value="droit_ohada">🌍 OHADA</option>
+          <option value="">🌍 Non définie</option>
+        </select>
+        <span id="rag-filter-count" style="padding:7px 0;font-size:12px;color:#6b7280;white-space:nowrap;align-self:center"></span>
+      </div>
       <div id="rag-list"><div class="empty">Chargement…</div></div>
     </div>
 
@@ -499,74 +526,89 @@ async function rejectContract(id) {
   }
 }
 
+var _ragAllDocs = [];
+
+function filterRag() {
+  var txt = (document.getElementById('rag-filter-text').value || '').toLowerCase();
+  var cat = document.getElementById('rag-filter-cat').value;
+  var jur = document.getElementById('rag-filter-jur').value;
+  var filtered = _ragAllDocs.filter(function(d) {
+    if (txt && !d.source.toLowerCase().includes(txt)) return false;
+    if (cat && d.type !== cat) return false;
+    if (jur && (d.jurisdiction || '') !== jur) return false;
+    return true;
+  });
+  renderRagDocs(filtered);
+  document.getElementById('rag-filter-count').textContent = filtered.length + ' / ' + _ragAllDocs.length + ' documents';
+}
+
+function renderRagDocs(docs) {
+  var list = document.getElementById('rag-list');
+  list.innerHTML = '';
+  if (!docs.length) { list.innerHTML = '<div class="empty">Aucun document ne correspond au filtre.</div>'; return; }
+  docs.forEach(function(doc) {
+    var catLabel = CAT_LABELS[doc.type] || doc.type || 'Document';
+    var typeColor = doc.type && doc.type.startsWith('law') ? '#3d6bff' : doc.type && doc.type.startsWith('contract') ? '#0dcf8a' : doc.type === 'jurisprudence' ? '#f59e0b' : '#7c5cfc';
+    var div = document.createElement('div');
+    div.className = 'doc-item';
+    div.style = 'flex-wrap:wrap;gap:8px';
+    var warningHtml = doc.warning ? '<span style="color:#ef4444;font-size:10px;margin-left:8px">⚠️ ' + (doc.warning_msg || 'Vérifier') + '</span>' : '';
+    var partyHtml = doc.party_label ? '<span style="color:#7c5cfc;font-size:10px;margin-left:6px">· ' + doc.party_label + '</span>' : '';
+    var jurHtml = doc.jurisdiction ? '<span style="color:#f59e0b;font-size:10px;margin-left:6px">🌍 ' + doc.jurisdiction + '</span>' : '<span style="color:#4b5563;font-size:10px;margin-left:6px">juridiction ?</span>';
+    var selectOpts = CAT_OPTS.replace('value="' + doc.type + '"', 'value="' + doc.type + '" selected');
+    var jurOpts = ['<option value="">Universel</option>','<option value="droit_marocain">🇲🇦 Droit marocain</option>','<option value="droit_francais">🇫🇷 Droit français</option>','<option value="droit_ohada">🌍 OHADA</option>'].map(function(o){ return o.replace('value="'+(doc.jurisdiction||'')+'"','value="'+(doc.jurisdiction||'')+'" selected'); }).join('');
+    div.dataset.source = doc.source;
+    div.innerHTML =
+      '<div class="doc-info" style="flex:1;min-width:0">' +
+        '<div class="name">' +
+          '<span style="background:' + typeColor + '22;color:' + typeColor + ';padding:2px 8px;border-radius:4px;font-size:10px;margin-right:6px;font-weight:600">' + catLabel.toUpperCase() + '</span>' +
+          doc.source + warningHtml +
+        '</div>' +
+        '<div class="meta">' + doc.chunks + ' chunks' + partyHtml + jurHtml + '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap">' +
+        '<select class="tag-select" style="padding:4px 8px;font-size:11px;background:#111420;border:1px solid #1f2537;color:#e2e8f0;border-radius:6px">' + selectOpts + '</select>' +
+        '<select class="jur-select" style="padding:4px 8px;font-size:11px;background:#111420;border:1px solid #1f2537;color:#e2e8f0;border-radius:6px">' + jurOpts + '</select>' +
+        '<button class="tag-btn" style="padding:4px 10px;font-size:11px;background:#1f2537;border:1px solid #374151;color:#9ca3af;border-radius:6px;cursor:pointer">🏷 Tagger</button>' +
+        '<button class="btn-danger del-doc-btn" style="flex-shrink:0">🗑</button>' +
+      '</div>';
+    div.querySelector('.del-doc-btn').addEventListener('click', function() { deleteDoc(div.dataset.source, this); });
+    div.querySelector('.tag-btn').addEventListener('click', async function() {
+      var sel = div.querySelector('.tag-select');
+      var newCat = sel.value;
+      var newJur = div.querySelector('.jur-select').value;
+      var btn = this;
+      btn.disabled = true; btn.textContent = '…';
+      try {
+        var r = await fetch(BACKEND + '/rag/retag', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ source: div.dataset.source, category: newCat, jurisdiction: newJur })
+        });
+        var d = await r.json();
+        if (!r.ok) throw new Error(d.error);
+        btn.textContent = '✅ ' + d.updated + ' docs';
+        btn.style.color = '#10b981';
+        setTimeout(function() { btn.disabled = false; btn.textContent = '🏷 Tagger'; btn.style.color = ''; }, 2000);
+      } catch(e) {
+        btn.textContent = '⚠ Erreur'; btn.style.color = '#ef4444';
+        setTimeout(function() { btn.disabled = false; btn.textContent = '🏷 Tagger'; btn.style.color = ''; }, 2000);
+      }
+    });
+    list.appendChild(div);
+  });
+}
+
 async function loadRag() {
   var list = document.getElementById('rag-list');
   try {
     var resp = await fetch(BACKEND + '/rag/list');
     var data = await resp.json();
-    var docs = data.documents || [];
-    if (docs.length === 0) {
-      list.innerHTML = '<div class="empty">Aucun document dans le RAG.</div>';
-      return;
-    }
-    // Show summary
-    var warnings = docs.filter(function(d) { return d.warning; }).length;
-    var header = document.createElement('div');
-    header.style = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding:12px 16px;background:#111420;border-radius:10px;border:1px solid #1f2537';
-    header.innerHTML = '<div style="font-size:13px"><strong>' + docs.length + '</strong> documents · <strong>' + data.total + '</strong> chunks</div>' +
-      (warnings > 0 ? '<div style="color:#ef4444;font-size:12px">⚠️ ' + warnings + ' document(s) à vérifier</div>' : '<div style="color:#0dcf8a;font-size:12px">✅ Tous les documents OK</div>');
-    list.appendChild(header);
-    list.innerHTML = '';
-    docs.forEach(function(doc) {
-      var catLabel = CAT_LABELS[doc.type] || doc.type || 'Document';
-      var typeColor = doc.type && doc.type.startsWith('law') ? '#3d6bff' : doc.type && doc.type.startsWith('contract') ? '#0dcf8a' : doc.type === 'jurisprudence' ? '#f59e0b' : '#7c5cfc';
-      var div = document.createElement('div');
-      div.className = 'doc-item';
-      div.style = 'flex-wrap:wrap;gap:8px';
-      var warningHtml = doc.warning ? '<span style="color:#ef4444;font-size:10px;margin-left:8px">⚠️ ' + (doc.warning_msg || 'Vérifier') + '</span>' : '';
-      var partyHtml = doc.party_label ? '<span style="color:#7c5cfc;font-size:10px;margin-left:6px">· ' + doc.party_label + '</span>' : '';
-      var jurHtml = doc.jurisdiction ? '<span style="color:#f59e0b;font-size:10px;margin-left:6px">🌍 ' + doc.jurisdiction + '</span>' : '<span style="color:#4b5563;font-size:10px;margin-left:6px">juridiction ?</span>';
-      var selectOpts = CAT_OPTS.replace('value="' + doc.type + '"', 'value="' + doc.type + '" selected');
-      var jurOpts = ['<option value="">Universel</option>','<option value="droit_marocain">🇲🇦 Droit marocain</option>','<option value="droit_francais">🇫🇷 Droit français</option>','<option value="droit_ohada">🌍 OHADA</option>'].map(function(o){ return o.replace('value="'+(doc.jurisdiction||'')+'"','value="'+(doc.jurisdiction||'')+'" selected'); }).join('');
-      div.dataset.source = doc.source;
-      div.innerHTML =
-        '<div class="doc-info" style="flex:1;min-width:0">' +
-          '<div class="name">' +
-            '<span style="background:' + typeColor + '22;color:' + typeColor + ';padding:2px 8px;border-radius:4px;font-size:10px;margin-right:6px;font-weight:600">' + catLabel.toUpperCase() + '</span>' +
-            doc.source + warningHtml +
-          '</div>' +
-          '<div class="meta">' + doc.chunks + ' chunks' + partyHtml + jurHtml + '</div>' +
-        '</div>' +
-        '<div style="display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap">' +
-          '<select class="tag-select" style="padding:4px 8px;font-size:11px;background:#111420;border:1px solid #1f2537;color:#e2e8f0;border-radius:6px">' + selectOpts + '</select>' +
-          '<select class="jur-select" style="padding:4px 8px;font-size:11px;background:#111420;border:1px solid #1f2537;color:#e2e8f0;border-radius:6px">' + jurOpts + '</select>' +
-          '<button class="tag-btn" style="padding:4px 10px;font-size:11px;background:#1f2537;border:1px solid #374151;color:#9ca3af;border-radius:6px;cursor:pointer">🏷 Tagger</button>' +
-          '<button class="btn-danger del-doc-btn" style="flex-shrink:0">🗑</button>' +
-        '</div>';
-      list.appendChild(div);
-      div.querySelector('.del-doc-btn').addEventListener('click', function() { deleteDoc(div.dataset.source, this); });
-      div.querySelector('.tag-btn').addEventListener('click', async function() {
-        var sel = div.querySelector('.tag-select');
-        var newCat = sel.value;
-        var newJur = div.querySelector('.jur-select').value;
-        var btn = this;
-        btn.disabled = true; btn.textContent = '…';
-        try {
-          var r = await fetch(BACKEND + '/rag/retag', {
-            method: 'POST', headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({ source: div.dataset.source, category: newCat, jurisdiction: newJur })
-          });
-          var d = await r.json();
-          if (!r.ok) throw new Error(d.error);
-          btn.textContent = '✅ ' + d.updated + ' docs';
-          btn.style.color = '#10b981';
-          setTimeout(function() { btn.disabled = false; btn.textContent = '🏷 Tagger'; btn.style.color = ''; }, 2000);
-        } catch(e) {
-          btn.textContent = '⚠ Erreur'; btn.style.color = '#ef4444';
-          setTimeout(function() { btn.disabled = false; btn.textContent = '🏷 Tagger'; btn.style.color = ''; }, 2000);
-        }
-      });
-    });
+    _ragAllDocs = data.documents || [];
+    if (!_ragAllDocs.length) { list.innerHTML = '<div class="empty">Aucun document dans le RAG.</div>'; return; }
+    var warnings = _ragAllDocs.filter(function(d) { return d.warning; }).length;
+    var countEl = document.getElementById('rag-filter-count');
+    if (countEl) countEl.textContent = _ragAllDocs.length + ' documents · ' + data.total + ' chunks' + (warnings > 0 ? ' · ⚠️ ' + warnings + ' à vérifier' : '');
+    filterRag();
   } catch(e) {
     list.innerHTML = '<div class="empty" style="color:#ef4444">⚠ Erreur de connexion</div>';
   }
