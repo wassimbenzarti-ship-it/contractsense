@@ -129,9 +129,37 @@ select { appearance: none; }
           <option value="droit_marocain">🇲🇦 Droit marocain</option>
           <option value="droit_francais">🇫🇷 Droit français</option>
           <option value="droit_ohada">🌍 OHADA</option>
-          <option value="">🌍 Non définie</option>
+          <option value="__none__">❓ Non définie</option>
         </select>
         <span id="rag-filter-count" style="padding:7px 0;font-size:12px;color:#6b7280;white-space:nowrap;align-self:center"></span>
+      </div>
+      <!-- Bulk retag bar -->
+      <div id="bulk-retag-bar" style="display:none;gap:8px;margin-bottom:10px;flex-wrap:wrap;background:#111420;border:1px solid #1f2537;border-radius:8px;padding:8px 12px;align-items:center">
+        <span style="font-size:12px;color:#9ca3af;flex-shrink:0">Retagger tout ce qui s'affiche :</span>
+        <select id="bulk-cat" style="padding:4px 8px;font-size:12px;background:#0a0d18;border:1px solid #1f2537;color:#e2e8f0;border-radius:6px">
+          <option value="">— catégorie —</option>
+          <option value="law">Loi générale</option>
+          <option value="law_employment">Droit du travail</option>
+          <option value="law_commercial">Droit commercial</option>
+          <option value="law_civil">Droit civil</option>
+          <option value="contract">Contrat générique</option>
+          <option value="contract_employment">CDI/CDD</option>
+          <option value="contract_nda">NDA</option>
+          <option value="contract_service">Service</option>
+          <option value="contract_purchase">Achat/Vente</option>
+          <option value="contract_saas">SaaS</option>
+          <option value="contract_partnership">Partenariat</option>
+          <option value="jurisprudence">Jurisprudence</option>
+          <option value="doctrine">Doctrine</option>
+        </select>
+        <select id="bulk-jur" style="padding:4px 8px;font-size:12px;background:#0a0d18;border:1px solid #1f2537;color:#e2e8f0;border-radius:6px">
+          <option value="">— juridiction —</option>
+          <option value="droit_marocain">🇲🇦 Droit marocain</option>
+          <option value="droit_francais">🇫🇷 Droit français</option>
+          <option value="droit_ohada">🌍 OHADA</option>
+        </select>
+        <button id="bulk-retag-btn" onclick="bulkRetag()" style="padding:4px 14px;font-size:12px;background:#3d6bff;color:#fff;border:none;border-radius:6px;cursor:pointer">🏷 Appliquer à tous</button>
+        <span id="bulk-retag-msg" style="font-size:12px;color:#10b981;display:none"></span>
       </div>
       <div id="rag-list"><div class="empty">Chargement…</div></div>
     </div>
@@ -535,11 +563,43 @@ function filterRag() {
   var filtered = _ragAllDocs.filter(function(d) {
     if (txt && !d.source.toLowerCase().includes(txt)) return false;
     if (cat && d.type !== cat) return false;
-    if (jur && (d.jurisdiction || '') !== jur) return false;
+    if (jur === '__none__') { if (d.jurisdiction) return false; }
+    else if (jur && (d.jurisdiction || '') !== jur) return false;
     return true;
   });
   renderRagDocs(filtered);
   document.getElementById('rag-filter-count').textContent = filtered.length + ' / ' + _ragAllDocs.length + ' documents';
+  var bar = document.getElementById('bulk-retag-bar');
+  if (bar) bar.style.display = filtered.length > 1 ? 'flex' : 'none';
+}
+
+async function bulkRetag() {
+  var newCat = document.getElementById('bulk-cat').value;
+  var newJur = document.getElementById('bulk-jur').value;
+  if (!newCat && !newJur) { alert('Sélectionne au moins une catégorie ou une juridiction.'); return; }
+  var btn = document.getElementById('bulk-retag-btn');
+  var msg = document.getElementById('bulk-retag-msg');
+  // Collect sources currently displayed
+  var sources = Array.from(document.querySelectorAll('#rag-list [data-source]')).map(function(el) { return el.dataset.source; });
+  if (!sources.length) return;
+  if (!confirm('Retagger ' + sources.length + ' source(s) avec' + (newCat ? ' catégorie=' + newCat : '') + (newJur ? ' juridiction=' + newJur : '') + ' ?')) return;
+  btn.disabled = true; btn.textContent = '…';
+  msg.style.display = 'none';
+  var ok = 0, errors = 0;
+  for (var i = 0; i < sources.length; i++) {
+    try {
+      var r = await fetch(BACKEND + '/rag/retag', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ source: sources[i], category: newCat, jurisdiction: newJur })
+      });
+      if (r.ok) ok++; else errors++;
+    } catch(e) { errors++; }
+  }
+  btn.disabled = false; btn.textContent = '🏷 Appliquer à tous';
+  msg.style.display = 'inline';
+  msg.style.color = errors ? '#ef4444' : '#10b981';
+  msg.textContent = '✅ ' + ok + ' sources retaggées' + (errors ? ' · ⚠ ' + errors + ' erreurs' : '');
+  setTimeout(function() { loadRag(); }, 800);
 }
 
 function renderRagDocs(docs) {
