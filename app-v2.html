@@ -1782,7 +1782,8 @@ async function upMdl(inp){
       var fd=new FormData();
       fd.append('file',f);
       fd.append('user_email',_cu.email);
-      console.log('[upMdl] POST /models/upload file=', f.name, 'email=', _cu.email);
+      fd.append('user_id',_cu.id);
+      console.log('[upMdl] POST /models/upload file=', f.name, 'email=', _cu.email, 'uid=', _cu.id);
       var r=await fetch(BACKEND+'/models/upload',{method:'POST',body:fd});
       console.log('[upMdl] status=', r.status);
       var d=await r.json();
