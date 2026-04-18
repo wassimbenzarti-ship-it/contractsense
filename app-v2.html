@@ -1694,7 +1694,7 @@ async function loadDash(){
     if(val==='__own__') return window._renderAnalyses(window._userAnalyses.filter(function(x){return !x._juristeEmail;}));
     window._renderAnalyses(window._userAnalyses.filter(function(x){return x._juristeEmail===val;}));
   };
-  var r2=await sf('/rest/v1/user_models?user_id=eq.'+_cu.id+'&order=created_at.desc&select=id,filename,created_at');
+  var r2=await sf('/rest/v1/user_models?user_email=eq.'+encodeURIComponent(_cu.email)+'&order=created_at.desc&select=id,filename,created_at');
   var m=r2.ok?await r2.json():[];
   document.getElementById('stm').textContent=m.length;
   var mlistHtml=m.length===0
@@ -1860,7 +1860,7 @@ async function deleteModel(modelId, btn) {
 
 async function getUserModelRAG(){
   if(!_cu)return[];
-  var r=await sf('/rest/v1/user_models?user_id=eq.'+_cu.id+'&select=id,filename,content');
+  var r=await sf('/rest/v1/user_models?user_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,filename,content');
   return r.ok?await r.json():[];
 }
 
