@@ -3010,6 +3010,14 @@ if (_appLang === 'en') appSetLang('en');
 .cb-msg{max-width:90%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.55;word-wrap:break-word;}
 .cb-msg.user{align-self:flex-end;background:#5b7cfa;color:#fff;border-bottom-right-radius:3px;}
 .cb-msg.bot{align-self:flex-start;background:#181c2a;color:#e2e5f0;border:1px solid #1f2537;border-bottom-left-radius:3px;}
+.cb-msg.bot h3,.cb-msg.bot h4,.cb-msg.bot h5{margin:8px 0 4px;color:#a0b4ff;font-size:13px;}
+.cb-msg.bot hr{border:none;border-top:1px solid #2a3040;margin:6px 0;}
+.cb-msg.bot ul{margin:4px 0 4px 16px;padding:0;}
+.cb-msg.bot li{margin:2px 0;}
+.cb-msg.bot table{border-collapse:collapse;width:100%;margin:6px 0;font-size:12px;}
+.cb-msg.bot td,.cb-msg.bot th{border:1px solid #2a3040;padding:4px 8px;text-align:left;}
+.cb-msg.bot th{background:#1f2537;color:#a0b4ff;}
+.cb-msg.bot code{background:#0d1117;padding:1px 5px;border-radius:3px;font-size:11px;}
 /* Modification card inside a bot message */
 .cb-mod-card{background:#0d1017;border:1px solid rgba(16,185,129,.25);border-radius:10px;padding:12px;margin-top:8px;font-size:12px;}
 .cb-mod-name{font-weight:700;color:#10b981;margin-bottom:5px;}
@@ -3107,7 +3115,8 @@ function cbToggle() {
     document.getElementById('cb-input').focus();
     if (!_cbWelcomed) { _cbWelcomed = true; cbWelcome(); }
     cbScrollBottom();
-    if(typeof window._chatRemaining==='number'&&window._chatRemaining<9999){var ctr=document.getElementById('cb-counter');if(ctr)ctr.textContent=window._chatRemaining+' / 15 messages restants';}
+    var _ctr=document.getElementById('cb-counter');
+    if(_ctr){if(_isAdmin)_ctr.textContent='Accès illimité';else if(typeof window._chatRemaining==='number')_ctr.textContent=window._chatRemaining+' / 15 messages restants';}
   } else {
     sb.classList.remove('cb-open');
     if (sh) sh.innerHTML = '&#8249;';
@@ -3152,6 +3161,46 @@ function cbKey(e) {
 function cbResize(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
+function _cbMd(t) {
+  var lines = t.split('\n'), out = '', inTbl = false, inUl = false;
+  function inline(s) {
+    return s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g,'<em>$1</em>')
+            .replace(/`(.+?)`/g,'<code>$1</code>');
+  }
+  for (var i = 0; i < lines.length; i++) {
+    var l = lines[i];
+    if (l.trim().charAt(0) === '|') {
+      if (l.replace(/[\|\s\-:]/g,'') === '') continue; // separator row
+      if (!inTbl) { out += '<table>'; inTbl = true; }
+      var cells = l.split('|').filter(function(c){return c.trim()!=='';});
+      var isHdr = i+1 < lines.length && /^\|[-\s|:]+\|$/.test(lines[i+1]);
+      var tag = isHdr ? 'th' : 'td';
+      out += '<tr>' + cells.map(function(c){return '<'+tag+'>'+inline(c.trim())+'</'+tag+'>';}).join('') + '</tr>';
+      continue;
+    }
+    if (inTbl) { out += '</table>'; inTbl = false; }
+    if (/^#{1,4}\s/.test(l)) {
+      if (inUl){out+='</ul>';inUl=false;}
+      out += '<h4>'+inline(l.replace(/^#+\s/,''))+'</h4>'; continue;
+    }
+    if (/^---+$/.test(l.trim())) {
+      if (inUl){out+='</ul>';inUl=false;}
+      out += '<hr>'; continue;
+    }
+    if (/^[-*]\s/.test(l)) {
+      if (!inUl){out+='<ul>';inUl=true;}
+      out += '<li>'+inline(l.replace(/^[-*]\s/,''))+'</li>'; continue;
+    }
+    if (inUl){out+='</ul>';inUl=false;}
+    if (l.trim()===''){out+='<br>';continue;}
+    out += inline(l)+'<br>';
+  }
+  if (inTbl) out += '</table>';
+  if (inUl) out += '</ul>';
+  return out;
 }
 
 function cbAddMsg(role, html, modObjs) {
@@ -3277,15 +3326,16 @@ async function cbSend() {
     cbHideTyping();
     if (!r.ok) throw new Error(data.error || 'Erreur serveur');
 
-    if (typeof data.chat_remaining === 'number' && data.chat_remaining < 9999) {
-      var ctr = document.getElementById('cb-counter');
-      if (ctr) ctr.textContent = data.chat_remaining + ' / 15 messages restants';
+    var ctr = document.getElementById('cb-counter');
+    if (ctr) {
+      if (data.chat_remaining === 9999) ctr.textContent = 'Accès illimité';
+      else if (typeof data.chat_remaining === 'number') ctr.textContent = data.chat_remaining + ' / 15 messages restants';
     }
 
     var reply = data.reply || '';
     _cbHistory.push({ role: 'assistant', content: reply });
     var modObjs = data.modifications && data.modifications.length ? data.modifications : (data.modification ? [data.modification] : null);
-    cbAddMsg('bot', reply.replace(/\n/g, '<br>'), modObjs);
+    cbAddMsg('bot', _cbMd(reply), modObjs);
   } catch(e) {
     cbHideTyping();
     cbAddMsg('bot', '\u274c ' + _escH(e.message || 'Erreur inattendue.'));
