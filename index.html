@@ -716,6 +716,170 @@ nav {
 .feat-title { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.5px; }
 .feat-text { color: var(--muted); font-size: 13px; line-height: 1.7; }
 
+/* ── PRICING ── */
+#pricing {
+  padding: 120px 24px;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  max-width: 1060px;
+  margin: 0 auto 48px;
+}
+
+.pricing-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.35s;
+  overflow: visible;
+}
+
+.pricing-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(61,107,255,0.3);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+}
+
+.pricing-card--featured {
+  border-color: rgba(200,169,75,0.45);
+  background: linear-gradient(160deg, rgba(200,169,75,0.06) 0%, var(--surface) 60%);
+}
+
+.plan-badge {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, var(--gold), #e8c96b);
+  color: #05070e;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 18px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.plan-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.plan-price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.price-amount {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 52px;
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: -2px;
+  line-height: 1;
+}
+
+.pricing-card--featured .price-amount { color: var(--gold); }
+
+.price-currency {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--muted);
+  align-self: flex-start;
+  margin-top: 10px;
+}
+
+.plan-period {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 28px;
+  letter-spacing: 0.02em;
+}
+
+.plan-features {
+  list-style: none;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  margin-bottom: 32px;
+}
+
+.plan-features li {
+  font-size: 13px;
+  color: rgba(230,234,246,0.75);
+  padding-left: 20px;
+  position: relative;
+  line-height: 1.4;
+}
+
+.plan-features li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--green);
+  font-weight: 700;
+  font-size: 11px;
+  top: 1px;
+}
+
+.btn-plan {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.25s;
+  margin-top: auto;
+}
+
+.btn-plan-gold {
+  background: linear-gradient(135deg, var(--gold) 0%, #e8c96b 100%);
+  color: #05070e;
+}
+
+.btn-plan-gold:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 32px rgba(200,169,75,0.35);
+}
+
+.btn-plan-outline {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-plan-outline:hover {
+  border-color: rgba(61,107,255,0.5);
+  color: var(--accent);
+}
+
+.pricing-note {
+  font-size: 12px;
+  color: var(--muted);
+}
+
 /* ── CTA ── */
 #cta {
   padding: 140px 48px; text-align: center;
@@ -770,6 +934,9 @@ footer {
   
   .feat-grid { grid-template-columns: 1fr; gap: 14px; }
   .feat-card { padding: 24px; }
+
+  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin-left: auto; margin-right: auto; }
+  .pricing-card--featured { order: -1; }
   
   .parties-row { grid-template-columns: 1fr; }
   
@@ -818,6 +985,7 @@ footer {
       <button id="lang-fr" onclick="setLang('fr')" style="padding:5px 11px;background:rgba(200,169,75,0.15);color:var(--amber);border:none;cursor:pointer;transition:all .2s">FR</button>
       <button id="lang-en" onclick="setLang('en')" style="padding:5px 11px;background:transparent;color:var(--muted);border:none;cursor:pointer;transition:all .2s">EN</button>
     </div>
+    <a href="#pricing" style="color:var(--muted);font-size:13px;font-weight:500;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'" data-fr="Tarifs" data-en="Pricing">Tarifs</a>
     <a href="app-v2.html" class="nav-cta" data-fr="Analyser un contrat →" data-en="Analyze a contract →">Analyser un contrat →</a>
   </div>
 </nav>
@@ -1431,6 +1599,73 @@ footer {
       <p class="feat-text" data-fr="La base de connaissances Westfield est continuellement enrichie par l'équipe d'avocats — nouvelles jurisprudences, évolutions législatives, standards de place — pour que les propositions restent toujours à jour." data-en="Westfield's knowledge base is continuously enriched by the legal team — new case law, legislative changes, market standards — so that suggestions always remain up to date.">La base de connaissances Westfield est continuellement enrichie par l'équipe d'avocats — nouvelles jurisprudences, évolutions législatives, standards de place — pour que les propositions restent toujours à jour.</p>
     </div>
   </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-tag reveal" data-fr="Tarifs" data-en="Pricing">Tarifs</div>
+  <h2 class="section-h2 reveal" data-fr="Investissement transparent,<br/><em style='color:var(--gold);font-style:normal;'>résultats mesurables</em>" data-en="Transparent pricing,<br/><em style='color:var(--gold);font-style:normal;'>measurable results</em>">Investissement transparent,<br/><em style="color:var(--gold);font-style:normal;">résultats mesurables</em></h2>
+  <p class="section-sub reveal" style="text-align:center;margin:0 auto 64px;" data-fr="Premier contrat analysé gratuitement — sans carte bancaire." data-en="First contract analyzed for free — no credit card required.">Premier contrat analysé gratuitement — sans carte bancaire.</p>
+
+  <div class="pricing-grid">
+    <!-- Découverte -->
+    <div class="pricing-card reveal">
+      <div class="plan-name" data-fr="Découverte" data-en="Discovery">Découverte</div>
+      <div class="plan-price-row">
+        <span class="price-currency" style="margin-top:10px;">MAD</span>
+        <span class="price-amount">0</span>
+      </div>
+      <div class="plan-period" data-fr="pour commencer" data-en="to get started">pour commencer</div>
+      <ul class="plan-features">
+        <li data-fr="1 contrat analysé" data-en="1 contract analyzed">1 contrat analysé</li>
+        <li data-fr="Détection des risques" data-en="Risk detection">Détection des risques</li>
+        <li data-fr="15 messages chatbot" data-en="15 chatbot messages">15 messages chatbot</li>
+        <li data-fr="Export DOCX inclus" data-en="DOCX export included">Export DOCX inclus</li>
+        <li data-fr="Sans inscription" data-en="No sign-up required">Sans inscription</li>
+      </ul>
+      <a href="app-v2.html" class="btn-plan btn-plan-outline" data-fr="Commencer gratuitement →" data-en="Start for free →">Commencer gratuitement →</a>
+    </div>
+
+    <!-- Professionnel -->
+    <div class="pricing-card pricing-card--featured reveal">
+      <div class="plan-badge" data-fr="Le plus populaire" data-en="Most popular">Le plus populaire</div>
+      <div class="plan-name" data-fr="Professionnel" data-en="Professional">Professionnel</div>
+      <div class="plan-price-row">
+        <span class="price-currency" style="margin-top:10px;">MAD</span>
+        <span class="price-amount">950</span>
+      </div>
+      <div class="plan-period" data-fr="/mois · accès illimité" data-en="/month · unlimited access">/mois · accès illimité</div>
+      <ul class="plan-features">
+        <li data-fr="Contrats illimités" data-en="Unlimited contracts">Contrats illimités</li>
+        <li data-fr="Base RAG juridique marocaine" data-en="Moroccan legal RAG base">Base RAG juridique marocaine</li>
+        <li data-fr="Chatbot contractuel illimité" data-en="Unlimited contract chatbot">Chatbot contractuel illimité</li>
+        <li data-fr="Workflow juriste → directeur" data-en="Lawyer → director workflow">Workflow juriste → directeur</li>
+        <li data-fr="Export DOCX track changes" data-en="DOCX track changes export">Export DOCX track changes</li>
+        <li data-fr="Analyse multi-juridictions" data-en="Multi-jurisdiction analysis">Analyse multi-juridictions</li>
+      </ul>
+      <a href="app-v2.html" class="btn-plan btn-plan-gold" data-fr="S'abonner maintenant →" data-en="Subscribe now →">S'abonner maintenant →</a>
+    </div>
+
+    <!-- Cabinet -->
+    <div class="pricing-card reveal">
+      <div class="plan-name" data-fr="Cabinet" data-en="Law Firm">Cabinet</div>
+      <div class="plan-price-row">
+        <span class="price-amount" style="font-size:32px;letter-spacing:-1px;" data-fr="Sur devis" data-en="Custom">Sur devis</span>
+      </div>
+      <div class="plan-period" data-fr="multi-utilisateurs" data-en="multi-user">multi-utilisateurs</div>
+      <ul class="plan-features">
+        <li data-fr="Équipe juristes + directeur" data-en="Lawyer team + director">Équipe juristes + directeur</li>
+        <li data-fr="Base RAG personnalisée cabinet" data-en="Custom firm RAG base">Base RAG personnalisée cabinet</li>
+        <li data-fr="Intégration SI &amp; processus" data-en="IS integration &amp; processes">Intégration SI &amp; processus</li>
+        <li data-fr="SLA &amp; support dédié" data-en="SLA &amp; dedicated support">SLA &amp; support dédié</li>
+        <li data-fr="Formation incluse" data-en="Training included">Formation incluse</li>
+        <li data-fr="Facturation entreprise" data-en="Enterprise billing">Facturation entreprise</li>
+      </ul>
+      <a href="mailto:contact@westfieldavocats.com" class="btn-plan btn-plan-outline" data-fr="Nous contacter →" data-en="Contact us →">Nous contacter →</a>
+    </div>
+  </div>
+
+  <p class="pricing-note reveal" data-fr="💳 Paiement sécurisé par CMI · Facturation mensuelle · Sans engagement" data-en="💳 Secure payment by CMI · Monthly billing · No commitment">💳 Paiement sécurisé par CMI · Facturation mensuelle · Sans engagement</p>
 </section>
 
 <!-- CTA -->
