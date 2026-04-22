@@ -1537,10 +1537,12 @@ async function checkRole(){
   if(!_cu)return;
   try{
     // Utilise la clé anon pour contourner la RLS utilisateur (même approche que loadJuristes)
-    var r=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=role,parent_email,is_admin,payment_status',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
+    var r=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=role,parent_email,is_admin,payment_status,chat_remaining',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
     if(r.ok){
       var d=await r.json();
-      if(d[0]){_userRole=d[0].role;_userParentEmail=d[0].parent_email;_isAdmin=!!d[0].is_admin;window._dirPayStatus=d[0].payment_status;}
+      if(d[0]){_userRole=d[0].role;_userParentEmail=d[0].parent_email;_isAdmin=!!d[0].is_admin;window._dirPayStatus=d[0].payment_status;
+        if(typeof d[0].chat_remaining==='number')window._chatRemaining=d[0].chat_remaining;
+      }
       else _userRole='directeur';
     } else {
       _userRole='directeur'; // fallback si fetch échoue
@@ -3105,6 +3107,7 @@ function cbToggle() {
     document.getElementById('cb-input').focus();
     if (!_cbWelcomed) { _cbWelcomed = true; cbWelcome(); }
     cbScrollBottom();
+    if(typeof window._chatRemaining==='number'&&window._chatRemaining<9999){var ctr=document.getElementById('cb-counter');if(ctr)ctr.textContent=window._chatRemaining+' / 15 messages restants';}
   } else {
     sb.classList.remove('cb-open');
     if (sh) sh.innerHTML = '&#8249;';
