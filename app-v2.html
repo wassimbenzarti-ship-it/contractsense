@@ -3043,6 +3043,7 @@ if (_appLang === 'en') appSetLang('en');
 }
 #cb-send:hover{background:#4a6be8;}
 #cb-send svg{width:15px;height:15px;fill:#fff;}
+#cb-counter{font-size:10px;color:#666;text-align:right;padding:2px 14px 5px;background:#111420;}
 
 @media(max-width:640px){
   #cb-sidebar{width:100vw;right:-100vw;}
@@ -3073,6 +3074,7 @@ if (_appLang === 'en') appSetLang('en');
 
   <div id="cb-msgs"></div>
 
+  <div id="cb-counter"></div>
   <div id="cb-footer">
     <textarea id="cb-input" placeholder="Posez une question ou demandez une modification…" rows="1" onkeydown="cbKey(event)" oninput="cbResize(this)"></textarea>
     <button id="cb-send" onclick="cbSend()" title="Envoyer">
@@ -3271,6 +3273,11 @@ async function cbSend() {
     var data = await r.json();
     cbHideTyping();
     if (!r.ok) throw new Error(data.error || 'Erreur serveur');
+
+    if (typeof data.chat_remaining === 'number' && data.chat_remaining < 9999) {
+      var ctr = document.getElementById('cb-counter');
+      if (ctr) ctr.textContent = data.chat_remaining + ' / 15 messages restants';
+    }
 
     var reply = data.reply || '';
     _cbHistory.push({ role: 'assistant', content: reply });
