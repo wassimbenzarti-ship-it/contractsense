@@ -2241,8 +2241,7 @@ async function analyzeManualClause(){
 async function dlUserAnalysis() {
   var ana = (window._userAnalyses||[])[window._anaIdx||0] || {};
   var mods = window._currentMods || [];
-  var det = document.getElementById('user-ana-detail');
-  var btn = det ? det.querySelector('button[onclick*="dlUserAnalysis"]') : null;
+  var btn = document.querySelector('button[onclick*="dlUserAnalysis"]');
   if(btn) { btn.textContent = 'Generation en cours...'; btn.disabled = true; }
   try {
     var fd = new FormData();
@@ -2268,7 +2267,7 @@ async function dlUserAnalysis() {
     realMods.forEach(function(m){ decs[String(m.id)] = 'accepted'; });
     fd.append('modifications', JSON.stringify(realMods));
     fd.append('decisions', JSON.stringify(decs));
-    var resp = await fetch('https://web-production-f96f7.up.railway.app/export', {method:'POST', body:fd});
+    var resp = await fetch(BACKEND+'/export', {method:'POST', body:fd});
     if(resp.ok) {
       var blob = await resp.blob();
       var url = URL.createObjectURL(blob);
