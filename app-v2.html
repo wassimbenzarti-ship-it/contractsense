@@ -3442,6 +3442,7 @@ async function cbExportTranslation(lang, btn) {
     document.body.removeChild(a);
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
     btn.textContent = '✅ Téléchargé';
+    setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 3500);
   } catch(e) {
     btn.textContent = '❌ ' + (e.message || 'Erreur');
     btn.disabled = false;
