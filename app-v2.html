@@ -233,6 +233,8 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
     <div id="d-review-juriste-bar"></div>
     <div style="margin-top:18px;padding-top:14px;border-top:1px solid #1f2537;display:flex;gap:8px;flex-wrap:wrap">
       <button onclick="exportDoc()" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger avec Track Changes</button>
+      <select id="d-trans-lang-sel" style="padding:9px 10px;background:#1a1d2e;border:1px solid #2a2d3e;border-radius:8px;color:#e0e6ff;font-size:12px;cursor:pointer;"><option value="en">🇬🇧 EN</option><option value="fr">🇫🇷 FR</option><option value="ar">🇲🇦 AR</option></select>
+      <button onclick="cbExportTranslation(document.getElementById('d-trans-lang-sel').value,this)" style="flex:1;padding:10px;background:linear-gradient(135deg,#c8a94b,#e8c96b);border:none;border-radius:9px;color:#05070e;font-weight:700;font-size:13px;cursor:pointer;">⬇ Traduction DOCX</button>
       <button onclick="dAnaReset()" style="padding:10px 14px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:12px;cursor:pointer">🔄 Nouvelle</button>
     </div>
   </div>
@@ -356,6 +358,14 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       <div style="font-size:16px;font-weight:700;margin-bottom:8px">Générer le document final</div>
       <div id="export-desc" style="color:#6b7280;font-size:13px;margin-bottom:20px;line-height:1.6"></div>
       <button class="btn-export" id="btn-export"> Télécharger avec Track Changes</button>
+      <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;">
+        <select id="trans-lang-sel" style="padding:10px 14px;background:#1a1d2e;border:1px solid #2a2d3e;border-radius:8px;color:#e0e6ff;font-size:13px;cursor:pointer;">
+          <option value="en">🇬🇧 English</option>
+          <option value="fr">🇫🇷 Français</option>
+          <option value="ar">🇲🇦 العربية</option>
+        </select>
+        <button onclick="cbExportTranslation(document.getElementById('trans-lang-sel').value,this)" style="padding:13px 22px;background:linear-gradient(135deg,#c8a94b,#e8c96b);border:none;border-radius:10px;color:#05070e;font-size:14px;font-weight:700;cursor:pointer;">⬇ Traduction DOCX</button>
+      </div>
       <button class="btn-new" id="btn-new">🔄 Analyser un autre contrat</button>
     </div>
   </div>
