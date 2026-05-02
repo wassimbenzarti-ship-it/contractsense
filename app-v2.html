@@ -3413,14 +3413,24 @@ async function cbExportTranslation(lang, btn) {
     var r = await fetch(BACKEND + '/export-translation', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({contract_text: contractTxt, target_lang: lang, filename: fname})
+      body: JSON.stringify({
+        contract_text: contractTxt,
+        target_lang:   lang,
+        filename:      fname,
+        modifications: modifications || [],
+        decisions:     decisions || {}
+      })
     });
     if (!r.ok) { var e = await r.json(); throw new Error(e.error || 'Erreur ' + r.status); }
     var blob = await r.blob();
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
-    a.href = url; a.download = fname + '_translation_' + lang + '.docx'; a.click();
-    URL.revokeObjectURL(url);
+    a.href = url;
+    a.download = fname + '_translation_' + lang + '.docx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
     btn.textContent = '✅ Téléchargé';
   } catch(e) {
     btn.textContent = '❌ ' + (e.message || 'Erreur');
