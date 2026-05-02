@@ -759,7 +759,7 @@ async function analyzeWithPartie(partieName) {
   } catch(e) {
     hide('step-loading');
     show('step-form');
-    showErr('form-error', '✅ ' + (e.message || 'Erreur inattendue.'));
+    showErr('form-error', '❌ ' + (e.message || 'Erreur inattendue.'));
   }
 }
 
