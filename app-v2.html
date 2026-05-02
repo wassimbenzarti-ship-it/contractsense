@@ -3145,7 +3145,21 @@ async function cbSend() {
     var reply = data.reply || '';
     _cbHistory.push({ role: 'assistant', content: reply });
     var modObjs = data.modifications && data.modifications.length ? data.modifications : (data.modification ? [data.modification] : null);
-    cbAddMsg('bot', reply.replace(/\n/g, '<br>'), modObjs);
+
+    // Detect [EXPORT_TRANSLATION:xx] marker — strip it and show download button
+    var _trMatch = reply.match(/\[EXPORT_TRANSLATION:([a-z]{2})\]/);
+    var _displayReply = reply.replace(/\[EXPORT_TRANSLATION:[a-z]{2}\]/g, '').trim();
+    var _trBtn = '';
+    if (_trMatch) {
+      var _tl = _trMatch[1];
+      var _tlLabel = {en:'anglais',fr:'français',ar:'arabe'}[_tl] || _tl;
+      _trBtn = '<div style="margin-top:12px;">'
+        + '<button onclick="cbExportTranslation(\'' + _tl + '\',this)" '
+        + 'style="background:linear-gradient(135deg,#c8a94b,#e8c96b);color:#05070e;border:none;'
+        + 'border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;">'
+        + '⬇ Télécharger la traduction Word (' + _tlLabel + ')</button></div>';
+    }
+    cbAddMsg('bot', _displayReply.replace(/\n/g, '<br>') + _trBtn, modObjs);
   } catch(e) {
     cbHideTyping();
     cbAddMsg('bot', '\u274c ' + _escH(e.message || 'Erreur inattendue.'));
@@ -3197,6 +3211,34 @@ async function cbSend() {
     }
   };
 })();
+
+async function cbExportTranslation(lang, btn) {
+  btn.disabled = true;
+  var orig = btn.textContent;
+  btn.textContent = '⏳ Traduction en cours…';
+  try {
+    var contractTxt = savedText || '';
+    if (!contractTxt) { btn.textContent = '❌ Contrat non disponible'; btn.disabled = false; return; }
+    var fname = (typeof curFile !== 'undefined' && curFile && curFile.name)
+      ? curFile.name.replace(/\.[^.]+$/, '') : 'contrat';
+    var r = await fetch(BACKEND + '/export-translation', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({contract_text: contractTxt, target_lang: lang, filename: fname})
+    });
+    if (!r.ok) { var e = await r.json(); throw new Error(e.error || 'Erreur ' + r.status); }
+    var blob = await r.blob();
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = fname + '_translation_' + lang + '.docx'; a.click();
+    URL.revokeObjectURL(url);
+    btn.textContent = '✅ Téléchargé';
+  } catch(e) {
+    btn.textContent = '❌ ' + (e.message || 'Erreur');
+    btn.disabled = false;
+    setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 3000);
+  }
+}
 </script>
 </body>
 </html>
