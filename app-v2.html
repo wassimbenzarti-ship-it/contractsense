@@ -1306,7 +1306,10 @@ async function exportDoc() {
     var blob = await resp.blob();
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'contrat-track-changes.docx';
+    var _ptie = (window.selectedPartie || 'Contrat').replace(/[\/\\:*?"<>|]/g, '').trim();
+    var _nd = new Date();
+    var _dt = String(_nd.getDate()).padStart(2,'0') + '-' + String(_nd.getMonth()+1).padStart(2,'0') + '-' + _nd.getFullYear();
+    a.download = (_ptie || 'Contrat') + '------' + _dt + '.docx';
     a.click();
     btn.textContent = ' ✅ Téléchargé !';
     btn.style.background = '#10b981';
