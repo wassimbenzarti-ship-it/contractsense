@@ -3422,10 +3422,35 @@ async function cbSend() {
 async function cbExportTranslation(lang, btn) {
   btn.disabled = true;
   var orig = btn.textContent;
-  btn.textContent = '⏳ Traduction en cours…';
+  var _tMsgs = [
+    '🔄 Lecture du contrat…',
+    '🤖 Traduction IA en cours…',
+    '📝 Application des modifications…',
+    '🌐 Vérification terminologique…',
+    '📄 Génération du document Word…',
+    '⚙️ Mise en forme finale…'
+  ];
+  var _tIdx = 0;
+  var _tSecs = 0;
+  var _tTimer = setInterval(function() {
+    _tSecs++;
+    var mins = Math.floor(_tSecs / 60);
+    var secs = _tSecs % 60;
+    var clock = mins > 0
+      ? mins + ':' + String(secs).padStart(2, '0')
+      : secs + 's';
+    if (_tSecs % 7 === 0) { _tIdx = (_tIdx + 1) % _tMsgs.length; }
+    btn.textContent = _tMsgs[_tIdx] + '  ' + clock;
+  }, 1000);
+  btn.textContent = _tMsgs[0] + '  0s';
   try {
     var contractTxt = savedText || '';
-    if (!contractTxt) { btn.textContent = '❌ Contrat non disponible'; btn.disabled = false; return; }
+    if (!contractTxt) {
+      clearInterval(_tTimer);
+      btn.textContent = '❌ Contrat non disponible';
+      btn.disabled = false;
+      return;
+    }
     var fname = (typeof curFile !== 'undefined' && curFile && curFile.name)
       ? curFile.name.replace(/\.[^.]+$/, '') : 'contrat';
     var r = await fetch(BACKEND + '/export-translation', {
@@ -3439,6 +3464,7 @@ async function cbExportTranslation(lang, btn) {
         decisions:     decisions || {}
       })
     });
+    clearInterval(_tTimer);
     if (!r.ok) { var e = await r.json(); throw new Error(e.error || 'Erreur ' + r.status); }
     var blob = await r.blob();
     var url = URL.createObjectURL(blob);
@@ -3449,9 +3475,12 @@ async function cbExportTranslation(lang, btn) {
     a.click();
     document.body.removeChild(a);
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
-    btn.textContent = '✅ Téléchargé';
+    btn.textContent = '✅ Téléchargé en ' + (_tSecs >= 60
+      ? Math.floor(_tSecs/60) + 'min' + (_tSecs%60 ? _tSecs%60 + 's' : '')
+      : _tSecs + 's');
     setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 3500);
   } catch(e) {
+    clearInterval(_tTimer);
     btn.textContent = '❌ ' + (e.message || 'Erreur');
     btn.disabled = false;
     setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 3000);
