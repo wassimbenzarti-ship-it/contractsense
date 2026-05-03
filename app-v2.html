@@ -2286,7 +2286,10 @@ async function dlUserAnalysis() {
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
-      a.download = (ana.filename||'contrat').replace(/.[^.]+$/, '') + '-modifie.docx';
+      var _ptie2 = (ana.partie || window.selectedPartie || 'Contrat').replace(/[\/\\:*?"<>|]/g, '').trim();
+      var _nd2 = new Date();
+      var _dt2 = String(_nd2.getDate()).padStart(2,'0') + '-' + String(_nd2.getMonth()+1).padStart(2,'0') + '-' + _nd2.getFullYear();
+      a.download = (_ptie2 || 'Contrat') + '------' + _dt2 + '.docx';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       URL.revokeObjectURL(url);
       if(btn) {
