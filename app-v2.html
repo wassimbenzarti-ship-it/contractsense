@@ -1497,6 +1497,7 @@ async function dAnaAnalyze(partie) {
 
     var fd = new FormData();
     fd.append('file', curFile); fd.append('partie', partie); fd.append('lang','auto');
+    fd.append('interface_lang', _appLang || 'fr');
     fd.append('type', savedType || document.getElementById('d-contract-type').value);
     if (_cu && _cu.email) fd.append('user_email', _cu.email);
 
