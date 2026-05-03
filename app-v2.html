@@ -547,6 +547,7 @@ function rl(r) { return r === 'high' ? 'Risque élevé' : r === 'medium' ? 'Risq
 function buildFormData() {
   var fd = new FormData();
   fd.append('lang', 'auto');
+  fd.append('interface_lang', _appLang || 'fr');
   fd.append('type', document.getElementById('type').value);
   if (_cu && _cu.email) fd.append('user_email', _cu.email);
   if (curMode === 'upload' && curFile) {
