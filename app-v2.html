@@ -1,10 +1,7 @@
 <!DOCTYPE html>
-<!-- v20260414-coalition -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-3JST2SHQ13"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-3JST2SHQ13');</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
 <meta http-equiv="Pragma" content="no-cache"/>
@@ -14,7 +11,6 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #0a0c12; color: #e2e5f0; font-family: system-ui, sans-serif; min-height: 100vh; }
 @keyframes spin { to { transform: rotate(360deg); } }
-@keyframes omniPulse { 0%,100%{transform:scale(1);filter:drop-shadow(0 0 8px rgba(91,124,250,0.5));} 50%{transform:scale(1.08);filter:drop-shadow(0 0 18px rgba(91,124,250,0.85));} }
 @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 .fadein { animation: fadeIn 0.35s ease; }
 .wrap { max-width: 820px; margin: 0 auto; padding: 36px 20px 80px; }
@@ -49,10 +45,8 @@ select { appearance: none; }
 h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.05; margin-bottom: 10px; }
 .accent { background: linear-gradient(135deg, #5b7cfa, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .desc { color: #6b7280; font-size: 14px; line-height: 1.65; max-width: 420px; margin-bottom: 28px; }
-.partie-btn { text-align: left; padding: 18px 20px; background: #111420; border: 1px solid #1f2537; border-radius: 13px; color: #e2e5f0; cursor: pointer; transition: all 0.2s; width: 100%; margin-bottom: 10px; position:relative; }
+.partie-btn { text-align: left; padding: 18px 20px; background: #111420; border: 1px solid #1f2537; border-radius: 13px; color: #e2e5f0; cursor: pointer; transition: all 0.2s; width: 100%; margin-bottom: 10px; }
 .partie-btn:hover { border-color: #5b7cfa; background: rgba(91,124,250,0.08); }
-.partie-btn.selected { border-color: #5b7cfa !important; background: rgba(91,124,250,0.18) !important; box-shadow: 0 0 0 2px rgba(91,124,250,0.35); }
-.partie-btn.selected::after { content: '✓'; position:absolute; top:12px; right:16px; color:#5b7cfa; font-size:18px; font-weight:900; }
 .partie-btn .name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
 .partie-btn .desc2 { color: #6b7280; font-size: 13px; }
 .mod-card { background: #111420; border: 1px solid #1f2537; border-radius: 14px; margin-bottom: 16px; overflow: hidden; }
@@ -116,6 +110,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 .mz{border:2px dashed #1f2537;border-radius:10px;padding:20px;text-align:center;cursor:pointer;margin-bottom:14px;color:#6b7280;display:block;font-size:13px}
 .mz:hover{border-color:#5b7cfa;color:#5b7cfa}
 .dclose{position:fixed;top:18px;right:18px;background:#1a2035;border:1px solid #1f2537;border-radius:8px;padding:8px 16px;color:#e2e5f0;cursor:pointer;font-size:13px}
+
 .ana-detail{background:#0f1320;border:1px solid #1f2537;border-radius:12px;padding:20px;margin-top:16px;display:none}
 .ana-detail.show{display:block}
 .mod-user-card{background:#181c2a;border:1px solid #1f2537;border-radius:8px;padding:12px;margin-bottom:10px}
@@ -164,7 +159,6 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <div class="dtb" onclick="dtab('models')">Modeles</div>
 <div class="dtb" id="dtb-juristes" onclick="dtab('juristes')" style="display:none">Equipe</div>
 <div class="dtb" id="dtb-abonnement" onclick="dtab('abonnement')" style="display:none">💳 Abonnement</div>
-<div class="dtb" id="dtb-nouvelle" onclick="dtab('nouvelle')">➕ Analyse</div>
 </div>
 <div id="d-analyses" class="ds active">
 <div id="juriste-filter-bar" style="display:none;margin-bottom:10px">
@@ -187,58 +181,6 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <div id="abonnement-content"><div style="color:#6b7280;font-size:13px">Chargement...</div></div>
 </div>
 </div>
-<div id="d-nouvelle" class="ds">
-  <div id="d-ana-form">
-    <div style="font-size:15px;font-weight:700;color:#e2e5f0;margin-bottom:14px">Nouvelle analyse</div>
-    <div id="d-drop-area" onclick="document.getElementById('d-file-input').click()" style="cursor:pointer;border:2px dashed #1f2537;border-radius:12px;padding:22px;text-align:center;margin-bottom:10px" onmouseover="this.style.borderColor='#5b7cfa'" onmouseout="this.style.borderColor='#1f2537'">
-      <div style="font-size:22px;margin-bottom:5px">📤</div>
-      <div style="font-weight:600;font-size:13px;margin-bottom:3px">Déposez votre contrat ou cliquez</div>
-      <div style="color:#6b7280;font-size:11px">PDF · DOCX · TXT</div>
-    </div>
-    <input type="file" id="d-file-input" accept=".pdf,.docx,.txt,.doc" style="display:none" onchange="dAnaOnFile(this)"/>
-    <div id="d-file-ok" style="display:none;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:8px 12px;font-size:12px;color:#10b981;margin-bottom:10px">✅ <span id="d-file-name"></span></div>
-    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
-      <label style="font-size:11px;color:#6b7280;white-space:nowrap">Type :</label>
-      <select id="d-contract-type" style="flex:1;background:#1a2035;border:1px solid #1f2537;border-radius:7px;padding:6px 10px;color:#e2e5f0;font-size:12px">
-        <option value="generic">Générique</option><option value="nda">NDA</option><option value="saas">SaaS</option>
-        <option value="purchase">Achat/Vente</option><option value="contrat de travail CDI">CDI</option>
-        <option value="contrat de travail CDD">CDD</option><option value="employment">RH / Autre</option>
-        <option value="partnership">Partenariat</option>
-      </select>
-    </div>
-    <button onclick="dAnaStart()" style="width:100%;padding:11px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:14px;cursor:pointer">Analyser →</button>
-    <div id="d-ana-error" style="display:none;color:#ef4444;font-size:12px;margin-top:8px;padding:8px 12px;background:rgba(239,68,68,0.08);border-radius:7px"></div>
-  </div>
-  <div id="d-ana-loading" style="display:none;text-align:center;padding:32px 0">
-    <img src="/westfield-ghost.png" style="width:56px;height:56px;object-fit:contain;border-radius:12px;animation:omniPulse 1.8s ease-in-out infinite;margin:0 auto 12px;display:block;" alt="Analyse en cours">
-    <div id="d-ana-status" style="font-size:13px;color:#6b7280;margin-bottom:10px">Analyse en cours...</div>
-    <div id="d-ana-live" style="display:none;margin:0 auto;max-width:320px;background:rgba(91,124,250,0.07);border:1px solid rgba(91,124,250,0.18);border-radius:9px;padding:10px 14px;font-size:12px;color:#8b9ac8;line-height:1.7;text-align:left">
-      <div id="d-ana-live-msg" style="color:#a5b4fc;font-weight:600;margin-bottom:4px"></div>
-      <div id="d-ana-live-log" style="color:#6b7280;font-size:11px;max-height:80px;overflow:hidden"></div>
-    </div>
-  </div>
-  <div id="d-ana-parties" style="display:none">
-    <div style="font-size:14px;font-weight:700;margin-bottom:5px">Quelle partie représentez-vous ?</div>
-    <div style="font-size:12px;color:#6b7280;margin-bottom:14px">L'IA adaptera ses modifications pour protéger vos intérêts.</div>
-    <div id="d-parties-list"></div>
-    <button onclick="dAnaReset()" style="display:block;margin:12px auto 0;padding:7px 18px;background:none;border:1px solid #1f2537;border-radius:8px;color:#6b7280;font-size:12px;cursor:pointer">← Retour</button>
-  </div>
-  <div id="d-ana-review" style="display:none">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:6px">
-      <div style="font-size:14px;font-weight:700">Révision du contrat</div>
-      <div id="d-review-stats"></div>
-    </div>
-    <div id="d-mods-list"></div>
-    <div id="d-compliance-section"></div>
-    <div id="d-review-juriste-bar"></div>
-    <div style="margin-top:18px;padding-top:14px;border-top:1px solid #1f2537;display:flex;gap:8px;flex-wrap:wrap">
-      <button onclick="exportDoc()" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger avec Track Changes</button>
-      <select id="d-trans-lang-sel" style="padding:9px 10px;background:#1a1d2e;border:1px solid #2a2d3e;border-radius:8px;color:#e0e6ff;font-size:12px;cursor:pointer;"><option value="en">🇬🇧 EN</option><option value="fr">🇫🇷 FR</option><option value="ar">🇲🇦 AR</option></select>
-      <button onclick="cbExportTranslation(document.getElementById('d-trans-lang-sel').value,this)" style="flex:1;padding:10px;background:linear-gradient(135deg,#c8a94b,#e8c96b);border:none;border-radius:9px;color:#05070e;font-weight:700;font-size:13px;cursor:pointer;">⬇ Traduction DOCX</button>
-      <button onclick="dAnaReset()" style="padding:10px 14px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:12px;cursor:pointer">🔄 Nouvelle</button>
-    </div>
-  </div>
-</div>
 </div>
 <div id="ubar">
 <span id="ueml"></span>
@@ -249,20 +191,12 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 </head>
 <body>
 <div class="wrap">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0">
-    <div class="logo">
-      <img src="/westfield-ghost.png" style="height:44px;width:auto;display:block;border-radius:8px;" alt="Omniscient">
-      <span style="color:#ffffff">Omniscient</span></div>
-    <div style="display:flex;border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;font-size:11px;font-weight:700">
-      <button id="app-lang-fr" onclick="appSetLang('fr')" style="padding:4px 10px;background:rgba(200,169,75,0.15);color:#c8a94b;border:none;cursor:pointer">FR</button>
-      <button id="app-lang-en" onclick="appSetLang('en')" style="padding:4px 10px;background:transparent;color:#6b7280;border:none;cursor:pointer">EN</button>
-    </div>
-  </div>
+  <div class="logo"><div class="dot"></div>Omniscient</div>
 
   <!-- STEP 2: Upload form -->
   <div id="step-form">
-    <h1 class="fadein" id="app-hero-h1">Révisez vos contrats<br/><span class="accent">avec l'IA.</span></h1>
-    <p class="desc" id="app-hero-sub">Uploadez votre contrat. L'IA identifie les parties, vous choisissez laquelle protéger, puis propose des modifications avec Track Changes.</p>
+    <h1 class="fadein">Révisez vos contrats<br/><span class="accent">avec l'IA.</span></h1>
+    <p class="desc">Uploadez votre contrat. L'IA identifie les parties, vous choisissez laquelle protéger, puis propose des modifications avec Track Changes.</p>
 
     <div class="tabs">
       <button class="tab active" id="tab-upload">📤 Uploader</button>
@@ -272,8 +206,8 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
     <div id="upload-zone">
       <div class="drop" id="drop-area">
         <div style="font-size:30px;margin-bottom:10px">📤</div>
-        <div id="drop-title" style="font-weight:700;font-size:15px;margin-bottom:5px">Déposez votre contrat ici</div>
-        <div id="drop-sub" style="color:#6b7280;font-size:13px">ou cliquez pour sélectionner</div>
+        <div style="font-weight:700;font-size:15px;margin-bottom:5px">Déposez votre contrat ici</div>
+        <div style="color:#6b7280;font-size:13px">ou cliquez pour sélectionner</div>
         <div class="tags"><span class="tag">PDF</span><span class="tag">DOCX</span><span class="tag">TXT</span></div>
       </div>
       <input type="file" id="file-input" accept=".pdf,.docx,.txt,.doc" style="display:none"/>
@@ -296,9 +230,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
           <option value="nda">NDA</option>
           <option value="saas">SaaS</option>
           <option value="purchase">Achat/Vente</option>
-          <option value="contrat de travail CDI">CDI</option>
-          <option value="contrat de travail CDD">CDD</option>
-          <option value="employment">RH / Autre</option>
+          <option value="employment">RH</option>
           <option value="partnership">Partenariat</option>
         </select>
       </div>
@@ -330,12 +262,12 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 
   <!-- STEP 3: Loading -->
   <div id="step-loading" style="display:none" class="loading">
-    <img src="/westfield-ghost.png" style="width:72px;height:72px;object-fit:contain;border-radius:16px;animation:omniPulse 1.8s ease-in-out infinite;" alt="Analyse en cours">
-    <!-- Hidden step labels kept for JS null-checks (stepDone) -->
-    <span id="s0" style="display:none"></span><span id="s1" style="display:none"></span><span id="s2" style="display:none"></span><span id="s3" style="display:none"></span>
-    <div id="s-live" style="width:100%;max-width:340px;min-height:44px;background:rgba(91,124,250,0.07);border:1px solid rgba(91,124,250,0.18);border-radius:9px;padding:10px 14px;font-size:12px;color:#8b9ac8;line-height:1.7;display:none">
-      <div id="s-live-msg" style="color:#a5b4fc;font-weight:600;margin-bottom:4px"></div>
-      <div id="s-live-log" style="color:#6b7280;font-size:11px;max-height:80px;overflow:hidden"></div>
+    <div class="spinner"></div>
+    <div class="steps">
+      <div class="step" id="s0">⏳ Lecture du document...</div>
+      <div class="step" id="s1">⏳ Identification des parties...</div>
+      <div class="step" id="s2">⏳ Analyse des risques...</div>
+      <div class="step" id="s3">⏳ Rédaction des modifications...</div>
     </div>
   </div>
 
@@ -358,14 +290,6 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       <div style="font-size:16px;font-weight:700;margin-bottom:8px">Générer le document final</div>
       <div id="export-desc" style="color:#6b7280;font-size:13px;margin-bottom:20px;line-height:1.6"></div>
       <button class="btn-export" id="btn-export"> Télécharger avec Track Changes</button>
-      <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;">
-        <select id="trans-lang-sel" style="padding:10px 14px;background:#1a1d2e;border:1px solid #2a2d3e;border-radius:8px;color:#e0e6ff;font-size:13px;cursor:pointer;">
-          <option value="en">🇬🇧 English</option>
-          <option value="fr">🇫🇷 Français</option>
-          <option value="ar">🇲🇦 العربية</option>
-        </select>
-        <button onclick="cbExportTranslation(document.getElementById('trans-lang-sel').value,this)" style="padding:13px 22px;background:linear-gradient(135deg,#c8a94b,#e8c96b);border:none;border-radius:10px;color:#05070e;font-size:14px;font-weight:700;cursor:pointer;">⬇ Traduction DOCX</button>
-      </div>
       <button class="btn-new" id="btn-new">🔄 Analyser un autre contrat</button>
     </div>
   </div>
@@ -547,7 +471,6 @@ function rl(r) { return r === 'high' ? 'Risque élevé' : r === 'medium' ? 'Risq
 function buildFormData() {
   var fd = new FormData();
   fd.append('lang', 'auto');
-  fd.append('interface_lang', _appLang || 'fr');
   fd.append('type', document.getElementById('type').value);
   if (_cu && _cu.email) fd.append('user_email', _cu.email);
   if (curMode === 'upload' && curFile) {
@@ -623,140 +546,64 @@ async function analyze() {
   try {
     var fd2 = buildFormData();
     var resp = await fetch(BACKEND + '/identify-parties', { method: 'POST', body: fd2 });
-    if (!resp.ok) {
-      var errData = {};
-      try { errData = await resp.json(); } catch(_) {}
-      throw new Error(errData.error || ('Erreur serveur (' + resp.status + ')'));
-    }
     var data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Erreur serveur');
 
     hide('step-loading');
     renderParties(data.parties || []);
   } catch(e) {
     hide('step-loading');
     show('step-form');
-    showErr('form-error', '&#10060; ' + (e.message || 'Erreur inattendue.'));
+    showErr('form-error', '✅ ' + (e.message || 'Erreur inattendue.'));
   }
 }
 
-// ─── Shared party-selection UI builder ───────────────────────────────────────
-// onConfirm(partieLabel) is called when the user clicks the confirm button.
-// All coalition logic lives here once; both flows call this.
-function _buildPartiesUI(listEl, parties, onConfirm) {
-  listEl.innerHTML = '';
-  var arr = parties.length ? parties : [{name:'Analyser (générique)', party_label:'Partie', description:''}];
-  var selected = [];
-
-  // Hint
-  var hint = document.createElement('p');
-  hint.style.cssText = 'font-size:12px;color:#6b7280;margin:0 0 14px;text-align:center;line-height:1.6';
-  hint.innerHTML = 'Cliquez sur <strong style="color:#e2e5f0">1 partie</strong> pour la défendre seule &nbsp;·&nbsp; ou sélectionnez <strong style="color:#e2e5f0">2 parties</strong> pour former une coalition';
-  listEl.appendChild(hint);
-
-  // Confirm button
-  var confirmBtn = document.createElement('button');
-  confirmBtn.style.cssText = 'display:none;width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:opacity 0.2s';
-  confirmBtn.onclick = function() { if (selected.length) onConfirm(selected.join(' et ')); };
-
-  function updateConfirm() {
-    if (!selected.length) {
-      confirmBtn.style.display = 'none';
-    } else if (selected.length === 1) {
-      confirmBtn.style.display = 'block';
-      confirmBtn.textContent = 'Défendre ' + selected[0] + ' →';
-    } else {
-      confirmBtn.style.display = 'block';
-      confirmBtn.textContent = 'Défendre la coalition : ' + selected.join(' + ') + ' →';
-    }
-  }
-
-  arr.forEach(function(p) {
-    var label = p.party_label || p.description || p.name || p;
-    var btn = document.createElement('button');
-    btn.className = 'partie-btn';
-    btn.innerHTML =
-      '<div class="name">'  + _escH(p.name || p) + '</div>' +
-      (p.description ? '<div class="desc2">' + _escH(p.description) + '</div>' : '') +
-      (p.party_label ? '<div style="margin-top:4px;font-size:11px;color:#5b7cfa;font-weight:600">' + _escH(p.party_label) + '</div>' : '');
-    btn.onclick = function() {
-      var idx = selected.indexOf(label);
-      if (idx === -1) { selected.push(label);   btn.classList.add('selected'); }
-      else            { selected.splice(idx, 1); btn.classList.remove('selected'); }
-      updateConfirm();
-    };
-    listEl.appendChild(btn);
-  });
-
-  listEl.appendChild(confirmBtn);
-}
-
-//  Step 2: Show parties (home flow)
+//  Step 2: Show parties 
 function renderParties(parties) {
   var list = document.getElementById('parties-list');
-  _buildPartiesUI(list, parties, analyzeWithPartie);
+  list.innerHTML = '';
+  parties.forEach(function(p) {
+    var btn = document.createElement('button');
+    btn.className = 'partie-btn';
+    // Show name + generic role
+    var roleLabel = p.party_label || p.description || p.role || '';
+    btn.innerHTML = 
+      '<div class="name">' + p.name + '</div>' +
+      '<div class="desc2">' + p.description + '</div>' +
+      (roleLabel ? '<div style="margin-top:4px;font-size:11px;color:#5b7cfa;font-weight:600">' + roleLabel + '</div>' : '');
+    // Pass party_label (generic role) not company name
+    btn.addEventListener('click', function() { analyzeWithPartie(p.party_label || p.description || p.name); });
+    list.appendChild(btn);
+  });
   show('step-parties');
 }
 
-//  Step 3: Analyze with selected partie
+//  Step 3: Analyze with selected partie 
 async function analyzeWithPartie(partieName) {
   selectedPartie = partieName;
   hide('step-parties');
   showFlex('step-loading');
   stepDone(2);
+  setTimeout(function() { stepDone(3); }, 1400);
 
   // Ensure session is restored before sending user_email
   if (!_cu) await chkSess();
 
   try {
-    // Show live status box immediately so jurisdiction message is visible
-    var sLive = document.getElementById('s-live');
-    var sLiveMsg = document.getElementById('s-live-msg');
-    var sLiveLog = document.getElementById('s-live-log');
-    if (sLive) { sLive.style.display = 'block'; }
-    if (sLiveLog) { sLiveLog.innerHTML = ''; }
-    if (sLiveMsg) sLiveMsg.textContent = '🔍 Détection du droit applicable...';
-
-    // Quick jurisdiction detection before full analysis
-    var fdJ = new FormData();
-    if(curFile) fdJ.append('file', curFile);
-    if(curFile) fdJ.append('title', curFile.name||'');
-    var jurR = await fetch(BACKEND+'/detect-jurisdiction',{method:'POST',body:fdJ});
-    var jurD = jurR.ok?await jurR.json():{jurisdiction:'universel'};
-    var jur = jurD.jurisdiction||'universel';
-    var jLabel = (_JUR_LABELS||{})[jur]||jur;
-    if (sLiveMsg) { sLiveMsg.textContent = '⚖️ Analyse en ' + jLabel + '...'; if (sLiveLog) sLiveLog.innerHTML = '<div>' + _escH('⚖️ Analyse en ' + jLabel + '...') + '</div>' + sLiveLog.innerHTML; }
-
     var fd = buildFormData();
     fd.append('partie', partieName);
 
-    // Progress animation (cycling messages while waiting for /analyze)
-    var _pMsgs = ['📚 Consultation de la base légale...', '🤖 Analyse IA en cours...', '🔍 Analyse des clauses contractuelles...', '⚖️ Application du droit applicable...', '✍️ Génération des modifications...', '🔍 Analyse de la clause de résiliation...', '⚖️ Vérification des responsabilités...', '📋 Finalisation du rapport...'];
-    var _pIdx = 0;
-    function _showP(msg) { if (sLiveMsg) sLiveMsg.textContent = msg; if (sLiveLog) sLiveLog.innerHTML = '<div>' + _escH(msg) + '</div>' + sLiveLog.innerHTML; }
-    _showP(_pMsgs[0]);
-    var _pTimer = setInterval(function() { _pIdx = (_pIdx + 1) % _pMsgs.length; _showP(_pMsgs[_pIdx]); }, 3500);
-
     var resp = await fetch(BACKEND + '/analyze', { method: 'POST', body: fd });
-    clearInterval(_pTimer);
-    if (!resp.ok) {
-      var errData = {};
-      try { errData = await resp.json(); } catch(_) {}
-      throw new Error(errData.error || ('Erreur serveur (' + resp.status + ')'));
-    }
-    if (sLiveMsg) sLiveMsg.textContent = '✅ Résultats prêts...';
     var data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Erreur serveur');
 
     modifications = data.modifications || [];
-    window._compliance = data.compliance || [];
-    window._jurisdiction = data._jurisdiction || 'universel';
     decisions = {};
     modifications.forEach(function(m) { decisions[m.id] = 'pending'; });
-    if (data.file_storage_path) window._fileStoragePath = data.file_storage_path;
-    if (data.file_cache_id) window._fileCacheId = data.file_cache_id;
 
     // Extraire toutes les clauses du contrat pour le dropdown "ajouter une clause"
     // Utiliser savedText (mode texte) ou lire le fichier uploadé (mode fichier)
-    var contractText = savedText || data.contract_text || data.text || data.document_text || '';
+    var contractText = savedText || data.text || data.document_text || '';
     if(!contractText && curFile) contractText = await _readFileText(curFile);
     if(contractText && !savedText) savedText = contractText; // cache pour saveAna
     window._allContractClauses = _extractContractClauses(contractText);
@@ -847,55 +694,14 @@ function updateStats() {
   var a = Object.values(decisions).filter(function(d){return d==='accepted';}).length;
   var r = Object.values(decisions).filter(function(d){return d==='rejected';}).length;
   var p = Object.values(decisions).filter(function(d){return d==='pending';}).length;
-  var _sh = '<span class="stat stat-pending">' + p + ' en attente</span><span class="stat stat-accepted">' + a + ' acceptées</span><span class="stat stat-rejected">' + r + ' refusées</span>';
-  var _s1=document.getElementById('review-stats'); if(_s1)_s1.innerHTML=_sh;
-  var _s2=document.getElementById('d-review-stats'); if(_s2)_s2.innerHTML=_sh;
-}
-
-function renderCompliance() {
-  var _compId = _dashAnalysis ? 'd-compliance-section' : 'compliance-section';
-  var _modsId = _dashAnalysis ? 'd-mods-list' : 'mods-list';
-  var container = document.getElementById(_compId);
-  if (!container) {
-    container = document.createElement('div');
-    container.id = _compId;
-    var modsList = document.getElementById(_modsId);
-    if(modsList) modsList.parentNode.insertBefore(container, modsList.nextSibling);
-  }
-  var items = window._compliance || [];
-  if (!items.length) {
-    container.innerHTML = '';
-    return;
-  }
-  var sevColor = { high: '#ef4444', medium: '#f59e0b', low: '#10b981' };
-  var sevLabel = { high: 'Critique', medium: 'Modéré', low: 'Faible' };
-  var typeLabel = { loi: 'LOI', doctrine: 'DOCTRINE', jurisprudence: 'JURISPRUDENCE' };
-  var _jurLabels={'droit_marocain':'🇲🇦 Droit marocain','droit_francais':'🇫🇷 Droit français','droit_anglais':'🇬🇧 English law','droit_tunisien':'🇹🇳 Droit tunisien','droit_algerien':'🇩🇿 Droit algérien','droit_belge':'🇧🇪 Droit belge','universel':'🌐 Droit universel'};
-  var _jurLabel=_jurLabels[window._jurisdiction||'universel']||('🌐 '+(window._jurisdiction||'universel'));
-  var html = '<div style="margin-top:24px;margin-bottom:8px;font-size:17px;font-weight:800;color:#e2e8f0;letter-spacing:0.01em;">⚖ Analyse de conformité juridique</div>';
-  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">'
-    +'<div style="font-size:12px;color:#6b7280;">Basée sur les lois, doctrine et jurisprudences de la base documentaire RAG</div>'
-    +'<span style="background:#1e293b;color:#a0a8c0;font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px;border:1px solid #2a3040">'+_jurLabel+'</span>'
-    +'</div>';
-  items.forEach(function(c) {
-    var color = sevColor[c.severity] || '#6b7280';
-    var sLabel = sevLabel[c.severity] || c.severity;
-    var tLabel = typeLabel[(c.type || '').toLowerCase()] || (c.type || 'RÉFÉRENCE').toUpperCase();
-    html += '<div style="background:#0d1017;border:1px solid ' + color + '33;border-left:3px solid ' + color + ';border-radius:10px;padding:14px 16px;margin-bottom:12px;">' +
-      '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">' +
-        '<span style="background:' + color + '22;color:' + color + ';font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;">' + sLabel + '</span>' +
-        '<span style="background:#1e293b;color:#94a3b8;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;">' + tLabel + '</span>' +
-        (c.source ? '<span style="font-size:11px;color:#5b7cfa;font-style:italic;">' + _escH(c.source) + '</span>' : '') +
-      '</div>' +
-      '<div style="font-size:13px;color:#e2e8f0;margin-bottom:6px;">' + _escH(c.issue || '') + '</div>' +
-      (c.recommendation ? '<div style="font-size:12px;color:#94a3b8;border-top:1px solid #1f2537;padding-top:8px;margin-top:6px;"> Recommandation : ' + _escH(c.recommendation) + '</div>' : '') +
-    '</div>';
-  });
-  container.innerHTML = html;
+  document.getElementById('review-stats').innerHTML =
+    '<span class="stat stat-pending">' + p + ' en attente</span>' +
+    '<span class="stat stat-accepted">' + a + ' acceptées</span>' +
+    '<span class="stat stat-rejected">' + r + ' refusées</span>';
 }
 
 function renderReview() {
-  var list = document.getElementById(_dashAnalysis ? 'd-mods-list' : 'mods-list');
+  var list = document.getElementById('mods-list');
   list.innerHTML = '';
   modifications.forEach(function(m) {
     var color = rc(m.risk);
@@ -929,13 +735,6 @@ function renderReview() {
     : 'Un document Word sera généré avec les modifications acceptées en Track Changes.';
 
   updateStats();
-  renderCompliance();
-  if (_dashAnalysis) {
-    document.getElementById('d-ana-review').style.display = '';
-    var dBar = document.getElementById('d-review-juriste-bar');
-    if(dBar){ if(!_userRole){ checkRole().then(function(){ _renderReviewJuristeBar('d-review-juriste-bar'); }); } else { _renderReviewJuristeBar('d-review-juriste-bar'); } }
-    return;
-  }
   show('step-review');
 
   // Pour les juristes : afficher le bouton Soumettre + section "Ajouter une clause"
@@ -951,9 +750,10 @@ function renderReview() {
   else { _renderReviewJuristeBar(); }
 }
 
-function _renderReviewJuristeBar(targetId){
-  var jAct = document.getElementById(targetId||'review-juriste-bar');
+function _renderReviewJuristeBar(){
+  var jAct = document.getElementById('review-juriste-bar');
   if(!jAct) return;
+  if(_userRole && _userRole !== 'juriste') { jAct.innerHTML=''; return; }
   var alreadyNames = modifications.map(function(m){ return (m.clause_name||'').toLowerCase(); });
   var contractClauses = window._allContractClauses||[];
   var remaining = contractClauses.filter(function(c){ return alreadyNames.indexOf((c.name||'').toLowerCase())<0; });
@@ -965,25 +765,10 @@ function _renderReviewJuristeBar(targetId){
         return '<option value="'+safe+'" data-text="'+safeT+'">'+_escH(c.name)+'</option>';
       }).join('')
     : '';
-
-  // Role-based action buttons
-  var isDir = (_userRole==='directeur'||_isAdmin);
-  var isJur = (_userRole==='juriste');
-  var actionBtns = '';
-  if(isJur){
-    actionBtns = '<button id="btn-submit-review" onclick="saveAndSubmitFromReview()" style="padding:10px 20px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur pour validation →</button>';
-  } else {
-    // Directeur, admin, solo, non-connecté
-    actionBtns = '<button id="btn-validate-review" onclick="validateFromReview()" style="padding:10px 20px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">✅ Valider et enregistrer dans le RAG</button>';
-    if(isDir){
-      actionBtns += '<button id="btn-send-juriste-review" onclick="sendToJuristeFromReview()" style="padding:10px 18px;background:none;border:1px solid #f59e0b;border-radius:8px;color:#f59e0b;font-weight:700;font-size:13px;cursor:pointer">↩ Renvoyer au juriste pour revue</button>';
-    }
-  }
-
   jAct.innerHTML =
     '<div style="background:#0d1017;border:1px solid #1f2537;border-radius:12px;padding:16px;margin-bottom:16px">'
     +'<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">'
-    +actionBtns
+    +'<button id="btn-submit-review" onclick="saveAndSubmitFromReview()" style="padding:10px 20px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur pour validation →</button>'
     +'<span style="font-size:11px;color:#4a5470">Vous pouvez aussi télécharger le DOCX ci-dessous.</span>'
     +'</div>'
     +'<div style="border-top:1px solid #1f2537;padding-top:12px">'
@@ -1010,10 +795,7 @@ function _syncClause(sel){
   var inp=document.getElementById('add-clause-name-r');
   var ta=document.getElementById('add-clause-orig-r');
   if(inp&&opt.value) inp.value=opt.value;
-  if(ta&&opt.value){
-    var found=(window._allContractClauses||[]).filter(function(c){return c.name===opt.value;})[0];
-    ta.value=found?(found.text||opt.dataset.text||''):(opt.dataset.text||'');
-  }
+  if(ta&&opt.dataset.text) ta.value=opt.dataset.text;
   sel.value='';
 }
 function _syncClauseDash(sel){
@@ -1021,10 +803,7 @@ function _syncClauseDash(sel){
   var inp=document.getElementById('add-clause-name');
   var ta=document.getElementById('add-clause-orig');
   if(inp&&opt.value) inp.value=opt.value;
-  if(ta&&opt.value){
-    var found=(window._allContractClauses||[]).filter(function(c){return c.name===opt.value;})[0];
-    ta.value=found?(found.text||opt.dataset.text||''):(opt.dataset.text||'');
-  }
+  if(ta&&opt.dataset.text) ta.value=opt.dataset.text;
   sel.value='';
 }
 // Re-extraction des clauses depuis un fichier rechargé (tableau de bord)
@@ -1121,20 +900,19 @@ function _extractContractClauses(text){
       curName=t; curLines=[];
     } else if(curName){
       curLines.push(t);
+      // Limiter le texte stocké à 600 caractères
+      if(curLines.join('\n').length>600) return;
     }
   });
-  if(curName) clauses.push({name:curName,text:curLines.join('\n').trim()});
+  if(curName) clauses.push({name:curName,text:curLines.join('\n').trim().slice(0,600)});
   return clauses.filter(function(c){return c.name.length>2;}).slice(0,80);
 }
 
 // Ajoute la métadonnée des clauses dans un tableau de modifications
 function _modsWithMeta(mods){
-  var list=(mods||[]).filter(function(m){return !m._isClauseMeta&&!m._isFileMeta;});
+  var list=(mods||[]).filter(function(m){return !m._isClauseMeta;});
   if(window._allContractClauses&&window._allContractClauses.length){
     list=[{_isClauseMeta:true,clauses:window._allContractClauses}].concat(list);
-  }
-  if(window._fileStoragePath||window._fileCacheId){
-    list=[{_isFileMeta:true,file_storage_path:window._fileStoragePath||'',file_cache_id:window._fileCacheId||''}].concat(list);
   }
   return list;
 }
@@ -1145,16 +923,6 @@ async function saveAndSubmitFromReview(){
   var btn = document.getElementById('btn-submit-review');
   if(btn){ btn.textContent='\u23f3 Sauvegarde...'; btn.disabled=true; }
   try{
-    // Recapture inline edits from contenteditable fields before saving
-    modifications.forEach(function(m) {
-      var el = document.getElementById('proposed-' + m.id);
-      if (el) {
-        var edited = el.innerText.trim();
-        if (edited && edited !== m.proposed) {
-          m.proposed = edited;
-        }
-      }
-    });
     await saveAna(curFile?curFile.name:'Contrat', savedType||'generic', selectedPartie||'', modifications);
     var anaId = window._lastSavedAnaId;
     if(anaId){
@@ -1167,75 +935,6 @@ async function saveAndSubmitFromReview(){
   }catch(e){
     alert('Erreur : '+e.message);
     if(btn){ btn.textContent='Soumettre au directeur \u2192'; btn.disabled=false; }
-  }
-}
-
-async function validateFromReview(){
-  if(!_cu){ showAuth(); return; }
-  if(!_userRole) await checkRole();
-  var btn = document.getElementById('btn-validate-review');
-  if(btn){ btn.textContent = '⏳ Validation...'; btn.disabled = true; }
-  try{
-    modifications.forEach(function(m){
-      var el = document.getElementById('proposed-'+m.id);
-      if(el){ var ed=el.innerText.trim(); if(ed&&ed!==m.proposed) m.proposed=ed; }
-    });
-    await saveAna(curFile?curFile.name:'Contrat', savedType||'generic', selectedPartie||'', modifications);
-    var anaId = window._lastSavedAnaId;
-    if(!anaId){ alert('Analyse sauvegardée.'); showDash(); return; }
-    // Validate directly → sends to RAG queue
-    var r = await fetch(BACKEND+'/analyses/validate-by-director/'+anaId, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({modifications: _modsWithMeta(modifications), director_email: (_cu&&_cu.email)||''})
-    });
-    var d = r.ok ? (await r.json().catch(function(){return{};})) : {};
-    if(r.ok && d.status==='ok'){
-      var decs = {};
-      modifications.forEach(function(m,i){ decs[String(m.id||i+1)]='accepted'; });
-      await fetch(BACKEND+'/queue/add', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({
-          filename: curFile?curFile.name:'Contrat',
-          contract_type: savedType||'',
-          partie: selectedPartie||'',
-          accepted_modifications: JSON.stringify(modifications),
-          decisions: JSON.stringify(decs),
-          submitted_by: (_cu&&_cu.email)||'',
-          score: 80,
-          analysis_id: anaId
-        })
-      });
-      alert('Analyse validée et enregistrée dans le RAG.');
-      showDash();
-    } else {
-      throw new Error(d.error||'Erreur validation');
-    }
-  }catch(e){
-    alert('Erreur : '+e.message);
-    if(btn){ btn.textContent='✅ Valider et enregistrer dans le RAG'; btn.disabled=false; }
-  }
-}
-
-async function sendToJuristeFromReview(){
-  if(!_cu){ showAuth(); return; }
-  if(!_userRole) await checkRole();
-  var btn = document.getElementById('btn-send-juriste-review');
-  if(btn){ btn.textContent='⏳ Envoi...'; btn.disabled=true; }
-  try{
-    modifications.forEach(function(m){
-      var el = document.getElementById('proposed-'+m.id);
-      if(el){ var ed=el.innerText.trim(); if(ed&&ed!==m.proposed) m.proposed=ed; }
-    });
-    await saveAna(curFile?curFile.name:'Contrat', savedType||'generic', selectedPartie||'', modifications);
-    var anaId = window._lastSavedAnaId;
-    if(anaId){
-      await _patchAnalysis(anaId, {status:'revision_requested', director_notes:'Revue IA insuffisante — merci de compléter l\'analyse manuellement.'});
-    }
-    alert('Document renvoyé au juriste pour revue approfondie.');
-    showDash();
-  }catch(e){
-    alert('Erreur : '+e.message);
-    if(btn){ btn.textContent='↩ Renvoyer au juriste pour revue'; btn.disabled=false; }
   }
 }
 
@@ -1298,19 +997,14 @@ async function exportDoc() {
       }
     });
     var fd = buildFormData();
-    if (window._fileCacheId) fd.append('file_cache_id', window._fileCacheId);
-    if (window._fileStoragePath) fd.append('file_storage_path', window._fileStoragePath);
     fd.append('modifications', JSON.stringify(modifications));
     fd.append('decisions', JSON.stringify(decisions));
     var resp = await fetch(BACKEND + '/export', { method: 'POST', body: fd });
-    if (!resp.ok) { var ed={}; try{ed=await resp.json();}catch(x){} throw new Error(ed.error||'Erreur serveur '+resp.status); }
+    if (!resp.ok) { var e = await resp.json(); throw new Error(e.error); }
     var blob = await resp.blob();
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    var _ptie = (window.selectedPartie || 'Contrat').replace(/[\/\\:*?"<>|]/g, '').trim();
-    var _nd = new Date();
-    var _dt = String(_nd.getDate()).padStart(2,'0') + '-' + String(_nd.getMonth()+1).padStart(2,'0') + '-' + _nd.getFullYear();
-    a.download = (_ptie || 'Contrat') + '------' + _dt + '.docx';
+    a.download = 'contrat-track-changes.docx';
     a.click();
     btn.textContent = ' ✅ Téléchargé !';
     btn.style.background = '#10b981';
@@ -1397,17 +1091,16 @@ var _cu=null;
 var _userRole=null;
 var _isAdmin=false;
 var _userParentEmail=null;
-async function sf(p,o){o=o||{};var t=localStorage.getItem('sbt')||_sk;var h={'apikey':_sk,'Authorization':'Bearer '+t,'Content-Type':'application/json'};if(o.headers)Object.assign(h,o.headers);var r=await fetch(_su+p,Object.assign({},o,{headers:h}));if(r.status===401&&t!==_sk){var ok=await _refreshSession();if(ok){var t2=localStorage.getItem('sbt')||_sk;var h2={'apikey':_sk,'Authorization':'Bearer '+t2,'Content-Type':'application/json'};if(o.headers)Object.assign(h2,o.headers);return fetch(_su+p,Object.assign({},o,{headers:h2}));}}return r;}
+async function sf(p,o){o=o||{};var t=localStorage.getItem('sbt')||_sk;var h={'apikey':_sk,'Authorization':'Bearer '+t,'Content-Type':'application/json'};if(o.headers)Object.assign(h,o.headers);return fetch(_su+p,Object.assign({},o,{headers:h}));}
 async function _refreshSession(){
   var rt=localStorage.getItem('sbr');
   if(!rt) return false;
   var rr=await fetch(_su+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'apikey':_sk,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:rt})});
   var rd=await rr.json();
-  if(rd.access_token){localStorage.setItem('sbt',rd.access_token);if(rd.refresh_token)localStorage.setItem('sbr',rd.refresh_token);setU(rd.user||_cu||{email:_cu&&_cu.email});return true;}
+  if(rd.access_token){localStorage.setItem('sbt',rd.access_token);if(rd.refresh_token)localStorage.setItem('sbr',rd.refresh_token);setU(rd.user||{email:_cu&&_cu.email});return true;}
   localStorage.removeItem('sbt');localStorage.removeItem('sbr');return false;
 }
-var _chkSessPromise=null;
-async function chkSess(){if(_chkSessPromise)return _chkSessPromise;_chkSessPromise=(async function(){var t=localStorage.getItem('sbt');if(!t)return;var r=await sf('/auth/v1/user');if(r.ok){setU(await r.json());return;}var ok=await _refreshSession();if(!ok){if(_cu)return;localStorage.removeItem('sbt');localStorage.removeItem('sbr');showAuth();}})();try{await _chkSessPromise;}finally{_chkSessPromise=null;}}
+async function chkSess(){var t=localStorage.getItem('sbt');if(!t)return;var r=await sf('/auth/v1/user');if(r.ok){setU(await r.json());return;}var ok=await _refreshSession();if(!ok){localStorage.removeItem('sbt');localStorage.removeItem('sbr');showAuth();}}
 function setU(u){_cu=u;document.getElementById('ubar').classList.add('show');var emailDisplay=(u.email||'').replace('@','[at]'); document.getElementById('ueml').textContent='>> '+emailDisplay;document.getElementById('deml').textContent=(u.email||'').replace('@','[at]');var b=document.getElementById('nlbtn');if(b)b.style.display='none';closeAuth();checkRole();}
 async function doLogin(){var e=document.getElementById('ae1').value.trim(),p=document.getElementById('ap1').value,err=document.getElementById('aerr');err.style.display='none';if(!e||!p){err.textContent='Champs requis';err.style.display='block';return;}var r=await sf('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:e,password:p})});var d=await r.json();if(d.access_token){localStorage.setItem('sbt',d.access_token);if(d.refresh_token)localStorage.setItem('sbr',d.refresh_token);setU(d.user);}else{err.textContent=d.error_description||'Erreur';err.style.display='block';}}
 async function doReg(){var e=document.getElementById('ae2').value.trim(),p=document.getElementById('ap2').value,err=document.getElementById('aerr2'),ok=document.getElementById('aok2');err.style.display='none';ok.style.display='none';if(!e||p.length<6){err.textContent='Email + mdp 6+ requis';err.style.display='block';return;}var _redir=encodeURIComponent(window.location.origin+window.location.pathname);var r=await sf('/auth/v1/signup?redirect_to='+_redir,{method:'POST',body:JSON.stringify({email:e,password:p})});var d=await r.json();if(d.id||d.user){ok.textContent='Compte cree - verifiez votre email';ok.style.display='block';}else{err.textContent=d.error_description||'Erreur';err.style.display='block';}}
@@ -1416,148 +1109,17 @@ function showAuth(){var o=document.getElementById('auth-ov');o.classList.add('sh
 function closeAuth(){var o=document.getElementById('auth-ov');o.classList.remove('show');o.style.display='none';}
 function showReg(){document.getElementById('afl').style.display='none';document.getElementById('afr').style.display='block';document.getElementById('atitle').textContent='Creer un compte';}
 function showLogin(){document.getElementById('afr').style.display='none';document.getElementById('afl').style.display='block';document.getElementById('atitle').textContent='Connexion';}
-var _dashAnalysis = false;
-var _dAnaCurFile = null;
-
-function dAnaOnFile(input) {
-  if (input.files && input.files.length) {
-    _dAnaCurFile = input.files[0]; curFile = _dAnaCurFile; curMode = 'upload';
-    document.getElementById('d-file-ok').style.display = '';
-    document.getElementById('d-file-name').textContent = _dAnaCurFile.name + ' (' + (_dAnaCurFile.size/1024).toFixed(0) + ' KB)';
-  }
-}
-
-function dAnaReset() {
-  _dashAnalysis = false; _dAnaCurFile = null;
-  modifications = []; decisions = {}; window._compliance = [];
-  ['d-ana-loading','d-ana-parties','d-ana-review'].forEach(function(id){ document.getElementById(id).style.display='none'; });
-  document.getElementById('d-ana-form').style.display = '';
-  document.getElementById('d-file-ok').style.display = 'none';
-  document.getElementById('d-file-input').value = '';
-  document.getElementById('d-mods-list').innerHTML = '';
-  document.getElementById('d-compliance-section').innerHTML = '';
-  document.getElementById('d-ana-error').style.display = 'none';
-}
-
-async function dAnaStart() {
-  var err = document.getElementById('d-ana-error'); err.style.display = 'none';
-  if (!_dAnaCurFile) { err.textContent = '📤 Sélectionnez un fichier'; err.style.display = ''; return; }
-  if (_cu) {
-    try {
-      var accR = await fetch(BACKEND+'/account/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email})});
-      if (accR.ok) { var acc = await accR.json(); if (!acc.is_admin && acc.analyses_remaining!==-1 && !acc.can_analyze) { err.textContent = acc.message||"Quota d'analyses épuisé."; err.style.display=''; return; } }
-    } catch(e) {}
-  }
-  curFile = _dAnaCurFile; curMode = 'upload';
-  savedType = document.getElementById('d-contract-type').value;
-  document.getElementById('d-ana-form').style.display = 'none';
-  document.getElementById('d-ana-loading').style.display = '';
-  document.getElementById('d-ana-status').textContent = 'Identification des parties...';
-  try {
-    var fd = new FormData();
-    fd.append('file', curFile); fd.append('lang','auto'); fd.append('type', savedType);
-    if (_cu && _cu.email) fd.append('user_email', _cu.email);
-    var resp = await fetch(BACKEND+'/identify-parties', {method:'POST', body:fd});
-    if (!resp.ok) { var ed={}; try{ed=await resp.json();}catch(x){} throw new Error(ed.error||'Erreur '+resp.status); }
-    var data = await resp.json();
-    document.getElementById('d-ana-loading').style.display = 'none';
-    dAnaShowParties(data.parties || []);
-  } catch(e) {
-    document.getElementById('d-ana-loading').style.display = 'none';
-    document.getElementById('d-ana-form').style.display = '';
-    err.textContent = '❌ ' + (e.message || 'Erreur inattendue'); err.style.display = '';
-  }
-}
-
-function dAnaShowParties(parties) {
-  document.getElementById('d-ana-parties').style.display = '';
-  var list = document.getElementById('d-parties-list');
-  _buildPartiesUI(list, parties, dAnaAnalyze);
-}
-
-var _JUR_LABELS = {droit_marocain:'droit marocain 🇲🇦',droit_francais:'droit français 🇫🇷',droit_anglais:'droit anglais 🇬🇧',droit_tunisien:'droit tunisien 🇹🇳',droit_algerien:'droit algérien 🇩🇿',droit_belge:'droit belge 🇧🇪',universel:'droit applicable 🌐'};
-
-async function dAnaAnalyze(partie) {
-  selectedPartie = partie;
-  document.getElementById('d-ana-parties').style.display = 'none';
-  document.getElementById('d-ana-loading').style.display = '';
-  var statusEl = document.getElementById('d-ana-status');
-  statusEl.textContent = 'Détection du droit applicable...';
-  _dashAnalysis = true;
-  try {
-    // Quick jurisdiction detection (no AI, fast)
-    var fdJ = new FormData();
-    fdJ.append('file', curFile);
-    fdJ.append('title', curFile.name || '');
-    var jurResp = await fetch(BACKEND+'/detect-jurisdiction', {method:'POST', body:fdJ});
-    var jurData = jurResp.ok ? await jurResp.json() : {jurisdiction:'universel'};
-    var detectedJur = jurData.jurisdiction || 'universel';
-    var jurLabel = _JUR_LABELS[detectedJur] || detectedJur;
-    statusEl.textContent = 'Analyse en ' + jurLabel + '...';
-
-    var fd = new FormData();
-    fd.append('file', curFile); fd.append('partie', partie); fd.append('lang','auto');
-    fd.append('interface_lang', _appLang || 'fr');
-    fd.append('type', savedType || document.getElementById('d-contract-type').value);
-    if (_cu && _cu.email) fd.append('user_email', _cu.email);
-
-    var dLive = document.getElementById('d-ana-live');
-    var dLiveMsg = document.getElementById('d-ana-live-msg');
-    var dLiveLog = document.getElementById('d-ana-live-log');
-    if (dLive) { dLive.style.display = 'block'; }
-    if (dLiveLog) { dLiveLog.innerHTML = ''; }
-
-    // Progress animation (cycling messages while waiting for /analyze)
-    var _pMsgs2 = ['📄 Lecture du document...', '📚 Consultation de la base légale...', '🤖 Analyse IA en cours...', '🔍 Analyse des clauses contractuelles...', '⚖️ Application du droit applicable...', '✍️ Génération des modifications...', '🔍 Analyse de la clause de résiliation...', '⚖️ Vérification des responsabilités...', '📋 Finalisation du rapport...'];
-    var _pIdx2 = 0;
-    function _showP2(msg) { statusEl.textContent = msg; if (dLiveMsg) dLiveMsg.textContent = msg; if (dLiveLog) dLiveLog.innerHTML = '<div>' + _escH(msg) + '</div>' + dLiveLog.innerHTML; }
-    _showP2(_pMsgs2[0]);
-    var _pTimer2 = setInterval(function() { _pIdx2 = (_pIdx2 + 1) % _pMsgs2.length; _showP2(_pMsgs2[_pIdx2]); }, 3500);
-
-    var resp = await fetch(BACKEND+'/analyze', {method:'POST', body:fd});
-    clearInterval(_pTimer2);
-    if (!resp.ok) { var ed={}; try{ed=await resp.json();}catch(x){} throw new Error(ed.error||'Erreur '+resp.status); }
-    if (dLiveMsg) dLiveMsg.textContent = '✅ Résultats prêts...';
-    var data = await resp.json();
-    if (!data) throw new Error('Pas de résultat reçu.');
-    modifications = data.modifications || []; window._compliance = data.compliance || [];
-    window._jurisdiction = data._jurisdiction || 'universel';
-    decisions = {}; modifications.forEach(function(m){ decisions[m.id]='pending'; });
-    if (data.file_cache_id) window._fileCacheId = data.file_cache_id;
-    if (data.file_storage_path) window._fileStoragePath = data.file_storage_path;
-    if (data.contract_text) {
-      savedText = data.contract_text;
-      window._allContractClauses = _extractContractClauses(savedText);
-      if (!window._allContractClauses.length && data._paragraphs && data._paragraphs.length) {
-        window._allContractClauses = data._paragraphs.map(function(p) {
-          return { name: p.text.slice(0, 80), text: p.text, idx: p.idx };
-        }).filter(function(c) { return c.name.length > 5; });
-      }
-    }
-    document.getElementById('d-ana-loading').style.display = 'none';
-    renderReview();
-  } catch(e) {
-    _dashAnalysis = false;
-    document.getElementById('d-ana-loading').style.display = 'none';
-    document.getElementById('d-ana-parties').style.display = '';
-    var err = document.getElementById('d-ana-error');
-    err.textContent = '❌ ' + (e.message || 'Erreur inattendue'); err.style.display = '';
-  }
-}
-
 function showDash(){document.getElementById('dash-ov').classList.add('show');loadDash();}
 function closeDash(){document.getElementById('dash-ov').classList.remove('show');}
-function dtab(t){var names=['analyses','models','juristes','abonnement','nouvelle'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();if(t==='abonnement')loadAbonnement();if(t==='nouvelle')dAnaReset();}
+function dtab(t){var names=['analyses','models','juristes','abonnement'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();if(t==='abonnement')loadAbonnement();}
 async function checkRole(){
   if(!_cu)return;
   try{
     // Utilise la clé anon pour contourner la RLS utilisateur (même approche que loadJuristes)
-    var r=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=role,parent_email,is_admin,payment_status,chat_remaining',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
+    var r=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=role,parent_email',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
     if(r.ok){
       var d=await r.json();
-      if(d[0]){_userRole=d[0].role;_userParentEmail=d[0].parent_email;_isAdmin=!!d[0].is_admin;window._dirPayStatus=d[0].payment_status;
-        if(typeof d[0].chat_remaining==='number')window._chatRemaining=d[0].chat_remaining;
-      }
+      if(d[0]){_userRole=d[0].role;_userParentEmail=d[0].parent_email;_isAdmin=!!d[0].is_admin;window._dirPayStatus=d[0].payment_status;}
       else _userRole='directeur';
     } else {
       _userRole='directeur'; // fallback si fetch échoue
@@ -1661,7 +1223,7 @@ async function loadDash(){
       filterBar.style.display='';
     }
   }
-  var STATUS_LABELS={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision par le directeur juridique','validated':'Validé par directeur','final_validated':'Validé — dans le RAG'};
+  var STATUS_LABELS={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision','validated':'Validé par directeur','final_validated':'Validé — dans le RAG'};
   var STATUS_COLORS={'draft':'#4a5470','pending_review':'#f59e0b','in_review':'#5b7cfa','revision_requested':'#ef4444','validated':'#10b981','final_validated':'#10b981'};
   window._renderAnalyses=function(list){
     // Trier : analyses normales par date, [ADVERSE] insérées juste après leur originale
@@ -1714,7 +1276,7 @@ async function loadDash(){
     if(val==='__own__') return window._renderAnalyses(window._userAnalyses.filter(function(x){return !x._juristeEmail;}));
     window._renderAnalyses(window._userAnalyses.filter(function(x){return x._juristeEmail===val;}));
   };
-  var r2=await sf('/rest/v1/user_models?user_email=eq.'+encodeURIComponent(_cu.email)+'&order=created_at.desc&select=id,filename,created_at');
+  var r2=await sf('/rest/v1/user_models?user_id=eq.'+_cu.id+'&order=created_at.desc&select=id,filename,created_at');
   var m=r2.ok?await r2.json():[];
   document.getElementById('stm').textContent=m.length;
   var mlistHtml=m.length===0
@@ -1729,13 +1291,13 @@ async function loadDash(){
   // Si directeur : charger aussi les suggestions des juristes
   if(_userRole==='directeur'){
     try{
-      var rp=await fetch(BACKEND+'/suggestions/list-for-director?director_email='+encodeURIComponent(_cu.email));
+      var rp=await fetch('https://web-production-f96f7.up.railway.app/suggestions/list-for-director?director_email='+encodeURIComponent(_cu.email));
       var pending=rp.ok?(await rp.json()).suggestions||[]:[];
       if(pending.length){
         mlistHtml='<div style="font-size:11px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+pending.length+' modèle(s) en attente de validation</div>'
           +pending.map(function(s){
             var sid=s.id;
-            var preview=(s.content||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            var preview=(s.content||'').substring(0,400).replace(/</g,'&lt;').replace(/>/g,'&gt;');
             return '<div class="ac" style="border-color:#f59e0b33" data-sid="'+sid+'">'
               +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">'
               +'<div style="flex:1">'
@@ -1745,8 +1307,8 @@ async function loadDash(){
               +'<button onclick="this.closest(\'[data-sid]\').querySelector(\'.sugg-preview\').style.display=this.closest(\'[data-sid]\').querySelector(\'.sugg-preview\').style.display===\'none\'?\'\':\'none\'" '
               +'style="background:#1a2035;border:1px solid #1f2537;color:#a0a8c0;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0">👁 Voir contenu</button>'
               +'</div>'
-              +'<div class="sugg-preview" style="display:none;background:#0a0c12;border:1px solid #1f2537;border-radius:6px;padding:10px;font-size:11px;color:#9ca3af;white-space:pre-wrap;max-height:500px;overflow-y:auto;margin-bottom:10px;line-height:1.6">'
-              +(preview||'(contenu vide)')
+              +'<div class="sugg-preview" style="display:none;background:#0a0c12;border:1px solid #1f2537;border-radius:6px;padding:10px;font-size:11px;color:#9ca3af;white-space:pre-wrap;max-height:200px;overflow-y:auto;margin-bottom:10px;line-height:1.6">'
+              +(preview||'(contenu vide)')+(s.content&&s.content.length>400?'\n\n[...]':'')
               +'</div>'
               +'<div style="display:flex;gap:8px">'
               +'<button class="fwd-sugg-btn" style="background:#10b98122;border:1px solid #10b981;color:#10b981;padding:5px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600">✅ Valider → Admin</button>'
@@ -1772,54 +1334,56 @@ async function loadDash(){
   if(_userRole==='directeur'||_isAdmin)loadJuristes();
 }
 async function upMdl(inp){
-  console.log('[upMdl] triggered, _cu=', _cu ? _cu.email : 'null');
   if(!_cu){showAuth();return;}
   if(!_userRole) await checkRole();
-  console.log('[upMdl] role=', _userRole, 'files=', inp.files.length);
-  var f=inp.files[0];
-  if(!f){alert('Aucun fichier sélectionné.');return;}
-  var lbl=document.querySelector('label[for="minp"]');
-  var origLbl=lbl?lbl.textContent:'';
-  if(lbl)lbl.textContent='Upload en cours...';
-  try{
-    if(_userRole==='juriste' && _userParentEmail){
-      // Juriste → soumet au directeur pour validation
+  var f=inp.files[0];if(!f)return;
+  var r=await sf('/rest/v1/user_models',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify({user_id:_cu.id,user_email:_cu.email,filename:f.name,category:'contract',is_public:false})});
+  if(r.ok){
+    var alertMsg='Modele uploade';
+    try{
       var fd=new FormData();
       fd.append('file',f);
       fd.append('source',f.name);
       fd.append('category','contract');
       fd.append('suggested_by',_cu.email);
-      fd.append('target_email',_userParentEmail);
-      var r2=await fetch(BACKEND+'/rag/suggest-to-director',{method:'POST',body:fd});
-      var sd=await r2.json();
-      if(!r2.ok) throw new Error(sd.error||'Erreur suggest-to-director');
-      if(lbl)lbl.textContent=origLbl;
-      inp.value='';
-      alert('Modèle soumis au directeur juridique pour validation.');
-      loadDash();
-    } else {
-      // Directeur/Admin → upload direct dans user_models (modèle cabinet, RAG prioritaire)
-      var fd=new FormData();
-      fd.append('file',f);
-      fd.append('user_email',_cu.email);
-      fd.append('user_id',_cu.id);
-      console.log('[upMdl] POST /models/upload file=', f.name, 'email=', _cu.email, 'uid=', _cu.id);
-      var r=await fetch(BACKEND+'/models/upload',{method:'POST',body:fd});
-      console.log('[upMdl] status=', r.status);
-      var d=await r.json();
-      console.log('[upMdl] body=', d);
-      if(!r.ok) throw new Error(d.error||'Erreur upload ('+r.status+')');
-      if(lbl)lbl.textContent=origLbl;
-      inp.value='';
-      alert('Modèle cabinet enregistré (' + d.chars + ' caractères). Il sera utilisé en priorité dans vos analyses.');
-      loadDash();
-    }
-  }catch(e){
-    console.error('[upMdl] error:', e);
-    if(lbl)lbl.textContent=origLbl;
-    inp.value='';
-    alert('Erreur upload : '+e.message);
-  }
+      if(_userRole==='juriste' && _userParentEmail){
+        // Juriste -> soumet au directeur pour validation
+        fd.append('target_email',_userParentEmail);
+        var r2=await fetch(BACKEND+'/rag/suggest-to-director',{method:'POST',body:fd});
+        var sd=await r2.json();
+        if(!r2.ok) throw new Error(sd.error||'Erreur suggest-to-director');
+        alertMsg='Modele soumis au directeur juridique pour validation';
+      } else {
+        // Directeur -> approche avant/après pour trouver l'ID créé et le forwarder à l'admin
+        var dirEmail=encodeURIComponent(_cu.email);
+        // 1. Snapshot des IDs existants dans la boite directeur
+        var idsBefore=[];
+        try{var rlB=await fetch(BACKEND+'/suggestions/list-for-director?director_email='+dirEmail);if(rlB.ok){var lb=await rlB.json();idsBefore=(lb.suggestions||[]).map(function(s){return s.id;});}}catch(e){}
+        // 2. Créer la suggestion (directeur se soumet à lui-même)
+        fd.append('target_email',_cu.email);
+        var r2=await fetch(BACKEND+'/rag/suggest-to-director',{method:'POST',body:fd});
+        var r2txt=await r2.text();
+        if(!r2.ok) throw new Error('suggest-to-director: '+r2.status+' '+r2txt);
+        // 3. Récupérer la liste après et trouver la nouvelle suggestion (diff des IDs)
+        var rlA=await fetch(BACKEND+'/suggestions/list-for-director?director_email='+dirEmail);
+        if(rlA.ok){
+          var la=await rlA.json();
+          var newSuggs=(la.suggestions||[]).filter(function(s){return idsBefore.indexOf(s.id)<0;});
+          if(newSuggs.length>0){
+            var sid=newSuggs[0].id;
+            await fetch(BACKEND+'/suggestions/forward-to-admin/'+sid,{method:'POST'});
+            alertMsg='Modele soumis pour validation admin';
+          } else {
+            alertMsg='Modele soumis pour validation admin';
+          }
+        } else {
+          alertMsg='Modele soumis pour validation admin';
+        }
+      }
+    }catch(e2){console.log('Suggest error:',e2);alertMsg='Modele uploade (erreur soumission: '+e2.message+')';}
+    alert(alertMsg);
+    loadDash();
+  }else alert('Erreur upload');
 }
 
 async function _decrementAnalyses(){
@@ -1881,7 +1445,7 @@ async function deleteModel(modelId, btn) {
 
 async function getUserModelRAG(){
   if(!_cu)return[];
-  var r=await sf('/rest/v1/user_models?user_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,filename,content');
+  var r=await sf('/rest/v1/user_models?user_id=eq.'+_cu.id+'&select=id,filename,content');
   return r.ok?await r.json():[];
 }
 
@@ -1898,14 +1462,11 @@ async function showAnaDetail(idx) {
   // Extraire la métadonnée des clauses si elle a été sauvegardée
   var clauseMeta = mods.find(function(m){ return m._isClauseMeta; });
   window._allContractClauses = clauseMeta ? (clauseMeta.clauses||[]) : [];
-  var fileMeta = mods.find(function(m){ return m._isFileMeta; });
-  window._fileStoragePath = fileMeta ? (fileMeta.file_storage_path||'') : '';
-  window._fileCacheId = fileMeta ? (fileMeta.file_cache_id||'') : '';
-  mods = mods.filter(function(m){ return !m._isClauseMeta && !m._isFileMeta; });
+  mods = mods.filter(function(m){ return !m._isClauseMeta; });
   window._currentMods = mods.map(function(m){ return Object.assign({}, m); });
 
   var st=ana.status||'draft';
-  var stLabels={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision par le directeur juridique','validated':'Validé par directeur','final_validated':'Validé — intégré au RAG'};
+  var stLabels={'draft':'Brouillon','pending_review':'En attente directeur','in_review':'En cours de révision','revision_requested':'Renvoyé pour révision','validated':'Validé par directeur','final_validated':'Validé — intégré au RAG'};
   var stColors={'draft':'#4a5470','pending_review':'#f59e0b','in_review':'#5b7cfa','revision_requested':'#ef4444','validated':'#10b981','final_validated':'#10b981'};
   var stColor=stColors[st]||'#4a5470';
   var isJuriste=_userRole==='juriste';
@@ -1922,7 +1483,6 @@ async function showAnaDetail(idx) {
     actionBar='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'
       +'<button onclick="validateByDirector(\''+ana.id+'\')" style="padding:9px 18px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Valider et transmettre à l\'admin</button>'
       +'<button onclick="requestRevision(\''+ana.id+'\')" style="padding:9px 18px;background:#ef444422;border:1px solid #ef4444;color:#ef4444;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">Demander une révision</button>'
-      +'<button id="btn-save-director-'+ana.id+'" onclick="saveDirectorChanges(\''+ana.id+'\')" style="padding:9px 18px;background:#1a2035;border:1px solid #2a3040;color:#a0a8c0;border-radius:8px;font-size:13px;cursor:pointer">Sauvegarder</button>'
       +'</div>';
   }
   if(isDirecteur&&st==='validated'){
@@ -2114,6 +1674,7 @@ async function analyzeAdverse(anaId, contractType, partie){
     fd.append('type',contractType||'general');
     fd.append('partie',partie||'');
     fd.append('lang','auto');
+    if(_cu&&_cu.email) fd.append('user_email',_cu.email);
     var r=await fetch(BACKEND+'/analyze',{method:'POST',body:fd});
     var data=await r.json();
     if(!r.ok) throw new Error(data.error||'Erreur serveur');
@@ -2256,42 +1817,29 @@ async function analyzeManualClause(){
 async function dlUserAnalysis() {
   var ana = (window._userAnalyses||[])[window._anaIdx||0] || {};
   var mods = window._currentMods || [];
-  var btn = document.querySelector('button[onclick*="dlUserAnalysis"]');
+  var det = document.getElementById('user-ana-detail');
+  var btn = det ? det.querySelector('button[onclick*="dlUserAnalysis"]') : null;
   if(btn) { btn.textContent = 'Generation en cours...'; btn.disabled = true; }
   try {
     var fd = new FormData();
-    var realMods = mods.filter(function(m){ return !m._isClauseMeta && !m._isFileMeta; });
-    var fileStoragePath = window._fileStoragePath || '';
-    var fileCacheId = window._fileCacheId || '';
-    if (fileStoragePath || fileCacheId) {
-      if (fileStoragePath) fd.append('file_storage_path', fileStoragePath);
-      if (fileCacheId) fd.append('file_cache_id', fileCacheId);
-      fd.append('file', new Blob([''], {type:'text/plain'}), 'placeholder.txt');
-    } else {
-      // Fallback sans fichier stocké : envoyer le texte des modifications nommé .docx
-      var contractText = realMods.map(function(m){
-        return (m.clause_name||'Clause') + ' - ' + (m.original||'');
-      }).join(' | ');
-      if(!contractText.trim()) contractText = 'Contrat - ' + (ana.filename||'document');
-      var docxFilename = (ana.filename||'contrat.docx').replace(/\.[^.]+$/, '.docx');
-      fd.append('file', new Blob([contractText], {type:'text/plain'}), docxFilename);
-    }
+    var contractText = mods.map(function(m){
+      return (m.clause_name||'Clause') + ' - ' + (m.original||'');
+    }).join(' | ');
+    if(!contractText.trim()) contractText = 'Contrat - ' + (ana.filename||'document');
+    fd.append('file', new Blob([contractText], {type:'text/plain'}), 'contrat.txt');
     fd.append('lang', 'auto');
     fd.append('type', ana.contract_type||'generic');
     var decs = {};
-    realMods.forEach(function(m){ decs[String(m.id)] = 'accepted'; });
-    fd.append('modifications', JSON.stringify(realMods));
+    mods.forEach(function(m){ decs[String(m.id)] = 'accepted'; });
+    fd.append('modifications', JSON.stringify(mods));
     fd.append('decisions', JSON.stringify(decs));
-    var resp = await fetch(BACKEND+'/export', {method:'POST', body:fd});
+    var resp = await fetch('https://web-production-f96f7.up.railway.app/export', {method:'POST', body:fd});
     if(resp.ok) {
       var blob = await resp.blob();
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
-      var _ptie2 = (ana.partie || window.selectedPartie || 'Contrat').replace(/[\/\\:*?"<>|]/g, '').trim();
-      var _nd2 = new Date();
-      var _dt2 = String(_nd2.getDate()).padStart(2,'0') + '-' + String(_nd2.getMonth()+1).padStart(2,'0') + '-' + _nd2.getFullYear();
-      a.download = (_ptie2 || 'Contrat') + '------' + _dt2 + '.docx';
+      a.download = (ana.filename||'contrat').replace(/.[^.]+$/, '') + '-modifie.docx';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       URL.revokeObjectURL(url);
       if(btn) {
@@ -2318,50 +1866,30 @@ async function loadJuristes(){
   if(!el||!_cu)return;
   el.innerHTML='<div style="color:#6b7280;font-size:13px">Chargement...</div>';
   try{
-    // Fetch director account data via backend (évite erreur 400 si colonnes manquantes)
-    var rdDir=await fetch(BACKEND+'/account/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email})});
-    var dirAcc=rdDir.ok?await rdDir.json():{};
-    var isAdmin=_isAdmin||dirAcc.role==='admin'||!!dirAcc.is_admin;
-
-    // Admin sees all users; director sees only their juristes
+    // Réutiliser les données déjà chargées par loadDash pour éviter l'incohérence
     var juristes=window._juristesData;
     if(!juristes){
-      if(isAdmin){
-        var ra=await fetch(BACKEND+'/admin/users?caller_email='+encodeURIComponent(_cu.email));
-        var ad=ra.ok?await ra.json():{users:[]};
-        juristes=ad.users||[];
-      } else {
-        var r=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email,role,created_at,payment_status,analyses_remaining,subscription_end',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
-        juristes=r.ok?await r.json():[];
-      }
+      var r=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email,role,created_at',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
+      juristes=r.ok?await r.json():[];
       window._juristesData=juristes;
     }
+    // Fetch director account data to know nb_juristes_max, payment_status and role
+    var rdDir=await fetch(_su+'/rest/v1/user_accounts?email=eq.'+encodeURIComponent(_cu.email)+'&select=nb_juristes_max,payment_status,role',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk}});
+    var dirAccData=rdDir.ok?await rdDir.json():[];
+    var dirAcc=dirAccData[0]||{};
+    var isAdmin=dirAcc.role==='admin';
     var nbJuristesMax=isAdmin?9999:(dirAcc.nb_juristes_max||0);
     var isActive=isAdmin||dirAcc.payment_status==='active';
     var slotsLeft=isAdmin?9999:Math.max(0,nbJuristesMax-juristes.length);
 
-    var rp=await fetch(BACKEND+'/suggestions/list-for-director?director_email='+encodeURIComponent(_cu.email));
+    var rp=await fetch('https://web-production-f96f7.up.railway.app/suggestions/list-for-director?director_email='+encodeURIComponent(_cu.email));
     var pending=[];
     if(rp.ok){var pd=await rp.json();pending=pd.suggestions||[];}
     var allAna=window._userAnalyses||[];
 
     // Slot status bar
-    var slotLabel=isAdmin?('Tous les comptes — '+juristes.length+' compte(s)'):(juristes.length+' / '+nbJuristesMax+' utilisé(s)');
-    var adminToolbar=isAdmin
-      ? '<div style="background:#0a0c12;border:1px solid #1f2537;border-radius:10px;padding:14px 16px;margin-bottom:12px">'
-        +'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">'
-        +'<div style="font-size:13px;font-weight:700;color:#e2e5f0">Tous les comptes <span style="color:#6b7280;font-weight:400;font-size:12px">'+juristes.length+' compte(s) enregistré(s)</span></div>'
-        +'<button id="btn-sync-payments" style="padding:7px 14px;background:#f59e0b22;border:1px solid #f59e0b55;border-radius:8px;color:#f59e0b;font-size:12px;font-weight:700;cursor:pointer">🔄 Sync paiements</button>'
-        +'</div>'
-        +'<div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">'
-        +'<div style="flex:1;min-width:200px"><label style="font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:5px">Email à activer manuellement</label>'
-        +'<input id="admin-activate-email" type="email" placeholder="utilisateur@exemple.com" style="width:100%;background:#111420;border:1px solid #1f2537;border-radius:8px;padding:8px 12px;color:#e2e5f0;font-size:13px;box-sizing:border-box"/></div>'
-        +'<button id="btn-admin-activate" style="padding:9px 16px;background:#10b98122;border:1px solid #10b981;border-radius:8px;color:#10b981;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">Activer</button>'
-        +'</div>'
-        +'<div id="admin-activate-msg" style="display:none;margin-top:8px;font-size:12px"></div>'
-        +'</div>'
-      : '';
-    var slotBar=isAdmin ? adminToolbar : (isActive
+    var slotLabel=isAdmin?(''+juristes.length+' juriste(s) — accès illimité'):(juristes.length+' / '+nbJuristesMax+' utilisé(s)');
+    var slotBar=isActive
       ? '<div style="display:flex;justify-content:space-between;align-items:center;background:#0a0c12;border-radius:8px;padding:12px 16px;margin-bottom:12px">'
         +'<div><div style="font-size:12px;color:#9ca3af">Comptes juristes</div>'
         +'<div style="font-size:14px;font-weight:700;color:#e2e5f0;margin-top:2px">'+slotLabel+'</div></div>'
@@ -2369,7 +1897,7 @@ async function loadJuristes(){
           ? '<button id="btn-create-juriste" style="padding:8px 16px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer">+ Créer un juriste</button>'
           : '<span style="font-size:12px;color:#f59e0b;padding:6px 12px;border:1px solid #f59e0b33;border-radius:8px">Quota atteint — modifiez votre abonnement</span>')
         +'</div>'
-      : '<div style="background:#1a1209;border:1px solid #f59e0b33;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#f59e0b">Souscrivez un abonnement pour créer des comptes juristes.</div>');
+      : '<div style="background:#1a1209;border:1px solid #f59e0b33;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#f59e0b">Souscrivez un abonnement pour créer des comptes juristes.</div>';
 
     // Create form (hidden by default)
     var createForm=slotsLeft>0&&isActive
@@ -2388,32 +1916,7 @@ async function loadJuristes(){
       : '';
 
     var html=slotBar+createForm;
-    if(isAdmin && juristes.length){
-      // Admin view: full user table
-      var statusColor={active:'#10b981',free:'#f59e0b',expired:'#ef4444'};
-      html+='<div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">'+juristes.length+' compte(s) enregistré(s)</div>';
-      html+=juristes.map(function(u){
-        var sc=statusColor[u.payment_status]||'#6b7280';
-        var roleLabel={directeur:'Directeur',juriste:'Juriste',admin:'Admin'}[u.role]||u.role||'?';
-        var subEnd=u.subscription_end?new Date(u.subscription_end).toLocaleDateString('fr-FR'):'—';
-        var createdAt=u.created_at?new Date(u.created_at).toLocaleDateString('fr-FR'):'—';
-        return '<div style="background:#111420;border:1px solid #1f2537;border-radius:10px;padding:12px 16px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'
-          +'<div>'
-          +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">'
-          +'<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:'+(u.role==='admin'?'#8b5cf633':u.role==='directeur'?'#5b7cfa22':'#1f2537')+';color:'+(u.role==='admin'?'#a78bfa':u.role==='directeur'?'#5b7cfa':'#9ca3af')+'">'+roleLabel+'</span>'
-          +'<span style="font-size:13px;font-weight:600;color:#e2e5f0">'+u.email+'</span>'
-          +(u.parent_email?'<span style="font-size:10px;color:#6b7280">↳ '+u.parent_email+'</span>':'')
-          +'</div>'
-          +'<div style="font-size:11px;color:#6b7280">Créé: '+createdAt+' &bull; Abonnement jusqu\'au: '+subEnd+'</div>'
-          +'</div>'
-          +'<div style="display:flex;align-items:center;gap:10px">'
-          +'<span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;background:'+sc+'22;color:'+sc+';border:1px solid '+sc+'44">'+(u.payment_status||'?')+'</span>'
-          +'<span style="font-size:11px;color:#6b7280">'+((u.analyses_remaining||0)+' analyses'+'</span>')
-          +(u.payment_status!=='active'?'<button onclick="adminActivateUser(\''+u.email+'\',\''+u.role+'\')" style="background:#10b98122;border:1px solid #10b981;color:#10b981;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap">Activer</button>':'')
-          +'</div>'
-          +'</div>';
-      }).join('');
-    } else if(!juristes.length){
+    if(!juristes.length){
       html+='<div style="text-align:center;padding:30px 0">'
         +'<div style="font-size:32px;margin-bottom:10px">&#9878;</div>'
         +'<div style="font-size:14px;font-weight:600;color:#e2e5f0;margin-bottom:6px">Aucun juriste rattaché</div>'
@@ -2447,63 +1950,16 @@ async function loadJuristes(){
     if(pending.length){
       html+='<div style="margin-top:20px"><div style="font-size:12px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Modeles en attente de validation ('+pending.length+')</div>';
       html+=pending.map(function(s){
-        var preview=(s.content||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         return '<div data-sid="'+s.id+'" style="background:#111420;border:1px solid #f59e0b33;border-radius:8px;padding:12px;margin-bottom:8px">'
           +'<div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:4px">'+(s.filename||'Modele')+'</div>'
           +'<div style="font-size:11px;color:#6b7280;margin-bottom:8px">Soumis par: <strong style="color:#f59e0b">'+(s.suggested_by||'')+'</strong></div>'
-          +(preview?'<div class="sugg-preview" style="display:none;background:#0a0c12;border:1px solid #1f2537;border-radius:6px;padding:10px;font-size:11px;color:#9ca3af;white-space:pre-wrap;max-height:500px;overflow-y:auto;margin-bottom:10px;line-height:1.6">'+preview+'</div>':'')
           +'<div style="display:flex;gap:8px">'
-          +(preview?'<button class="toggle-preview-btn" style="background:#1a2035;border:1px solid #1f2537;color:#a0a8c0;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer">👁 Voir contenu</button>':'')
           +'<button class="fwd-sugg-btn" style="background:#10b98122;border:1px solid #10b981;color:#10b981;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer">Transmettre admin</button>'
           +'<button class="rej-sugg-btn" style="background:#ef444422;border:1px solid #ef4444;color:#ef4444;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer">Rejeter</button>'
           +'</div></div>';
       }).join('')+'</div>';
     }
     el.innerHTML=html;
-
-    // Admin: sync payments button
-    var btnSync=el.querySelector('#btn-sync-payments');
-    if(btnSync){
-      btnSync.addEventListener('click',async function(){
-        btnSync.disabled=true;btnSync.textContent='⏳ Sync...';
-        var msgDiv=el.querySelector('#admin-activate-msg');
-        try{
-          var r=await fetch(BACKEND+'/admin/sync-payments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({caller_email:_cu.email})});
-          var d=await r.json();
-          if(!r.ok) throw new Error(d.error||'Erreur');
-          var created=d.created_or_updated||[];
-          if(msgDiv){msgDiv.style.display='block';msgDiv.style.color='#10b981';msgDiv.textContent=created.length>0?'Comptes créés/mis à jour: '+created.join(', '):'Tous les comptes sont déjà à jour.';}
-          window._juristesData=null;loadJuristes();
-        }catch(e){
-          if(msgDiv){msgDiv.style.display='block';msgDiv.style.color='#ef4444';msgDiv.textContent='Erreur: '+e.message;}
-          btnSync.disabled=false;btnSync.textContent='🔄 Sync paiements';
-        }
-      });
-    }
-
-    // Admin: manual activate form
-    var btnActivate=el.querySelector('#btn-admin-activate');
-    if(btnActivate){
-      btnActivate.addEventListener('click',async function(){
-        var emailInput=el.querySelector('#admin-activate-email');
-        var msgDiv=el.querySelector('#admin-activate-msg');
-        var targetEmail=(emailInput?emailInput.value.trim():'');
-        if(!targetEmail){if(msgDiv){msgDiv.style.display='block';msgDiv.style.color='#ef4444';msgDiv.textContent='Entrez un email.';}return;}
-        btnActivate.disabled=true;btnActivate.textContent='⏳...';
-        try{
-          var r=await fetch(BACKEND+'/admin/activate-user',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({caller_email:_cu.email,target_email:targetEmail,role:'directeur',analyses_remaining:20,nb_juristes_max:5})});
-          var d=await r.json();
-          if(!r.ok) throw new Error(d.error||'Erreur');
-          if(msgDiv){msgDiv.style.display='block';msgDiv.style.color='#10b981';msgDiv.textContent=d.message||'Activé !';}
-          if(emailInput)emailInput.value='';
-          window._juristesData=null;
-          setTimeout(function(){loadJuristes();},800);
-        }catch(e){
-          if(msgDiv){msgDiv.style.display='block';msgDiv.style.color='#ef4444';msgDiv.textContent='Erreur: '+e.message;}
-        }
-        btnActivate.disabled=false;btnActivate.textContent='Activer';
-      });
-    }
 
     // Create juriste button toggle
     var btnCreate=el.querySelector('#btn-create-juriste');
@@ -2520,7 +1976,6 @@ async function loadJuristes(){
         el.querySelector('#jur-ok').style.display='none';
       });
       el.querySelector('#btn-jur-submit').addEventListener('click',async function(){
-        if(window._juristeCreating) return;
         var emailVal=el.querySelector('#jur-email').value.trim();
         var pwdVal=el.querySelector('#jur-pwd').value;
         var errDiv=el.querySelector('#jur-err');
@@ -2528,7 +1983,6 @@ async function loadJuristes(){
         errDiv.style.display='none';okDiv.style.display='none';
         if(!emailVal||!pwdVal){errDiv.textContent='Email et mot de passe requis.';errDiv.style.display='block';return;}
         if(pwdVal.length<8){errDiv.textContent='Mot de passe trop court (min. 8 caractères).';errDiv.style.display='block';return;}
-        window._juristeCreating=true;
         this.disabled=true;this.textContent='Création...';
         try{
           var res=await fetch(BACKEND+'/director/create-juriste',{
@@ -2542,25 +1996,14 @@ async function loadJuristes(){
             okDiv.textContent='Compte créé avec succès pour '+emailVal;okDiv.style.display='block';
             el.querySelector('#jur-email').value='';el.querySelector('#jur-pwd').value='';
             window._juristesData=null;
-            setTimeout(function(){window._juristeCreating=false;loadJuristes();},1500);
-            return;
+            setTimeout(function(){loadJuristes();},1500);
           }
         }catch(e2){errDiv.textContent='Erreur réseau : '+e2.message;errDiv.style.display='block';}
-        window._juristeCreating=false;
         this.disabled=false;this.textContent='Créer le compte';
       });
     }
 
     // Attach event listeners to suggestion buttons
-    el.querySelectorAll('.toggle-preview-btn').forEach(function(btn){
-      btn.addEventListener('click',function(){
-        var preview=this.closest('[data-sid]').querySelector('.sugg-preview');
-        if(!preview)return;
-        var shown=preview.style.display!=='none';
-        preview.style.display=shown?'none':'';
-        this.textContent=shown?'👁 Voir contenu':'🔼 Masquer';
-      });
-    });
     el.querySelectorAll('.fwd-sugg-btn').forEach(function(btn){
       btn.addEventListener('click',function(){
         var sid=this.closest('[data-sid]').getAttribute('data-sid');
@@ -2579,23 +2022,11 @@ async function loadJuristes(){
 // ===== WORKFLOW COLLABORATION =====
 
 async function _patchAnalysis(id, patch){
-  // Try with user JWT first (works for own rows); fallback to anon key for cross-user ops (director patching jurist's row)
-  var _t=localStorage.getItem('sbt')||_sk;
-  var r=await fetch(_su+'/rest/v1/analyses?id=eq.'+id,{
+  return fetch(_su+'/rest/v1/analyses?id=eq.'+id,{
     method:'PATCH',
-    headers:{'apikey':_sk,'Authorization':'Bearer '+_t,'Content-Type':'application/json','Prefer':'return=representation'}
+    headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json','Prefer':'return=minimal'}
     ,body:JSON.stringify(patch)
   });
-  var rows=[];try{rows=await r.json();}catch(e){}
-  if((r.ok||r.status===204)&&Array.isArray(rows)&&rows.length===0){
-    // RLS blocked silently (cross-user op) — retry with anon key
-    return fetch(_su+'/rest/v1/analyses?id=eq.'+id,{
-      method:'PATCH',
-      headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json','Prefer':'return=minimal'}
-      ,body:JSON.stringify(patch)
-    });
-  }
-  return r;
 }
 
 async function submitForReview(id){
@@ -2788,50 +2219,28 @@ async function initiateCMIPayment(nbUsers, total, role){
   }
 }
 
-async function saveDirectorChanges(id){
-  var note=document.getElementById('director-note-input');
-  var noteVal=note?note.value.trim():'';
-  var btn=document.getElementById('btn-save-director-'+id);
-  if(btn){btn.textContent='⏳...';btn.disabled=true;}
-  try{
-    var r=await fetch(BACKEND+'/analyses/save-director/'+id,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({modifications:_modsWithMeta(window._currentMods),director_notes:noteVal})
-    });
-    var d=r.ok?await r.json().catch(function(){return{};}):{};
-    if(r.ok&&d.status==='ok'){
-      if(btn){btn.textContent='✓ Sauvegardé';setTimeout(function(){if(btn){btn.textContent='Sauvegarder';btn.disabled=false;}},2000);}
-      // Update local data so it survives navigation
-      var ana=(window._userAnalyses||[])[window._anaIdx||0];
-      if(ana){ana.modifications=_modsWithMeta(window._currentMods);ana.director_notes=noteVal;}
-    } else {
-      if(btn){btn.textContent='Sauvegarder';btn.disabled=false;}
-      alert('Erreur sauvegarde: '+(d.error||r.status));
-    }
-  }catch(e){
-    if(btn){btn.textContent='Sauvegarder';btn.disabled=false;}
-    alert('Erreur réseau: '+e.message);
-  }
-}
-
 async function requestRevision(id){
   var note=document.getElementById('director-note-input');
   var noteVal=note?note.value.trim():'';
   if(!confirm('Renvoyer cette analyse au juriste avec une demande de révision ?')) return;
   try{
     var r=await fetch(BACKEND+'/analyses/request-revision/'+id,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({modifications:_modsWithMeta(window._currentMods),director_notes:noteVal,director_email:_cu&&_cu.email||''})
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        modifications:_modsWithMeta(window._currentMods),
+        director_email:_cu.email,
+        director_notes:noteVal
+      })
     });
-    var d=r.ok?await r.json().catch(function(){return{};}):{};
-    if(r.ok&&d.status==='ok'){
-      alert('Renvoyé pour révision. Le juriste verra votre note lors de sa prochaine connexion.');
-      window._juristesData=null;
-      var savedIdx=window._anaIdx||0;
-      await loadDash();
-      showAnaDetail(savedIdx);
-    } else { alert('Erreur révision: '+(d.error||r.status)); }
-  }catch(e){ alert('Erreur réseau révision: '+e.message); }
+    var d=await r.json();
+    if(!r.ok) throw new Error(d.error||'Erreur serveur');
+    alert('Renvoyé pour révision. Le juriste verra votre note lors de sa prochaine connexion.');
+    window._juristesData=null;
+    var savedIdx=window._anaIdx||0;
+    await loadDash();
+    showAnaDetail(savedIdx);
+  }catch(e){ alert('Erreur : '+e.message); }
 }
 
 async function validateByDirector(id){
@@ -2839,25 +2248,26 @@ async function validateByDirector(id){
   var mods=window._currentMods||[];
   try{
     var r=await fetch(BACKEND+'/analyses/validate-by-director/'+id,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({modifications:_modsWithMeta(mods),director_email:_cu&&_cu.email||''})
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({modifications:_modsWithMeta(mods),director_email:_cu.email})
     });
-    var d=r.ok?await r.json().catch(function(){return{};}):{};
-    if(r.ok&&d.status==='ok'){
-      var ana=(window._userAnalyses||[])[window._anaIdx||0]||{};
-      var decisions={};
-      mods.forEach(function(m,i){decisions[String(m.id||i+1)]='accepted';});
-      await fetch(BACKEND+'/queue/add',{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({filename:ana.filename||'Contrat',contract_type:ana.contract_type||'',partie:ana.partie||'',accepted_modifications:JSON.stringify(mods),decisions:JSON.stringify(decisions),submitted_by:_cu&&_cu.email||'',score:80,analysis_id:id,juriste_email:ana.user_email||''})
-      });
-      alert('Analyse validée et transmise à l\'admin pour intégration dans le RAG.');
-      window._juristesData=null;
-      var savedIdx=window._anaIdx||0;
-      await loadDash();
-      showAnaDetail(savedIdx);
-    } else { alert('Erreur validation: '+(d.error||r.status)); }
-  }catch(e){ alert('Erreur réseau validation: '+e.message); }
+    var d=await r.json();
+    if(!r.ok) throw new Error(d.error||'Erreur serveur');
+    // Envoyer à la file admin via queue/add
+    var ana=(window._userAnalyses||[])[window._anaIdx||0]||{};
+    var decisions={};
+    mods.forEach(function(m,i){decisions[String(m.id||i+1)]='accepted';});
+    await fetch(BACKEND+'/queue/add',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({filename:ana.filename||'Contrat',contract_type:ana.contract_type||'',partie:ana.partie||'',accepted_modifications:JSON.stringify(mods),decisions:JSON.stringify(decisions),submitted_by:_cu.email,score:80,analysis_id:id,juriste_email:ana.user_email||''})
+    });
+    alert('Analyse validée et transmise à l\'admin pour intégration dans le RAG.');
+    window._juristesData=null;
+    var savedIdx=window._anaIdx||0;
+    await loadDash();
+    showAnaDetail(savedIdx);
+  }catch(e){ alert('Erreur : '+e.message); }
 }
 
 function filterAndShowAnalyses(juristeEmail){
@@ -2865,22 +2275,6 @@ function filterAndShowAnalyses(juristeEmail){
   dtab('analyses');
   var sel=document.getElementById('juriste-filter');
   if(sel){sel.value=juristeEmail;if(window.filterAnalysesByJuriste)window.filterAnalysesByJuriste(juristeEmail);}
-}
-
-async function adminActivateUser(targetEmail, role){
-  if(!confirm('Activer l\'abonnement de '+targetEmail+' (30 jours) ?')) return;
-  try{
-    var r=await fetch(BACKEND+'/admin/activate-user',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({caller_email:_cu.email, target_email:targetEmail, role:role||'directeur', analyses_remaining:20, nb_juristes_max:role==='directeur'?5:0})
-    });
-    var d=await r.json();
-    if(!r.ok) throw new Error(d.error||'Erreur serveur');
-    alert(d.message||'Utilisateur activé !');
-    window._juristesData=null;
-    loadJuristes();
-  }catch(e){ alert('Erreur : '+e.message); }
 }
 
 async function deleteJuriste(juristeEmail){
@@ -2893,8 +2287,9 @@ async function deleteJuriste(juristeEmail){
     });
     var d=await r.json();
     if(!r.ok) throw new Error(d.error||'Erreur serveur');
-    window._juristesData=null;
-    loadJuristes();
+    // Reload the team tab
+    var el=document.getElementById('tab-equipe');
+    if(el&&window.loadJuristes) loadJuristes(el);
   }catch(e){ alert('Erreur : '+e.message); }
 }
 
@@ -2910,581 +2305,6 @@ async function rejectSuggDir(id){
   var r=await fetch(BACKEND+'/suggestions/reject-director/'+id,{method:'POST'});
   if(r.ok){alert('Suggestion rejetee.');loadJuristes();}
   else alert('Erreur');
-}
-
-// ── App language switcher ─────────────────────────────────────────
-var _appLang = localStorage.getItem('omniscient_lang') || 'fr';
-var _appStrings = {
-  fr: {
-    heroH1: 'Révisez vos contrats<br/><span class="accent">avec l\'IA.</span>',
-    heroSub: 'Uploadez votre contrat. L\'IA identifie les parties, vous choisissez laquelle protéger, puis propose des modifications avec Track Changes.',
-    uploadTitle: 'Déposez votre contrat ici',
-    uploadSub: 'ou cliquez pour sélectionner',
-    btnAnalyse: '⚡ Analyser',
-    btnDownload: 'Télécharger DOCX',
-    tabUpload: '📤 Uploader',
-    tabText: ' Coller du texte',
-    complianceTitle: '⚖ Analyse de conformité juridique',
-    complianceSub: 'Basée sur les lois, doctrine et jurisprudences de la base documentaire RAG',
-    dashTitle: 'Mon espace',
-    riskHigh: 'Risque élevé', riskMed: 'Risque modéré', riskLow: 'Risque faible',
-  },
-  en: {
-    heroH1: 'Review your contracts<br/><span class="accent">with AI.</span>',
-    heroSub: 'Upload your contract. The AI identifies the parties, you choose which one to protect, then it suggests edits with Track Changes.',
-    uploadTitle: 'Drop your contract here',
-    uploadSub: 'or click to select',
-    btnAnalyse: '⚡ Analyze',
-    btnDownload: 'Download DOCX',
-    tabUpload: '📤 Upload',
-    tabText: ' Paste text',
-    complianceTitle: '⚖ Legal compliance analysis',
-    complianceSub: 'Based on laws, doctrine and case law from the RAG knowledge base',
-    dashTitle: 'My workspace',
-    riskHigh: 'High risk', riskMed: 'Moderate risk', riskLow: 'Low risk',
-  }
-};
-function appSetLang(l) {
-  _appLang = l;
-  localStorage.setItem('omniscient_lang', l);
-  var s = _appStrings[l] || _appStrings.fr;
-  var h1 = document.getElementById('app-hero-h1'); if (h1) h1.innerHTML = s.heroH1;
-  var sub = document.getElementById('app-hero-sub'); if (sub) sub.textContent = s.heroSub;
-  var dt = document.getElementById('drop-title'); if (dt) dt.textContent = s.uploadTitle;
-  var ds = document.getElementById('drop-sub'); if (ds) ds.textContent = s.uploadSub;
-  var dt2 = document.getElementById('dash-title'); if (dt2) dt2.textContent = s.dashTitle;
-  var tu = document.getElementById('tab-upload'); if (tu) tu.textContent = s.tabUpload;
-  var tt = document.getElementById('tab-text'); if (tt) tt.textContent = s.tabText;
-  // Toggle button styles
-  var bf = document.getElementById('app-lang-fr'), be = document.getElementById('app-lang-en');
-  if (bf) { bf.style.background = l==='fr'?'rgba(200,169,75,0.15)':'transparent'; bf.style.color = l==='fr'?'#c8a94b':'#6b7280'; }
-  if (be) { be.style.background = l==='en'?'rgba(200,169,75,0.15)':'transparent'; be.style.color = l==='en'?'#c8a94b':'#6b7280'; }
-  document.documentElement.lang = l;
-}
-if (_appLang === 'en') appSetLang('en');
-</script>
-
-<!-- ════════════════ CHATBOT SIDEBAR ════════════════ -->
-<style>
-/* ── Shrink content when sidebar opens ── */
-@media(min-width:861px){
-  body.chatbot-open #dash-ov{right:340px;}
-  body.chatbot-open .wrap{padding-right:340px;}
-  body.chatbot-open #ubar{margin-right:340px;}
-  body.chatbot-open .dclose{right:392px;}
-}
-.wrap{transition:padding-right .3s ease;}
-#ubar{transition:margin-right .3s ease;}
-.dclose{transition:right .3s ease;}
-
-/* ── Sidebar container ── */
-#cb-sidebar{
-  position:fixed;top:0;right:-310px;width:340px;height:100vh;
-  background:#0f1320;border-left:1px solid #1f2537;
-  z-index:1001;display:flex;flex-direction:column;
-  transition:right .32s cubic-bezier(.4,0,.2,1);
-  box-shadow:-6px 0 36px rgba(0,0,0,.55);
-}
-#cb-sidebar.cb-open{right:0;}
-
-/* ── Toggle tab (sticks out on the left) ── */
-#cb-tab{
-  position:absolute;left:-42px;top:50%;transform:translateY(-50%);
-  width:42px;background:#0f1320;border:1px solid #1f2537;border-right:none;
-  border-radius:12px 0 0 12px;cursor:pointer;padding:14px 7px 14px;
-  display:flex;flex-direction:column;align-items:center;gap:10px;
-  box-shadow:-3px 0 14px rgba(0,0,0,.4);transition:background .2s;
-}
-#cb-tab:hover{background:#111a2e;}
-#cb-tab-lbl{
-  writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);
-  font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
-  color:#6b7280;user-select:none;transition:color .2s;
-}
-#cb-sidebar.cb-open #cb-tab-lbl{color:#5b7cfa;}
-
-/* ── Header ── */
-#cb-head{
-  padding:15px 18px;border-bottom:1px solid #1f2537;
-  display:flex;align-items:center;gap:11px;background:#111420;flex-shrink:0;
-}
-#cb-logo{width:38px;height:38px;flex-shrink:0;}
-#cb-head-title{font-weight:800;font-size:14px;color:#e2e5f0;line-height:1.2;}
-#cb-head-sub{font-size:11px;color:#6b7280;}
-#cb-shrink{
-  background:none;border:none;color:#6b7280;cursor:pointer;
-  font-size:22px;line-height:1;padding:0 3px;margin-left:auto;transition:color .15s;
-}
-#cb-shrink:hover{color:#e2e5f0;}
-
-/* ── Messages ── */
-#cb-msgs{
-  flex:1;overflow-y:auto;padding:14px 15px;
-  display:flex;flex-direction:column;gap:10px;
-}
-#cb-msgs::-webkit-scrollbar{width:3px;}
-#cb-msgs::-webkit-scrollbar-thumb{background:#2a3040;border-radius:3px;}
-.cb-msg{max-width:90%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.55;word-wrap:break-word;}
-.cb-msg.user{align-self:flex-end;background:#5b7cfa;color:#fff;border-bottom-right-radius:3px;}
-.cb-msg.bot{align-self:flex-start;background:#181c2a;color:#e2e5f0;border:1px solid #1f2537;border-bottom-left-radius:3px;}
-.cb-msg.bot h3,.cb-msg.bot h4,.cb-msg.bot h5{margin:8px 0 4px;color:#a0b4ff;font-size:13px;}
-.cb-msg.bot hr{border:none;border-top:1px solid #2a3040;margin:6px 0;}
-.cb-msg.bot ul{margin:4px 0 4px 16px;padding:0;}
-.cb-msg.bot li{margin:2px 0;}
-.cb-msg.bot table{border-collapse:collapse;width:100%;margin:6px 0;font-size:12px;}
-.cb-msg.bot td,.cb-msg.bot th{border:1px solid #2a3040;padding:4px 8px;text-align:left;}
-.cb-msg.bot th{background:#1f2537;color:#a0b4ff;}
-.cb-msg.bot code{background:#0d1117;padding:1px 5px;border-radius:3px;font-size:11px;}
-/* Modification card inside a bot message */
-.cb-mod-card{background:#0d1017;border:1px solid rgba(16,185,129,.25);border-radius:10px;padding:12px;margin-top:8px;font-size:12px;}
-.cb-mod-name{font-weight:700;color:#10b981;margin-bottom:5px;}
-.cb-mod-orig{color:#6b7280;font-size:11px;margin-bottom:3px;}
-.cb-mod-prop{color:#e2e5f0;font-size:11px;margin-bottom:9px;}
-.cb-apply-btn{
-  width:100%;padding:7px 10px;
-  background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.35);
-  border-radius:7px;color:#10b981;font-size:12px;font-weight:700;cursor:pointer;
-  transition:background .15s;
-}
-.cb-apply-btn:hover{background:rgba(16,185,129,.22);}
-.cb-apply-btn.applied{background:#10b981;color:#fff;cursor:default;pointer-events:none;}
-/* Typing indicator */
-.cb-typing{align-self:flex-start;background:#181c2a;border:1px solid #1f2537;border-radius:12px;border-bottom-left-radius:3px;padding:10px 14px;display:flex;gap:5px;align-items:center;}
-.cb-typing span{width:5px;height:5px;border-radius:50%;background:#5b7cfa;animation:cb-bounce .9s infinite;}
-.cb-typing span:nth-child(2){animation-delay:.15s;}
-.cb-typing span:nth-child(3){animation-delay:.3s;}
-@keyframes cb-bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
-
-/* ── Footer input ── */
-#cb-footer{padding:12px 13px;border-top:1px solid #1f2537;display:flex;gap:8px;background:#111420;flex-shrink:0;}
-#cb-input{
-  flex:1;background:#181c2a;border:1px solid #1f2537;border-radius:9px;
-  padding:9px 12px;color:#e2e5f0;font-size:13px;font-family:inherit;
-  resize:none;min-height:38px;max-height:100px;outline:none;line-height:1.4;
-}
-#cb-input:focus{border-color:#5b7cfa;}
-#cb-send{
-  width:36px;height:36px;background:#5b7cfa;border:none;border-radius:8px;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;align-self:flex-end;transition:background .15s;
-}
-#cb-send:hover{background:#4a6be8;}
-#cb-send svg{width:15px;height:15px;fill:#fff;}
-#cb-counter{font-size:10px;color:#666;text-align:right;padding:2px 14px 5px;background:#111420;}
-
-@media(max-width:640px){
-  #cb-sidebar{width:100vw;right:-100vw;}
-  #cb-sidebar.cb-open{right:0;}
-  #cb-tab{left:-38px;width:38px;}
-}
-</style>
-
-<!-- ── Sidebar DOM ── -->
-<div id="cb-sidebar">
-
-  <!-- Tab trigger -->
-  <button id="cb-tab" onclick="cbToggle()" title="Assistant Omniscient">
-    <img src="/westfield-ghost.png" style="width:28px;height:28px;object-fit:contain;border-radius:6px;display:block;" alt="Omniscient">
-    <span id="cb-tab-lbl">Assistant</span>
-  </button>
-
-  <!-- Header -->
-  <div id="cb-head">
-    <!-- Ghost + scales logo -->
-    <img id="cb-logo" src="/westfield-ghost.png" style="border-radius:8px;object-fit:contain;" alt="Omniscient">
-    <div>
-      <div id="cb-head-title">Omniscient</div>
-      <div id="cb-head-sub">Assistant contractuel IA</div>
-    </div>
-    <button id="cb-shrink" onclick="cbToggle()" title="Réduire">&#8250;</button>
-  </div>
-
-  <div id="cb-msgs"></div>
-
-  <div id="cb-counter"></div>
-  <div id="cb-footer">
-    <textarea id="cb-input" placeholder="Posez une question ou demandez une modification…" rows="1" onkeydown="cbKey(event)" oninput="cbResize(this)"></textarea>
-    <button id="cb-send" onclick="cbSend()" title="Envoyer">
-      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-    </button>
-  </div>
-</div>
-
-<script>
-// Ensure selectedPartie is always declared (implicit global only created after first analysis)
-if (typeof selectedPartie === 'undefined') var selectedPartie = '';
-
-// ── Chatbot state ─────────────────────────────────────────────────
-var _cbHistory       = [];
-var _cbOpen          = false;
-var _cbWelcomed      = false;
-var _cbModStore      = {};   // key → modObj  (avoids inline JSON in onclick)
-var _cbLastCacheId   = null; // tracks the current analysis session
-
-function cbToggle() {
-  _cbOpen = !_cbOpen;
-  var sb = document.getElementById('cb-sidebar');
-  var sh = document.getElementById('cb-shrink');
-  document.body.classList.toggle('chatbot-open', _cbOpen);
-  if (_cbOpen) {
-    sb.classList.add('cb-open');
-    if (sh) sh.innerHTML = '&#8250;';
-    document.getElementById('cb-input').focus();
-    if (!_cbWelcomed) { _cbWelcomed = true; cbWelcome(); }
-    cbScrollBottom();
-    var _ctr=document.getElementById('cb-counter');
-    if(_ctr){if(_isAdmin)_ctr.textContent='Accès illimité';else if(typeof window._chatRemaining==='number')_ctr.textContent=window._chatRemaining+' / 15 messages restants';}
-  } else {
-    sb.classList.remove('cb-open');
-    if (sh) sh.innerHTML = '&#8249;';
-  }
-}
-
-function cbOpen() { if (!_cbOpen) cbToggle(); }
-
-// Called when a new analysis is complete — resets chatbot context
-function cbNewAnalysis() {
-  _cbHistory   = [];
-  _cbWelcomed  = false;
-  _cbModStore  = {};
-  _cbLastCacheId = window._fileCacheId || null;
-  document.getElementById('cb-msgs').innerHTML = '';
-  cbOpen();
-}
-
-function cbWelcome() {
-  var hasContract = modifications.length > 0 || window._fileCacheId;
-  if (!hasContract) {
-    cbAddMsg('bot',
-      '<span style="color:#6b7280">Aucun contrat charg\u00e9 pour le moment.<br>'
-      + 'Analysez un contrat d\u2019abord, puis revenez\u00a0!</span>'
-    );
-    return;
-  }
-  cbAddMsg('bot',
-    'Bonjour\u00a0! Je suis <strong>Omniscient</strong>, votre assistant juridique IA.<br>'
-    + 'Posez vos questions sur ce contrat ou demandez-moi d\u2019y apporter des modifications.<br><br>'
-    + '<span style="color:#6b7280;font-size:12px">Exemples\u00a0:<br>'
-    + '\u00b7 \u00abExplique la clause de r\u00e9siliation\u00bb<br>'
-    + '\u00b7 \u00abModifie la confidentialit\u00e9 pour mieux prot\u00e9ger '
-    + _escH((window.selectedPartie) || 'votre partie') + '\u00bb</span>'
-  );
-}
-
-function cbKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); cbSend(); }
-}
-
-function cbResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
-}
-
-function _cbMd(t) {
-  var lines = t.split('\n'), out = '', inTbl = false, inUl = false;
-  function inline(s) {
-    return s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-            .replace(/\*(.+?)\*/g,'<em>$1</em>')
-            .replace(/`(.+?)`/g,'<code>$1</code>');
-  }
-  for (var i = 0; i < lines.length; i++) {
-    var l = lines[i];
-    if (l.trim().charAt(0) === '|') {
-      if (l.replace(/[\|\s\-:]/g,'') === '') continue; // separator row
-      if (!inTbl) { out += '<table>'; inTbl = true; }
-      var cells = l.split('|').filter(function(c){return c.trim()!=='';});
-      var isHdr = i+1 < lines.length && /^\|[-\s|:]+\|$/.test(lines[i+1]);
-      var tag = isHdr ? 'th' : 'td';
-      out += '<tr>' + cells.map(function(c){return '<'+tag+'>'+inline(c.trim())+'</'+tag+'>';}).join('') + '</tr>';
-      continue;
-    }
-    if (inTbl) { out += '</table>'; inTbl = false; }
-    if (/^#{1,4}\s/.test(l)) {
-      if (inUl){out+='</ul>';inUl=false;}
-      out += '<h4>'+inline(l.replace(/^#+\s/,''))+'</h4>'; continue;
-    }
-    if (/^---+$/.test(l.trim())) {
-      if (inUl){out+='</ul>';inUl=false;}
-      out += '<hr>'; continue;
-    }
-    if (/^[-*]\s/.test(l)) {
-      if (!inUl){out+='<ul>';inUl=true;}
-      out += '<li>'+inline(l.replace(/^[-*]\s/,''))+'</li>'; continue;
-    }
-    if (inUl){out+='</ul>';inUl=false;}
-    if (l.trim()===''){out+='<br>';continue;}
-    out += inline(l)+'<br>';
-  }
-  if (inTbl) out += '</table>';
-  if (inUl) out += '</ul>';
-  return out;
-}
-
-function cbAddMsg(role, html, modObjs) {
-  var msgs = document.getElementById('cb-msgs');
-  var div  = document.createElement('div');
-  div.className = 'cb-msg ' + role;
-  div.innerHTML  = html;
-
-  if (role === 'bot' && modObjs) {
-    var list = Array.isArray(modObjs) ? modObjs : [modObjs];
-    list.forEach(function(modObj) {
-      if (!modObj) return;
-      var sk = 'cbm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-      _cbModStore[sk] = modObj;
-
-      var card = document.createElement('div');
-      card.className = 'cb-mod-card';
-
-      var origTxt  = (modObj.original || '').slice(0, 130);
-      var propTxt  = (modObj.proposed || '').slice(0, 130);
-      var origMore = (modObj.original || '').length > 130 ? '\u2026' : '';
-      var propMore = (modObj.proposed || '').length > 130 ? '\u2026' : '';
-
-      card.innerHTML =
-        '<div class="cb-mod-name">\u2726 ' + _escH(modObj.clause_name || 'Modification propos\u00e9e') + '</div>' +
-        (modObj.original ? '<div class="cb-mod-orig">\u26a0 Original\u00a0: ' + _escH(origTxt) + origMore + '</div>' : '') +
-        '<div class="cb-mod-prop">\u2713 Propos\u00e9\u00a0: ' + _escH(propTxt) + propMore + '</div>' +
-        '<button class="cb-apply-btn" data-sk="' + sk + '" onclick="cbApplyMod(this)">+ Ajouter au contrat</button>';
-
-      div.appendChild(card);
-    });
-  }
-
-  msgs.appendChild(div);
-  cbScrollBottom();
-  return div;
-}
-
-function cbScrollBottom() {
-  var msgs = document.getElementById('cb-msgs');
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function cbShowTyping() {
-  var msgs = document.getElementById('cb-msgs');
-  var t = document.createElement('div');
-  t.className = 'cb-typing'; t.id = 'cb-typing';
-  t.innerHTML = '<span></span><span></span><span></span>';
-  msgs.appendChild(t);
-  cbScrollBottom();
-}
-
-function cbHideTyping() {
-  var t = document.getElementById('cb-typing');
-  if (t) t.remove();
-}
-
-function cbApplyMod(btn) {
-  if (btn.classList.contains('applied')) return;
-  var sk  = btn.getAttribute('data-sk');
-  var mod = _cbModStore[sk];
-  if (!mod) { alert('Donn\u00e9es introuvables, r\u00e9essayez.'); return; }
-  try {
-    var newId  = Date.now();
-    var newMod = {
-      id:           newId,
-      clause_name:  mod.clause_name || 'Clause (assistant)',
-      original:     mod.original    || '',
-      proposed:     mod.proposed    || '',
-      risk:         mod.risk        || 'medium',
-      reason:       mod.reason      || 'Modification sugg\u00e9r\u00e9e par Omniscient'
-    };
-    modifications.push(newMod);
-    decisions[String(newId)] = 'accepted';
-    renderReview();
-    btn.textContent = '\u2705 Ajout\u00e9 et accept\u00e9';
-    btn.classList.add('applied');
-    setTimeout(function() {
-      var card = document.getElementById('card-' + newId);
-      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 250);
-  } catch(e) {
-    alert('Erreur\u00a0: ' + e.message);
-  }
-}
-
-async function cbSend() {
-  var input = document.getElementById('cb-input');
-  var msg   = input.value.trim();
-  if (!msg) return;
-  input.value = ''; input.style.height = 'auto';
-
-  cbAddMsg('user', _escH(msg));
-  _cbHistory.push({ role: 'user', content: msg });
-  cbShowTyping();
-  document.getElementById('cb-send').disabled = true;
-
-  try {
-    // Send contract text if available in this session
-    var contractTxt = savedText || '';
-    // Also pass cache/storage IDs so backend can recover if savedText is empty
-    var currentCacheId = window._fileCacheId || '';
-
-    var payload = {
-      message:       msg,
-      history:       _cbHistory.slice(-10),
-      contract_text: contractTxt,
-      modifications: modifications,
-      decisions:     decisions,
-      partie:        (window.selectedPartie) || '',
-      jurisdiction:  window._jurisdiction || 'universel',
-      file_cache_id:      currentCacheId,
-      file_storage_path:  window._fileStoragePath || ''
-    };
-    if (_cu && _cu.email) payload.user_email = _cu.email;
-
-    var r    = await fetch(BACKEND + '/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    var data = await r.json();
-    cbHideTyping();
-    if (!r.ok) throw new Error(data.error || 'Erreur serveur');
-
-    var ctr = document.getElementById('cb-counter');
-    if (ctr) {
-      if (data.chat_remaining === 9999) ctr.textContent = 'Accès illimité';
-      else if (typeof data.chat_remaining === 'number') ctr.textContent = data.chat_remaining + ' / 15 messages restants';
-    }
-
-    var reply = data.reply || '';
-    _cbHistory.push({ role: 'assistant', content: reply });
-    var modObjs = data.modifications && data.modifications.length ? data.modifications : (data.modification ? [data.modification] : null);
-
-    // Detect [EXPORT_TRANSLATION:xx] marker — strip it and show download button
-    var _trMatch = reply.match(/\[EXPORT_TRANSLATION:([a-z]{2})\]/);
-    var _displayReply = reply.replace(/\[EXPORT_TRANSLATION:[a-z]{2}\]/g, '').trim();
-    var _trBtn = '';
-    if (_trMatch) {
-      var _tl = _trMatch[1];
-      var _tlLabel = {en:'anglais',fr:'français',ar:'arabe'}[_tl] || _tl;
-      _trBtn = '<div style="margin-top:12px;">'
-        + '<button onclick="cbExportTranslation(\'' + _tl + '\',this)" '
-        + 'style="background:linear-gradient(135deg,#c8a94b,#e8c96b);color:#05070e;border:none;'
-        + 'border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;">'
-        + '⬇ Télécharger la traduction Word (' + _tlLabel + ')</button></div>';
-    }
-    cbAddMsg('bot', _cbMd(_displayReply) + _trBtn, modObjs);
-  } catch(e) {
-    cbHideTyping();
-    cbAddMsg('bot', '\u274c ' + _escH(e.message || 'Erreur inattendue.'));
-  } finally {
-    document.getElementById('cb-send').disabled = false;
-    document.getElementById('cb-input').focus();
-  }
-}
-
-// Hook renderReview: only trigger a full chatbot reset when a new analysis
-// has completed (detected by a new _fileCacheId different from the last known one).
-(function() {
-  var _orig = renderReview;
-  renderReview = function() {
-    _orig.apply(this, arguments);
-    var newCacheId = window._fileCacheId || null;
-    if (newCacheId && newCacheId !== _cbLastCacheId) {
-      cbNewAnalysis();
-    } else {
-      cbOpen();
-    }
-  };
-})();
-
-// Hook showAnaDetail: sync past analysis data into chatbot context
-(function() {
-  var _origShow = showAnaDetail;
-  showAnaDetail = async function(idx) {
-    await _origShow.apply(this, arguments);
-    var ana = (window._userAnalyses || [])[idx];
-    if (!ana) return;
-
-    // Sync global modifications with the past analysis
-    modifications = (window._currentMods || []).slice();
-    decisions = {};
-    modifications.forEach(function(m) { decisions[String(m.id || '')] = 'accepted'; });
-    window.selectedPartie = ana.partie || (window.selectedPartie) || '';
-    if (ana.contract_type) savedType = ana.contract_type;
-    savedText = ''; // raw text not available; backend will use file cache / storage
-
-    // Build a stable identifier for this past analysis
-    // If the in-memory file cache has expired, fall back to a synthetic ID
-    // so the chatbot still resets its history for each different analysis.
-    var pastId = 'past__' + (ana.id || idx);
-    if (!window._fileCacheId) window._fileCacheId = pastId;
-
-    if (window._fileCacheId !== _cbLastCacheId) {
-      cbNewAnalysis();
-    }
-  };
-})();
-
-async function cbExportTranslation(lang, btn) {
-  btn.disabled = true;
-  var orig = btn.textContent;
-  var _tMsgs = [
-    '🔄 Lecture du contrat…',
-    '🤖 Traduction IA en cours…',
-    '📝 Application des modifications…',
-    '🌐 Vérification terminologique…',
-    '📄 Génération du document Word…',
-    '⚙️ Mise en forme finale…'
-  ];
-  var _tIdx = 0;
-  var _tSecs = 0;
-  var _tTimer = setInterval(function() {
-    _tSecs++;
-    var mins = Math.floor(_tSecs / 60);
-    var secs = _tSecs % 60;
-    var clock = mins > 0
-      ? mins + ':' + String(secs).padStart(2, '0')
-      : secs + 's';
-    if (_tSecs % 7 === 0) { _tIdx = (_tIdx + 1) % _tMsgs.length; }
-    btn.textContent = _tMsgs[_tIdx] + '  ' + clock;
-  }, 1000);
-  btn.textContent = _tMsgs[0] + '  0s';
-  try {
-    var contractTxt = savedText || '';
-    if (!contractTxt) {
-      clearInterval(_tTimer);
-      btn.textContent = '❌ Contrat non disponible';
-      btn.disabled = false;
-      return;
-    }
-    var fname = (typeof curFile !== 'undefined' && curFile && curFile.name)
-      ? curFile.name.replace(/\.[^.]+$/, '') : 'contrat';
-    var r = await fetch(BACKEND + '/export-translation', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        contract_text: contractTxt,
-        target_lang:   lang,
-        filename:      fname,
-        modifications: modifications || [],
-        decisions:     decisions || {}
-      })
-    });
-    clearInterval(_tTimer);
-    if (!r.ok) { var e = await r.json(); throw new Error(e.error || 'Erreur ' + r.status); }
-    var blob = await r.blob();
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = fname + '_translation_' + lang + '.docx';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
-    btn.textContent = '✅ Téléchargé en ' + (_tSecs >= 60
-      ? Math.floor(_tSecs/60) + 'min' + (_tSecs%60 ? _tSecs%60 + 's' : '')
-      : _tSecs + 's');
-    setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 3500);
-  } catch(e) {
-    clearInterval(_tTimer);
-    btn.textContent = '❌ ' + (e.message || 'Erreur');
-    btn.disabled = false;
-    setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 3000);
-  }
 }
 </script>
 </body>
