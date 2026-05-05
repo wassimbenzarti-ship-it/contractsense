@@ -1962,47 +1962,22 @@ async function analyzeAdverse(anaId, contractType, partie){
   var inp=document.getElementById('adverse-file-inp');
   var file=inp?inp.files[0]:null;
   if(!file) return;
+  window._adverseFile=file;
   var res=document.getElementById('adverse-result');
-  if(res)res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Analyse des écarts par rapport à vos positions validées...</div>';
+  if(res)res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Comparaison avec Haiku — analyse des écarts uniquement...</div>';
 
   try{
+    var ourMods=window._currentMods||modifications||[];
     var fd=new FormData();
     fd.append('file',file);
     fd.append('type',contractType||'general');
     fd.append('partie',partie||'');
-    fd.append('lang','auto');
+    fd.append('our_modifications',JSON.stringify(ourMods));
     if(_cu&&_cu.email) fd.append('user_email',_cu.email);
-    var r=await fetch(BACKEND+'/analyze',{method:'POST',body:fd});
+    var r=await fetch(BACKEND+'/analyze-adverse-diff',{method:'POST',body:fd});
     var data=await r.json();
     if(!r.ok) throw new Error(data.error||'Erreur serveur');
-    var adverseMods=data.modifications||[];
-
-    var ourMods=window._currentMods||[];
-
-    function findOurClause(adverseClauseName){
-      if(!adverseClauseName||!ourMods.length) return null;
-      var name=adverseClauseName.toLowerCase();
-      return ourMods.find(function(m){
-        var mn=(m.clause_name||'').toLowerCase();
-        return mn&&(mn===name||name.indexOf(mn.split(' ')[0])>=0||mn.indexOf(name.split(' ')[0])>=0);
-      })||null;
-    }
-
-    // Filtrer : ne garder que les clauses où la partie adverse s'écarte de notre position validée
-    var results=adverseMods.map(function(m){
-      var ours=findOurClause(m.clause_name);
-      var ourProposed=ours?(ours.proposed||ours.original):'';
-      // Si le texte adverse est très proche de notre proposition validée (>65%), ils ont accepté → ignorer
-      if(ours&&_wordSim(ourProposed,m.original||'')>0.65) return null;
-      return {
-        clause_name: m.clause_name,
-        original: m.original,       // version de la partie adverse
-        proposed: ours?ourProposed:m.proposed,  // notre contre-proposition
-        risk: m.risk,
-        reason: m.reason,
-        _fromOurs: !!ours
-      };
-    }).filter(Boolean);
+    var results=data.modifications||[];
 
     if(!results.length){
       if(res)res.innerHTML='<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:14px;font-size:13px;color:#10b981">✅ La partie adverse n\'a pas modifié vos positions validées. Aucune contre-proposition nécessaire.</div>';
@@ -2016,12 +1991,9 @@ async function analyzeAdverse(anaId, contractType, partie){
       var risk=m.risk||'medium';
       var col=risk==='high'?'#ef4444':risk==='low'?'#10b981':'#f59e0b';
       var lbl=risk==='high'?'Risque élevé':risk==='low'?'Risque faible':'Risque modéré';
-      var sourceTag=m._fromOurs
-        ?'<span style="font-size:10px;background:#10b98122;color:#10b981;padding:1px 6px;border-radius:10px">✓ vs notre version validée</span>'
-        :'<span style="font-size:10px;background:#f59e0b22;color:#f59e0b;padding:1px 6px;border-radius:10px">clause non couverte</span>';
       html+='<div class="mod-card" style="margin-bottom:14px">'
         +'<div class="mod-header">'
-        +'<div class="mod-name">'+_escH(m.clause_name||'Clause')+'&nbsp;'+sourceTag+'</div>'
+        +'<div class="mod-name">'+_escH(m.clause_name||'Clause')+'</div>'
         +'<span class="risk-pill" style="background:'+col+'20;color:'+col+'">'+lbl+'</span>'
         +'</div>'
         +'<div class="mod-body">'
@@ -2033,11 +2005,45 @@ async function analyzeAdverse(anaId, contractType, partie){
         +'</div>'
         +'</div>';
     });
-    html+='<button onclick="saveAdverseResponse(\''+anaId+'\','+results.length+')" style="margin-top:4px;padding:10px 22px;background:#8b5cf6;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Sauvegarder les contre-propositions →</button>';
+    html+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'
+      +'<button onclick="saveAdverseResponse(\''+_eJS(anaId)+'\','+results.length+')" style="padding:10px 20px;background:#8b5cf6;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Sauvegarder →</button>'
+      +'<button onclick="exportAdverseDiff(\''+_eJS(anaId)+'\',\''+_eJS(partie)+'\')" style="padding:10px 20px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX</button>'
+      +'</div>';
     if(res)res.innerHTML=html;
     window._adverseMods=results;
   }catch(e){
     if(res)res.innerHTML='<div style="color:#ef4444;font-size:12px;padding:10px 0">Erreur : '+e.message+'</div>';
+  }
+}
+
+async function exportAdverseDiff(anaId, partie){
+  var btn=event.target;
+  btn.disabled=true; btn.textContent='⏳ Génération...';
+  try{
+    var mods=(window._adverseMods||[]).map(function(m,i){
+      var ta=document.getElementById('adv-mod-'+i);
+      return Object.assign({},m,{proposed:ta?ta.value:m.proposed,decision:'accepted'});
+    });
+    var fd=new FormData();
+    if(window._adverseFile) fd.append('file',window._adverseFile);
+    fd.append('modifications',JSON.stringify(mods));
+    fd.append('decisions',JSON.stringify(Object.fromEntries(mods.map(function(m,i){return [String(i),'accepted'];}))));
+    fd.append('partie',partie||'');
+    if(_cu&&_cu.email) fd.append('user_email',_cu.email);
+    var r=await fetch(BACKEND+'/export',{method:'POST',body:fd});
+    if(!r.ok){var e=await r.json();throw new Error(e.error||'Erreur export');}
+    var blob=await r.blob();
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    a.download=((partie||'adverse').replace(/[\/\\:*?"<>|]/g,'-')+'------contre-propositions---'+new Date().toLocaleDateString('fr-FR').split('/').reverse().join('-')+'.docx');
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    btn.textContent='✅ Téléchargé'; btn.disabled=false;
+    setTimeout(function(){btn.textContent='⬇ Télécharger DOCX';},3500);
+  }catch(e){
+    btn.textContent='❌ '+e.message; btn.disabled=false;
+    setTimeout(function(){btn.textContent='⬇ Télécharger DOCX';},3000);
   }
 }
 
