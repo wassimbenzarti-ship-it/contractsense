@@ -2022,7 +2022,7 @@ async function exportAdverseDiff(anaId, partie){
   try{
     var mods=(window._adverseMods||[]).map(function(m,i){
       var ta=document.getElementById('adv-mod-'+i);
-      return Object.assign({},m,{proposed:ta?ta.value:m.proposed,decision:'accepted'});
+      return Object.assign({},m,{id:i,proposed:ta?ta.value:m.proposed,decision:'accepted'});
     });
     var fd=new FormData();
     if(window._adverseFile) fd.append('file',window._adverseFile);
