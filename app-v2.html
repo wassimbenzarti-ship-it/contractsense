@@ -2086,7 +2086,10 @@ async function exportAdverseDiff(anaId, partie){
   try{
     var mods=(window._adverseMods||[]).map(function(m,i){
       var ta=document.getElementById('adv-mod-'+i);
-      return Object.assign({},m,{id:i,proposed:ta?ta.value:m.proposed,decision:'accepted'});
+      var proposed=ta?ta.value:(m.proposed||m.our_text||'');
+      // delete: adverse removed our clause → treat as nouvelle_clause so it gets inserted in the DOCX
+      var type=(m.type==='delete')?'nouvelle_clause':m.type;
+      return Object.assign({},m,{id:i,proposed:proposed,decision:'accepted',type:type});
     });
     var fd=new FormData();
     if(window._adverseFile) fd.append('file',window._adverseFile);
