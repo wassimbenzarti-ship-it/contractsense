@@ -1877,10 +1877,10 @@ async function showAnaDetail(idx) {
     // Section markups partie adverse — uniquement après validation directeur
     +(st==='validated'||st==='final_validated'?
       '<div style="margin-top:20px;border-top:1px solid #1f2537;padding-top:16px">'
-      +'<div style="font-size:12px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">⚔ Version partie adverse</div>'
-      +'<div style="font-size:12px;color:#6b7280;margin-bottom:12px;line-height:1.5">Importez la version clean envoyée par la partie adverse (DOCX ou TXT). Le système analysera leur document et proposera des contre-rédactions basées sur vos clauses validées.</div>'
+      +'<div style="font-size:12px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">⚔ Comparer avec la version adverse</div>'
+      +'<div style="font-size:12px;color:#6b7280;margin-bottom:12px;line-height:1.5">Importez le document envoyé par la partie adverse (DOCX ou TXT). Toutes les différences seront affichées avec une analyse juridique.</div>'
       +'<label style="display:inline-block;padding:9px 18px;background:#1a2035;border:1px solid #8b5cf644;color:#8b5cf6;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600">'
-      +'<input type="file" id="adverse-file-inp" accept=".docx,.txt,.pdf" style="display:none" onchange="analyzeAdverse(\''+_eJS(ana.id)+'\',\''+_eJS(ana.contract_type)+'\',\''+_eJS(ana.partie)+'\')">'
+      +'<input type="file" id="adverse-file-inp" accept=".docx,.txt,.pdf" style="display:none" onchange="compareAdversary(\''+_eJS(ana.id)+'\',\''+_eJS(ana.contract_type)+'\',\''+_eJS(ana.partie)+'\')">'
       +'⚔ Importer version adverse</label>'
       +'<div id="adverse-result" style="margin-top:12px"></div>'
       +'</div>'
@@ -2007,6 +2007,63 @@ async function analyzeAdverse(anaId, contractType, partie){
     });
     html+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'
       +'<button onclick="saveAdverseResponse(\''+_eJS(anaId)+'\','+results.length+')" style="padding:10px 20px;background:#8b5cf6;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Sauvegarder →</button>'
+      +'<button onclick="exportAdverseDiff(\''+_eJS(anaId)+'\',\''+_eJS(partie)+'\')" style="padding:10px 20px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX</button>'
+      +'</div>';
+    if(res)res.innerHTML=html;
+    window._adverseMods=results;
+  }catch(e){
+    if(res)res.innerHTML='<div style="color:#ef4444;font-size:12px;padding:10px 0">Erreur : '+e.message+'</div>';
+  }
+}
+
+async function compareAdversary(anaId, contractType, partie){
+  var inp=document.getElementById('adverse-file-inp');
+  var file=inp?inp.files[0]:null;
+  if(!file) return;
+  window._adverseFile=file;
+  var res=document.getElementById('adverse-result');
+  if(res)res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Comparaison en cours — analyse de toutes les différences...</div>';
+  try{
+    var ourMods=window._currentMods||[];
+    var fd=new FormData();
+    fd.append('file',file);
+    fd.append('our_text',savedText||'');
+    fd.append('our_modifications',JSON.stringify(ourMods));
+    fd.append('decisions',JSON.stringify(decisions));
+    fd.append('partie',partie||'');
+    var r=await fetch(BACKEND+'/compare-adversary',{method:'POST',body:fd});
+    var data=await r.json();
+    if(!r.ok) throw new Error(data.error||'Erreur serveur');
+    var results=data.modifications||[];
+    if(!results.length){
+      if(res)res.innerHTML='<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:14px;font-size:13px;color:#10b981">✅ Aucune différence entre votre contrat validé et la version adverse.</div>';
+      return;
+    }
+    var html='<div style="font-size:11px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">'
+      +'⚔ '+results.length+' modification(s) détectée(s)</div>';
+    results.forEach(function(m,i){
+      var risk=m.risk||'medium';
+      var col=risk==='high'?'#ef4444':risk==='low'?'#10b981':'#f59e0b';
+      var lbl=risk==='high'?'Risque élevé':risk==='low'?'Risque faible':'Risque modéré';
+      var typeIcon=m.type==='insert'?'➕ Ajouté par la partie adverse':m.type==='delete'?'🗑 Supprimé par la partie adverse':'✏️ Modifié par la partie adverse';
+      html+='<div class="mod-card" style="margin-bottom:14px">'
+        +'<div class="mod-header">'
+        +'<div class="mod-name">'+_escH(m.clause_name||'Modification')+'</div>'
+        +'<span class="risk-pill" style="background:'+col+'20;color:'+col+'">'+lbl+'</span>'
+        +'</div>'
+        +'<div class="mod-body">'
+        +'<div style="font-size:11px;color:#6b7280;margin-bottom:8px">'+typeIcon+'</div>'
+        +(m.reason?'<div style="font-size:11px;color:#8892a4;margin-bottom:10px;line-height:1.5">💡 '+_escH(m.reason)+'</div>':'')
+        +(m.our_text?'<div class="mod-label" style="color:#5b7cfa">📄 Notre version validée</div>'
+          +'<div style="background:#1a2035;border:1px solid #5b7cfa33;border-radius:6px;padding:8px;margin-bottom:10px;font-size:12px;color:#93c5fd;line-height:1.6">'+_escHBr(m.our_text)+'</div>':'')
+        +'<div class="mod-label" style="color:#ef4444">⚔ Version adverse</div>'
+        +'<div class="mod-original" style="color:#ef9a9a;line-height:1.6">'+_escHBr(m.original||'—')+'</div>'
+        +'<div class="mod-label" style="color:#8b5cf6"> Contre-proposition <span style="color:#6b7280;font-size:10px;font-weight:400">(éditable)</span></div>'
+        +'<textarea id="adv-mod-'+i+'" class="mod-proposed" style="width:100%;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:10px;font-size:12px;color:#e2e5f0;min-height:80px;resize:vertical;box-sizing:border-box;line-height:1.6;font-family:inherit">'+_escH(m.proposed||'')+'</textarea>'
+        +'</div>'
+        +'</div>';
+    });
+    html+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'
       +'<button onclick="exportAdverseDiff(\''+_eJS(anaId)+'\',\''+_eJS(partie)+'\')" style="padding:10px 20px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX</button>'
       +'</div>';
     if(res)res.innerHTML=html;
