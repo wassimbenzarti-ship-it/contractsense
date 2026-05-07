@@ -2025,9 +2025,16 @@ async function compareAdversary(anaId, contractType, partie){
   if(res)res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Comparaison en cours — analyse de toutes les différences...</div>';
   try{
     var ourMods=window._currentMods||[];
+    // If savedText empty (dashboard), try to reconstruct from mods so diff has a reference
+    var ourText=savedText||'';
+    if(!ourText&&ourMods.length){
+      ourText=ourMods.map(function(m){return (m.clause_name?m.clause_name+'\n':'')+(m.original||'');}).join('\n\n');
+    }
     var fd=new FormData();
     fd.append('file',file);
-    fd.append('our_text',savedText||'');
+    fd.append('our_text',ourText);
+    fd.append('file_cache_id',window._fileCacheId||'');
+    fd.append('file_storage_path',window._fileStoragePath||'');
     fd.append('our_modifications',JSON.stringify(ourMods));
     fd.append('decisions',JSON.stringify(decisions));
     fd.append('partie',partie||'');
