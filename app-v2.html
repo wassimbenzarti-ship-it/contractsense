@@ -2057,6 +2057,7 @@ async function compareAdversary(anaId, contractType, partie){
       +'</div>';
 
     // ── Cards ──
+    window._adverseDecisions = [];
     results.forEach(function(m,i){
       var risk=m.risk||'medium';
       var crit=m.criticite||'modéré';
@@ -2068,7 +2069,7 @@ async function compareAdversary(anaId, contractType, partie){
       var typeIcon =_typeIcon[m.type]||'✏️';
       var typeLbl  =_typeLabel[m.type]||'Modifié';
 
-      html+='<div style="border:1px solid '+borderCol+'44;border-left:3px solid '+borderCol+';border-radius:8px;margin-bottom:12px;overflow:hidden">'
+      html+='<div id="adv-card-'+i+'" style="border:1px solid '+borderCol+'44;border-left:3px solid '+borderCol+';border-radius:8px;margin-bottom:12px;overflow:hidden;transition:opacity 0.2s">'
         // Card header
         +'<div style="background:'+critBg+';padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
         +'<span style="font-size:13px;font-weight:700;color:#e2e5f0;flex:1">'+_escH(m.clause_name||'Modification')+'</span>'
@@ -2091,9 +2092,17 @@ async function compareAdversary(anaId, contractType, partie){
             +'<div style="background:#0f1829;border:1px solid #ef444433;border-radius:6px;padding:8px;font-size:11px;color:#fca5a5;line-height:1.6;min-height:36px">'+_escHBr(m.original)+'</div></div>'
             :'<div></div>')
           +'</div>':'')
-        // Counter-proposal
+        // Decision buttons
+        +'<div style="display:flex;gap:6px;margin-bottom:10px">'
+        +'<button id="adv-btn-maintenir-'+i+'" onclick="_setAdvDecision('+i+',\'maintenir\')" style="flex:1;padding:6px 10px;background:#ffffff08;border:1px solid #5b7cfa44;border-radius:6px;color:#9ca3af;font-size:11px;font-weight:600;cursor:pointer">✅ Maintenir notre position</button>'
+        +'<button id="adv-btn-reformuler-'+i+'" onclick="_setAdvDecision('+i+',\'reformuler\')" style="flex:1;padding:6px 10px;background:#ffffff08;border:1px solid #8b5cf644;border-radius:6px;color:#9ca3af;font-size:11px;font-weight:600;cursor:pointer">✏️ Reformuler</button>'
+        +'<button id="adv-btn-accepter-'+i+'" onclick="_setAdvDecision('+i+',\'accepter\')" style="flex:1;padding:6px 10px;background:#ffffff08;border:1px solid #10b98144;border-radius:6px;color:#9ca3af;font-size:11px;font-weight:600;cursor:pointer">☑ Accepter adverse</button>'
+        +'</div>'
+        // Counter-proposal textarea (shown when reformuler or default)
+        +'<div id="adv-proposal-'+i+'">'
         +'<div style="font-size:10px;font-weight:600;color:#8b5cf6;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px"> Contre-proposition <span style="color:#6b7280;font-weight:400;text-transform:none">(modifiable)</span></div>'
         +'<textarea id="adv-mod-'+i+'" style="width:100%;background:#0f1829;border:1px solid #4c1d9544;border-radius:6px;padding:8px;font-size:12px;color:#e2e5f0;min-height:70px;resize:vertical;box-sizing:border-box;line-height:1.6;font-family:inherit">'+_escH(m.proposed||m.our_text||'')+'</textarea>'
+        +'</div>'
         +'</div>'
         +'</div>';
     });
@@ -2109,17 +2118,43 @@ async function compareAdversary(anaId, contractType, partie){
   }
 }
 
+function _setAdvDecision(i, decision){
+  window._adverseDecisions = window._adverseDecisions || [];
+  window._adverseDecisions[i] = decision;
+  var card = document.getElementById('adv-card-'+i);
+  var ta   = document.getElementById('adv-mod-'+i);
+  var m    = (window._adverseMods || [])[i] || {};
+  if(card) card.style.opacity = (decision === 'accepter') ? '0.45' : '1';
+  if(ta){
+    if(decision === 'maintenir')      ta.value = m.our_text  || m.proposed || '';
+    else if(decision === 'accepter')  ta.value = m.original  || '';
+  }
+  ['maintenir','reformuler','accepter'].forEach(function(d){
+    var btn = document.getElementById('adv-btn-'+d+'-'+i);
+    if(!btn) return;
+    var active = (d === decision);
+    var col = d==='maintenir' ? '#5b7cfa' : d==='accepter' ? '#10b981' : '#8b5cf6';
+    btn.style.background = active ? col : '#ffffff08';
+    btn.style.color      = active ? '#fff' : '#9ca3af';
+    btn.style.borderColor= active ? col : col+'44';
+  });
+}
+
 async function exportAdverseDiff(anaId, partie){
   var btn=event.target;
   btn.disabled=true; btn.textContent='⏳ Génération...';
   try{
     var mods=(window._adverseMods||[]).map(function(m,i){
+      var dec=(window._adverseDecisions||[])[i];
+      if(dec==='accepter') return null;          // accepted as-is → skip from export
       var ta=document.getElementById('adv-mod-'+i);
-      var proposed=ta?ta.value:(m.proposed||m.our_text||'');
+      var proposed=dec==='maintenir'
+        ? (m.our_text||m.proposed||'')
+        : (ta?ta.value:(m.proposed||m.our_text||''));
       // delete: adverse removed our clause → treat as nouvelle_clause so it gets inserted in the DOCX
       var type=(m.type==='delete')?'nouvelle_clause':m.type;
       return Object.assign({},m,{id:i,proposed:proposed,decision:'accepted',type:type});
-    });
+    }).filter(Boolean);
     var fd=new FormData();
     if(window._adverseFile) fd.append('file',window._adverseFile);
     fd.append('modifications',JSON.stringify(mods));
