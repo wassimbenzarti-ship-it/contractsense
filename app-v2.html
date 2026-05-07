@@ -2043,35 +2043,73 @@ async function compareAdversary(anaId, contractType, partie){
     if(!r.ok) throw new Error(data.error||'Erreur serveur');
     var results=data.modifications||[];
     if(!results.length){
-      if(res)res.innerHTML='<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:14px;font-size:13px;color:#10b981">✅ Aucune différence entre votre contrat validé et la version adverse.</div>';
+      if(res)res.innerHTML='<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:14px;font-size:13px;color:#10b981">✅ Aucune modification substantielle détectée. La version adverse est conforme à vos positions validées.</div>';
       return;
     }
-    var html='<div style="font-size:11px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">'
-      +'⚔ '+results.length+' modification(s) détectée(s)</div>';
+
+    // ── Counts per criticality ──
+    var nCrit=results.filter(function(m){return m.risk==='high';}).length;
+    var nImp =results.filter(function(m){return m.risk==='medium';}).length;
+    var nMod =results.filter(function(m){return m.risk==='low';}).length;
+
+    var _catLabel={'financier':'💰 Financier','délai':'⏱ Délai','résiliation':'🔚 Résiliation',
+      'responsabilité':'⚖ Responsabilité','garantie':'🛡 Garantie','autre':'📋 Autre'};
+    var _typeLabel={'insert':'Ajouté par adverse','delete':'Supprimé par adverse','replace':'Modifié par adverse'};
+    var _typeIcon ={'insert':'➕','delete':'🗑','replace':'✏️'};
+
+    // ── Summary banner ──
+    var html='<div style="background:#1a2035;border:1px solid #2a3040;border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">'
+      +'<div style="font-size:13px;font-weight:700;color:#e2e5f0;flex:1">⚔ '+results.length+' modification'+(results.length>1?'s':'')+' détectée'+(results.length>1?'s':'')</div>'
+      +(nCrit?'<span style="background:#ef444420;color:#ef4444;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">🔴 '+nCrit+' critique'+(nCrit>1?'s':'')+'</span>':''  )
+      +(nImp ?'<span style="background:#f59e0b20;color:#f59e0b;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">🟡 '+nImp +' important'+(nImp>1?'s':'')+'</span>':''  )
+      +(nMod ?'<span style="background:#6b728020;color:#9ca3af;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">⚪ '+nMod +' modéré'+(nMod>1?'s':'')+'</span>':''  )
+      +'</div>';
+
+    // ── Cards ──
     results.forEach(function(m,i){
       var risk=m.risk||'medium';
-      var col=risk==='high'?'#ef4444':risk==='low'?'#10b981':'#f59e0b';
-      var lbl=risk==='high'?'Risque élevé':risk==='low'?'Risque faible':'Risque modéré';
-      var typeIcon=m.type==='insert'?'➕ Ajouté par la partie adverse':m.type==='delete'?'🗑 Supprimé par la partie adverse':'✏️ Modifié par la partie adverse';
-      html+='<div class="mod-card" style="margin-bottom:14px">'
-        +'<div class="mod-header">'
-        +'<div class="mod-name">'+_escH(m.clause_name||'Modification')+'</div>'
-        +'<span class="risk-pill" style="background:'+col+'20;color:'+col+'">'+lbl+'</span>'
+      var crit=m.criticite||'modéré';
+      var borderCol=risk==='high'?'#ef4444':risk==='medium'?'#f59e0b':'#374151';
+      var critCol  =risk==='high'?'#ef4444':risk==='medium'?'#f59e0b':'#9ca3af';
+      var critBg   =risk==='high'?'#ef444418':risk==='medium'?'#f59e0b18':'#37415118';
+      var critLbl  =risk==='high'?'🔴 Critique':risk==='medium'?'🟡 Important':'⚪ Modéré';
+      var catLbl   =_catLabel[m.categorie]||'📋 Autre';
+      var typeIcon =_typeIcon[m.type]||'✏️';
+      var typeLbl  =_typeLabel[m.type]||'Modifié';
+
+      html+='<div style="border:1px solid '+borderCol+'44;border-left:3px solid '+borderCol+';border-radius:8px;margin-bottom:12px;overflow:hidden">'
+        // Card header
+        +'<div style="background:'+critBg+';padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+        +'<span style="font-size:13px;font-weight:700;color:#e2e5f0;flex:1">'+_escH(m.clause_name||'Modification')+'</span>'
+        +'<span style="background:'+critCol+'22;color:'+critCol+';padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">'+critLbl+'</span>'
+        +'<span style="background:#ffffff10;color:#9ca3af;padding:3px 10px;border-radius:20px;font-size:11px">'+catLbl+'</span>'
         +'</div>'
-        +'<div class="mod-body">'
-        +'<div style="font-size:11px;color:#6b7280;margin-bottom:8px">'+typeIcon+'</div>'
-        +(m.reason?'<div style="font-size:11px;color:#8892a4;margin-bottom:10px;line-height:1.5">💡 '+_escH(m.reason)+'</div>':'')
-        +(m.our_text?'<div class="mod-label" style="color:#5b7cfa">📄 Notre version validée</div>'
-          +'<div style="background:#1a2035;border:1px solid #5b7cfa33;border-radius:6px;padding:8px;margin-bottom:10px;font-size:12px;color:#93c5fd;line-height:1.6">'+_escHBr(m.our_text)+'</div>':'')
-        +'<div class="mod-label" style="color:#ef4444">⚔ Version adverse</div>'
-        +'<div class="mod-original" style="color:#ef9a9a;line-height:1.6">'+_escHBr(m.original||'—')+'</div>'
-        +'<div class="mod-label" style="color:#8b5cf6"> Contre-proposition <span style="color:#6b7280;font-size:10px;font-weight:400">(éditable)</span></div>'
-        +'<textarea id="adv-mod-'+i+'" class="mod-proposed" style="width:100%;background:#181c2a;border:1px solid #2a3040;border-radius:6px;padding:10px;font-size:12px;color:#e2e5f0;min-height:80px;resize:vertical;box-sizing:border-box;line-height:1.6;font-family:inherit">'+_escH(m.proposed||'')+'</textarea>'
+        // Card body
+        +'<div style="padding:12px 14px">'
+        // Type tag + impact
+        +'<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">'
+        +'<span style="font-size:11px;background:#ffffff08;color:#9ca3af;padding:2px 8px;border-radius:4px;white-space:nowrap">'+typeIcon+' '+typeLbl+'</span>'
+        +(m.reason?'<span style="font-size:12px;color:#d1d5db;line-height:1.5">'+_escH(m.reason)+'</span>':'')
+        +'</div>'
+        // Side-by-side: our vs adverse
+        +(m.our_text||m.original?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'
+          +(m.our_text?'<div><div style="font-size:10px;font-weight:600;color:#5b7cfa;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Notre position</div>'
+            +'<div style="background:#0f1829;border:1px solid #5b7cfa33;border-radius:6px;padding:8px;font-size:11px;color:#93c5fd;line-height:1.6;min-height:36px">'+_escHBr(m.our_text)+'</div></div>'
+            :'<div></div>')
+          +(m.original?'<div><div style="font-size:10px;font-weight:600;color:#ef4444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Version adverse</div>'
+            +'<div style="background:#0f1829;border:1px solid #ef444433;border-radius:6px;padding:8px;font-size:11px;color:#fca5a5;line-height:1.6;min-height:36px">'+_escHBr(m.original)+'</div></div>'
+            :'<div></div>')
+          +'</div>':'')
+        // Counter-proposal
+        +'<div style="font-size:10px;font-weight:600;color:#8b5cf6;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px"> Contre-proposition <span style="color:#6b7280;font-weight:400;text-transform:none">(modifiable)</span></div>'
+        +'<textarea id="adv-mod-'+i+'" style="width:100%;background:#0f1829;border:1px solid #4c1d9544;border-radius:6px;padding:8px;font-size:12px;color:#e2e5f0;min-height:70px;resize:vertical;box-sizing:border-box;line-height:1.6;font-family:inherit">'+_escH(m.proposed||m.our_text||'')+'</textarea>'
         +'</div>'
         +'</div>';
     });
-    html+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">'
-      +'<button onclick="exportAdverseDiff(\''+_eJS(anaId)+'\',\''+_eJS(partie)+'\')" style="padding:10px 20px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX</button>'
+
+    // ── Footer actions ──
+    html+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid #1f2537">'
+      +'<button onclick="exportAdverseDiff(\''+_eJS(anaId)+'\',\''+_eJS(partie)+'\')" style="padding:10px 22px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX avec contre-propositions</button>'
       +'</div>';
     if(res)res.innerHTML=html;
     window._adverseMods=results;
