@@ -55,7 +55,10 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 .mod-card { background: #111420; border: 1px solid #1f2537; border-radius: 14px; margin-bottom: 16px; overflow: hidden; }
 .mod-card.accepted { border-color: #10b981; }
 .mod-card.rejected { border-color: #ef4444; opacity: 0.6; }
-.mod-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #1f2537; flex-wrap: wrap; gap: 8px; }
+.mod-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #1f2537; flex-wrap: wrap; gap: 8px; cursor:pointer; user-select:none; }
+.mod-card.collapsed .mod-body { display:none; }
+.mod-card.collapsed .mod-header { border-bottom:none; }
+#review-sticky-bar { position:sticky; top:0; z-index:50; background:#0a0c12ee; backdrop-filter:blur(6px); border-bottom:1px solid #1f2537; padding:8px 0; margin-bottom:16px; }
 .mod-name { font-weight: 700; font-size: 15px; }
 .risk-pill { padding: 3px 10px; border-radius: 20px; font-size: 11px; white-space: nowrap; }
 .mod-body { padding: 20px; }
@@ -343,6 +346,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       <div style="font-size:20px;font-weight:800">Révision du contrat</div>
       <div class="review-stats" id="review-stats"></div>
     </div>
+    <div id="review-sticky-bar" style="display:none"></div>
     <div id="mods-list"></div>
     <div class="export-section">
       <div style="font-size:16px;font-weight:700;margin-bottom:8px">Générer le document final</div>
@@ -821,6 +825,42 @@ function updateStats() {
   var _s2=document.getElementById('d-review-stats'); if(_s2)_s2.innerHTML=_sh;
 }
 
+function _toggleCard(id){
+  var card=document.getElementById('card-'+id);
+  var chv=document.getElementById('chv-'+id);
+  if(!card) return;
+  var collapsed=card.classList.toggle('collapsed');
+  if(chv) chv.style.transform=collapsed?'rotate(-90deg)':'';
+}
+function _collapseAll(){
+  modifications.forEach(function(m){
+    var card=document.getElementById('card-'+m.id);
+    var chv=document.getElementById('chv-'+m.id);
+    if(card){card.classList.add('collapsed'); if(chv) chv.style.transform='rotate(-90deg)';}
+  });
+}
+function _expandAll(){
+  modifications.forEach(function(m){
+    var card=document.getElementById('card-'+m.id);
+    var chv=document.getElementById('chv-'+m.id);
+    if(card){card.classList.remove('collapsed'); if(chv) chv.style.transform='';}
+  });
+}
+function _filterMods(risk){
+  window._modFilter=risk;
+  modifications.forEach(function(m){
+    var card=document.getElementById('card-'+m.id);
+    if(card) card.style.display=(!risk||m.risk===risk)?'':'none';
+  });
+  ['high','medium','low','all'].forEach(function(r){
+    var btn=document.getElementById('flt-'+r);
+    if(!btn) return;
+    var active=(r==='all'&&!risk)||(r===risk);
+    btn.style.fontWeight=active?'800':'600';
+    btn.style.opacity=active?'1':'0.5';
+  });
+}
+
 function renderCompliance() {
   var _compId = _dashAnalysis ? 'd-compliance-section' : 'compliance-section';
   var _modsId = _dashAnalysis ? 'd-mods-list' : 'mods-list';
@@ -872,11 +912,14 @@ function renderReview() {
     div.className = 'mod-card';
     div.id = 'card-' + m.id;
     div.innerHTML =
-      '<div class="mod-header">' +
+      '<div class="mod-header" onclick="_toggleCard('+m.id+')">' +
         '<div class="mod-name">' + m.clause_name + '</div>' +
-        '<span class="risk-pill" style="background:' + color + '20;color:' + color + '">' + rl(m.risk) + '</span>' +
+        '<div style="display:flex;align-items:center;gap:8px">' +
+          '<span class="risk-pill" style="background:' + color + '20;color:' + color + '">' + rl(m.risk) + '</span>' +
+          '<span id="chv-'+m.id+'" style="color:#6b7280;font-size:10px;display:inline-block;transition:transform .2s">▼</span>' +
+        '</div>' +
       '</div>' +
-      '<div class="mod-body">' +
+      '<div class="mod-body" id="body-'+m.id+'">' +
         (m.rag_source ? '<div style="background:rgba(91,124,250,0.08);border:1px solid rgba(91,124,250,0.2);border-radius:7px;padding:5px 10px;font-size:11px;color:#5b7cfa;margin-bottom:10px;">>🧠 Basé sur: ' + m.rag_source + '</div>' : '') +
         '<div class="mod-reason">💡 ' + m.reason + '</div>' +
         '<div class="mod-label" style="color:#ef4444">⚠ Texte original</div>' +
@@ -899,6 +942,32 @@ function renderReview() {
 
   updateStats();
   renderCompliance();
+
+  // Sticky filter bar (home flow only)
+  if(!_dashAnalysis){
+    var _bar=document.getElementById('review-sticky-bar');
+    if(_bar){
+      _bar.style.display='';
+      var _nh=modifications.filter(function(m){return m.risk==='high';}).length;
+      var _nm=modifications.filter(function(m){return m.risk==='medium';}).length;
+      var _nl=modifications.filter(function(m){return m.risk==='low';}).length;
+      var _tot=modifications.length;
+      _bar.innerHTML=
+        '<div style="display:flex;flex-wrap:wrap;gap:7px;align-items:center">'
+        +'<span style="font-size:11px;color:#6b7280;font-weight:600">Filtrer&nbsp;:</span>'
+        +(_nh?'<button id="flt-high" onclick="_filterMods(\'high\')" style="padding:3px 10px;background:#ef444418;border:1px solid #ef444444;border-radius:20px;color:#ef4444;font-size:11px;font-weight:600;cursor:pointer">🔴 Critiques ('+_nh+')</button>':'')
+        +(_nm?'<button id="flt-medium" onclick="_filterMods(\'medium\')" style="padding:3px 10px;background:#f59e0b18;border:1px solid #f59e0b44;border-radius:20px;color:#f59e0b;font-size:11px;font-weight:600;cursor:pointer">🟡 Importantes ('+_nm+')</button>':'')
+        +(_nl?'<button id="flt-low" onclick="_filterMods(\'low\')" style="padding:3px 10px;background:#10b98118;border:1px solid #10b98144;border-radius:20px;color:#10b981;font-size:11px;font-weight:600;cursor:pointer">⚪ Faibles ('+_nl+')</button>':'')
+        +'<button id="flt-all" onclick="_filterMods(null)" style="padding:3px 10px;background:#5b7cfa30;border:1px solid #5b7cfa66;border-radius:20px;color:#5b7cfa;font-size:11px;font-weight:700;cursor:pointer">Toutes ('+_tot+')</button>'
+        +'<span style="flex:1"></span>'
+        +'<button onclick="_collapseAll()" style="padding:3px 10px;background:#ffffff08;border:1px solid #2a3040;border-radius:20px;color:#9ca3af;font-size:11px;cursor:pointer">▲ Replier</button>'
+        +'<button onclick="_expandAll()" style="padding:3px 10px;background:#ffffff08;border:1px solid #2a3040;border-radius:20px;color:#9ca3af;font-size:11px;cursor:pointer">▼ Déplier</button>'
+        +'<button onclick="exportDoc()" style="padding:3px 12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:20px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">⬇ DOCX</button>'
+        +'</div>';
+      window._modFilter=null;
+    }
+  }
+
   if (_dashAnalysis) { document.getElementById('d-ana-review').style.display = ''; return; }
   show('step-review');
 
