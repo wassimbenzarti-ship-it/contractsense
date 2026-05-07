@@ -1916,22 +1916,13 @@ async function deleteAnalysis(id, idx){
   var card = document.getElementById('ana-card-'+idx);
   if(card) card.style.opacity='0.4';
   try{
-    // Utiliser la clé anon + Prefer:return=representation pour détecter un blocage RLS silencieux
-    var r = await fetch(_su+'/rest/v1/analyses?id=eq.'+id, {
+    var r = await sf('/rest/v1/analyses?id=eq.'+id, {
       method:'DELETE',
-      headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json','Prefer':'return=representation'}
+      headers:{'Prefer':'return=representation'}
     });
     var deleted = [];
     try { deleted = await r.json(); } catch(e) {}
-    if((r.ok || r.status===204) && Array.isArray(deleted) && deleted.length === 0){
-      // RLS a bloqué sans erreur — essai avec le token utilisateur
-      var r2 = await fetch(_su+'/rest/v1/analyses?id=eq.'+id, {
-        method:'DELETE',
-        headers:{'apikey':_sk,'Authorization':'Bearer '+(localStorage.getItem('sbt')||_sk),'Content-Type':'application/json','Prefer':'return=representation'}
-      });
-      try { deleted = await r2.json(); } catch(e) {}
-    }
-    if(deleted.length > 0 || r.status===204){
+    if(r.ok || r.status===204 || (Array.isArray(deleted) && deleted.length > 0)){
       window._juristesData=null;
       loadDash();
     } else {
