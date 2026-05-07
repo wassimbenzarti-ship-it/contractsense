@@ -2050,7 +2050,7 @@ async function compareAdversary(anaId, contractType, partie){
 
     // ── Summary banner ──
     var html='<div style="background:#1a2035;border:1px solid #2a3040;border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">'
-      +'<div style="font-size:13px;font-weight:700;color:#e2e5f0;flex:1">⚔ '+results.length+' modification'+(results.length>1?'s':'')+' détectée'+(results.length>1?'s':'')</div>'
+      +'<div style="font-size:13px;font-weight:700;color:#e2e5f0;flex:1">⚔ '+results.length+' modification'+(results.length>1?'s':'')+' détectée'+(results.length>1?'s':'')+'</div>'
       +(nCrit?'<span style="background:#ef444420;color:#ef4444;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">🔴 '+nCrit+' critique'+(nCrit>1?'s':'')+'</span>':''  )
       +(nImp ?'<span style="background:#f59e0b20;color:#f59e0b;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">🟡 '+nImp +' important'+(nImp>1?'s':'')+'</span>':''  )
       +(nMod ?'<span style="background:#6b728020;color:#9ca3af;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">⚪ '+nMod +' modéré'+(nMod>1?'s':'')+'</span>':''  )
