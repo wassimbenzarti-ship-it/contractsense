@@ -2147,7 +2147,7 @@ function _renderAnaAdverseTab(idx){
 function _renderAnaTranslateTab(){
   var container=document.getElementById('atp-translate-panel');
   if(!container) return;
-  var hasText=!!(savedText||window._fileStoragePath||window._fileCacheId);
+  var hasText=!!savedText;
   container.innerHTML=
     '<div style="margin-bottom:20px">'
     +'<div style="font-size:14px;font-weight:700;color:#c8a94b;margin-bottom:6px">🌐 Traduction bilingue du contrat</div>'
