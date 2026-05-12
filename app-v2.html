@@ -2151,7 +2151,7 @@ function _renderAnaAdverseTab(idx){
 function _renderAnaTranslateTab(){
   var container=document.getElementById('atp-translate-panel');
   if(!container) return;
-  var hasText=!!savedText;
+  var hasText=!!savedText||!!window._fileStoragePath;
   container.innerHTML=
     '<div style="margin-bottom:20px">'
     +'<div style="font-size:14px;font-weight:700;color:#c8a94b;margin-bottom:6px">🌐 Traduction bilingue du contrat</div>'
@@ -2539,13 +2539,9 @@ async function dlUserAnalysis() {
       if (fileCacheId) fd.append('file_cache_id', fileCacheId);
       fd.append('file', new Blob([''], {type:'text/plain'}), 'placeholder.txt');
     } else {
-      // Fallback sans fichier stocké : envoyer le texte des modifications nommé .docx
-      var contractText = realMods.map(function(m){
-        return (m.clause_name||'Clause') + ' - ' + (m.original||'');
-      }).join(' | ');
-      if(!contractText.trim()) contractText = 'Contrat - ' + (ana.filename||'document');
-      var docxFilename = (ana.filename||'contrat.docx').replace(/\.[^.]+$/, '.docx');
-      fd.append('file', new Blob([contractText], {type:'text/plain'}), docxFilename);
+      if(btn) { btn.disabled = false; btn.textContent = 'Télécharger DOCX'; }
+      alert('Le fichier original de ce contrat n\'est plus disponible. Rechargez le contrat depuis l\'étape Upload, relancez l\'analyse, puis utilisez l\'export.');
+      return;
     }
     fd.append('lang', 'auto');
     fd.append('type', ana.contract_type||'generic');
@@ -3642,13 +3638,15 @@ async function cbExportTranslation(lang, btn) {
   }, 1000);
   try {
     var contractTxt = savedText || '';
-    if (!contractTxt) { clearInterval(_cbTimer); btn.textContent = '❌ Contrat non disponible'; btn.disabled = false; return; }
+    var _cacheId = window._fileCacheId || '';
+    var _storagePath = window._fileStoragePath || '';
+    if (!contractTxt && !_cacheId && !_storagePath) { clearInterval(_cbTimer); btn.textContent = '❌ Contrat non disponible'; btn.disabled = false; return; }
     var fname = (typeof curFile !== 'undefined' && curFile && curFile.name)
       ? curFile.name.replace(/\.[^.]+$/, '') : 'contrat';
     var r = await fetch(BACKEND + '/export-translation', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({contract_text: contractTxt, target_lang: lang, filename: fname, modifications: modifications, decisions: decisions})
+      body: JSON.stringify({contract_text: contractTxt, file_cache_id: _cacheId, file_storage_path: _storagePath, target_lang: lang, filename: fname, modifications: modifications, decisions: decisions})
     });
     clearInterval(_cbTimer);
     if (!r.ok) { var e = await r.json(); throw new Error(e.error || 'Erreur ' + r.status); }
