@@ -50,7 +50,6 @@
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap');
 :root {
   --bg: #05070e; --surface: #0c0f1a; --border: #161c2e;
   --accent: #3d6bff; --gold: #c8a94b; --green: #0dcf8a;
@@ -63,7 +62,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 body::before {
   content: ''; position: fixed; inset: 0;
   background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(61,107,255,0.07) 0%, transparent 70%);
-  pointer-events: none; z-index: 0;
+  pointer-events: none; z-index: -1;
 }
 nav {
   position: fixed; top: 0; left: 0; right: 0;
@@ -192,8 +191,7 @@ h1 em { font-style: italic; color: var(--gold); }
 .faq-q::after { content: '+'; font-size: 1.3rem; color: var(--muted); transition: transform 0.2s; }
 .faq-item.open .faq-q::after { transform: rotate(45deg); }
 .faq-a {
-  padding: 0 24px; max-height: 0; overflow: hidden;
-  font-size: 0.875rem; color: rgba(230,234,246,0.6); line-height: 1.7;
+  padding: 0 24px; font-size: 0.875rem; color: rgba(230,234,246,0.6); line-height: 1.7;
   transition: max-height 0.3s, padding 0.3s;
 }
 .faq-item.open .faq-a { max-height: 200px; padding: 0 24px 20px; }
