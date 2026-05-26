@@ -72,7 +72,7 @@
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
 :root {
   --bg: #05070e; --surface: #0c0f1a; --border: #161c2e;
   --accent: #3d6bff; --gold: #c8a94b; --green: #0dcf8a;
@@ -85,7 +85,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 body::before {
   content: ''; position: fixed; inset: 0;
   background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(200,169,75,0.05) 0%, transparent 70%);
-  pointer-events: none; z-index: 0;
+  pointer-events: none; z-index: -1;
 }
 nav {
   position: fixed; top: 0; left: 0; right: 0;
