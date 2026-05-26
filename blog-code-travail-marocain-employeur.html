@@ -25,11 +25,10 @@
 }
 </script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
 :root { --bg:#05070e; --surface:#0c0f1a; --border:#161c2e; --accent:#3d6bff; --gold:#c8a94b; --green:#0dcf8a; --red:#ff4560; --text:#e6eaf6; --muted:#4a5470; }
 * { box-sizing:border-box; margin:0; padding:0; }
 body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.7; }
-body::before { content:''; position:fixed; inset:0; background:radial-gradient(ellipse 80% 60% at 50% -20%,rgba(61,107,255,0.06) 0%,transparent 70%); pointer-events:none; z-index:0; }
+body::before { content:''; position:fixed; inset:0; background:radial-gradient(ellipse 80% 60% at 50% -20%,rgba(61,107,255,0.06) 0%,transparent 70%); pointer-events:none; z-index:-1; }
 nav { position:fixed; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:center; padding:20px 48px; z-index:100; backdrop-filter:blur(24px); background:rgba(5,7,14,0.85); border-bottom:1px solid rgba(255,255,255,0.04); }
 .nav-brand { display:flex; align-items:center; gap:12px; text-decoration:none; }
 .nav-brand span { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:700; color:var(--text); }
