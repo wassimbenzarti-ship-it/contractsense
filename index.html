@@ -191,13 +191,7 @@ body {
   overflow-x: hidden;
 }
 
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(61,107,255,0.07) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: -1;
-}
+/* body::before removed — causes headless Chrome rendering issues */
 
 /* ── PROGRESS ── */
 #progress {
@@ -214,7 +208,7 @@ nav {
   display: flex; justify-content: space-between; align-items: center;
   padding: 22px 56px;
   z-index: 100;
-  backdrop-filter: blur(24px);
+  /* backdrop-filter removed — headless Chrome rendering bug */
   background: rgba(5,7,14,0.8);
   border-bottom: 1px solid rgba(255,255,255,0.04);
 }
@@ -293,13 +287,11 @@ nav {
 
 .hero-h1 em {
   font-style: normal;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--purple) 50%, var(--gold) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--gold);
 }
 
 .hero-sub {
-  font-size: 17px; color: var(--muted); max-width: 560px;
+  font-size: 17px; color: #8892aa; max-width: 560px;
   line-height: 1.75; margin-bottom: 52px; font-weight: 300;
 }
 
