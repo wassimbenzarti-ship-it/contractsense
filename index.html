@@ -1798,30 +1798,17 @@ window.addEventListener('scroll', function() {
   document.getElementById('progress').style.width = (p * 100) + '%';
 });
 
-// Reveal - set hidden state via JS only so bots/crawlers always see content
+// Reveal - content visible by default, no opacity hiding
 var revEls = document.querySelectorAll('.reveal');
-revEls.forEach(function(el) { el.style.opacity = '0'; el.style.transform = 'translateY(36px)'; });
 var ro = new IntersectionObserver(function(entries) {
   entries.forEach(function(e) {
     if (e.isIntersecting) {
-      e.target.style.opacity = '';
-      e.target.style.transform = '';
       e.target.classList.add('vis');
       ro.unobserve(e.target);
     }
   });
 }, { threshold: 0.1 });
 revEls.forEach(function(el) { ro.observe(el); });
-// Safety fallback: reveal all after 1.5s for headless renderers
-setTimeout(function() {
-  revEls.forEach(function(el) {
-    if (!el.classList.contains('vis')) {
-      el.style.opacity = '';
-      el.style.transform = '';
-      el.classList.add('vis');
-    }
-  });
-}, 1500);
 
 // Demo steps
 var cur = 1;
