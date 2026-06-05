@@ -65,8 +65,8 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 .risk-pill { padding: 3px 10px; border-radius: 20px; font-size: 11px; white-space: nowrap; }
 .mod-body { padding: 20px; }
 .mod-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600; }
-.mod-original { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 9px; padding: 14px; font-size: 13px; line-height: 1.65; margin-bottom: 12px; }
-.mod-proposed { background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 9px; padding: 14px; font-size: 13px; line-height: 1.65; margin-bottom: 16px; }
+.mod-original { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 9px; padding: 14px; font-size: 13px; line-height: 1.65; margin-bottom: 12px; white-space: pre-wrap; }
+.mod-proposed { background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 9px; padding: 14px; font-size: 13px; line-height: 1.65; margin-bottom: 16px; white-space: pre-wrap; }
 .mod-reason { color: #6b7280; font-size: 12px; line-height: 1.6; margin-bottom: 16px; }
 .mod-actions { display: flex; gap: 10px; }
 .btn-accept { flex: 1; padding: 10px; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); border-radius: 9px; color: #10b981; font-size: 13px; font-weight: 700; cursor: pointer; }
@@ -945,7 +945,7 @@ function renderReview() {
         '<div class="mod-label" style="color:#ef4444">⚠ Texte original</div>' +
         '<div class="mod-original">' + m.original + '</div>' +
         '<div class="mod-label" style="color:#10b981"> Modification proposée <span style="color:#6b7280;font-size:10px;font-weight:400">(éditable)</span></div>' +
-        '<div class="mod-proposed" id="proposed-' + m.id + '" contenteditable="true" spellcheck="true" style="cursor:text;outline:none;" oninput="onProposedEdit(' + m.id + ', this)">' + m.proposed + '</div>' +
+        '<div class="mod-proposed" id="proposed-' + m.id + '" contenteditable="true" spellcheck="true" style="cursor:text;outline:none;" oninput="onProposedEdit(' + m.id + ', this)">' + (m.proposed||'').replace(/\\n/g,'\n') + '</div>' +
         '<div class="mod-actions">' +
           '<button class="btn-accept" id="ba-' + m.id + '" onclick="decide(' + m.id + ',\'accepted\')"> Accepter</button>' +
           '<button class="btn-reject" id="br-' + m.id + '" onclick="decide(' + m.id + ',\'rejected\')">L Refuser</button>' +
@@ -2977,7 +2977,7 @@ async function loadAbonnement(){
     if(window._selectedNbJuristes===null||window._selectedNbJuristes===undefined)window._selectedNbJuristes=_nbJuristesSuggested;
     var nbJuristes=window._selectedNbJuristes;
     var nbUsers=isJuristeSolo?1:nbJuristes+1;
-    var pricePerUser=isJuristeSolo?950:850;
+    var pricePerUser=(isJuristeSolo||nbJuristes===0)?950:850;
     var total=nbUsers*pricePerUser;
     var subEnd=dir.subscription_end?new Date(dir.subscription_end).toLocaleDateString('fr-FR'):'—';
     var isActive=dir.payment_status==='active';
