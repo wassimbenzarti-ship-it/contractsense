@@ -1992,6 +1992,7 @@ async function showAnaDetail(idx) {
 function toggleAnaDetail(idx){ openAnaPage(idx); }
 
 async function openAnaPage(idx){
+  window._anaDecisions = {};  // reset per-mod decisions for this analysis
   document.getElementById('alist').style.display='none';
   var fb=document.getElementById('juriste-filter-bar');
   if(fb) fb.style.display='none';
@@ -2089,6 +2090,10 @@ function _renderAnaModsTab(idx){
       +'<div style="background:#0d1017;border-radius:6px;padding:10px;font-size:12px;color:#a0a8c0;margin-bottom:10px;line-height:1.6;white-space:pre-wrap">'+_escH(m.original||'Non disponible')+'</div>'
       +'<div style="font-size:10px;font-weight:600;color:#5b7cfa;margin-bottom:4px;text-transform:uppercase">Proposition (modifiable)</div>'
       +'<textarea data-anaidx="'+i+'" oninput="(window._currentMods||[])['+i+'].proposed=this.value" style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:10px;font-size:12px;color:#e2e5f0;min-height:80px;resize:vertical;box-sizing:border-box;line-height:1.6;font-family:inherit">'+_escH(m.proposed||'')+'</textarea>'
+      +'<div style="display:flex;gap:6px;margin-top:10px">'
+      +'<button id="anaba-'+i+'" onclick="_setAnaDecision('+i+',\'accepted\')" style="flex:1;padding:8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:7px;color:#10b981;font-size:12px;font-weight:700;cursor:pointer"> Accepter</button>'
+      +'<button id="anabr-'+i+'" onclick="_setAnaDecision('+i+',\'rejected\')" style="flex:1;padding:8px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:7px;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer">✕ Refuser</button>'
+      +'</div>'
       +(isD&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'?'<div id="dir-note-wrap"><div style="font-size:10px;font-weight:600;color:#6b7280;margin:8px 0 4px;text-transform:uppercase">Note directeur</div><textarea id="director-note-input" placeholder="Note pour le juriste..." style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:8px;font-size:12px;color:#e2e5f0;min-height:48px;resize:vertical;box-sizing:border-box"></textarea></div>':'')
       +'</div>'
       +'</div>';
@@ -2125,6 +2130,16 @@ function _filterAna(risk){
     var card=document.getElementById('anac-'+i);
     if(card) card.style.display=(!risk||m.risk===risk)?'':'none';
   });
+}
+function _setAnaDecision(i, dec){
+  var m=(window._currentMods||[])[i]; if(!m) return;
+  if(!window._anaDecisions) window._anaDecisions={};
+  window._anaDecisions[String(m.id)]=dec;
+  var bA=document.getElementById('anaba-'+i), bR=document.getElementById('anabr-'+i);
+  var card=document.getElementById('anac-'+i);
+  if(bA){ bA.style.background=dec==='accepted'?'#10b981':'rgba(16,185,129,0.1)'; bA.style.color=dec==='accepted'?'#fff':'#10b981'; bA.style.borderColor=dec==='accepted'?'#10b981':'rgba(16,185,129,0.3)'; }
+  if(bR){ bR.style.background=dec==='rejected'?'#ef4444':'rgba(239,68,68,0.08)'; bR.style.color=dec==='rejected'?'#fff':'#ef4444'; bR.style.borderColor=dec==='rejected'?'#ef4444':'rgba(239,68,68,0.25)'; }
+  if(card){ card.style.borderColor=dec==='accepted'?'#10b981':dec==='rejected'?'#ef4444':'#2a3040'; card.style.opacity=dec==='rejected'?'0.5':'1'; }
 }
 
 function _renderAnaAdverseTab(idx){
@@ -2537,7 +2552,7 @@ async function dlUserAnalysis() {
     if (fileStoragePath || fileCacheId) {
       if (fileStoragePath) fd.append('file_storage_path', fileStoragePath);
       if (fileCacheId) fd.append('file_cache_id', fileCacheId);
-      fd.append('file', new Blob([''], {type:'text/plain'}), 'placeholder.txt');
+      // No placeholder file — backend returns 400 if neither cache nor storage resolves
     } else {
       if(btn) { btn.disabled = false; btn.textContent = 'Télécharger DOCX'; }
       alert('Le fichier original de ce contrat n\'est plus disponible. Rechargez le contrat depuis l\'étape Upload, relancez l\'analyse, puis utilisez l\'export.');
@@ -2546,7 +2561,7 @@ async function dlUserAnalysis() {
     fd.append('lang', 'auto');
     fd.append('type', ana.contract_type||'generic');
     var decs = {};
-    realMods.forEach(function(m){ decs[String(m.id)] = 'accepted'; });
+    realMods.forEach(function(m){ decs[String(m.id)] = (window._anaDecisions||{})[String(m.id)] || 'accepted'; });
     fd.append('modifications', JSON.stringify(realMods));
     fd.append('decisions', JSON.stringify(decs));
     var resp = await fetch('https://web-production-f96f7.up.railway.app/export', {method:'POST', body:fd});
@@ -2567,13 +2582,17 @@ async function dlUserAnalysis() {
           btn.disabled = false;
         }, 3000);
       }
+    } else if(resp.status === 400) {
+      if(btn) { btn.disabled = false; btn.textContent = 'Télécharger DOCX'; }
+      alert('Le fichier original n\'est plus disponible (cache expiré). Rechargez le contrat depuis l\'étape Upload, relancez l\'analyse, puis exportez.');
+      return;
     } else {
       var errText = await resp.text();
       throw new Error('Erreur ' + resp.status + ' : ' + errText);
     }
   } catch(e) {
     alert('Erreur : ' + e.message);
-    if(btn) { btn.disabled = false; btn.textContent = 'Telecharger avec mes modifications'; }
+    if(btn) { btn.disabled = false; btn.textContent = 'Télécharger DOCX'; }
   }
 }
 
