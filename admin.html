@@ -80,6 +80,20 @@ select { appearance: none; }
     <button onclick="changeKey()" style="background:none;border:none;color:#6b7280;font-size:12px;cursor:pointer">Changer</button>
   </div>
 
+  <!-- Modèle IA -->
+  <div class="card" id="model-card" style="display:none;margin-top:12px">
+    <div class="card-title">🤖 Modèle IA</div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button id="btn-haiku" onclick="setModel('haiku')" style="flex:1;padding:10px 16px;border-radius:8px;border:2px solid #1f2537;background:#0d1117;color:#a0a8c0;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s">
+        🐢 Haiku <span style="font-size:11px;opacity:.7;display:block">Tests — ~12× moins cher</span>
+      </button>
+      <button id="btn-sonnet" onclick="setModel('sonnet')" style="flex:1;padding:10px 16px;border-radius:8px;border:2px solid #1f2537;background:#0d1117;color:#a0a8c0;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s">
+        ⚡ Sonnet <span style="font-size:11px;opacity:.7;display:block">Production — qualité max</span>
+      </button>
+    </div>
+    <div id="model-status" style="margin-top:8px;font-size:12px;color:#6b7280;text-align:center"></div>
+  </div>
+
   <div id="main-content" style="display:none">
 
     <!-- Stats -->
@@ -358,8 +372,42 @@ function changeKey() {
 function showMain() {
   document.getElementById('key-card').style.display = 'none';
   document.getElementById('key-saved-bar').style.display = 'flex';
+  document.getElementById('model-card').style.display = 'block';
   document.getElementById('main-content').style.display = 'block';
+  loadCurrentModel();
   loadAll();
+}
+
+function loadCurrentModel() {
+  fetch(BACKEND + '/admin/get-model').then(function(r) { return r.json(); }).then(function(d) {
+    highlightModel(d.model);
+  }).catch(function() {});
+}
+
+function highlightModel(model) {
+  var isHaiku = model && model.indexOf('haiku') !== -1;
+  var bH = document.getElementById('btn-haiku');
+  var bS = document.getElementById('btn-sonnet');
+  var ACTIVE = 'border:2px solid #5b7cfa;background:rgba(91,124,250,0.12);color:#e2e5f0;';
+  var IDLE   = 'border:2px solid #1f2537;background:#0d1117;color:#a0a8c0;';
+  bH.style.cssText = bH.style.cssText.replace(/border:[^;]+;background:[^;]+;color:[^;]+;/, isHaiku ? ACTIVE : IDLE);
+  bS.style.cssText = bS.style.cssText.replace(/border:[^;]+;background:[^;]+;color:[^;]+;/, isHaiku ? IDLE : ACTIVE);
+  document.getElementById('model-status').textContent = 'Modèle actif : ' + (isHaiku ? '🐢 Haiku (mode test)' : '⚡ Sonnet (mode production)');
+}
+
+async function setModel(name) {
+  var st = document.getElementById('model-status');
+  st.textContent = '⏳ Changement en cours...';
+  try {
+    var r = await fetch(BACKEND + '/admin/set-model', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({api_key: apiKey, model: name})
+    });
+    var d = await r.json();
+    if (!r.ok) { st.textContent = '❌ ' + (d.error || 'Erreur'); return; }
+    highlightModel(d.model);
+  } catch(e) { st.textContent = '❌ ' + e.message; }
 }
 
 function showTab(tab, btn) {
