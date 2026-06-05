@@ -956,9 +956,12 @@ function renderReview() {
   });
 
   var isDocx = curFile && (curFile.name.endsWith('.docx') || curFile.name.endsWith('.doc'));
+  var isPdf = curFile && curFile.name.toLowerCase().endsWith('.pdf');
   document.getElementById('export-desc').innerHTML = isDocx
     ? 'Le fichier DOCX original sera téléchargé avec les <strong>vraies Track Changes Word</strong>  mise en forme préservée.'
-    : 'Un document Word sera généré avec les modifications acceptées en Track Changes.';
+    : isPdf
+      ? '⚠️ Fichier PDF : les Track Changes natifs ne sont pas disponibles. Un <strong>rapport de modifications</strong> Word sera généré à la place. Pour les Track Changes sur le document original, convertissez votre PDF en DOCX avant l\'analyse.'
+      : 'Un document Word sera généré avec les modifications acceptées en Track Changes.';
 
   updateStats();
   renderCompliance();
