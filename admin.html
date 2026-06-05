@@ -402,7 +402,7 @@ async function setModel(name) {
     var r = await fetch(BACKEND + '/admin/set-model', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({api_key: apiKey, model: name})
+      body: JSON.stringify({api_key: localStorage.getItem('admin_pass') || apiKey, model: name})
     });
     var d = await r.json();
     if (!r.ok) { st.textContent = '❌ ' + (d.error || 'Erreur'); return; }
