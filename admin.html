@@ -407,6 +407,8 @@ async function setModel(name) {
     var d = await r.json();
     if (!r.ok) { st.textContent = '❌ ' + (d.error || 'Erreur'); return; }
     highlightModel(d.model);
+    var isHaiku = d.model && d.model.indexOf('haiku') !== -1;
+    st.textContent = '✅ ' + (isHaiku ? '🐢 Haiku activé — sauvegardé (survivra aux redémarrages)' : '⚡ Sonnet activé — sauvegardé (survivra aux redémarrages)');
   } catch(e) { st.textContent = '❌ ' + e.message; }
 }
 
