@@ -730,6 +730,7 @@ async function analyzeWithPartie(partieName) {
   selectedPartie = partieName;
   hide('step-parties');
   showFlex('step-loading');
+  startLoadingTimer();
   stepDone(2);
 
   // Ensure session is restored before sending user_email
@@ -786,11 +787,13 @@ async function analyzeWithPartie(partieName) {
     // Auto-save après analyse (flow principal)
     saveAna(curFile?curFile.name:'Contrat', savedType||'generic', selectedPartie||'', modifications).catch(function(){});
   } catch(e) {
-    showErr('form-error', '✅ ' + (e.message || 'Erreur inattendue.'));
+    stopLoadingTimer(); hide('step-loading');
+    show('step-form');
+    showErr('form-error', '❌ ' + (e.message || 'Erreur inattendue.'));
   }
 }
 
-//  Step 4: Review 
+//  Step 4: Review
 function applyAccessCode() {
   var code = document.getElementById('access-code-input').value.trim().toUpperCase();
   // Valid codes stored in localStorage by admin
