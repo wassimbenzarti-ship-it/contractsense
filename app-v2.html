@@ -344,6 +344,8 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
   <!-- STEP 3: Loading -->
   <div id="step-loading" style="display:none" class="loading">
     <div class="spinner"></div>
+    <div id="loading-timer" style="font-size:28px;font-weight:800;letter-spacing:2px;color:#5b7cfa;margin:8px 0 4px;font-variant-numeric:tabular-nums">0:00</div>
+    <div style="font-size:11px;color:#6b7280;margin-bottom:12px">Temps écoulé</div>
     <div class="steps">
       <div class="step" id="s0">⏳ Lecture du document...</div>
       <div class="step" id="s1">⏳ Identification des parties...</div>
@@ -548,6 +550,24 @@ function stepReset() {
   }
 }
 
+var _loadingTimerInterval = null;
+var _loadingTimerSecs = 0;
+function startLoadingTimer() {
+  _loadingTimerSecs = 0;
+  var el = document.getElementById('loading-timer');
+  if (el) el.textContent = '0:00';
+  if (_loadingTimerInterval) clearInterval(_loadingTimerInterval);
+  _loadingTimerInterval = setInterval(function() {
+    _loadingTimerSecs++;
+    var m = Math.floor(_loadingTimerSecs / 60);
+    var s = _loadingTimerSecs % 60;
+    if (el) el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  }, 1000);
+}
+function stopLoadingTimer() {
+  if (_loadingTimerInterval) { clearInterval(_loadingTimerInterval); _loadingTimerInterval = null; }
+}
+
 function rc(r) { return r === 'high' ? '#ef4444' : r === 'medium' ? '#f59e0b' : '#10b981'; }
 function rl(r) { return r === 'high' ? 'Risque élevé' : r === 'medium' ? 'Risque modéré' : 'Faible risque'; }
 
@@ -618,6 +638,7 @@ async function analyze() {
 
   hide('step-form');
   showFlex('step-loading');
+  startLoadingTimer();
   stepReset();
   stepDone(0);
   setTimeout(function() { stepDone(1); }, 800);
@@ -637,10 +658,10 @@ async function analyze() {
     }
     var data = await resp.json();
 
-    hide('step-loading');
+    stopLoadingTimer(); hide('step-loading');
     renderParties(data.parties || []);
   } catch(e) {
-    hide('step-loading');
+    stopLoadingTimer(); hide('step-loading');
     show('step-form');
     showErr('form-error', '&#10060; ' + (e.message || 'Erreur inattendue.'));
   }
@@ -760,7 +781,7 @@ async function analyzeWithPartie(partieName) {
       }).filter(function(c) { return c.name.length > 5; });
     }
 
-    hide('step-loading');
+    stopLoadingTimer(); hide('step-loading');
     renderReview();
     // Auto-save après analyse (flow principal)
     saveAna(curFile?curFile.name:'Contrat', savedType||'generic', selectedPartie||'', modifications).catch(function(){});
@@ -1348,7 +1369,7 @@ function reset() {
   savedFormData = null;
   hide('step-review');
   hide('step-parties');
-  hide('step-loading');
+  stopLoadingTimer(); hide('step-loading');
   hide('file-ok');
   document.getElementById('contract-text').value = '';
   document.getElementById('file-input').value = '';
