@@ -2099,15 +2099,27 @@ function _renderAnaModsTab(idx){
     +'<button onclick="_expandAna()" style="padding:3px 10px;background:#ffffff08;border:1px solid #2a3040;border-radius:20px;color:#9ca3af;font-size:11px;cursor:pointer">▼ Déplier</button>'
     +'<button onclick="dlUserAnalysis()" style="padding:3px 12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:20px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">⬇ DOCX</button>'
     +'</div>';
+  // Restore director decisions embedded in mods (survives page reloads)
+  if(!window._anaDecisions) window._anaDecisions={};
+  mods.forEach(function(m){ if(m._director_decision&&!window._anaDecisions[String(m.id)]) window._anaDecisions[String(m.id)]=m._director_decision; });
   var cards='';
   var isJ=_userRole==='juriste', isD=_userRole==='directeur';
   mods.forEach(function(m,i){
     var risk=m.risk||'medium';
     var col=risk==='high'?'#ef4444':risk==='low'?'#10b981':'#f59e0b';
     var lbl=risk==='high'?'Risque élevé':risk==='low'?'Risque faible':'Risque modéré';
-    cards+='<div id="anac-'+i+'" style="background:#181c2a;border:1px solid #2a3040;border-radius:10px;margin-bottom:10px;overflow:hidden">'
+    var dirDec=(window._anaDecisions||{})[String(m.id)]||m._director_decision||null;
+    var dirBadge=dirDec==='accepted'
+      ?'<span style="padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:#10b98122;color:#10b981;white-space:nowrap">✓ Accepté</span>'
+      :dirDec==='rejected'
+      ?'<span style="padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:#ef444422;color:#ef4444;white-space:nowrap">✕ Refusé</span>'
+      :'';
+    var cardBorder=dirDec==='accepted'?'#10b981':dirDec==='rejected'?'#ef4444':'#2a3040';
+    var cardOpacity=dirDec==='rejected'?'0.5':'1';
+    cards+='<div id="anac-'+i+'" style="background:#181c2a;border:1px solid '+cardBorder+';border-radius:10px;margin-bottom:10px;overflow:hidden;opacity:'+cardOpacity+'">'
       +'<div style="display:flex;align-items:center;gap:8px;padding:12px 14px;cursor:pointer;user-select:none" onclick="_toggleAnaCard('+i+')">'
       +'<span style="padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:'+col+'22;color:'+col+';white-space:nowrap">'+lbl+'</span>'
+      +dirBadge
       +'<strong style="color:#e2e5f0;font-size:13px;flex:1">'+_escH(m.clause_name||'Clause')+'</strong>'
       +'<span id="anachv-'+i+'" style="color:#6b7280;font-size:10px;transition:transform .2s">▼</span>'
       +'</div>'
@@ -2126,6 +2138,11 @@ function _renderAnaModsTab(idx){
       +'</div>';
   });
   container.innerHTML=filterBar+cards;
+  // Restore button visual state for previously stored decisions
+  Object.keys(window._anaDecisions||{}).forEach(function(modId){
+    var idx2=(window._currentMods||[]).findIndex(function(m){return String(m.id)===modId;});
+    if(idx2>=0) _setAnaDecision(idx2,window._anaDecisions[modId]);
+  });
 }
 
 function _toggleAnaCard(i){
@@ -3129,9 +3146,15 @@ async function requestRevision(id){
   var noteVal=note?note.value.trim():'';
   if(!confirm('Renvoyer cette analyse au juriste avec une demande de révision ?')) return;
   try{
+    // Embed director accept/reject decisions into each mod so juriste can see them
+    var _decs=window._anaDecisions||{};
+    var modsWithDec=(window._currentMods||[]).map(function(m){
+      var dec=_decs[String(m.id)];
+      return dec?Object.assign({},m,{_director_decision:dec}):m;
+    });
     var r=await fetch(BACKEND+'/analyses/request-revision/'+id,{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({modifications:_modsWithMeta(window._currentMods),director_notes:noteVal,director_email:_cu&&_cu.email||''})
+      body:JSON.stringify({modifications:_modsWithMeta(modsWithDec),director_notes:noteVal,director_email:_cu&&_cu.email||''})
     });
     var d=r.ok?await r.json().catch(function(){return{};}):{};
     if(r.ok&&d.status==='ok'){
