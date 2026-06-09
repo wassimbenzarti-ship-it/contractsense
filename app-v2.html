@@ -2605,7 +2605,7 @@ async function dlUserAnalysis() {
     fd.append('lang', 'auto');
     fd.append('type', ana.contract_type||'generic');
     var decs = {};
-    realMods.forEach(function(m){ decs[String(m.id)] = (window._anaDecisions||{})[String(m.id)] || 'accepted'; });
+    realMods.forEach(function(m){ decs[String(m.id)] = (window._anaDecisions||{})[String(m.id)] || 'pending'; });
     fd.append('modifications', JSON.stringify(realMods));
     fd.append('decisions', JSON.stringify(decs));
     var resp = await fetch('https://web-production-f96f7.up.railway.app/export', {method:'POST', body:fd});
@@ -2930,8 +2930,20 @@ async function submitForReview(id){
   // Sauvegarder les modifs en cours avant de soumettre
   var r=await _patchAnalysis(id,{status:'pending_review',modifications:_modsWithMeta(window._currentMods)});
   if(r.ok||r.status===204){
-    alert('Analyse soumise au directeur. Il sera notifié lors de sa prochaine connexion.');
-    window._juristesData=null; // reset cache
+    // Fire-and-forget: email notification to director
+    var _ana=(window._userAnalyses||[]).find(function(a){return a.id===id;})||{};
+    fetch(BACKEND+'/notify/pending-review',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        analysis_id:id,
+        juriste_email:_cu&&_cu.email||'',
+        director_email:_userParentEmail||_ana.director_email||'',
+        filename:_ana.filename||window._currentAnaFilename||'Contrat',
+        contract_type:_ana.contract_type||savedType||''
+      })
+    }).catch(function(){});
+    alert('Analyse soumise. Le directeur a été notifié par e-mail.');
+    window._juristesData=null;
     loadDash();
   } else { alert('Erreur lors de la soumission ('+r.status+')'); }
 }
