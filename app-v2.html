@@ -1522,11 +1522,24 @@ function analyzeDraftAsAdverse() {
   var text = document.getElementById('draft-editor').value;
   if (!text.trim()) return;
   var blob = new Blob([text], {type: 'text/plain'});
-  var file = new File([blob], 'contrat-draft.txt', {type: 'text/plain'});
-  _dAnaCurFile = file;
-  document.getElementById('d-file-name').textContent = 'contrat-draft.txt';
-  document.getElementById('d-file-ok').style.display = '';
-  dtab('nouvelle');
+  window._pendingAdverseFile = new File([blob], 'contrat-draft.txt', {type: 'text/plain'});
+  dtab('analyses');
+  var anaPage = document.getElementById('ana-page');
+  if(window._anaIdx !== undefined && anaPage && anaPage.style.display !== 'none'){
+    _switchAnaTab('adverse');
+    _renderAnaAdverseTab(window._anaIdx);
+  } else {
+    var alist = document.getElementById('alist');
+    var existing = document.getElementById('adverse-pending-banner');
+    if(existing) existing.remove();
+    if(alist && alist.parentNode){
+      var banner = document.createElement('div');
+      banner.id = 'adverse-pending-banner';
+      banner.style.cssText = 'background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:10px 14px;font-size:12px;color:#a78bfa;margin-bottom:10px';
+      banner.textContent = '⚔ Draft en attente — ouvrez une analyse puis cliquez sur l\'onglet "⚔ Version adverse".';
+      alist.parentNode.insertBefore(banner, alist);
+    }
+  }
 }
 
 function dAnaReset() {
@@ -2332,6 +2345,13 @@ function _renderAnaAdverseTab(idx){
     +'⚔ Importer la version adverse</label>'
     +'</div>'
     +'<div id="adverse-result" style="margin-top:4px"></div>';
+  // Auto-trigger si un draft en attente a été envoyé depuis l'onglet Rédiger
+  if(window._pendingAdverseFile && allowed){
+    var _pf=window._pendingAdverseFile; window._pendingAdverseFile=null;
+    var _res=document.getElementById('adverse-result');
+    if(_res) _res.innerHTML='<div style="color:#8b5cf6;font-size:12px;margin-bottom:8px;padding:8px 12px;background:rgba(139,92,246,0.08);border-radius:7px">⚔ Contrat draft chargé automatiquement — comparaison en cours...</div>';
+    setTimeout(function(){ compareAdversary(ana.id, ana.contract_type, ana.partie, _pf); }, 150);
+  }
 }
 
 function _renderAnaTranslateTab(){
@@ -2468,9 +2488,9 @@ async function analyzeAdverse(anaId, contractType, partie){
   }
 }
 
-async function compareAdversary(anaId, contractType, partie){
+async function compareAdversary(anaId, contractType, partie, _fileOverride){
   var inp=document.getElementById('adverse-file-inp');
-  var file=inp?inp.files[0]:null;
+  var file=_fileOverride||(inp?inp.files[0]:null);
   if(!file) return;
   window._adverseFile=file;
   var res=document.getElementById('adverse-result');
