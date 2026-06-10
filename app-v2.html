@@ -165,6 +165,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <div class="dt">
 <div class="dtb active" id="dtb-analyses" onclick="dtab('analyses')">Analyses</div>
 <div class="dtb" onclick="dtab('models')">Modeles</div>
+<div class="dtb" onclick="dtab('draft')">✏️ Rédiger</div>
 <div class="dtb" id="dtb-juristes" onclick="dtab('juristes')" style="display:none">Equipe</div>
 <div class="dtb" id="dtb-abonnement" onclick="dtab('abonnement')" style="display:none">💳 Abonnement</div>
 <div class="dtb" id="dtb-nouvelle" onclick="dtab('nouvelle')">➕ Analyse</div>
@@ -252,6 +253,58 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       <button onclick="dAnaReset()" style="padding:10px 14px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:12px;cursor:pointer">🔄 Nouvelle</button>
     </div>
   </div>
+<div id="d-draft" class="ds">
+  <div id="draft-form-section">
+    <div style="font-size:15px;font-weight:700;color:#e2e5f0;margin-bottom:14px">Rédiger un contrat</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <div style="flex:1;min-width:120px">
+        <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px">Type de contrat</label>
+        <select id="draft-type" style="width:100%;background:#1a2035;border:1px solid #1f2537;border-radius:7px;padding:7px 10px;color:#e2e5f0;font-size:12px">
+          <option value="generic">Générique</option>
+          <option value="nda">NDA / Confidentialité</option>
+          <option value="service">Prestation de services</option>
+          <option value="purchase">Achat / Vente</option>
+          <option value="employment">Contrat de travail CDI</option>
+          <option value="partnership">Partenariat</option>
+          <option value="saas">SaaS / Licence</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:100px">
+        <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px">Langue</label>
+        <select id="draft-lang" style="width:100%;background:#1a2035;border:1px solid #1f2537;border-radius:7px;padding:7px 10px;color:#e2e5f0;font-size:12px">
+          <option value="fr">Français</option>
+          <option value="ar">Arabe</option>
+          <option value="en">Anglais</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-bottom:10px">
+      <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px">Partie représentée (optionnel)</label>
+      <input id="draft-partie" type="text" placeholder="ex: Westfield Avocats" style="width:100%;background:#1a2035;border:1px solid #1f2537;border-radius:7px;padding:7px 10px;color:#e2e5f0;font-size:12px;box-sizing:border-box"/>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px">Description du contrat</label>
+      <textarea id="draft-prompt" rows="5" placeholder="Décrivez le contrat à rédiger : parties, objet, durée, montant, conditions particulières..." style="width:100%;background:#1a2035;border:1px solid #1f2537;border-radius:7px;padding:9px 12px;color:#e2e5f0;font-size:12px;resize:vertical;box-sizing:border-box;line-height:1.5"></textarea>
+    </div>
+    <button onclick="generateDraft()" id="draft-btn" style="width:100%;padding:11px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:14px;cursor:pointer">✏️ Générer le contrat</button>
+    <div id="draft-error" style="display:none;color:#ef4444;font-size:12px;margin-top:8px;padding:8px 12px;background:rgba(239,68,68,0.08);border-radius:7px"></div>
+  </div>
+  <div id="draft-loading" style="display:none;text-align:center;padding:32px 0">
+    <div style="width:30px;height:30px;border:3px solid #1f2537;border-top-color:#5b7cfa;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px"></div>
+    <div style="font-size:13px;color:#6b7280">Rédaction en cours...</div>
+  </div>
+  <div id="draft-result-section" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+      <div style="font-size:14px;font-weight:700;color:#e2e5f0">Contrat généré</div>
+      <button onclick="document.getElementById('draft-result-section').style.display='none';document.getElementById('draft-form-section').style.display='';" style="background:none;border:1px solid #1f2537;border-radius:7px;padding:4px 10px;color:#6b7280;font-size:11px;cursor:pointer">← Modifier le prompt</button>
+    </div>
+    <textarea id="draft-editor" rows="22" style="width:100%;background:#111827;border:1px solid #1f2537;border-radius:9px;padding:14px;color:#e2e5f0;font-size:12px;line-height:1.7;resize:vertical;box-sizing:border-box;font-family:monospace"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button onclick="exportDraftDocx()" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX</button>
+      <button onclick="analyzeDraftAsAdverse()" style="flex:1;padding:10px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:9px;color:#10b981;font-weight:700;font-size:13px;cursor:pointer">⚖ Analyser (partie adverse)</button>
+    </div>
+  </div>
+</div>
 </div>
 </div>
 <div id="ubar">
@@ -1418,6 +1471,64 @@ function dAnaOnFile(input) {
   }
 }
 
+// ─── Draft (contract generation) ─────────────────────────────────────────────
+async function generateDraft() {
+  var prompt = (document.getElementById('draft-prompt').value || '').trim();
+  if (!prompt) { var e=document.getElementById('draft-error'); e.textContent='Décrivez le contrat à rédiger.'; e.style.display=''; return; }
+  document.getElementById('draft-error').style.display = 'none';
+  document.getElementById('draft-form-section').style.display = 'none';
+  document.getElementById('draft-loading').style.display = '';
+  try {
+    var resp = await fetch(BACKEND+'/draft', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        prompt: prompt,
+        contract_type: document.getElementById('draft-type').value,
+        language: document.getElementById('draft-lang').value,
+        partie: (document.getElementById('draft-partie').value||'').trim(),
+        jurisdiction: 'droit marocain'
+      })
+    });
+    var data = await resp.json();
+    if (!resp.ok || data.error) throw new Error(data.error || 'Erreur serveur');
+    document.getElementById('draft-editor').value = data.draft || '';
+    document.getElementById('draft-loading').style.display = 'none';
+    document.getElementById('draft-result-section').style.display = '';
+  } catch(e) {
+    document.getElementById('draft-loading').style.display = 'none';
+    document.getElementById('draft-form-section').style.display = '';
+    var errEl = document.getElementById('draft-error');
+    errEl.textContent = '❌ ' + (e.message || 'Erreur inattendue'); errEl.style.display = '';
+  }
+}
+
+async function exportDraftDocx() {
+  var text = document.getElementById('draft-editor').value;
+  if (!text.trim()) return;
+  try {
+    var resp = await fetch(BACKEND+'/draft/export', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({text: text, filename: 'contrat-draft'})
+    });
+    if (!resp.ok) throw new Error('Erreur export');
+    var blob = await resp.blob();
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a'); a.href=url; a.download='contrat-draft.docx'; a.click();
+    URL.revokeObjectURL(url);
+  } catch(e) { alert('Erreur export : ' + e.message); }
+}
+
+function analyzeDraftAsAdverse() {
+  var text = document.getElementById('draft-editor').value;
+  if (!text.trim()) return;
+  var blob = new Blob([text], {type: 'text/plain'});
+  var file = new File([blob], 'contrat-draft.txt', {type: 'text/plain'});
+  _dAnaCurFile = file;
+  document.getElementById('d-file-name').textContent = 'contrat-draft.txt';
+  document.getElementById('d-file-ok').style.display = '';
+  dtab('nouvelle');
+}
+
 function dAnaReset() {
   _dashAnalysis = false; _dAnaCurFile = null;
   modifications = []; decisions = {}; window._compliance = [];
@@ -1525,7 +1636,7 @@ async function dAnaAnalyze(partie) {
 
 function showDash(){document.getElementById('dash-ov').classList.add('show');loadDash();}
 function closeDash(){document.getElementById('dash-ov').classList.remove('show');}
-function dtab(t){var names=['analyses','models','juristes','abonnement','nouvelle'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();if(t==='abonnement')loadAbonnement();if(t==='nouvelle')dAnaReset();}
+function dtab(t){var names=['analyses','models','draft','juristes','abonnement','nouvelle'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();if(t==='abonnement')loadAbonnement();if(t==='nouvelle')dAnaReset();}
 async function checkRole(){
   if(!_cu)return;
   try{
