@@ -1552,7 +1552,7 @@ function draftSyncPreview(){
     } else {
       // Inline bold **text**
       var formatted = _escH(line).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
-      html += '<div style="margin-bottom:3px">'+formatted+'</div>';
+      html += '<div style="margin-bottom:3px;text-align:justify">'+formatted+'</div>';
     }
     i++;
   }
