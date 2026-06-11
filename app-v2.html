@@ -303,14 +303,8 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
       <div id="draft-preview" style="background:#fff;margin:0 auto;padding:36px 44px;box-shadow:0 2px 10px rgba(0,0,0,0.15);font-family:'Calibri',Arial,sans-serif;font-size:10.5pt;line-height:1.65;color:#1a1a1a;min-height:280px"></div>
     </div>
     <textarea id="draft-editor" style="display:none" oninput="draftSyncPreview()"></textarea>
-    <div style="background:#111827;border:1px solid #1f2537;border-radius:9px;padding:11px;margin-bottom:10px">
-      <div style="font-size:11px;color:#6b7280;margin-bottom:7px;font-weight:600">✦ Modifier via Omniscient</div>
-      <div id="draft-refine-history" style="max-height:80px;overflow-y:auto;margin-bottom:7px;display:none"></div>
-      <div style="display:flex;gap:6px">
-        <input id="draft-refine-input" type="text" placeholder="ex : ajouter une clause de non-concurrence, changer la durée à 24 mois..." style="flex:1;background:#1a2035;border:1px solid #1f2537;border-radius:7px;padding:7px 10px;color:#e2e5f0;font-size:12px;outline:none" onkeydown="if(event.key==='Enter')refineDraft()"/>
-        <button onclick="refineDraft()" id="draft-refine-btn" style="padding:7px 14px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap">Modifier →</button>
-      </div>
-      <div id="draft-refine-loading" style="display:none;font-size:11px;color:#5b7cfa;margin-top:6px">Omniscient modifie le contrat...</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button onclick="openChatForDraft()" style="flex:1;padding:9px;background:rgba(91,124,250,0.1);border:1px solid rgba(91,124,250,0.3);border-radius:9px;color:#5b7cfa;font-weight:700;font-size:13px;cursor:pointer">💬 Modifier avec Omniscient</button>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button onclick="exportDraftDocx()" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX</button>
@@ -1587,40 +1581,6 @@ async function generateDraft() {
   }
 }
 
-async function refineDraft() {
-  var instruction = (document.getElementById('draft-refine-input').value || '').trim();
-  if (!instruction) return;
-  var currentDraft = document.getElementById('draft-editor').value;
-  if (!currentDraft.trim()) return;
-  var btn = document.getElementById('draft-refine-btn');
-  var loadEl = document.getElementById('draft-refine-loading');
-  btn.disabled = true;
-  loadEl.style.display = '';
-  try {
-    var resp = await fetch(BACKEND+'/draft/refine', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({draft: currentDraft, instruction: instruction})
-    });
-    var data = await resp.json();
-    if (!resp.ok || data.error) throw new Error(data.error || 'Erreur serveur');
-    document.getElementById('draft-editor').value = data.draft || '';
-    draftSyncPreview();
-    // Add instruction to history
-    var hist = document.getElementById('draft-refine-history');
-    hist.style.display = '';
-    var pill = document.createElement('div');
-    pill.style.cssText = 'font-size:10.5px;color:#9ca3af;padding:2px 0;border-bottom:1px solid #1f2537;margin-bottom:3px';
-    pill.textContent = '✓ ' + instruction;
-    hist.insertBefore(pill, hist.firstChild);
-    document.getElementById('draft-refine-input').value = '';
-  } catch(e) {
-    alert('Erreur : ' + (e.message || 'Erreur inattendue'));
-  } finally {
-    btn.disabled = false;
-    loadEl.style.display = 'none';
-  }
-}
-
 async function exportDraftDocx() {
   var text = document.getElementById('draft-editor').value;
   if (!text.trim()) return;
@@ -1768,7 +1728,7 @@ async function dAnaAnalyze(partie) {
 
 function showDash(){document.getElementById('dash-ov').classList.add('show');loadDash();}
 function closeDash(){document.getElementById('dash-ov').classList.remove('show');}
-function dtab(t){var names=['analyses','models','draft','juristes','abonnement','nouvelle'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();if(t==='abonnement')loadAbonnement();if(t==='nouvelle')dAnaReset();}
+function dtab(t){var names=['analyses','models','draft','juristes','abonnement','nouvelle'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();if(t==='abonnement')loadAbonnement();if(t==='nouvelle')dAnaReset();if(t!=='draft'){_draftMode=false;_draftContextText=null;}}
 async function checkRole(){
   if(!_cu)return;
   try{
@@ -3721,6 +3681,8 @@ var _cbOpen          = false;
 var _cbWelcomed      = false;
 var _cbModStore      = {};   // key → modObj  (avoids inline JSON in onclick)
 var _cbLastCacheId   = null; // tracks the current analysis session
+var _draftMode       = false; // true when chatbot opened from draft tab
+var _draftContextText = null; // draft text injected as contract_text
 
 function cbToggle() {
   _cbOpen = !_cbOpen;
@@ -3749,6 +3711,21 @@ function cbNewAnalysis() {
   _cbLastCacheId = window._fileCacheId || null;
   document.getElementById('cb-msgs').innerHTML = '';
   cbOpen();
+}
+
+function openChatForDraft() {
+  _draftMode = true;
+  _draftContextText = document.getElementById('draft-editor').value || '';
+  _cbHistory  = [];
+  _cbWelcomed = true;
+  _cbModStore = {};
+  document.getElementById('cb-msgs').innerHTML = '';
+  cbOpen();
+  cbAddMsg('bot',
+    'Bonjour ! Je suis <strong>Omniscient</strong>. Votre draft est chargé comme contexte.<br>'
+    + 'Demandez une modification : ajout d’une clause, changement de durée, reformulation…<br>'
+    + '<span style="color:#6b7280;font-size:12px">Les suggestions seront applicables directement au draft via le bouton « → Appliquer au draft ».</span>'
+  );
 }
 
 function cbWelcome() {
@@ -3804,7 +3781,7 @@ function cbAddMsg(role, html, modObjs) {
         '<div class="cb-mod-name">\u2726 ' + _escH(modObj.clause_name || 'Modification propos\u00e9e') + '</div>' +
         (modObj.original ? '<div class="cb-mod-orig">\u26a0 Original\u00a0: ' + _escH(origTxt) + origMore + '</div>' : '') +
         '<div class="cb-mod-prop">\u2713 Propos\u00e9\u00a0: ' + _escH(propTxt) + propMore + '</div>' +
-        '<button class="cb-apply-btn" data-sk="' + sk + '" onclick="cbApplyMod(this)">+ Ajouter au contrat</button>';
+        '<button class="cb-apply-btn" data-sk="' + sk + '" onclick="cbApplyMod(this)">' + (_draftMode ? '→ Appliquer au draft' : '+ Ajouter au contrat') + '</button>';
 
       div.appendChild(card);
     });
@@ -3840,6 +3817,21 @@ function cbApplyMod(btn) {
   var mod = _cbModStore[sk];
   if (!mod) { alert('Donn\u00e9es introuvables, r\u00e9essayez.'); return; }
   try {
+    if (_draftMode) {
+      var editor = document.getElementById('draft-editor');
+      if (editor) {
+        if (mod.original && mod.proposed && editor.value.includes(mod.original)) {
+          editor.value = editor.value.replace(mod.original, mod.proposed);
+        } else if (mod.proposed) {
+          editor.value += '\n\n' + mod.proposed;
+        }
+        _draftContextText = editor.value;
+        draftSyncPreview();
+      }
+      btn.textContent = '\u2705 Appliqu\u00e9 au draft';
+      btn.classList.add('applied');
+      return;
+    }
     var newId  = Date.now();
     var newMod = {
       id:           newId,
@@ -3876,9 +3868,9 @@ async function cbSend() {
 
   try {
     // Send contract text if available in this session
-    var contractTxt = savedText || '';
+    var contractTxt = (_draftMode && _draftContextText) ? _draftContextText : (savedText || '');
     // Also pass cache/storage IDs so backend can recover if savedText is empty
-    var currentCacheId = window._fileCacheId || '';
+    var currentCacheId = _draftMode ? '' : (window._fileCacheId || '');
 
     var payload = {
       message:       msg,
