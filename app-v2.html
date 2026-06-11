@@ -297,9 +297,14 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
   <div id="draft-result-section" style="display:none">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px">
       <div style="font-size:14px;font-weight:700;color:#e2e5f0">Contrat généré</div>
-      <button onclick="document.getElementById('draft-result-section').style.display='none';document.getElementById('draft-form-section').style.display='';" style="background:none;border:1px solid #1f2537;border-radius:7px;padding:4px 10px;color:#6b7280;font-size:11px;cursor:pointer">← Modifier le prompt</button>
+      <div style="display:flex;gap:6px;align-items:center">
+        <button id="draft-tab-preview" onclick="draftSetTab('preview')" style="padding:4px 10px;background:rgba(91,124,250,0.15);border:1px solid #5b7cfa;border-radius:6px;color:#5b7cfa;font-size:11px;cursor:pointer;font-weight:700">👁 Aperçu</button>
+        <button id="draft-tab-edit" onclick="draftSetTab('edit')" style="padding:4px 10px;background:none;border:1px solid #1f2537;border-radius:6px;color:#6b7280;font-size:11px;cursor:pointer">✏️ Éditer</button>
+        <button onclick="document.getElementById('draft-result-section').style.display='none';document.getElementById('draft-form-section').style.display='';" style="background:none;border:1px solid #1f2537;border-radius:7px;padding:4px 10px;color:#6b7280;font-size:11px;cursor:pointer">← Prompt</button>
+      </div>
     </div>
-    <textarea id="draft-editor" rows="22" style="width:100%;background:#111827;border:1px solid #1f2537;border-radius:9px;padding:14px;color:#e2e5f0;font-size:12px;line-height:1.7;resize:vertical;box-sizing:border-box;font-family:monospace"></textarea>
+    <div id="draft-preview" style="background:#0f1623;border:1px solid #1f2537;border-radius:9px;padding:20px 24px;min-height:300px;max-height:520px;overflow-y:auto;font-size:12.5px;line-height:1.8;color:#d1d5e0;font-family:Georgia,serif"></div>
+    <textarea id="draft-editor" rows="22" style="display:none;width:100%;background:#111827;border:1px solid #1f2537;border-radius:9px;padding:14px;color:#e2e5f0;font-size:12px;line-height:1.7;resize:vertical;box-sizing:border-box;font-family:monospace" oninput="draftSyncPreview()"></textarea>
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
       <button onclick="exportDraftDocx()" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX</button>
       <button onclick="analyzeDraftAsAdverse()" style="flex:1;padding:10px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:9px;color:#10b981;font-weight:700;font-size:13px;cursor:pointer">⚖ Analyser (partie adverse)</button>
@@ -1472,6 +1477,88 @@ function dAnaOnFile(input) {
 }
 
 // ─── Draft (contract generation) ─────────────────────────────────────────────
+function draftSetTab(tab){
+  var isPreview = tab === 'preview';
+  document.getElementById('draft-preview').style.display = isPreview ? '' : 'none';
+  document.getElementById('draft-editor').style.display = isPreview ? 'none' : '';
+  document.getElementById('draft-tab-preview').style.background = isPreview ? 'rgba(91,124,250,0.15)' : 'none';
+  document.getElementById('draft-tab-preview').style.borderColor = isPreview ? '#5b7cfa' : '#1f2537';
+  document.getElementById('draft-tab-preview').style.color = isPreview ? '#5b7cfa' : '#6b7280';
+  document.getElementById('draft-tab-edit').style.background = !isPreview ? 'rgba(91,124,250,0.15)' : 'none';
+  document.getElementById('draft-tab-edit').style.borderColor = !isPreview ? '#5b7cfa' : '#1f2537';
+  document.getElementById('draft-tab-edit').style.color = !isPreview ? '#5b7cfa' : '#6b7280';
+}
+
+function draftSyncPreview(){
+  var text = document.getElementById('draft-editor').value || '';
+  var html = '';
+  var lines = text.split('\n');
+  var i = 0;
+  while(i < lines.length){
+    var line = lines[i].trim();
+    // Markdown table
+    if(line.startsWith('|') && line.endsWith('|')){
+      var tableLines = [];
+      while(i < lines.length && lines[i].trim().startsWith('|')){
+        var isSepar = /^[\s|:-]+$/.test(lines[i]);
+        if(!isSepar) tableLines.push(lines[i].trim().replace(/^\||\|$/g,'').split('|').map(function(c){return c.trim();}));
+        i++;
+      }
+      if(tableLines.length){
+        html += '<table style="width:100%;border-collapse:collapse;margin:10px 0;font-size:11.5px">';
+        tableLines.forEach(function(row, ri){
+          html += '<tr>';
+          row.forEach(function(cell){
+            var tag = ri===0 ? 'th' : 'td';
+            html += '<'+tag+' style="border:1px solid #2a3040;padding:6px 10px;'+(ri===0?'background:#1a2035;font-weight:700;':'')+'">'+_escH(cell)+'</'+tag+'>';
+          });
+          html += '</tr>';
+        });
+        html += '</table>';
+      }
+      continue;
+    }
+    // ##TABLE## block
+    if(line === '##TABLE##'){
+      var tableLines2 = [];
+      i++;
+      while(i < lines.length && lines[i].trim() !== '##ENDTABLE##'){
+        var cols = lines[i].split('|').map(function(c){return c.trim();}).filter(Boolean);
+        if(cols.length) tableLines2.push(cols);
+        i++;
+      }
+      i++;
+      if(tableLines2.length){
+        html += '<table style="width:100%;border-collapse:collapse;margin:10px 0;font-size:11.5px">';
+        tableLines2.forEach(function(row, ri){
+          html += '<tr>';
+          row.forEach(function(cell){
+            var tag = ri===0 ? 'th' : 'td';
+            html += '<'+tag+' style="border:1px solid #2a3040;padding:6px 10px;'+(ri===0?'background:#1a2035;font-weight:700;':'')+'">'+_escH(cell)+'</'+tag+'>';
+          });
+          html += '</tr>';
+        });
+        html += '</table>';
+      }
+      continue;
+    }
+    // Heading: ALL CAPS short line or ARTICLE X
+    var isHeading = line && line === line.toUpperCase() && line.length > 4 && line.length < 120 && !/^\d+[\.\)]/.test(line);
+    var isArticle = /^ARTICLE\s+\d/i.test(line);
+    if((isHeading || isArticle) && line){
+      html += '<div style="font-weight:700;font-size:13px;text-align:center;margin:16px 0 6px;color:#e2e5f0;letter-spacing:0.3px">'+_escH(line)+'</div>';
+    } else if(!line){
+      html += '<div style="height:6px"></div>';
+    } else {
+      // Inline bold **text**
+      var formatted = _escH(line).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+      html += '<div style="margin-bottom:3px">'+formatted+'</div>';
+    }
+    i++;
+  }
+  document.getElementById('draft-preview').innerHTML = html;
+}
+
 async function generateDraft() {
   var prompt = (document.getElementById('draft-prompt').value || '').trim();
   if (!prompt) { var e=document.getElementById('draft-error'); e.textContent='Décrivez le contrat à rédiger.'; e.style.display=''; return; }
@@ -1494,6 +1581,8 @@ async function generateDraft() {
     document.getElementById('draft-editor').value = data.draft || '';
     document.getElementById('draft-loading').style.display = 'none';
     document.getElementById('draft-result-section').style.display = '';
+    draftSyncPreview();
+    draftSetTab('preview');
   } catch(e) {
     document.getElementById('draft-loading').style.display = 'none';
     document.getElementById('draft-form-section').style.display = '';
