@@ -308,8 +308,10 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button onclick="exportDraftDocx()" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX</button>
-      <button onclick="analyzeDraftAsAdverse()" style="flex:1;padding:10px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:9px;color:#10b981;font-weight:700;font-size:13px;cursor:pointer">⚖ Analyser (partie adverse)</button>
+      <label for="draft-adverse-file" style="flex:1;padding:10px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:9px;color:#8b5cf6;font-weight:700;font-size:13px;cursor:pointer;text-align:center;display:block">⚔ Importer version adverse</label>
+      <input type="file" id="draft-adverse-file" accept=".docx,.txt,.pdf" style="display:none" onchange="compareDraftWithAdverse(this.files[0])">
     </div>
+    <div id="draft-adverse-result" style="margin-top:10px"></div>
   </div>
 </div>
 </div>
@@ -2700,6 +2702,128 @@ function _setAdvDecision(i, decision){
   });
 }
 
+// ── Draft adverse comparison ─────────────────────────────────────
+async function compareDraftWithAdverse(file){
+  if(!file) return;
+  window._draftAdverseFile = file;
+  var res = document.getElementById('draft-adverse-result');
+  if(res) res.innerHTML = '<div style="color:#8b5cf6;font-size:13px;padding:10px 0">Comparaison avec la version adverse...</div>';
+  try{
+    var draftText = document.getElementById('draft-editor').value || '';
+    var partie = (document.getElementById('draft-partie').value || '').trim();
+    var fd = new FormData();
+    fd.append('file', file);
+    fd.append('our_text', draftText);
+    fd.append('partie', partie);
+    fd.append('our_modifications', '[]');
+    fd.append('decisions', '{}');
+    var r = await fetch(BACKEND+'/compare-adversary', {method:'POST', body:fd});
+    var data = await r.json();
+    if(!r.ok) throw new Error(data.error||'Erreur serveur');
+    var results = data.modifications || [];
+    window._draftAdverseMods = results;
+    window._draftAdverseDecisions = [];
+    if(!results.length){
+      if(res) res.innerHTML = '<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:14px;font-size:13px;color:#10b981">Version adverse conforme a votre draft. Aucune divergence significative.</div>';
+      return;
+    }
+    var nCrit=results.filter(function(m){return m.risk==='high';}).length;
+    var nImp =results.filter(function(m){return m.risk==='medium';}).length;
+    var nMod =results.filter(function(m){return m.risk==='low';}).length;
+    var _typeLabel={'insert':'Ajout adverse','delete':'Suppression adverse','replace':'Modification adverse'};
+    var html='<div style="background:#1a2035;border:1px solid #2a3040;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">'
+      +'<div style="font-size:13px;font-weight:700;color:#e2e5f0;flex:1">'+results.length+' modification(s) par la partie adverse</div>'
+      +(nCrit?'<span style="background:#ef444420;color:#ef4444;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">'+nCrit+' critique(s)</span>':'')
+      +(nImp ?'<span style="background:#f59e0b20;color:#f59e0b;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">'+nImp+' important(s)</span>':'')
+      +(nMod ?'<span style="background:#6b728020;color:#9ca3af;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">'+nMod+' modere(s)</span>':'')
+      +'</div>';
+    results.forEach(function(m,i){
+      var risk=m.risk||'medium';
+      var borderCol=risk==='high'?'#ef4444':risk==='medium'?'#f59e0b':'#374151';
+      var critBg   =risk==='high'?'#ef444418':risk==='medium'?'#f59e0b18':'#37415118';
+      var critLbl  =risk==='high'?'Critique':risk==='medium'?'Important':'Modere';
+      var typeLbl  =_typeLabel[m.type]||'Modification';
+      html+='<div id="dadv-card-'+i+'" style="border:1px solid '+borderCol+'44;border-left:3px solid '+borderCol+';border-radius:8px;margin-bottom:12px;overflow:hidden">'
+        +'<div style="background:'+critBg+';padding:10px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+        +'<span style="font-size:13px;font-weight:700;color:#e2e5f0;flex:1">'+_escH(m.clause_name||'Modification')+'</span>'
+        +'<span style="background:#ffffff10;color:#9ca3af;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">'+critLbl+'</span>'
+        +'</div>'
+        +'<div style="padding:12px 14px">'
+        +(m.reason?'<div style="font-size:12px;color:#d1d5db;line-height:1.5;margin-bottom:10px">'+_escH(m.reason)+'</div>':'')
+        +(m.our_text||m.original?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'
+          +(m.our_text?'<div><div style="font-size:10px;font-weight:600;color:#5b7cfa;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Notre draft</div>'
+            +'<div style="background:#0f1829;border:1px solid #5b7cfa33;border-radius:6px;padding:8px;font-size:11px;color:#93c5fd;line-height:1.6;min-height:36px">'+_escHBr(m.our_text)+'</div></div>'
+            :'<div></div>')
+          +(m.original?'<div><div style="font-size:10px;font-weight:600;color:#ef4444;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Version adverse</div>'
+            +'<div style="background:#0f1829;border:1px solid #ef444433;border-radius:6px;padding:8px;font-size:11px;color:#fca5a5;line-height:1.6;min-height:36px">'+_escHBr(m.original)+'</div></div>'
+            :'<div></div>')
+          +'</div>':'')
+        +'<div style="display:flex;gap:6px;margin-bottom:10px">'
+        +'<button id="dadv-btn-maintenir-'+i+'" onclick="_setDraftAdvDecision('+i+',\'maintenir\')" style="flex:1;padding:6px 10px;background:#ffffff08;border:1px solid #5b7cfa44;border-radius:6px;color:#9ca3af;font-size:11px;font-weight:600;cursor:pointer">Maintenir notre draft</button>'
+        +'<button id="dadv-btn-reformuler-'+i+'" onclick="_setDraftAdvDecision('+i+',\'reformuler\')" style="flex:1;padding:6px 10px;background:#ffffff08;border:1px solid #8b5cf644;border-radius:6px;color:#9ca3af;font-size:11px;font-weight:600;cursor:pointer">Reformuler</button>'
+        +'<button id="dadv-btn-accepter-'+i+'" onclick="_setDraftAdvDecision('+i+',\'accepter\')" style="flex:1;padding:6px 10px;background:#ffffff08;border:1px solid #10b98144;border-radius:6px;color:#9ca3af;font-size:11px;font-weight:600;cursor:pointer">Accepter adverse</button>'
+        +'</div>'
+        +'<div>'
+        +'<div style="font-size:10px;font-weight:600;color:#8b5cf6;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Contre-proposition (modifiable)</div>'
+        +'<textarea id="dadv-mod-'+i+'" style="width:100%;background:#0f1829;border:1px solid #4c1d9544;border-radius:6px;padding:8px;font-size:12px;color:#e2e5f0;min-height:70px;resize:vertical;box-sizing:border-box;line-height:1.6;font-family:inherit">'+_escH(m.proposed||m.our_text||'')+'</textarea>'
+        +'</div></div></div>';
+    });
+    html += '<button onclick="exportDraftAdverseDiff(\''+_escH(partie)+'\')" style="width:100%;margin-top:6px;padding:11px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Exporter contre-propositions DOCX</button>';
+    if(res) res.innerHTML = html;
+  }catch(e){
+    if(res) res.innerHTML = '<div style="color:#ef4444;padding:10px 0;font-size:13px">Erreur : '+_escH(e.message)+'</div>';
+  }
+}
+
+function _setDraftAdvDecision(i, decision){
+  window._draftAdverseDecisions = window._draftAdverseDecisions || [];
+  window._draftAdverseDecisions[i] = decision;
+  ['maintenir','reformuler','accepter'].forEach(function(d){
+    var btn = document.getElementById('dadv-btn-'+d+'-'+i);
+    if(!btn) return;
+    var active = (d === decision);
+    var col = d==='maintenir' ? '#5b7cfa' : d==='accepter' ? '#10b981' : '#8b5cf6';
+    btn.style.background  = active ? col : '#ffffff08';
+    btn.style.color       = active ? '#fff' : '#9ca3af';
+    btn.style.borderColor = active ? col : col+'44';
+  });
+}
+
+async function exportDraftAdverseDiff(partie){
+  var btn = event.target;
+  btn.disabled = true; btn.textContent = 'Generation...';
+  try{
+    var mods = (window._draftAdverseMods||[]).map(function(m,i){
+      var dec = (window._draftAdverseDecisions||[])[i];
+      if(dec === 'accepter') return null;
+      var ta = document.getElementById('dadv-mod-'+i);
+      var proposed = dec==='maintenir' ? (m.our_text||m.proposed||'') : (ta?ta.value:(m.proposed||m.our_text||''));
+      var type = (m.type==='delete') ? 'nouvelle_clause' : m.type;
+      return Object.assign({},m,{id:i, proposed:proposed, decision:'accepted', type:type});
+    }).filter(Boolean);
+    var fd = new FormData();
+    if(window._draftAdverseFile) fd.append('file', window._draftAdverseFile);
+    fd.append('modifications', JSON.stringify(mods));
+    fd.append('decisions', JSON.stringify(Object.fromEntries(mods.map(function(m,i){return [String(i),'accepted'];}))));
+    fd.append('partie', partie||'');
+    if(_cu&&_cu.email) fd.append('user_email', _cu.email);
+    var r = await fetch(BACKEND+'/export', {method:'POST', body:fd});
+    if(!r.ok){var e=await r.json();throw new Error(e.error||'Erreur export');}
+    var blob = await r.blob();
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = (partie||'contre-propositions')+'-draft-adverse-'+new Date().toLocaleDateString('fr-FR').split('/').reverse().join('-')+'.docx';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+    btn.textContent = 'Telecharge'; btn.disabled = false;
+    setTimeout(function(){btn.textContent='Exporter contre-propositions DOCX';},3500);
+  }catch(e){
+    btn.textContent = 'Erreur: '+e.message; btn.disabled = false;
+    setTimeout(function(){btn.textContent='Exporter contre-propositions DOCX';},3000);
+  }
+}
+
 async function exportAdverseDiff(anaId, partie){
   var btn=event.target;
   btn.disabled=true; btn.textContent='⏳ Génération...';
@@ -3716,15 +3840,19 @@ function cbNewAnalysis() {
 function openChatForDraft() {
   _draftMode = true;
   _draftContextText = document.getElementById('draft-editor').value || '';
-  _cbHistory  = [];
+  // Pre-seed history so the model immediately acts as a contract editor
+  _cbHistory = [
+    {role: 'user', content: 'MODE ÉDITION ACTIVÉ. Tu vas modifier ce contrat selon mes instructions. Pour CHAQUE instruction, produis IMMÉDIATEMENT le bloc <modification> avec le texte original exact et la version révisée complète. Pas de questions, pas de confirmation — modifie directement.'},
+    {role: 'assistant', content: 'Mode édition activé. Pour chaque instruction je produis directement le bloc <modification> sans demander de confirmation. Quelle est votre première instruction ?'}
+  ];
   _cbWelcomed = true;
   _cbModStore = {};
   document.getElementById('cb-msgs').innerHTML = '';
   cbOpen();
   cbAddMsg('bot',
-    'Bonjour ! Je suis <strong>Omniscient</strong>. Votre draft est chargé comme contexte.<br>'
-    + 'Demandez une modification : ajout d’une clause, changement de durée, reformulation…<br>'
-    + '<span style="color:#6b7280;font-size:12px">Les suggestions seront applicables directement au draft via le bouton « → Appliquer au draft ».</span>'
+    'Je suis en <strong>mode édition</strong> — donnez vos instructions directement.<br>'
+    + '<span style="color:#6b7280;font-size:12px">Exemples : « modifier la durée à 24 mois », « ajouter une clause de non-concurrence ».<br>'
+    + 'Chaque suggestion sera applicable via <strong>→ Appliquer au draft</strong>.</span>'
   );
 }
 
