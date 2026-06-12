@@ -3947,13 +3947,52 @@ function cbApplyMod(btn) {
   try {
     if (_draftMode) {
       var editor = document.getElementById('draft-editor');
-      if (editor) {
-        if (mod.original && mod.proposed && editor.value.includes(mod.original)) {
-          editor.value = editor.value.replace(mod.original, mod.proposed);
-        } else if (mod.proposed) {
-          editor.value += '\n\n' + mod.proposed;
+      if (editor && mod.proposed) {
+        var val  = editor.value;
+        var orig = (mod.original || '').trim();
+        var applied = false;
+        // Strategy 1: exact match
+        if (orig && val.includes(orig)) {
+          val = val.replace(orig, mod.proposed);
+          applied = true;
         }
-        _draftContextText = editor.value;
+        // Strategy 2: normalized whitespace match \u2192 find first-line anchor
+        if (!applied && orig) {
+          var firstLine = orig.split('\n').map(function(l){return l.trim();}).filter(Boolean)[0] || '';
+          var lastLine  = orig.split('\n').map(function(l){return l.trim();}).filter(Boolean).pop() || '';
+          if (firstLine.length > 8) {
+            var fi = val.indexOf(firstLine);
+            if (fi >= 0) {
+              var li = lastLine.length > 8 ? val.indexOf(lastLine, fi) : -1;
+              if (li >= fi) {
+                val = val.slice(0, fi) + mod.proposed + val.slice(li + lastLine.length);
+              } else {
+                // Only found first line \u2014 replace to next double-newline
+                var nl = val.indexOf('\n\n', fi + firstLine.length);
+                val = nl > fi ? val.slice(0, fi) + mod.proposed + val.slice(nl) : val.slice(0, fi) + mod.proposed;
+              }
+              applied = true;
+            }
+          }
+        }
+        // Strategy 3: article heading match (ARTICLE X pattern)
+        if (!applied && orig) {
+          var artMatch = orig.match(/^(ARTICLE\s+\d+[^$\n]*)/im);
+          if (artMatch) {
+            var artIdx = val.indexOf(artMatch[1]);
+            if (artIdx >= 0) {
+              var nextArt = val.search(new RegExp('ARTICLE\\s+' + (parseInt(artMatch[1].match(/\d+/)[0]) + 1), 'i'));
+              val = nextArt > artIdx
+                ? val.slice(0, artIdx) + mod.proposed + '\n\n' + val.slice(nextArt)
+                : val.slice(0, artIdx) + mod.proposed;
+              applied = true;
+            }
+          }
+        }
+        // Fallback: append
+        if (!applied) { val = val + '\n\n' + mod.proposed; }
+        editor.value = val;
+        _draftContextText = val;
         draftSyncPreview();
       }
       btn.textContent = '\u2705 Appliqu\u00e9 au draft';
