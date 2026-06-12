@@ -1572,6 +1572,8 @@ async function generateDraft() {
     var data = await resp.json();
     if (!resp.ok || data.error) throw new Error(data.error || 'Erreur serveur');
     document.getElementById('draft-editor').value = data.draft || '';
+    _draftMode = true;
+    _draftContextText = data.draft || '';
     document.getElementById('draft-loading').style.display = 'none';
     document.getElementById('draft-result-section').style.display = '';
     draftSyncPreview();
@@ -1730,7 +1732,7 @@ async function dAnaAnalyze(partie) {
 
 function showDash(){document.getElementById('dash-ov').classList.add('show');loadDash();}
 function closeDash(){document.getElementById('dash-ov').classList.remove('show');}
-function dtab(t){var names=['analyses','models','draft','juristes','abonnement','nouvelle'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();if(t==='abonnement')loadAbonnement();if(t==='nouvelle')dAnaReset();if(t!=='draft'){_draftMode=false;_draftContextText=null;}}
+function dtab(t){var names=['analyses','models','draft','juristes','abonnement','nouvelle'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();if(t==='abonnement')loadAbonnement();if(t==='nouvelle')dAnaReset();if(t==='draft'){_draftMode=true;var _de=document.getElementById('draft-editor');if(_de&&_de.value.trim())_draftContextText=_de.value;}else{_draftMode=false;_draftContextText=null;}}
 async function checkRole(){
   if(!_cu)return;
   try{
