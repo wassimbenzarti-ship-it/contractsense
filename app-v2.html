@@ -2125,6 +2125,12 @@ async function showAnaDetail(idx) {
       +'<button id="btn-save-director-'+ana.id+'" onclick="saveDirectorChanges(\''+ana.id+'\')" style="padding:9px 18px;background:#1a2035;border:1px solid #2a3040;color:#a0a8c0;border-radius:8px;font-size:13px;cursor:pointer">Sauvegarder</button>'
       +'</div>';
   }
+  if(isDirecteur&&!ana._juristeEmail&&st!=='validated'&&st!=='final_validated'){
+    actionBar=(actionBar||'')+'<div style="margin-bottom:16px">'
+      +'<button id="btn-assign-juriste-'+ana.id+'" onclick="assignToJuriste(\''+ana.id+'\',\'inline\')" style="padding:9px 18px;background:#5b7cfa22;border:1px solid #5b7cfa66;color:#5b7cfa;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">⚖ Envoyer à un juriste pour révision</button>'
+      +'<div id="assign-juriste-panel-'+ana.id+'" style="display:none;margin-top:10px;padding:14px;background:#0d1017;border:1px solid #2a3040;border-radius:8px"></div>'
+      +'</div>';
+  }
   if(isDirecteur&&st==='validated'){
     actionBar='<div style="padding:10px 14px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:8px;font-size:13px;color:#10b981;margin-bottom:16px">Transmis à l\'admin pour validation RAG</div>';
   }
@@ -2270,6 +2276,8 @@ async function openAnaPage(idx){
   document.getElementById('ana-page-actions').innerHTML=
     (isJ&&(st==='draft'||st==='revision_requested')?'<button onclick="submitForReview(\''+_eJS(ana.id)+'\')" style="padding:9px 18px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer;margin-right:8px">Soumettre au directeur →</button>':'')
     +(isD&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'?'<button onclick="validateByDirector(\''+_eJS(ana.id)+'\')" style="padding:9px 18px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;margin-right:6px">Valider → admin</button><button onclick="requestRevision(\''+_eJS(ana.id)+'\')" style="padding:9px 18px;background:#ef444422;border:1px solid #ef4444;color:#ef4444;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">Demander révision</button>':'')
+    +(isD&&!ana._juristeEmail&&st!=='validated'&&st!=='final_validated'?'<button id="btn-assign-juriste-page-'+_eJS(ana.id)+'" onclick="assignToJuriste(\''+_eJS(ana.id)+'\',\'page\')" style="padding:9px 18px;background:#5b7cfa22;border:1px solid #5b7cfa66;color:#5b7cfa;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">⚖ Envoyer à un juriste pour révision</button>'
+      +'<div id="assign-juriste-panel-page-'+_eJS(ana.id)+'" style="display:none;margin-top:10px;padding:14px;background:#0d1017;border:1px solid #2a3040;border-radius:8px;width:100%"></div>':'')
     +(ana.director_notes?'<div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:10px 14px;font-size:13px;color:#e2e5f0;margin-top:8px"><span style="font-size:11px;font-weight:700;color:#ef4444;display:block;margin-bottom:3px">Note du directeur</span>'+_escH(ana.director_notes)+'</div>':'');
   // Modifications tab
   _renderAnaModsTab(idx);
@@ -3555,6 +3563,42 @@ async function validateByDirector(id){
       showAnaDetail(savedIdx);
     } else { alert('Erreur validation: '+(d.error||r.status)); }
   }catch(e){ alert('Erreur réseau validation: '+e.message); }
+}
+
+function assignToJuriste(anaId, ctx){
+  var panelId = ctx==='page' ? 'assign-juriste-panel-page-'+anaId : 'assign-juriste-panel-'+anaId;
+  var panel = document.getElementById(panelId);
+  if(!panel) return;
+  if(panel.style.display !== 'none'){panel.style.display='none';return;}
+  var juristes = (window._juristesData||[]).filter(function(j){return j.role==='juriste'||!j.role;});
+  if(!juristes.length){panel.innerHTML='<p style="color:#ef4444;font-size:12px;margin:0">Aucun juriste dans votre cabinet. Ajoutez-en d\'abord depuis les paramètres.</p>';panel.style.display='';return;}
+  var opts=juristes.map(function(j){return '<option value="'+j.email+'">'+j.email+'</option>';}).join('');
+  panel.innerHTML='<div style="font-size:12px;font-weight:700;color:#5b7cfa;margin-bottom:8px">Choisir le juriste destinataire</div>'
+    +'<select id="ajs-sel-'+anaId+'" style="width:100%;background:#1a2035;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;margin-bottom:8px;box-sizing:border-box">'+opts+'</select>'
+    +'<textarea id="ajs-note-'+anaId+'" placeholder="Note pour le juriste (optionnel)..." style="width:100%;background:#1a2035;border:1px solid #2a3040;border-radius:6px;padding:8px;font-size:12px;color:#e2e5f0;min-height:56px;resize:vertical;box-sizing:border-box;margin-bottom:8px"></textarea>'
+    +'<button onclick="confirmAssignToJuriste(\''+anaId+'\')" style="padding:9px 18px;background:#5b7cfa;border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:pointer">Envoyer au juriste</button>';
+  panel.style.display='';
+}
+
+async function confirmAssignToJuriste(anaId){
+  var sel=document.getElementById('ajs-sel-'+anaId);
+  var noteEl=document.getElementById('ajs-note-'+anaId);
+  var juristeEmail=sel?sel.value:'';
+  var note=noteEl?noteEl.value.trim():'';
+  if(!juristeEmail){alert('Sélectionnez un juriste.');return;}
+  var panel=document.getElementById('assign-juriste-panel-'+anaId)||document.getElementById('assign-juriste-panel-page-'+anaId);
+  try{
+    var r=await fetch(BACKEND+'/analyses/assign-to-juriste/'+anaId,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({juriste_email:juristeEmail,director_email:(_cu&&_cu.email)||'',director_notes:note,modifications:window._currentMods||[]})
+    });
+    var d=r.ok?await r.json().catch(function(){return{};}):{};
+    if(r.ok&&d.status==='ok'){
+      if(panel) panel.innerHTML='<div style="color:#10b981;font-size:12px;padding:4px 0">✅ Assigné à '+juristeEmail+' — email envoyé.</div>';
+      window._juristesData=null;
+      await loadDash();
+    } else { alert('Erreur : '+(d.error||r.status)); }
+  }catch(e){ alert('Erreur réseau : '+e.message); }
 }
 
 function filterAndShowAnalyses(juristeEmail){
