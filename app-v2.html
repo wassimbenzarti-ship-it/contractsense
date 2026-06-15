@@ -248,6 +248,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
     </div>
     <div id="d-mods-list"></div>
     <div id="d-compliance-section"></div>
+    <div id="d-review-action-bar" style="margin-top:12px"></div>
     <div style="margin-top:18px;padding-top:14px;border-top:1px solid #1f2537;display:flex;gap:8px;flex-wrap:wrap">
       <button onclick="exportDoc()" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger avec Track Changes</button>
       <button onclick="dAnaReset()" style="padding:10px 14px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:12px;cursor:pointer">🔄 Nouvelle</button>
@@ -1077,7 +1078,12 @@ function renderReview() {
     }
   }
 
-  if (_dashAnalysis) { document.getElementById('d-ana-review').style.display = ''; return; }
+  if (_dashAnalysis) {
+    document.getElementById('d-ana-review').style.display = '';
+    if(!_userRole) { checkRole().then(function(){ _renderDashActionBar(); }); }
+    else { _renderDashActionBar(); }
+    return;
+  }
   show('step-review');
 
   // Pour les juristes : afficher le bouton Soumettre + section "Ajouter une clause"
@@ -1142,6 +1148,16 @@ function _renderReviewJuristeBar(){
     +'<button id="add-clause-btn-r" onclick="analyzeManualClauseInReview()" style="padding:8px 16px;background:#5b7cfa;border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:pointer">Analyser avec l\'IA et ajouter</button>'
     +'</div>'
     +'</div>';
+}
+
+function _renderDashActionBar(){
+  var bar = document.getElementById('d-review-action-bar');
+  if(!bar) return;
+  var _isDir = _userRole==='directeur' || _isAdmin;
+  if(!_isDir){ bar.innerHTML=''; return; }
+  bar.innerHTML =
+    '<button onclick="saveAndAssignToJuristeDash()" id="btn-dash-assign" style="padding:10px 20px;background:#5b7cfa22;border:1px solid #5b7cfa66;color:#5b7cfa;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer">⚖ Envoyer à un juriste pour révision</button>'
+    +'<div id="assign-juriste-panel-dash" style="display:none;margin-top:10px;padding:14px;background:#181c2a;border:1px solid #2a3040;border-radius:8px"></div>';
 }
 
 function _syncClause(sel){
@@ -1351,6 +1367,65 @@ async function confirmAssignFromReview(){
       if(el){var ed=el.innerText.trim();if(ed&&ed!==m.proposed)m.proposed=ed;}
     });
     await saveAna(curFile?curFile.name:'Contrat', savedType||'generic', selectedPartie||'', modifications);
+    var anaId=window._lastSavedAnaId;
+    if(!anaId){alert('Erreur : impossible de sauvegarder l\'analyse.');return;}
+    var r=await fetch(BACKEND+'/analyses/assign-to-juriste/'+anaId,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({juriste_email:juristeEmail,director_email:(_cu&&_cu.email)||'',director_notes:note,modifications:_modsWithMeta(modifications)})
+    });
+    var d=r.ok?await r.json().catch(function(){return{};}):{};
+    if(r.ok&&d.status==='ok'){
+      if(panel) panel.innerHTML='<div style="color:#10b981;font-size:12px;padding:4px 0">✅ Analyse envoyée à '+juristeEmail+' — email envoyé.</div>';
+      setTimeout(showDash, 1500);
+    } else { alert('Erreur : '+(d.error||r.status)); }
+  }catch(e){ alert('Erreur réseau : '+e.message); }
+}
+
+async function saveAndAssignToJuristeDash(){
+  if(!_cu){ showAuth(); return; }
+  var panel = document.getElementById('assign-juriste-panel-dash');
+  if(!panel) return;
+  if(panel.style.display !== 'none'){ panel.style.display='none'; return; }
+  var btn = document.getElementById('btn-dash-assign');
+  if(btn){ btn.textContent='⏳ Chargement...'; btn.disabled=true; }
+  if(!window._juristesData){
+    try{
+      var _r=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email,role',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk}});
+      window._juristesData=_r.ok?await _r.json():[];
+    }catch(e){ window._juristesData=[]; }
+  }
+  if(btn){ btn.textContent='⚖ Envoyer à un juriste pour révision'; btn.disabled=false; }
+  var juristes=(window._juristesData||[]).filter(function(j){return j.role==='juriste'||!j.role;});
+  if(!juristes.length){
+    panel.innerHTML='<p style="color:#ef4444;font-size:12px;margin:0">Aucun juriste dans votre cabinet. Ajoutez-en depuis les paramètres.</p>';
+    panel.style.display='';
+    return;
+  }
+  var opts=juristes.map(function(j){return '<option value="'+j.email+'">'+j.email+'</option>';}).join('');
+  panel.innerHTML='<div style="font-size:12px;font-weight:700;color:#5b7cfa;margin-bottom:8px">Choisir le juriste destinataire</div>'
+    +'<select id="ajs-sel-dash" style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;margin-bottom:8px;box-sizing:border-box">'+opts+'</select>'
+    +'<textarea id="ajs-note-dash" placeholder="Note pour le juriste (optionnel)..." style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:8px;font-size:12px;color:#e2e5f0;min-height:52px;resize:vertical;box-sizing:border-box;margin-bottom:8px"></textarea>'
+    +'<button onclick="confirmAssignFromDash()" style="padding:9px 18px;background:#5b7cfa;border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:pointer">Envoyer au juriste</button>';
+  panel.style.display='';
+}
+
+async function confirmAssignFromDash(){
+  var sel=document.getElementById('ajs-sel-dash');
+  var noteEl=document.getElementById('ajs-note-dash');
+  var juristeEmail=sel?sel.value:'';
+  var note=noteEl?noteEl.value.trim():'';
+  if(!juristeEmail){alert('Sélectionnez un juriste.');return;}
+  var panel=document.getElementById('assign-juriste-panel-dash');
+  if(panel) panel.innerHTML='<div style="color:#a0a8c0;font-size:12px">⏳ Envoi en cours...</div>';
+  try{
+    if(!window._lastSavedAnaId){
+      modifications.forEach(function(m){
+        var el=document.getElementById('proposed-'+m.id);
+        if(el){var ed=el.innerText.trim();if(ed&&ed!==m.proposed)m.proposed=ed;}
+      });
+      var _ct=savedType||((document.getElementById('d-contract-type')||{}).value)||'generic';
+      await saveAna(curFile?curFile.name:'Contrat', _ct, selectedPartie||'', modifications);
+    }
     var anaId=window._lastSavedAnaId;
     if(!anaId){alert('Erreur : impossible de sauvegarder l\'analyse.');return;}
     var r=await fetch(BACKEND+'/analyses/assign-to-juriste/'+anaId,{
