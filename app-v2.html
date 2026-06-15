@@ -157,9 +157,8 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <p id="deml" style="color:#6b7280;font-size:13px;margin-bottom:12px"></p>
 <div class="sg">
 <div class="sb"><div class="sn" id="sta">0</div><div class="sl" id="sl-analyses">Analyses</div></div>
-<div class="sb"><div class="sn" id="stm">0</div><div class="sl">Modeles</div></div>
+<div class="sb"><div class="sn" id="stp">0</div><div class="sl" id="sl-pending">En attente</div></div>
 <div class="sb" id="sb-juristes" style="display:none"><div class="sn" id="stj">0</div><div class="sl">Juristes</div></div>
-<div class="sb"><div class="sn" id="stc">0</div><div class="sl">Clauses</div></div>
 <div class="sb" id="sb-quota" style="display:none"><div class="sn" id="stq">—</div><div class="sl">Analyses restantes</div></div>
 </div>
 <div class="dt">
@@ -2048,12 +2047,20 @@ async function loadDash(){
       }).join('');
   };
   window._renderAnalyses(a);
-  // Badge notification in-app : compte les analyses nécessitant une action
+  // Badge notification + stat "En attente"
   (function(){
     var pendingCount=a.filter(function(x){
       var st=x.status||'draft';
       return (_userRole==='juriste'&&st==='revision_requested')||(_userRole==='directeur'&&(st==='pending_review'||st==='validated'));
     }).length;
+    var stpEl=document.getElementById('stp');
+    var slpEl=document.getElementById('sl-pending');
+    if(stpEl) stpEl.textContent=pendingCount;
+    if(slpEl){
+      if(_userRole==='juriste') slpEl.textContent='En révision';
+      else if(_userRole==='directeur') slpEl.textContent='À valider';
+      else slpEl.textContent='En attente';
+    }
     var tabEl=document.getElementById('dtb-analyses');
     if(tabEl){
       if(pendingCount>0){
@@ -2070,7 +2077,6 @@ async function loadDash(){
   };
   var r2=await sf('/rest/v1/user_models?user_id=eq.'+_cu.id+'&order=created_at.desc&select=id,filename,created_at');
   var m=r2.ok?await r2.json():[];
-  document.getElementById('stm').textContent=m.length;
   var mlistHtml=m.length===0
     ?'<p style="color:#6b7280;font-size:13px">Aucun modele soumis</p>'
     :m.map(function(x){
@@ -2223,8 +2229,6 @@ async function deleteModel(modelId, btn) {
     var r = await sf('/rest/v1/user_models?id=eq.' + modelId, {method:'DELETE'});
     if(r.ok || r.status === 204) {
       btn.closest('.ac').remove();
-      var stm = document.getElementById('stm');
-      if(stm) stm.textContent = Math.max(0, parseInt(stm.textContent||'0') - 1);
     } else {
       alert('Erreur lors de la suppression');
       btn.disabled = false; btn.textContent = 'Supprimer';
