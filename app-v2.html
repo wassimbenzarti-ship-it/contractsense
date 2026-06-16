@@ -155,7 +155,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <div class="dt">
 <div class="dtb" id="dtb-nouvelle" onclick="dtab('nouvelle')">➕ Analyse</div>
 <div class="dtb active" id="dtb-analyses" onclick="dtab('analyses')">Analyses</div>
-<div class="dtb" id="dtb-brouillons" onclick="dtab('brouillons')">Brouillons</div>
+<div class="dtb" id="dtb-brouillons" onclick="dtab('brouillons')">✏️ Drafts</div>
 <div class="dtb" onclick="dtab('draft')">✏️ Rédiger</div>
 <div class="dtb" id="dtb-juristes" onclick="dtab('juristes')" style="display:none">Equipe</div>
 <div class="dtb" id="dtb-abonnement" onclick="dtab('abonnement')" style="display:none">💳 Abonnement</div>
@@ -188,7 +188,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 </div>
 </div>
 <div id="d-brouillons" class="ds">
-<div style="margin-bottom:10px"><button onclick="dtab('draft')" style="padding:6px 14px;background:#5b7cfa22;border:1px solid #5b7cfa44;border-radius:8px;color:#5b7cfa;font-size:12px;font-weight:600;cursor:pointer">✏️ + Rédiger un nouveau contrat</button></div>
+<div style="margin-bottom:10px"><button onclick="dtab('draft')" style="padding:6px 14px;background:#5b7cfa22;border:1px solid #5b7cfa44;border-radius:8px;color:#5b7cfa;font-size:12px;font-weight:600;cursor:pointer">➕ Nouveau draft</button></div>
 <div id="blist"></div>
 </div>
 <div id="d-models" class="ds">
@@ -1757,7 +1757,7 @@ async function saveDraftToHistory(){
       window._userAnalyses.unshift(d[0]);
       var bCount=(window._userAnalyses).filter(function(x){return x.contract_type==='brouillon';}).length;
       var btab=document.getElementById('dtb-brouillons');
-      if(btab){var bBadge=bCount>0?'<span style="display:inline-block;background:rgba(139,92,246,0.2);color:#8b5cf6;border-radius:20px;font-size:10px;font-weight:600;padding:1px 7px;margin-left:5px">'+bCount+'</span>':'';btab.innerHTML='Brouillons'+bBadge;}
+      if(btab){var bBadge=bCount>0?'<span style="display:inline-block;background:rgba(139,92,246,0.2);color:#8b5cf6;border-radius:20px;font-size:10px;font-weight:600;padding:1px 7px;margin-left:5px">'+bCount+'</span>':'';btab.innerHTML='✏️ Drafts'+bBadge;}
     }
   }
 }
@@ -2138,7 +2138,7 @@ async function loadDash(){
     var btab=document.getElementById('dtb-brouillons');
     if(btab){
       var bBadge=_brouillons.length>0?'<span style="display:inline-block;background:rgba(139,92,246,0.2);color:#8b5cf6;border-radius:20px;font-size:10px;font-weight:600;padding:1px 7px;margin-left:5px">'+_brouillons.length+'</span>':'';
-      btab.innerHTML='Brouillons'+bBadge;
+      btab.innerHTML='✏️ Drafts'+bBadge;
     }
   })();
   window.filterAnalysesByJuriste=function(val){
@@ -2511,7 +2511,7 @@ async function showAnaDetail(idx) {
 }
 
 function toggleAnaDetail(idx){ openAnaPage(idx); }
-function toggleBrouillonDetail(idx){ openAnaPage(idx,'brouillons'); }
+function toggleBrouillonDetail(idx){ openBrouillonPage(idx); }
 
 async function openAnaPage(idx,_fromTab){
   window._anaFromTab=_fromTab||null;
@@ -2574,8 +2574,86 @@ async function openAnaPage(idx,_fromTab){
   _switchAnaTab('mods');
 }
 
+async function openBrouillonPage(idx){
+  window._anaFromTab='brouillons';
+  window._anaIdx=idx;
+  window._isDraftEntry=true;
+  if(!_userRole) await checkRole();
+  var ana=(window._userAnalyses||[])[idx]||{};
+  var st=ana.status||'draft';
+  // Parse modifications to extract draft text
+  var mods=ana.modifications||[];
+  if(typeof mods==='string'){try{mods=JSON.parse(mods);}catch(e){mods=[];}}
+  var draftMod=mods.find(function(m){return m&&m._isDraft;});
+  var draftText=draftMod?(draftMod.text||''):'';
+  // Fallback: fresh fetch if text missing (e.g. injected entry didn't have modifications)
+  if(!draftText&&ana.id){
+    try{
+      var fr=await sf('/rest/v1/analyses?id=eq.'+ana.id+'&select=modifications');
+      if(fr.ok){var fd=await fr.json();if(fd&&fd[0]){var fm=fd[0].modifications;if(typeof fm==='string')fm=JSON.parse(fm);var dm=(fm||[]).find(function(m){return m&&m._isDraft;});if(dm)draftText=dm.text||'';}}
+    }catch(e){}
+  }
+  window._draftText=draftText;
+  // Make ana-page visible (inside d-analyses)
+  dtab('analyses');
+  document.getElementById('alist').style.display='none';
+  var fb=document.getElementById('juriste-filter-bar');if(fb)fb.style.display='none';
+  document.getElementById('ana-page').style.display='';
+  document.getElementById('ana-page').classList.add('fadein');
+  var _backBtn=document.getElementById('ana-back-btn');
+  if(_backBtn)_backBtn.textContent='← Drafts';
+  // Title & meta
+  var stColors={'draft':'#4a5470','pending_review':'#f59e0b','revision_requested':'#ef4444','validated':'#10b981','final_validated':'#10b981'};
+  var stLabels={'draft':'Brouillon','pending_review':'En attente directeur','revision_requested':'Renvoyé pour révision','validated':'Validé','final_validated':'Intégré RAG'};
+  var stColor=stColors[st]||'#4a5470';
+  document.getElementById('ana-page-title').textContent='✏️ '+(ana.filename||'Draft');
+  document.getElementById('ana-page-meta').innerHTML=
+    '<span style="background:'+stColor+'22;color:'+stColor+';padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">'+(stLabels[st]||st)+'</span>'
+    +'<span style="color:#4a5470;font-size:11px">'+new Date(ana.created_at).toLocaleDateString('fr-FR')+'</span>';
+  // Action buttons
+  var isJ=_userRole==='juriste', isD=_userRole==='directeur';
+  var _pAct='<button onclick="downloadDraftDocx(\''+((draftText||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n'))+'\')" style="padding:9px 18px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;margin-right:8px">⬇ Télécharger DOCX</button>';
+  if(isJ&&(st==='draft'||st==='revision_requested'))
+    _pAct+='<button onclick="submitForReview(\''+_eJS(ana.id)+'\')" style="padding:9px 18px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer;margin-right:8px">Soumettre au directeur →</button>';
+  if(isD&&st!=='validated'&&st!=='final_validated'){
+    _pAct+='<button onclick="validateByDirector(\''+_eJS(ana.id)+'\')" style="padding:9px 18px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;margin-right:6px">✅ Valider → Admin</button>';
+    if(!ana._juristeEmail)
+      _pAct+='<button id="btn-assign-juriste-page-'+_eJS(ana.id)+'" onclick="assignToJuriste(\''+_eJS(ana.id)+'\',\'page\')" style="padding:9px 18px;background:#5b7cfa22;border:1px solid #5b7cfa66;color:#5b7cfa;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">⚖ Envoyer à un juriste</button>'
+        +'<div id="assign-juriste-panel-page-'+_eJS(ana.id)+'" style="display:none;margin-top:10px;padding:14px;background:#0d1017;border:1px solid #2a3040;border-radius:8px;width:100%"></div>';
+    else
+      _pAct+='<button onclick="requestRevision(\''+_eJS(ana.id)+'\')" style="padding:9px 18px;background:#ef444422;border:1px solid #ef4444;color:#ef4444;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">Demander révision</button>';
+  }
+  if(isD&&st==='validated')
+    _pAct+='<span style="padding:7px 12px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;font-size:12px;color:#10b981;margin-right:6px">✅ Transmis à l\'admin</span>'
+      +'<button onclick="resetToDraft(\''+_eJS(ana.id)+'\')" style="padding:6px 12px;background:transparent;border:1px solid #4a5470;color:#6b7280;border-radius:6px;font-size:11px;cursor:pointer">↩ Réinitialiser</button>';
+  document.getElementById('ana-page-actions').innerHTML=_pAct;
+  // Hide analyse-only tabs, show only mods panel with draft text
+  document.getElementById('atp-adverse-btn').style.display='none';
+  document.getElementById('atp-translate-btn').style.display='none';
+  var container=document.getElementById('atp-mods-panel');
+  if(container){
+    container.innerHTML=draftText
+      ?'<div style="background:#0d1017;border:1px solid #2a3040;border-radius:10px;padding:18px">'
+        +'<div style="font-size:11px;font-weight:700;color:#5b7cfa;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">✏️ Contrat rédigé</div>'
+        +'<div style="font-size:13px;color:#e2e5f0;white-space:pre-wrap;line-height:1.7;max-height:600px;overflow-y:auto">'+_escH(draftText)+'</div>'
+        +'</div>'
+      :'<p style="color:#6b7280;font-size:13px;padding:20px 0">Texte non disponible.</p>';
+  }
+  document.getElementById('atp-adverse-panel').style.display='none';
+  document.getElementById('atp-translate-panel').style.display='none';
+  document.getElementById('atp-mods-panel').style.display='';
+  document.getElementById('atp-mods-btn').classList.add('active');
+  document.getElementById('atp-adverse-btn').classList.remove('active');
+  document.getElementById('atp-translate-btn').classList.remove('active');
+}
+
 function closeAnaPage(){
   document.getElementById('ana-page').style.display='none';
+  // Restore tabs hidden for brouillons
+  var advBtn=document.getElementById('atp-adverse-btn');
+  var trBtn=document.getElementById('atp-translate-btn');
+  if(advBtn)advBtn.style.display='';
+  if(trBtn)trBtn.style.display='';
   var fromTab=window._anaFromTab||null;
   window._anaFromTab=null;
   if(fromTab&&fromTab!=='analyses'){
