@@ -1980,9 +1980,13 @@ async function loadDash(){
           if(_ntab)_ntab.innerHTML='➕ Analyse <span style="display:inline-block;background:rgba(16,185,129,0.2);color:#10b981;border-radius:20px;font-size:10px;font-weight:600;padding:1px 7px;margin-left:4px">'+remQ+'</span>';
         }
       }catch(e2){}
-      // Juriste: only own analyses
+      // Juriste: own analyses + analyses assigned by director (user_email=juriste but user_id=director)
       var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at,modifications,user_id,status,director_notes,director_email');
       a=r1.ok?await r1.json():[];
+      try{
+        var r1b=await sf('/rest/v1/analyses?user_email=eq.'+encodeURIComponent(_cu.email)+'&user_id=neq.'+_cu.id+'&order=created_at.desc&limit=20&select=id,filename,contract_type,partie,created_at,modifications,user_id,status,director_notes,director_email');
+        if(r1b.ok){var a1b=await r1b.json();a=a.concat(a1b);}
+      }catch(e5){}
     } else {
       // Directeur: afficher quota
       try{
@@ -2009,6 +2013,8 @@ async function loadDash(){
       }
     }
   }catch(e){console.log('loadDash error:',e);}
+  // Déduplication par id (un brouillon assigné au juriste apparaît dans les deux requêtes du directeur)
+  var _seen={};a=a.filter(function(x){if(_seen[x.id])return false;_seen[x.id]=true;return true;});
   document.getElementById('sta').textContent=a.length;
   window._userAnalyses=a;
   // Populate juriste filter and count for directeur
