@@ -155,8 +155,8 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <div class="dt">
 <div class="dtb" id="dtb-nouvelle" onclick="dtab('nouvelle')">➕ Analyse</div>
 <div class="dtb active" id="dtb-analyses" onclick="dtab('analyses')">Analyses</div>
-<div class="dtb" id="dtb-brouillons" onclick="dtab('brouillons')">✏️ Drafts</div>
-<div class="dtb" onclick="dtab('draft')">✏️ Rédiger</div>
+<div class="dtb" id="dtb-brouillons" onclick="dtab('brouillons')">Drafts</div>
+<div class="dtb" onclick="dtab('draft')">➕ Rédiger</div>
 <div class="dtb" id="dtb-juristes" onclick="dtab('juristes')" style="display:none">Equipe</div>
 <div class="dtb" id="dtb-abonnement" onclick="dtab('abonnement')" style="display:none">💳 Abonnement</div>
 </div>
@@ -1756,7 +1756,7 @@ async function saveDraftToHistory(){
       window._userAnalyses.unshift(d[0]);
       var bCount=(window._userAnalyses).filter(function(x){return x.contract_type==='brouillon';}).length;
       var btab=document.getElementById('dtb-brouillons');
-      if(btab){var bBadge=bCount>0?'<span style="display:inline-block;background:rgba(139,92,246,0.2);color:#8b5cf6;border-radius:20px;font-size:10px;font-weight:600;padding:1px 7px;margin-left:5px">'+bCount+'</span>':'';btab.innerHTML='✏️ Drafts'+bBadge;}
+      if(btab){var bBadge=bCount>0?'<span style="display:inline-block;background:rgba(139,92,246,0.2);color:#8b5cf6;border-radius:20px;font-size:10px;font-weight:600;padding:1px 7px;margin-left:5px">'+bCount+'</span>':'';btab.innerHTML='Drafts'+bBadge;}
     }
   }
 }
@@ -2134,7 +2134,7 @@ async function loadDash(){
     var btab=document.getElementById('dtb-brouillons');
     if(btab){
       var bBadge=_brouillons.length>0?'<span style="display:inline-block;background:rgba(139,92,246,0.2);color:#8b5cf6;border-radius:20px;font-size:10px;font-weight:600;padding:1px 7px;margin-left:5px">'+_brouillons.length+'</span>':'';
-      btab.innerHTML='✏️ Drafts'+bBadge;
+      btab.innerHTML='Drafts'+bBadge;
     }
   })();
   window.filterAnalysesByJuriste=function(val){
