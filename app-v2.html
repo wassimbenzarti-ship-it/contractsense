@@ -2335,34 +2335,44 @@ async function showAnaDetail(idx) {
   var isDirecteur=_userRole==='directeur';
 
   // Boutons d'action selon le rôle et le statut
+  // Cycle : draft → (juriste relecture optionnelle) → directeur valide → admin → RAG
+  var _btnV='<button onclick="validateByDirector(\''+ana.id+'\')" style="padding:9px 18px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">✅ Valider → Admin</button>';
+  var _btnRev='<button onclick="requestRevision(\''+ana.id+'\')" style="padding:9px 18px;background:#ef444422;border:1px solid #ef4444;color:#ef4444;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">Demander une révision</button>';
+  var _btnSav='<button id="btn-save-director-'+ana.id+'" onclick="saveDirectorChanges(\''+ana.id+'\')" style="padding:9px 18px;background:#1a2035;border:1px solid #2a3040;color:#a0a8c0;border-radius:8px;font-size:13px;cursor:pointer">Sauvegarder</button>';
+  var _btnAss='<button id="btn-assign-juriste-'+ana.id+'" onclick="assignToJuriste(\''+ana.id+'\',\'inline\')" style="padding:9px 18px;background:#5b7cfa22;border:1px solid #5b7cfa66;color:#5b7cfa;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">⚖ Envoyer à un juriste pour relecture</button>'
+    +'<div id="assign-juriste-panel-'+ana.id+'" style="display:none;margin-top:10px;padding:14px;background:#0d1017;border:1px solid #2a3040;border-radius:8px"></div>';
+  var _btnReset='<button onclick="resetToDraft(\''+ana.id+'\')" style="padding:6px 12px;background:transparent;border:1px solid #4a5470;color:#6b7280;border-radius:6px;font-size:11px;cursor:pointer">↩ Réinitialiser en brouillon</button>';
+
   var actionBar='';
   if(_isDraftEntry){
     var _draftTextEsc=_draftText.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n');
-    actionBar='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'
-      +'<button onclick="downloadDraftDocx(\''+_draftTextEsc+'\')" style="padding:9px 18px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX</button>'
-      +(isJuriste&&(st==='draft'||st==='revision_requested')?'<button onclick="submitForReview(\''+ana.id+'\')" style="padding:9px 18px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur →</button>':'')
-      +(isDirecteur&&!ana._juristeEmail&&(st==='draft')?'<button onclick="assignToJuriste(\''+ana.id+'\',\'inline\')" style="padding:9px 18px;background:#5b7cfa22;border:1px solid #5b7cfa66;color:#5b7cfa;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">⚖ Envoyer à un juriste</button><div id="assign-juriste-panel-'+ana.id+'" style="display:none;margin-top:10px;padding:14px;background:#0d1017;border:1px solid #2a3040;border-radius:8px"></div>':'')
-      +'</div>';
+    var _dBtns='<button onclick="downloadDraftDocx(\''+_draftTextEsc+'\')" style="padding:9px 18px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX</button>';
+    if(isJuriste&&(st==='draft'||st==='revision_requested'))
+      _dBtns+='<button onclick="submitForReview(\''+ana.id+'\')" style="padding:9px 18px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur →</button>';
+    if(isDirecteur&&st!=='validated'&&st!=='final_validated'){
+      _dBtns+=_btnV;
+      _dBtns+=(!ana._juristeEmail?_btnAss:_btnRev);
+    }
+    if(isDirecteur&&st==='validated')
+      _dBtns+='<span style="padding:6px 12px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;font-size:12px;color:#10b981">✅ Transmis à l\'admin</span>'+_btnReset;
+    actionBar='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'+_dBtns+'</div>';
   } else if(isJuriste&&(st==='draft'||st==='revision_requested')){
     actionBar='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'
       +'<button onclick="submitForReview(\''+ana.id+'\')" style="padding:9px 18px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur pour validation →</button>'
       +'</div>';
   }
-  if(isDirecteur&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'){
-    actionBar='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'
-      +'<button onclick="validateByDirector(\''+ana.id+'\')" style="padding:9px 18px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Valider et transmettre à l\'admin</button>'
-      +'<button onclick="requestRevision(\''+ana.id+'\')" style="padding:9px 18px;background:#ef444422;border:1px solid #ef4444;color:#ef4444;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">Demander une révision</button>'
-      +'<button id="btn-save-director-'+ana.id+'" onclick="saveDirectorChanges(\''+ana.id+'\')" style="padding:9px 18px;background:#1a2035;border:1px solid #2a3040;color:#a0a8c0;border-radius:8px;font-size:13px;cursor:pointer">Sauvegarder</button>'
-      +'</div>';
+  if(!_isDraftEntry&&isDirecteur&&st!=='validated'&&st!=='final_validated'){
+    var _dDirBtns=_btnV;
+    if(ana._juristeEmail) _dDirBtns+=_btnRev+_btnSav;
+    else _dDirBtns+=_btnAss;
+    actionBar='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'+_dDirBtns+'</div>';
   }
-  if(isDirecteur&&!ana._juristeEmail&&st!=='final_validated'){
-    actionBar=(actionBar||'')+'<div style="margin-bottom:16px">'
-      +'<button id="btn-assign-juriste-'+ana.id+'" onclick="assignToJuriste(\''+ana.id+'\',\'inline\')" style="padding:9px 18px;background:#5b7cfa22;border:1px solid #5b7cfa66;color:#5b7cfa;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">⚖ Envoyer à un juriste pour révision</button>'
-      +'<div id="assign-juriste-panel-'+ana.id+'" style="display:none;margin-top:10px;padding:14px;background:#0d1017;border:1px solid #2a3040;border-radius:8px"></div>'
-      +'</div>';
+  if(!_isDraftEntry&&isDirecteur&&st==='validated'){
+    actionBar='<div style="padding:10px 14px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:8px;font-size:13px;color:#10b981;margin-bottom:8px">✅ Transmis à l\'admin pour validation RAG</div>'
+      +'<div style="margin-bottom:12px">'+_btnReset+'</div>';
   }
-  if(isDirecteur&&ana._juristeEmail&&st==='validated'){
-    actionBar='<div style="padding:10px 14px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:8px;font-size:13px;color:#10b981;margin-bottom:16px">Transmis à l\'admin pour validation RAG</div>';
+  if(!_isDraftEntry&&isDirecteur&&st==='final_validated'){
+    actionBar='<div style="padding:10px 14px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:8px;font-size:13px;color:#10b981;margin-bottom:16px">✅ Intégré au RAG</div>';
   }
 
   // Note du directeur si révision demandée
@@ -2418,18 +2428,18 @@ async function showAnaDetail(idx) {
 
   } // end if(!_isDraftEntry)
 
-  // Zone note directeur (visible uniquement pour le directeur en revue)
+  // Zone note directeur (visible quand juriste impliqué et pas encore validé)
   if(!_isDraftEntry&&isDirecteur&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'){
     html+='<div style="margin-top:12px">'
       +'<div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:6px;text-transform:uppercase">Note pour le juriste (optionnel)</div>'
       +'<textarea id="director-note-input" placeholder="Ex: Vérifier la clause de résiliation, modifier la durée..." style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:10px;font-size:12px;color:#e2e5f0;min-height:60px;resize:vertical;box-sizing:border-box"></textarea>'
       +'</div>';
   }
-  html += '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'
+  html += (!_isDraftEntry?'<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'
     +'<button onclick="dlUserAnalysis()" style="flex:1;padding:11px;background:#1a2035;border:1px solid #1f2537;border-radius:8px;color:#a0a8c0;font-size:13px;cursor:pointer;min-width:140px">Télécharger DOCX</button>'
     +(isJuriste&&(st==='draft'||st==='revision_requested')?'<button onclick="submitForReview(\''+ana.id+'\')" style="flex:2;padding:11px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur →</button>':'')
-    +(isDirecteur&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'?'<button onclick="validateByDirector(\''+ana.id+'\')" style="flex:2;padding:11px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Valider → admin</button>':'')
-    +'</div>'
+    +(isDirecteur&&st!=='validated'&&st!=='final_validated'?'<button onclick="validateByDirector(\''+ana.id+'\')" style="flex:2;padding:11px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">✅ Valider → Admin</button>':'')
+    +'</div>':'')
     // Section "Ajouter une clause" pour juriste en révision
     +(isJuriste&&(st==='draft'||st==='revision_requested')?
       (function(){
@@ -2518,12 +2528,26 @@ async function openAnaPage(idx,_fromTab){
     +'<span style="color:#4a5470;font-size:11px">'+new Date(ana.created_at).toLocaleDateString('fr-FR')+'</span>';
   // Action buttons
   var isJ=_userRole==='juriste', isD=_userRole==='directeur';
-  document.getElementById('ana-page-actions').innerHTML=
-    (isJ&&(st==='draft'||st==='revision_requested')?'<button onclick="submitForReview(\''+_eJS(ana.id)+'\')" style="padding:9px 18px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer;margin-right:8px">Soumettre au directeur →</button>':'')
-    +(isD&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'?'<button onclick="validateByDirector(\''+_eJS(ana.id)+'\')" style="padding:9px 18px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;margin-right:6px">Valider → admin</button><button onclick="requestRevision(\''+_eJS(ana.id)+'\')" style="padding:9px 18px;background:#ef444422;border:1px solid #ef4444;color:#ef4444;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">Demander révision</button>':'')
-    +(isD&&!ana._juristeEmail&&st!=='final_validated'?'<button id="btn-assign-juriste-page-'+_eJS(ana.id)+'" onclick="assignToJuriste(\''+_eJS(ana.id)+'\',\'page\')" style="padding:9px 18px;background:#5b7cfa22;border:1px solid #5b7cfa66;color:#5b7cfa;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">⚖ Envoyer à un juriste pour révision</button>'
-      +'<div id="assign-juriste-panel-page-'+_eJS(ana.id)+'" style="display:none;margin-top:10px;padding:14px;background:#0d1017;border:1px solid #2a3040;border-radius:8px;width:100%"></div>':'')
-    +(ana.director_notes?'<div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:10px 14px;font-size:13px;color:#e2e5f0;margin-top:8px"><span style="font-size:11px;font-weight:700;color:#ef4444;display:block;margin-bottom:3px">Note du directeur</span>'+_escH(ana.director_notes)+'</div>':'');
+  // Cycle : draft → (juriste optionnel) → directeur valide → admin → RAG
+  var _pAct='';
+  if(isJ&&(st==='draft'||st==='revision_requested'))
+    _pAct+='<button onclick="submitForReview(\''+_eJS(ana.id)+'\')" style="padding:9px 18px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer;margin-right:8px">Soumettre au directeur →</button>';
+  if(isD&&st!=='validated'&&st!=='final_validated'){
+    _pAct+='<button onclick="validateByDirector(\''+_eJS(ana.id)+'\')" style="padding:9px 18px;background:#10b981;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;margin-right:6px">✅ Valider → Admin</button>';
+    if(ana._juristeEmail)
+      _pAct+='<button onclick="requestRevision(\''+_eJS(ana.id)+'\')" style="padding:9px 18px;background:#ef444422;border:1px solid #ef4444;color:#ef4444;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">Demander révision</button>';
+    else
+      _pAct+='<button id="btn-assign-juriste-page-'+_eJS(ana.id)+'" onclick="assignToJuriste(\''+_eJS(ana.id)+'\',\'page\')" style="padding:9px 18px;background:#5b7cfa22;border:1px solid #5b7cfa66;color:#5b7cfa;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">⚖ Envoyer à un juriste pour relecture</button>'
+        +'<div id="assign-juriste-panel-page-'+_eJS(ana.id)+'" style="display:none;margin-top:10px;padding:14px;background:#0d1017;border:1px solid #2a3040;border-radius:8px;width:100%"></div>';
+  }
+  if(isD&&st==='validated')
+    _pAct+='<span style="padding:7px 12px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;font-size:12px;color:#10b981;margin-right:6px">✅ Transmis à l\'admin pour validation RAG</span>'
+      +'<button onclick="resetToDraft(\''+_eJS(ana.id)+'\')" style="padding:6px 12px;background:transparent;border:1px solid #4a5470;color:#6b7280;border-radius:6px;font-size:11px;cursor:pointer">↩ Réinitialiser en brouillon</button>';
+  if(isD&&st==='final_validated')
+    _pAct+='<span style="padding:7px 12px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;font-size:12px;color:#10b981">✅ Intégré au RAG</span>';
+  if(ana.director_notes)
+    _pAct+='<div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:10px 14px;font-size:13px;color:#e2e5f0;margin-top:8px"><span style="font-size:11px;font-weight:700;color:#ef4444;display:block;margin-bottom:3px">Note du directeur</span>'+_escH(ana.director_notes)+'</div>';
+  document.getElementById('ana-page-actions').innerHTML=_pAct;
   // Modifications tab
   _renderAnaModsTab(idx);
   // Adverse tab
@@ -3814,6 +3838,22 @@ async function validateByDirector(id){
       showAnaDetail(savedIdx);
     } else { alert('Erreur validation: '+(d.error||r.status)); }
   }catch(e){ alert('Erreur réseau validation: '+e.message); }
+}
+
+async function resetToDraft(id){
+  if(!confirm('Réinitialiser cette analyse en brouillon (status → draft) ?')) return;
+  try{
+    var r=await fetch(_su+'/rest/v1/analyses?id=eq.'+id,{
+      method:'PATCH',
+      headers:{'apikey':_sk,'Authorization':'Bearer '+localStorage.getItem('sbt'),'Content-Type':'application/json','Prefer':'return=representation'},
+      body:JSON.stringify({status:'draft'})
+    });
+    if(r.ok){
+      var savedIdx=window._anaIdx||0;
+      await loadDash();
+      showAnaDetail(savedIdx);
+    } else { alert('Erreur réinitialisation: '+r.status); }
+  }catch(e){ alert('Erreur réseau: '+e.message); }
 }
 
 function assignToJuriste(anaId, ctx){
