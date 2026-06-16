@@ -161,7 +161,6 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <div class="dtb" id="dtb-abonnement" onclick="dtab('abonnement')" style="display:none">💳 Abonnement</div>
 </div>
 <div id="d-analyses" class="ds active">
-<span id="sb-quota" style="display:none;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);border-radius:20px;padding:3px 10px;font-size:11px;color:#10b981;font-weight:600;margin-bottom:10px"><span id="stq">—</span> analyses restantes</span>
 <div id="juriste-filter-bar" style="display:none;margin-bottom:10px">
   <select id="juriste-filter" onchange="filterAnalysesByJuriste(this.value)" style="background:#1a2035;border:1px solid #1f2537;border-radius:6px;padding:6px 10px;color:#e2e5f0;font-size:12px;width:100%">
     <option value="">Tous les juristes</option>
@@ -206,7 +205,10 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 </div>
 <div id="d-nouvelle" class="ds">
   <div id="d-ana-form">
-    <div style="font-size:15px;font-weight:700;color:#e2e5f0;margin-bottom:14px">Nouvelle analyse</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
+      <div style="font-size:15px;font-weight:700;color:#e2e5f0">Nouvelle analyse</div>
+      <span id="sb-quota" style="display:none;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);border-radius:20px;padding:3px 10px;font-size:11px;color:#10b981;font-weight:600"><span id="stq">—</span> analyses restantes</span>
+    </div>
     <div id="d-drop-area" onclick="document.getElementById('d-file-input').click()" style="cursor:pointer;border:2px dashed #1f2537;border-radius:12px;padding:22px;text-align:center;margin-bottom:10px" onmouseover="this.style.borderColor='#5b7cfa'" onmouseout="this.style.borderColor='#1f2537'">
       <div style="font-size:22px;margin-bottom:5px">📤</div>
       <div style="font-weight:600;font-size:13px;margin-bottom:3px">Déposez votre contrat ou cliquez</div>
@@ -2146,6 +2148,7 @@ async function loadDash(){
     if(val==='__own__') return window._renderAnalyses(window._userAnalyses.filter(function(x){return !x._juristeEmail;}));
     window._renderAnalyses(window._userAnalyses.filter(function(x){return x._juristeEmail===val;}));
   };
+  window._renderBrouillons();
   var r2=await sf('/rest/v1/user_models?user_id=eq.'+_cu.id+'&order=created_at.desc&select=id,filename,created_at');
   var m=r2.ok?await r2.json():[];
   var mlistHtml=m.length===0
