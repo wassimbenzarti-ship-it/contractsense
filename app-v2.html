@@ -1732,12 +1732,39 @@ async function generateDraft() {
     document.getElementById('draft-loading').style.display = 'none';
     document.getElementById('draft-result-section').style.display = '';
     draftSyncPreview();
+    if(_cu) saveDraftToHistory().catch(function(){});
   } catch(e) {
     document.getElementById('draft-loading').style.display = 'none';
     document.getElementById('draft-form-section').style.display = '';
     var errEl = document.getElementById('draft-error');
     errEl.textContent = '❌ ' + (e.message || 'Erreur inattendue'); errEl.style.display = '';
   }
+}
+
+async function saveDraftToHistory(){
+  if(!_cu) return;
+  var text=document.getElementById('draft-editor').value||'';
+  if(!text.trim()) return;
+  var prompt=(document.getElementById('draft-prompt').value||'').trim().slice(0,200);
+  var draftType=document.getElementById('draft-type').value||'generic';
+  var partie=(document.getElementById('draft-partie').value||'').trim();
+  var fn='Brouillon — '+(draftType)+' — '+new Date().toLocaleDateString('fr-FR');
+  var mods=[{_isDraft:true,text:text,prompt:prompt,partie:partie}];
+  var payload={user_id:_cu.id,user_email:_cu.email,filename:fn,contract_type:'brouillon',partie:partie,modifications:mods,status:'draft',director_email:_userParentEmail||''};
+  var r=await sf('/rest/v1/analyses',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(payload)}).catch(function(){return null;});
+  if(r&&r.ok){var d=await r.json().catch(function(){return[];});if(d&&d[0])window._lastDraftId=d[0].id;}
+}
+
+async function downloadDraftDocx(text){
+  if(!text||!text.trim()) return;
+  try{
+    var resp=await fetch(BACKEND+'/draft/export',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,filename:'brouillon'})});
+    if(!resp.ok) throw new Error('Erreur export');
+    var blob=await resp.blob();
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');a.href=url;a.download='brouillon.docx';a.click();
+    setTimeout(function(){URL.revokeObjectURL(url);},2000);
+  }catch(e){alert('Erreur export DOCX : '+e.message);}
 }
 
 async function exportDraftDocx() {
@@ -2018,6 +2045,7 @@ async function loadDash(){
         var realIdx=window._userAnalyses.indexOf(x);
         var isAdverse=x.filename&&x.filename.indexOf('[ADVERSE]')===0;
         var tag=x._juristeEmail?'<span style="font-size:10px;background:#5b7cfa22;color:#5b7cfa;padding:2px 6px;border-radius:10px;margin-left:6px">⚖ '+x._juristeEmail+'</span>':'';
+        var draftTag=x.contract_type==='brouillon'?'<span style="font-size:10px;background:rgba(139,92,246,0.15);color:#8b5cf6;padding:2px 6px;border-radius:10px;margin-left:4px">✏️ Brouillon</span>':'';
         var ct=x.contract_type?'<span style="background:#1f2537;color:#a0a8c0;padding:1px 6px;border-radius:4px;font-size:10px;margin-right:4px">'+x.contract_type+'</span>':'';
         var pa=x.partie?'<span style="background:rgba(16,185,129,0.1);color:#10b981;padding:1px 6px;border-radius:4px;font-size:10px">'+x.partie+'</span>':'';
         var st=x.status||'draft';
@@ -2033,7 +2061,7 @@ async function loadDash(){
           +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px" onclick="toggleAnaDetail('+realIdx+')">'
           +'<div style="flex:1;min-width:0">'
           +'<div style="font-size:15px;font-weight:700;color:#e2e5f0;margin-bottom:4px;word-break:break-word">'+displayName+'</div>'
-          +'<div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">'+tag+stBadge+'</div>'
+          +'<div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">'+tag+draftTag+stBadge+'</div>'
           +'<p style="margin-top:5px">'+ct+pa+'<span style="color:#4a5470;font-size:11px;margin-left:4px">'+new Date(x.created_at).toLocaleDateString('fr-FR')+'</span></p>'
           +(x.director_notes&&st==='revision_requested'?'<p style="font-size:11px;color:#ef4444;margin-top:4px;background:rgba(239,68,68,0.06);padding:4px 8px;border-radius:4px">Note: '+x.director_notes+'</p>':'')
           +'</div>'
@@ -2206,15 +2234,17 @@ async function _decrementAnalyses(){
 async function saveAna(fn,ct,pa,mods){
   if(!_cu) return;
   var isJuriste=_userRole==='juriste';
-  var payload={user_id:_cu.id,user_email:_cu.email,filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',modifications:_modsWithMeta(mods),status:isJuriste?'draft':'validated',director_email:_userParentEmail||''};
+  var isDirecteur=_userRole==='directeur';
+  var _status=(isJuriste||isDirecteur)?'draft':'validated';
+  var payload={user_id:_cu.id,user_email:_cu.email,filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',modifications:_modsWithMeta(mods),status:_status,director_email:_userParentEmail||''};
   var r=await sf('/rest/v1/analyses',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(payload)}).catch(function(){return null;});
   if(r&&r.ok){
     var d=await r.json().catch(function(){return[];});
     if(d[0]) window._lastSavedAnaId=d[0].id;
     _decrementAnalyses();
   }
-  // Envoyer à l'admin queue UNIQUEMENT si directeur (le juriste doit d'abord passer par le directeur)
-  if(!isJuriste){
+  // Queue uniquement pour les utilisateurs solo (ni juriste ni directeur)
+  if(!isJuriste&&!isDirecteur){
     var decisions={};
     (mods||[]).forEach(function(m,i){decisions[String(m.id||i+1)]='accepted';});
     fetch(BACKEND+'/queue/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filename:fn||'Contrat',contract_type:ct||'',partie:pa||'',accepted_modifications:JSON.stringify(mods||[]),decisions:JSON.stringify(decisions),submitted_by:_cu.email,score:75})}).catch(function(){});
@@ -2261,7 +2291,10 @@ async function showAnaDetail(idx) {
   var fileMeta = mods.find(function(m){ return m._isFileMeta; });
   window._fileStoragePath = fileMeta ? (fileMeta.file_storage_path||'') : '';
   window._fileCacheId = fileMeta ? (fileMeta.file_cache_id||'') : '';
-  mods = mods.filter(function(m){ return !m._isClauseMeta && !m._isFileMeta; });
+  var _draftMod=mods.find(function(m){return m&&m._isDraft;});
+  var _isDraftEntry=!!(ana.contract_type==='brouillon'||_draftMod);
+  var _draftText=_draftMod?(_draftMod.text||''):'';
+  mods = mods.filter(function(m){ return !m._isClauseMeta && !m._isFileMeta && !m._isDraft; });
   window._currentMods = mods.map(function(m){ return Object.assign({}, m); });
 
   var st=ana.status||'draft';
@@ -2273,7 +2306,14 @@ async function showAnaDetail(idx) {
 
   // Boutons d'action selon le rôle et le statut
   var actionBar='';
-  if(isJuriste&&(st==='draft'||st==='revision_requested')){
+  if(_isDraftEntry){
+    var _draftTextEsc=_draftText.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n');
+    actionBar='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'
+      +'<button onclick="downloadDraftDocx(\''+_draftTextEsc+'\')" style="padding:9px 18px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX</button>'
+      +(isJuriste&&(st==='draft'||st==='revision_requested')?'<button onclick="submitForReview(\''+ana.id+'\')" style="padding:9px 18px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur →</button>':'')
+      +(isDirecteur&&!ana._juristeEmail&&(st==='draft')?'<button onclick="assignToJuriste(\''+ana.id+'\',\'inline\')" style="padding:9px 18px;background:#5b7cfa22;border:1px solid #5b7cfa66;color:#5b7cfa;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer">⚖ Envoyer à un juriste</button><div id="assign-juriste-panel-'+ana.id+'" style="display:none;margin-top:10px;padding:14px;background:#0d1017;border:1px solid #2a3040;border-radius:8px"></div>':'')
+      +'</div>';
+  } else if(isJuriste&&(st==='draft'||st==='revision_requested')){
     actionBar='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'
       +'<button onclick="submitForReview(\''+ana.id+'\')" style="padding:9px 18px;background:#f59e0b;border:none;border-radius:8px;color:#000;font-weight:700;font-size:13px;cursor:pointer">Soumettre au directeur pour validation →</button>'
       +'</div>';
@@ -2317,6 +2357,13 @@ async function showAnaDetail(idx) {
     + noteSection
     + actionBar;
 
+  if(_isDraftEntry){
+    html += '<div style="background:#0d1017;border:1px solid #2a3040;border-radius:10px;padding:18px;margin-bottom:12px">'
+      +'<div style="font-size:11px;font-weight:700;color:#5b7cfa;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">✏️ Brouillon</div>'
+      +'<div style="font-size:13px;color:#e2e5f0;white-space:pre-wrap;line-height:1.7;max-height:480px;overflow-y:auto">'+_escH(_draftText)+'</div>'
+      +'</div>';
+  } else {
+
   if(!window._currentMods.length) {
     html += '<p style="color:#6b7280;font-size:13px">Aucune modification enregistree.</p>';
   }
@@ -2339,8 +2386,10 @@ async function showAnaDetail(idx) {
       + '</div>';
   });
 
+  } // end if(!_isDraftEntry)
+
   // Zone note directeur (visible uniquement pour le directeur en revue)
-  if(isDirecteur&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'){
+  if(!_isDraftEntry&&isDirecteur&&ana._juristeEmail&&st!=='validated'&&st!=='final_validated'){
     html+='<div style="margin-top:12px">'
       +'<div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:6px;text-transform:uppercase">Note pour le juriste (optionnel)</div>'
       +'<textarea id="director-note-input" placeholder="Ex: Vérifier la clause de résiliation, modifier la durée..." style="width:100%;background:#0d1017;border:1px solid #2a3040;border-radius:6px;padding:10px;font-size:12px;color:#e2e5f0;min-height:60px;resize:vertical;box-sizing:border-box"></textarea>'
