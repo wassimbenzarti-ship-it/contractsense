@@ -1984,7 +1984,7 @@ async function loadDash(){
       var r1=await sf('/rest/v1/analyses?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50&select=id,filename,contract_type,partie,created_at,modifications,user_id,status,director_notes,director_email');
       a=r1.ok?await r1.json():[];
       try{
-        var r1b=await sf('/rest/v1/analyses?user_email=eq.'+encodeURIComponent(_cu.email)+'&user_id=neq.'+_cu.id+'&order=created_at.desc&limit=20&select=id,filename,contract_type,partie,created_at,modifications,user_id,status,director_notes,director_email');
+        var r1b=await fetch(_su+'/rest/v1/analyses?user_email=eq.'+encodeURIComponent(_cu.email)+'&user_id=neq.'+_cu.id+'&order=created_at.desc&limit=20&select=id,filename,contract_type,partie,created_at,modifications,user_id,status,director_notes,director_email',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
         if(r1b.ok){var a1b=await r1b.json();a=a.concat(a1b);}
       }catch(e5){}
     } else {
