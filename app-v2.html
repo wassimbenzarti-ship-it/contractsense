@@ -2337,6 +2337,9 @@ async function showAnaDetail(idx) {
   var _draftMod=mods.find(function(m){return m&&m._isDraft;});
   var _isDraftEntry=!!(ana.contract_type==='brouillon'||_draftMod);
   var _draftText=_draftMod?(_draftMod.text||''):'';
+  // Exposer en globals pour _renderAnaModsTab (vue page openAnaPage)
+  window._isDraftEntry=_isDraftEntry;
+  window._draftText=_draftText;
   mods = mods.filter(function(m){ return !m._isClauseMeta && !m._isFileMeta && !m._isDraft; });
   window._currentMods = mods.map(function(m){ return Object.assign({}, m); });
 
@@ -2599,6 +2602,17 @@ function _renderAnaModsTab(idx){
   if(!container) return;
   var ana=(window._userAnalyses||[])[idx]||{};
   var st=ana.status||'draft';
+  // Brouillon : afficher le texte du contrat rédigé
+  if(window._isDraftEntry){
+    var dt=window._draftText||'';
+    container.innerHTML=dt
+      ?'<div style="background:#0d1017;border:1px solid #2a3040;border-radius:10px;padding:18px">'
+        +'<div style="font-size:11px;font-weight:700;color:#5b7cfa;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">✏️ Contrat rédigé</div>'
+        +'<div style="font-size:13px;color:#e2e5f0;white-space:pre-wrap;line-height:1.7;max-height:600px;overflow-y:auto">'+_escH(dt)+'</div>'
+        +'</div>'
+      :'<p style="color:#6b7280;font-size:13px;padding:20px 0">Texte du brouillon non disponible.</p>';
+    return;
+  }
   if(!mods.length){
     container.innerHTML='<p style="color:#6b7280;font-size:13px;padding:20px 0">Aucune modification enregistrée.</p>';
     return;
