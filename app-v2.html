@@ -199,7 +199,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <div id="d-opinions" class="ds">
 <div style="font-size:15px;font-weight:700;color:#e2e5f0;margin-bottom:8px">⚖ Avis juridique</div>
 <div style="font-size:12px;color:#6b7280;margin-bottom:16px;line-height:1.6">Posez une question juridique générale à l'assistant Omniscient — pas besoin d'avoir un contrat ouvert. L'assistant s'appuie sur la même base documentaire (lois, doctrine, jurisprudence) que l'analyse de contrats.</div>
-<button onclick="openLegalOpinions()" style="padding:11px 22px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:14px;cursor:pointer">💬 Ouvrir l'assistant</button>
+<div id="d-opinions-chat-host"></div>
 </div>
 <div id="d-compte" class="ds">
 <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;border-bottom:1px solid #1f2537;padding-bottom:10px">
@@ -1935,7 +1935,7 @@ async function dAnaAnalyze(partie) {
 
 function showDash(){document.getElementById('dash-ov').classList.add('show');loadDash();}
 function closeDash(){document.getElementById('dash-ov').classList.remove('show');}
-function dtab(t){var names=['analyses','brouillons','models','opinions','compte'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='compte')_switchCompteTab('profil');if(t==='nouvelle')dAnaReset();if(t==='brouillons'&&window._renderBrouillons)window._renderBrouillons();if(t==='opinions')openLegalOpinions();if(t==='draft'){_draftMode=true;var _de=document.getElementById('draft-editor');if(_de&&_de.value.trim())_draftContextText=_de.value;}else{_draftMode=false;_draftContextText=null;}}
+function dtab(t){var names=['analyses','brouillons','models','opinions','compte'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t!=='opinions'&&typeof _cbInline!=='undefined'&&_cbInline)_cbRestoreFixed();if(t==='compte')_switchCompteTab('profil');if(t==='nouvelle')dAnaReset();if(t==='brouillons'&&window._renderBrouillons)window._renderBrouillons();if(t==='opinions')openLegalOpinions();if(t==='draft'){_draftMode=true;var _de=document.getElementById('draft-editor');if(_de&&_de.value.trim())_draftContextText=_de.value;}else{_draftMode=false;_draftContextText=null;}}
 
 function _switchCompteTab(tab){
   ['profil','juristes','abonnement'].forEach(function(t){
@@ -4304,6 +4304,15 @@ if (_appLang === 'en') appSetLang('en');
 }
 #cb-sidebar.cb-open{right:0;}
 
+/* ── Inline mode: rendered inside a dashboard section body (e.g. Avis juridique) instead of as a fixed right panel ── */
+#cb-sidebar.cb-inline{
+  position:relative !important;top:auto !important;right:auto !important;left:auto !important;
+  width:100% !important;height:560px;max-height:75vh;
+  border-left:none;border:1px solid #1f2537;border-radius:12px;
+  box-shadow:none;transition:none;z-index:auto;
+}
+#cb-sidebar.cb-inline #cb-tab{display:none;}
+
 /* ── Toggle tab (sticks out on the left) ── */
 #cb-tab{
   position:absolute;left:-42px;top:50%;transform:translateY(-50%);
@@ -4455,8 +4464,35 @@ var _cbLastCacheId   = null; // tracks the current analysis session
 var _draftMode       = false; // true when chatbot opened from draft tab
 var _draftContextText = null; // draft text injected as contract_text
 var _generalQAMode   = false; // true when chatbot opened from "Avis juridique" tab (no contract context)
+var _cbInline         = false; // true when #cb-sidebar is relocated inside a dashboard section body instead of being a fixed right panel
+
+// Moves #cb-sidebar into a dashboard section's body, rendered inline instead of as a fixed right-edge panel.
+function _cbMoveInline(hostId) {
+  var host = document.getElementById(hostId);
+  var sb   = document.getElementById('cb-sidebar');
+  if (!host || !sb) return;
+  host.appendChild(sb);
+  sb.classList.add('cb-inline');
+  sb.classList.add('cb-open');
+  document.body.classList.remove('chatbot-open');
+  _cbInline = true;
+  _cbOpen   = true;
+}
+
+// Moves #cb-sidebar back to the document body as a fixed right panel (closed).
+function _cbRestoreFixed() {
+  var sb = document.getElementById('cb-sidebar');
+  if (!sb) return;
+  document.body.appendChild(sb);
+  sb.classList.remove('cb-inline');
+  sb.classList.remove('cb-open');
+  document.body.classList.remove('chatbot-open');
+  _cbInline = false;
+  _cbOpen   = false;
+}
 
 function cbToggle() {
+  if (_cbInline) { _cbRestoreFixed(); return; }
   _cbOpen = !_cbOpen;
   var sb = document.getElementById('cb-sidebar');
   var sh = document.getElementById('cb-shrink');
@@ -4473,7 +4509,7 @@ function cbToggle() {
   }
 }
 
-function cbOpen() { if (!_cbOpen) cbToggle(); }
+function cbOpen() { if (_cbInline) _cbRestoreFixed(); if (!_cbOpen) cbToggle(); }
 
 // Called when a new analysis is complete — resets chatbot context
 function cbNewAnalysis() {
@@ -4499,7 +4535,7 @@ function openLegalOpinions() {
   document.getElementById('cb-msgs').innerHTML = '';
   var _emBtn=document.getElementById('cb-export-memo');if(_emBtn)_emBtn.style.display='';
   var _eeBtn=document.getElementById('cb-export-email');if(_eeBtn)_eeBtn.style.display='';
-  cbOpen();
+  _cbMoveInline('d-opinions-chat-host');
   cbAddMsg('bot',
     'Bonjour ! Je suis <strong>Omniscient</strong>, votre assistant juridique IA.<br>'
     + 'Posez-moi une question juridique générale — pas besoin d’avoir un contrat ouvert.<br><br>'
