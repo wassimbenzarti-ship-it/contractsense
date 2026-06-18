@@ -4404,6 +4404,7 @@ if (_appLang === 'en') appSetLang('en');
       <div id="cb-head-title">Omniscient</div>
       <div id="cb-head-sub">Assistant contractuel IA</div>
     </div>
+    <button id="cb-export-memo" onclick="cbExportMemo(this)" title="Exporter en mémo Word" style="display:none;background:none;border:1px solid #2a3040;border-radius:7px;color:#c8a94b;font-size:11px;font-weight:600;cursor:pointer;padding:5px 9px;margin-left:6px;white-space:nowrap">📄 Mémo</button>
     <button id="cb-shrink" onclick="cbToggle()" title="Réduire">&#8250;</button>
   </div>
 
@@ -4458,6 +4459,7 @@ function cbNewAnalysis() {
   _generalQAMode = false;
   _cbLastCacheId = window._fileCacheId || null;
   document.getElementById('cb-msgs').innerHTML = '';
+  var _emBtn=document.getElementById('cb-export-memo');if(_emBtn)_emBtn.style.display='none';
   cbOpen();
 }
 
@@ -4470,6 +4472,7 @@ function openLegalOpinions() {
   _cbWelcomed = true;
   _cbModStore = {};
   document.getElementById('cb-msgs').innerHTML = '';
+  var _emBtn=document.getElementById('cb-export-memo');if(_emBtn)_emBtn.style.display='';
   cbOpen();
   cbAddMsg('bot',
     'Bonjour ! Je suis <strong>Omniscient</strong>, votre assistant juridique IA.<br>'
@@ -4492,6 +4495,7 @@ function openChatForDraft() {
   _cbWelcomed = true;
   _cbModStore = {};
   document.getElementById('cb-msgs').innerHTML = '';
+  var _emBtn=document.getElementById('cb-export-memo');if(_emBtn)_emBtn.style.display='none';
   cbOpen();
   cbAddMsg('bot',
     'Je suis en <strong>mode édition</strong> — donnez vos instructions directement.<br>'
@@ -4692,7 +4696,8 @@ async function cbSend() {
       partie:        _generalQAMode ? '' : ((window.selectedPartie) || ''),
       jurisdiction:  window._jurisdiction || 'universel',
       file_cache_id:      currentCacheId,
-      file_storage_path:  _generalQAMode ? '' : (window._fileStoragePath || '')
+      file_storage_path:  _generalQAMode ? '' : (window._fileStoragePath || ''),
+      general_qa:    _generalQAMode
     };
     if (_cu && _cu.email) payload.user_email = _cu.email;
 
@@ -4774,6 +4779,34 @@ async function cbSend() {
     }
   };
 })();
+
+async function cbExportMemo(btn) {
+  var qaTurns = _cbHistory.filter(function(h){return h.role==='user'||h.role==='assistant';});
+  if (qaTurns.length < 2) { var _o0=btn.textContent; btn.textContent='Posez une question d\'abord'; setTimeout(function(){btn.textContent=_o0;},2500); return; }
+  btn.disabled = true;
+  var orig = btn.textContent;
+  btn.textContent = '⏳ Génération…';
+  try {
+    var r = await fetch(BACKEND + '/chat/export-memo', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({history: qaTurns})
+    });
+    if (!r.ok) { var e = await r.json(); throw new Error(e.error || 'Erreur ' + r.status); }
+    var blob = await r.blob();
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'memo-juridique.docx';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    btn.textContent = '✅ Téléchargé';
+    setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 3000);
+  } catch(e) {
+    btn.textContent = '❌ ' + (e.message || 'Erreur');
+    btn.disabled = false;
+    setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 3000);
+  }
+}
 
 async function cbExportTranslation(lang, btn) {
   btn.disabled = true;
