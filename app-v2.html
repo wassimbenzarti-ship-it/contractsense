@@ -153,14 +153,15 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <p id="deml" style="color:#6b7280;font-size:13px;margin-bottom:12px"></p>
 <span id="sta" style="display:none">0</span><span id="stp" style="display:none">0</span><span id="sl-pending" style="display:none"></span><span id="stj" style="display:none">0</span>
 <div class="dt">
-<div class="dtb" id="dtb-nouvelle" onclick="dtab('nouvelle')">➕ Analyse</div>
 <div class="dtb active" id="dtb-analyses" onclick="dtab('analyses')">Analyses</div>
 <div class="dtb" id="dtb-brouillons" onclick="dtab('brouillons')">Drafts</div>
-<div class="dtb" onclick="dtab('draft')">➕ Rédiger</div>
+<div class="dtb" id="dtb-models" onclick="dtab('models')">📁 Modèles</div>
+<div class="dtb" id="dtb-opinions" onclick="dtab('opinions')">⚖ Avis juridique</div>
 <div class="dtb" id="dtb-juristes" onclick="dtab('juristes')" style="display:none">Equipe</div>
 <div class="dtb" id="dtb-abonnement" onclick="dtab('abonnement')" style="display:none">💳 Abonnement</div>
 </div>
 <div id="d-analyses" class="ds active">
+<div style="margin-bottom:10px"><button id="dtb-nouvelle" onclick="dtab('nouvelle')" style="padding:6px 14px;background:#5b7cfa22;border:1px solid #5b7cfa44;border-radius:8px;color:#5b7cfa;font-size:12px;font-weight:600;cursor:pointer">➕ Nouvelle analyse</button></div>
 <div id="juriste-filter-bar" style="display:none;margin-bottom:10px">
   <select id="juriste-filter" onchange="filterAnalysesByJuriste(this.value)" style="background:#1a2035;border:1px solid #1f2537;border-radius:6px;padding:6px 10px;color:#e2e5f0;font-size:12px;width:100%">
     <option value="">Tous les juristes</option>
@@ -195,6 +196,11 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <label class="mz" for="minp">+ Soumettre un modele de contrat</label>
 <input type="file" id="minp" accept=".pdf,.docx,.txt" style="display:none" onchange="upMdl(this)"/>
 <div id="mlist"></div>
+</div>
+<div id="d-opinions" class="ds">
+<div style="font-size:15px;font-weight:700;color:#e2e5f0;margin-bottom:8px">⚖ Avis juridique</div>
+<div style="font-size:12px;color:#6b7280;margin-bottom:16px;line-height:1.6">Posez une question juridique générale à l'assistant Omniscient — pas besoin d'avoir un contrat ouvert. L'assistant s'appuie sur la même base documentaire (lois, doctrine, jurisprudence) que l'analyse de contrats.</div>
+<button onclick="openLegalOpinions()" style="padding:11px 22px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:14px;cursor:pointer">💬 Ouvrir l'assistant</button>
 </div>
 <div id="d-juristes" class="ds">
 <div id="juristes-list"><div style="color:#6b7280;font-size:13px;padding:20px 0">Chargement...</div></div>
@@ -1920,7 +1926,7 @@ async function dAnaAnalyze(partie) {
 
 function showDash(){document.getElementById('dash-ov').classList.add('show');loadDash();}
 function closeDash(){document.getElementById('dash-ov').classList.remove('show');}
-function dtab(t){var names=['nouvelle','analyses','brouillons','draft','juristes','abonnement'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();if(t==='abonnement')loadAbonnement();if(t==='nouvelle')dAnaReset();if(t==='brouillons'&&window._renderBrouillons)window._renderBrouillons();if(t==='draft'){_draftMode=true;var _de=document.getElementById('draft-editor');if(_de&&_de.value.trim())_draftContextText=_de.value;}else{_draftMode=false;_draftContextText=null;}}
+function dtab(t){var names=['analyses','brouillons','models','opinions','juristes','abonnement'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t==='juristes')loadJuristes();if(t==='abonnement')loadAbonnement();if(t==='nouvelle')dAnaReset();if(t==='brouillons'&&window._renderBrouillons)window._renderBrouillons();if(t==='opinions')openLegalOpinions();if(t==='draft'){_draftMode=true;var _de=document.getElementById('draft-editor');if(_de&&_de.value.trim())_draftContextText=_de.value;}else{_draftMode=false;_draftContextText=null;}}
 async function checkRole(){
   if(!_cu)return;
   try{
@@ -1977,7 +1983,7 @@ async function loadDash(){
           var qa=await qr.json();
           var remQ=qa.analyses_remaining!==-1?qa.analyses_remaining:'∞';
           var _ntab=document.getElementById('dtb-nouvelle');
-          if(_ntab)_ntab.innerHTML='➕ Analyse <span style="display:inline-block;background:rgba(16,185,129,0.2);color:#10b981;border-radius:20px;font-size:10px;font-weight:600;padding:1px 7px;margin-left:4px">'+remQ+'</span>';
+          if(_ntab)_ntab.innerHTML='➕ Nouvelle analyse <span style="display:inline-block;background:rgba(16,185,129,0.2);color:#10b981;border-radius:20px;font-size:10px;font-weight:600;padding:1px 7px;margin-left:4px">'+remQ+'</span>';
         }
       }catch(e2){}
       // Juriste: own analyses + analyses assigned by director (user_email=juriste but user_id=director)
@@ -1995,7 +2001,7 @@ async function loadDash(){
           var qaD=await qrD.json();
           var remQD=qaD.analyses_remaining!==-1?qaD.analyses_remaining:'illim.';
           var _ntabD=document.getElementById('dtb-nouvelle');
-          if(_ntabD)_ntabD.innerHTML='➕ Analyse <span style="display:inline-block;background:rgba(16,185,129,0.2);color:#10b981;border-radius:20px;font-size:10px;font-weight:600;padding:1px 7px;margin-left:4px">'+remQD+'</span>';
+          if(_ntabD)_ntabD.innerHTML='➕ Nouvelle analyse <span style="display:inline-block;background:rgba(16,185,129,0.2);color:#10b981;border-radius:20px;font-size:10px;font-weight:600;padding:1px 7px;margin-left:4px">'+remQD+'</span>';
         }
       }catch(e3){}
       // Directeur: own analyses + juristes' analyses
@@ -4252,6 +4258,7 @@ var _cbModStore      = {};   // key → modObj  (avoids inline JSON in onclick)
 var _cbLastCacheId   = null; // tracks the current analysis session
 var _draftMode       = false; // true when chatbot opened from draft tab
 var _draftContextText = null; // draft text injected as contract_text
+var _generalQAMode   = false; // true when chatbot opened from "Avis juridique" tab (no contract context)
 
 function cbToggle() {
   _cbOpen = !_cbOpen;
@@ -4277,12 +4284,33 @@ function cbNewAnalysis() {
   _cbHistory   = [];
   _cbWelcomed  = false;
   _cbModStore  = {};
+  _generalQAMode = false;
   _cbLastCacheId = window._fileCacheId || null;
   document.getElementById('cb-msgs').innerHTML = '';
   cbOpen();
 }
 
+// Opens the assistant for general legal questions (no contract loaded)
+function openLegalOpinions() {
+  _draftMode = false;
+  _draftContextText = null;
+  _generalQAMode = true;
+  _cbHistory = [];
+  _cbWelcomed = true;
+  _cbModStore = {};
+  document.getElementById('cb-msgs').innerHTML = '';
+  cbOpen();
+  cbAddMsg('bot',
+    'Bonjour ! Je suis <strong>Omniscient</strong>, votre assistant juridique IA.<br>'
+    + 'Posez-moi une question juridique générale — pas besoin d’avoir un contrat ouvert.<br><br>'
+    + '<span style="color:#6b7280;font-size:12px">Exemples :<br>'
+    + '· «Quel est le délai de préavis pour un CDI au Maroc»<br>'
+    + '· «Quelles mentions sont obligatoires dans un NDA»</span>'
+  );
+}
+
 function openChatForDraft() {
+  _generalQAMode = false;
   _draftMode = true;
   _draftContextText = document.getElementById('draft-editor').value || '';
   // Pre-seed history so the model immediately acts as a contract editor
@@ -4479,21 +4507,21 @@ async function cbSend() {
   document.getElementById('cb-send').disabled = true;
 
   try {
-    // Send contract text if available in this session
-    var contractTxt = (_draftMode && _draftContextText) ? _draftContextText : (savedText || '');
+    // Send contract text if available in this session (none in general Q&A mode)
+    var contractTxt = _generalQAMode ? '' : ((_draftMode && _draftContextText) ? _draftContextText : (savedText || ''));
     // Also pass cache/storage IDs so backend can recover if savedText is empty
-    var currentCacheId = _draftMode ? '' : (window._fileCacheId || '');
+    var currentCacheId = (_generalQAMode || _draftMode) ? '' : (window._fileCacheId || '');
 
     var payload = {
       message:       msg,
       history:       _cbHistory.slice(-10),
       contract_text: contractTxt,
-      modifications: modifications,
-      decisions:     decisions,
-      partie:        (window.selectedPartie) || '',
+      modifications: _generalQAMode ? [] : modifications,
+      decisions:     _generalQAMode ? {} : decisions,
+      partie:        _generalQAMode ? '' : ((window.selectedPartie) || ''),
       jurisdiction:  window._jurisdiction || 'universel',
       file_cache_id:      currentCacheId,
-      file_storage_path:  window._fileStoragePath || ''
+      file_storage_path:  _generalQAMode ? '' : (window._fileStoragePath || '')
     };
     if (_cu && _cu.email) payload.user_email = _cu.email;
 
