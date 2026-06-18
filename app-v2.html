@@ -4405,6 +4405,7 @@ if (_appLang === 'en') appSetLang('en');
       <div id="cb-head-sub">Assistant contractuel IA</div>
     </div>
     <button id="cb-export-memo" onclick="cbExportMemo(this)" title="Exporter en mémo Word" style="display:none;background:none;border:1px solid #2a3040;border-radius:7px;color:#c8a94b;font-size:11px;font-weight:600;cursor:pointer;padding:5px 9px;margin-left:6px;white-space:nowrap">📄 Mémo</button>
+    <button id="cb-export-email" onclick="cbExportEmail(this)" title="Exporter en email" style="display:none;background:none;border:1px solid #2a3040;border-radius:7px;color:#c8a94b;font-size:11px;font-weight:600;cursor:pointer;padding:5px 9px;margin-left:6px;white-space:nowrap">✉️ Email</button>
     <button id="cb-shrink" onclick="cbToggle()" title="Réduire">&#8250;</button>
   </div>
 
@@ -4460,6 +4461,7 @@ function cbNewAnalysis() {
   _cbLastCacheId = window._fileCacheId || null;
   document.getElementById('cb-msgs').innerHTML = '';
   var _emBtn=document.getElementById('cb-export-memo');if(_emBtn)_emBtn.style.display='none';
+  var _eeBtn=document.getElementById('cb-export-email');if(_eeBtn)_eeBtn.style.display='none';
   cbOpen();
 }
 
@@ -4473,6 +4475,7 @@ function openLegalOpinions() {
   _cbModStore = {};
   document.getElementById('cb-msgs').innerHTML = '';
   var _emBtn=document.getElementById('cb-export-memo');if(_emBtn)_emBtn.style.display='';
+  var _eeBtn=document.getElementById('cb-export-email');if(_eeBtn)_eeBtn.style.display='';
   cbOpen();
   cbAddMsg('bot',
     'Bonjour ! Je suis <strong>Omniscient</strong>, votre assistant juridique IA.<br>'
@@ -4496,6 +4499,7 @@ function openChatForDraft() {
   _cbModStore = {};
   document.getElementById('cb-msgs').innerHTML = '';
   var _emBtn=document.getElementById('cb-export-memo');if(_emBtn)_emBtn.style.display='none';
+  var _eeBtn=document.getElementById('cb-export-email');if(_eeBtn)_eeBtn.style.display='none';
   cbOpen();
   cbAddMsg('bot',
     'Je suis en <strong>mode édition</strong> — donnez vos instructions directement.<br>'
@@ -4806,6 +4810,69 @@ async function cbExportMemo(btn) {
     btn.disabled = false;
     setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 3000);
   }
+}
+
+async function cbExportEmail(btn) {
+  var qaTurns = _cbHistory.filter(function(h){return h.role==='user'||h.role==='assistant';});
+  if (qaTurns.length < 2) { var _o0=btn.textContent; btn.textContent='Posez une question d\'abord'; setTimeout(function(){btn.textContent=_o0;},2500); return; }
+  btn.disabled = true;
+  var orig = btn.textContent;
+  btn.textContent = '⏳ Génération…';
+  try {
+    var r = await fetch(BACKEND + '/chat/export-email', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({history: qaTurns})
+    });
+    var j = await r.json();
+    if (!r.ok) throw new Error(j.error || 'Erreur ' + r.status);
+    cbShowEmailModal(j.subject || '', j.body || '');
+    btn.textContent = orig;
+    btn.disabled = false;
+  } catch(e) {
+    btn.textContent = '❌ ' + (e.message || 'Erreur');
+    btn.disabled = false;
+    setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 3000);
+  }
+}
+
+function cbShowEmailModal(subject, body) {
+  var old = document.getElementById('cb-email-modal');
+  if (old) old.remove();
+  var wrap = document.createElement('div');
+  wrap.id = 'cb-email-modal';
+  wrap.style.cssText = 'position:fixed;inset:0;background:rgba(10,12,20,.65);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px';
+  var mailto = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  wrap.innerHTML =
+    '<div style="background:#13151f;border:1px solid #2a3040;border-radius:12px;max-width:560px;width:100%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden">' +
+      '<div style="padding:14px 18px;border-bottom:1px solid #2a3040;display:flex;align-items:center;justify-content:space-between">' +
+        '<div style="font-weight:700;color:#e2e5f0;font-size:14px">✉️ Email — avis juridique</div>' +
+        '<button onclick="document.getElementById(\'cb-email-modal\').remove()" style="background:none;border:none;color:#8b92a8;font-size:18px;cursor:pointer;line-height:1">&times;</button>' +
+      '</div>' +
+      '<div style="padding:16px 18px;overflow:auto;display:flex;flex-direction:column;gap:10px">' +
+        '<label style="font-size:11px;color:#8b92a8;font-weight:600">Objet</label>' +
+        '<input id="cb-email-subject" value="' + subject.replace(/"/g,'&quot;') + '" style="background:#0e1018;border:1px solid #2a3040;border-radius:7px;color:#e2e5f0;padding:8px 10px;font-size:13px">' +
+        '<label style="font-size:11px;color:#8b92a8;font-weight:600">Corps</label>' +
+        '<textarea id="cb-email-body" rows="14" style="background:#0e1018;border:1px solid #2a3040;border-radius:7px;color:#e2e5f0;padding:10px;font-size:13px;font-family:inherit;resize:vertical">' + body.replace(/</g,'&lt;') + '</textarea>' +
+      '</div>' +
+      '<div style="padding:12px 18px;border-top:1px solid #2a3040;display:flex;gap:8px;justify-content:flex-end">' +
+        '<a href="' + mailto + '" style="background:none;border:1px solid #2a3040;border-radius:7px;color:#c8a94b;font-size:12px;font-weight:600;padding:8px 14px;text-decoration:none">Ouvrir dans le client mail</a>' +
+        '<button onclick="cbCopyEmail(this)" style="background:#4a6be8;border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:600;padding:8px 14px;cursor:pointer">📋 Copier</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(wrap);
+  wrap.addEventListener('click', function(e){ if (e.target === wrap) wrap.remove(); });
+}
+
+function cbCopyEmail(btn) {
+  var subject = document.getElementById('cb-email-subject').value;
+  var body = document.getElementById('cb-email-body').value;
+  var text = 'Objet : ' + subject + '\n\n' + body;
+  navigator.clipboard.writeText(text).then(function(){
+    var orig = btn.textContent;
+    btn.textContent = '✅ Copié';
+    setTimeout(function(){ btn.textContent = orig; }, 2000);
+  });
 }
 
 async function cbExportTranslation(lang, btn) {
