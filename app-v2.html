@@ -3455,6 +3455,23 @@ async function loadProfil(){
     +'<div id="av-msg" style="font-size:12px;margin-top:10px;display:none"></div>'
     +'</div>'
 
+    // LOGO DU CABINET
+    +'<div style="background:#111420;border:1px solid #1f2537;border-radius:12px;padding:20px;margin-bottom:16px">'
+    +'<div style="font-size:13px;font-weight:700;color:#e2e5f0;margin-bottom:6px">Logo du cabinet</div>'
+    +'<div style="font-size:11px;color:#6b7280;margin-bottom:16px">Affiché à la place du logo Omniscient en en-tête des mémos juridiques exportés.</div>'
+    +'<div style="display:flex;align-items:center;gap:20px">'
+    +'<div id="logo-preview-wrap" style="width:120px;height:80px;border-radius:8px;background:#0a0c12;border:1px solid #1f2537;display:flex;align-items:center;justify-content:center;overflow:hidden">'
+    +'<span id="logo-placeholder" style="font-size:10px;color:#4a5470">Aucun logo</span>'
+    +'</div>'
+    +'<div>'
+    +'<label for="logo-inp" style="display:inline-block;padding:9px 18px;background:#5b7cfa22;border:1px solid #5b7cfa55;border-radius:8px;color:#5b7cfa;font-size:13px;font-weight:600;cursor:pointer">Choisir un logo</label>'
+    +'<input type="file" id="logo-inp" accept="image/*" style="display:none"/>'
+    +'<div style="font-size:11px;color:#4a5470;margin-top:8px">JPG, PNG — max 2 MB<br>Redimensionné automatiquement</div>'
+    +'<button id="logo-rm" style="margin-top:8px;background:none;border:none;color:#ef4444;font-size:12px;cursor:pointer;padding:0;display:none">Supprimer le logo</button>'
+    +'</div></div>'
+    +'<div id="logo-msg" style="font-size:12px;margin-top:10px;display:none"></div>'
+    +'</div>'
+
     // MOT DE PASSE
     +'<div style="background:#111420;border:1px solid #1f2537;border-radius:12px;padding:20px;margin-bottom:16px">'
     +'<div style="font-size:13px;font-weight:700;color:#e2e5f0;margin-bottom:16px">Changer le mot de passe</div>'
@@ -3519,6 +3536,62 @@ async function loadProfil(){
   });
 
   function showAvMsg(txt,col){var d=el.querySelector('#av-msg');d.textContent=txt;d.style.color=col;d.style.display='block';setTimeout(function(){d.style.display='none';},3000);}
+
+  // Logo du cabinet — chargé depuis le backend (user_accounts.firm_logo)
+  function showLogoMsg(txt,col){var d=el.querySelector('#logo-msg');d.textContent=txt;d.style.color=col;d.style.display='block';setTimeout(function(){d.style.display='none';},3000);}
+  function renderLogoPreview(dataUrl){
+    var wrap=el.querySelector('#logo-preview-wrap');
+    var rmBtn=el.querySelector('#logo-rm');
+    if(!wrap)return;
+    if(dataUrl){
+      wrap.innerHTML='<img src="'+dataUrl+'" style="max-width:100%;max-height:100%;object-fit:contain"/>';
+      if(rmBtn)rmBtn.style.display='';
+    } else {
+      wrap.innerHTML='<span id="logo-placeholder" style="font-size:10px;color:#4a5470">Aucun logo</span>';
+      if(rmBtn)rmBtn.style.display='none';
+    }
+  }
+  (async function(){
+    try{
+      var rl=await fetch(BACKEND+'/account/info',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email})});
+      if(rl.ok){var ai=await rl.json();if(ai.firm_logo)renderLogoPreview(ai.firm_logo);}
+    }catch(e){}
+  })();
+  el.querySelector('#logo-inp').addEventListener('change',function(){
+    var file=this.files[0];
+    if(!file)return;
+    if(file.size>2*1024*1024){showLogoMsg('Fichier trop lourd (max 2 MB).','#ef4444');return;}
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var img=new Image();
+      img.onload=function(){
+        var MAX=300;
+        var scale=Math.min(MAX/img.width,MAX/img.height,1);
+        var c=document.createElement('canvas');
+        c.width=Math.round(img.width*scale);c.height=Math.round(img.height*scale);
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        var dataUrl=c.toDataURL('image/png');
+        renderLogoPreview(dataUrl);
+        fetch(BACKEND+'/account/upload-logo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email,logo_base64:dataUrl})})
+          .then(function(r){return r.json();})
+          .then(function(d){
+            if(d.status==='ok')showLogoMsg('Logo mis à jour !','#10b981');
+            else showLogoMsg('Erreur : '+(d.error||''),'#ef4444');
+          })
+          .catch(function(err){showLogoMsg('Erreur réseau : '+err.message,'#ef4444');});
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  el.querySelector('#logo-rm').addEventListener('click',async function(){
+    try{
+      var r=await fetch(BACKEND+'/account/upload-logo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:_cu.email,logo_base64:null})});
+      var d=await r.json();
+      if(d.status==='ok'){renderLogoPreview(null);showLogoMsg('Logo supprimé.','#10b981');}
+      else showLogoMsg('Erreur : '+(d.error||''),'#ef4444');
+    }catch(err){showLogoMsg('Erreur réseau : '+err.message,'#ef4444');}
+  });
 
   // Password change
   el.querySelector('#pw-btn').addEventListener('click',async function(){
@@ -4980,7 +5053,7 @@ async function cbExportMemo(btn) {
     var r = await fetch(BACKEND + '/chat/export-memo', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({history: qaTurns})
+      body: JSON.stringify({history: qaTurns, user_email: (_cu && _cu.email) || ''})
     });
     if (!r.ok) { var e = await r.json(); throw new Error(e.error || 'Erreur ' + r.status); }
     var blob = await r.blob();
