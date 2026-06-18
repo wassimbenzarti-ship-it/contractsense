@@ -199,6 +199,11 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <div id="d-opinions" class="ds">
 <div style="font-size:15px;font-weight:700;color:#e2e5f0;margin-bottom:8px">⚖ Avis juridique</div>
 <div style="font-size:12px;color:#6b7280;margin-bottom:16px;line-height:1.6">Posez une question juridique générale à l'assistant Omniscient — pas besoin d'avoir un contrat ouvert. L'assistant s'appuie sur la même base documentaire (lois, doctrine, jurisprudence) que l'analyse de contrats.</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+  <div style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:1px">Historique</div>
+  <button onclick="newLegalOpinionConsultation()" style="padding:6px 14px;background:#5b7cfa22;border:1px solid #5b7cfa44;border-radius:8px;color:#5b7cfa;font-size:12px;font-weight:600;cursor:pointer">➕ Nouvel avis</button>
+</div>
+<div id="oplist" style="margin-bottom:18px"><div style="color:#6b7280;font-size:13px;padding:10px 0">Chargement...</div></div>
 <div id="d-opinions-chat-host"></div>
 </div>
 <div id="d-compte" class="ds">
@@ -1935,7 +1940,7 @@ async function dAnaAnalyze(partie) {
 
 function showDash(){document.getElementById('dash-ov').classList.add('show');loadDash();}
 function closeDash(){document.getElementById('dash-ov').classList.remove('show');}
-function dtab(t){var names=['analyses','brouillons','models','opinions','compte'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t!=='opinions'&&typeof _cbInline!=='undefined'&&_cbInline)_cbRestoreFixed();if(t==='compte')_switchCompteTab('profil');if(t==='nouvelle')dAnaReset();if(t==='brouillons'&&window._renderBrouillons)window._renderBrouillons();if(t==='opinions')openLegalOpinions();if(t==='draft'){_draftMode=true;var _de=document.getElementById('draft-editor');if(_de&&_de.value.trim())_draftContextText=_de.value;}else{_draftMode=false;_draftContextText=null;}}
+function dtab(t){var names=['analyses','brouillons','models','opinions','compte'];document.querySelectorAll('.dtb').forEach(function(el,i){el.classList.toggle('active',names[i]===t);});document.querySelectorAll('.ds').forEach(function(s){s.classList.remove('active');});document.getElementById('d-'+t).classList.add('active');if(t!=='opinions'&&typeof _cbInline!=='undefined'&&_cbInline)_cbRestoreFixed();if(t==='compte')_switchCompteTab('profil');if(t==='nouvelle')dAnaReset();if(t==='brouillons'&&window._renderBrouillons)window._renderBrouillons();if(t==='opinions'){openLegalOpinions(true);loadLegalOpinions();}if(t==='draft'){_draftMode=true;var _de=document.getElementById('draft-editor');if(_de&&_de.value.trim())_draftContextText=_de.value;}else{_draftMode=false;_draftContextText=null;}}
 
 function _switchCompteTab(tab){
   ['profil','juristes','abonnement'].forEach(function(t){
@@ -4509,6 +4514,7 @@ if (_appLang === 'en') appSetLang('en');
       <div id="cb-head-title">Omniscient</div>
       <div id="cb-head-sub">Assistant contractuel IA</div>
     </div>
+    <button id="cb-save-opinion" onclick="saveLegalOpinionFromChat(this)" title="Enregistrer dans l'historique" style="display:none;background:none;border:1px solid #2a3040;border-radius:7px;color:#10b981;font-size:11px;font-weight:600;cursor:pointer;padding:5px 9px;margin-left:6px;white-space:nowrap">💾 Enregistrer</button>
     <button id="cb-export-memo" onclick="cbExportMemo(this)" title="Exporter en mémo Word" style="display:none;background:none;border:1px solid #2a3040;border-radius:7px;color:#c8a94b;font-size:11px;font-weight:600;cursor:pointer;padding:5px 9px;margin-left:6px;white-space:nowrap">📄 Mémo</button>
     <button id="cb-export-email" onclick="cbExportEmail(this)" title="Exporter en email" style="display:none;background:none;border:1px solid #2a3040;border-radius:7px;color:#c8a94b;font-size:11px;font-weight:600;cursor:pointer;padding:5px 9px;margin-left:6px;white-space:nowrap">✉️ Email</button>
     <button id="cb-shrink" onclick="cbToggle()" title="Réduire">&#8250;</button>
@@ -4594,20 +4600,25 @@ function cbNewAnalysis() {
   document.getElementById('cb-msgs').innerHTML = '';
   var _emBtn=document.getElementById('cb-export-memo');if(_emBtn)_emBtn.style.display='none';
   var _eeBtn=document.getElementById('cb-export-email');if(_eeBtn)_eeBtn.style.display='none';
+  var _soBtn=document.getElementById('cb-save-opinion');if(_soBtn)_soBtn.style.display='none';
   cbOpen();
 }
 
 // Opens the assistant for general legal questions (no contract loaded)
-function openLegalOpinions() {
+// keepHistory: true to re-enter an in-progress consultation (e.g. switching tabs) without discarding it
+function openLegalOpinions(keepHistory) {
   _draftMode = false;
   _draftContextText = null;
   _generalQAMode = true;
+  var _emBtn=document.getElementById('cb-export-memo');if(_emBtn)_emBtn.style.display='';
+  var _eeBtn=document.getElementById('cb-export-email');if(_eeBtn)_eeBtn.style.display='';
+  var _soBtn=document.getElementById('cb-save-opinion');if(_soBtn)_soBtn.style.display='';
+  if (keepHistory && _cbHistory.length) { _cbMoveInline('d-opinions-chat-host'); return; }
   _cbHistory = [];
   _cbWelcomed = true;
   _cbModStore = {};
+  window._currentLegalOpinionId = null;
   document.getElementById('cb-msgs').innerHTML = '';
-  var _emBtn=document.getElementById('cb-export-memo');if(_emBtn)_emBtn.style.display='';
-  var _eeBtn=document.getElementById('cb-export-email');if(_eeBtn)_eeBtn.style.display='';
   _cbMoveInline('d-opinions-chat-host');
   cbAddMsg('bot',
     'Bonjour ! Je suis <strong>Omniscient</strong>, votre assistant juridique IA.<br>'
@@ -4616,6 +4627,13 @@ function openLegalOpinions() {
     + '· «Quel est le délai de préavis pour un CDI au Maroc»<br>'
     + '· «Quelles mentions sont obligatoires dans un NDA»</span>'
   );
+}
+
+// Starts a brand-new consultation, discarding any in-progress one
+function newLegalOpinionConsultation() {
+  _cbHistory = [];
+  window._currentLegalOpinionId = null;
+  openLegalOpinions(false);
 }
 
 function openChatForDraft() {
@@ -4632,6 +4650,7 @@ function openChatForDraft() {
   document.getElementById('cb-msgs').innerHTML = '';
   var _emBtn=document.getElementById('cb-export-memo');if(_emBtn)_emBtn.style.display='none';
   var _eeBtn=document.getElementById('cb-export-email');if(_eeBtn)_eeBtn.style.display='none';
+  var _soBtn=document.getElementById('cb-save-opinion');if(_soBtn)_soBtn.style.display='none';
   cbOpen();
   cbAddMsg('bot',
     'Je suis en <strong>mode édition</strong> — donnez vos instructions directement.<br>'
@@ -5132,6 +5151,264 @@ function cbCopyEmail(btn) {
     btn.textContent = '✅ Copié';
     setTimeout(function(){ btn.textContent = orig; }, 2000);
   });
+}
+
+// ── Legal Opinions (Avis juridique) — history & validation workflow ──────────
+
+function _opTitleFromHistory(turns){
+  var firstQ = (turns.find(function(h){return h.role==='user';})||{}).content || 'Avis juridique';
+  return firstQ.length>80 ? firstQ.slice(0,77)+'…' : firstQ;
+}
+
+async function saveLegalOpinionFromChat(btn){
+  var qaTurns = _cbHistory.filter(function(h){return h.role==='user'||h.role==='assistant';});
+  if (qaTurns.length < 2) { var _o0=btn.textContent; btn.textContent='Posez une question d\'abord'; setTimeout(function(){btn.textContent=_o0;},2500); return; }
+  if (!_cu) { showAuth(); return; }
+  if (!_userRole) await checkRole();
+  btn.disabled = true;
+  var orig = btn.textContent;
+  btn.textContent = '⏳ Enregistrement…';
+  try {
+    var isJuriste = _userRole==='juriste';
+    var isDirecteur = _userRole==='directeur';
+    var payload = {
+      user_email: _cu.email,
+      title: _opTitleFromHistory(qaTurns),
+      conversation: qaTurns,
+      director_email: _userParentEmail || ''
+    };
+    var r;
+    if (window._currentLegalOpinionId) {
+      payload.status = undefined;
+      r = await sf('/rest/v1/legal_opinions?id=eq.'+window._currentLegalOpinionId, {method:'PATCH', headers:{'Prefer':'return=representation'}, body:JSON.stringify({conversation: qaTurns})});
+    } else {
+      payload.user_id = _cu.id;
+      payload.status = (isJuriste||isDirecteur) ? 'draft' : 'validated';
+      r = await sf('/rest/v1/legal_opinions', {method:'POST', headers:{'Prefer':'return=representation'}, body:JSON.stringify(payload)});
+    }
+    if (r.ok) {
+      var d = await r.json().catch(function(){return [];});
+      if (d[0]) window._currentLegalOpinionId = d[0].id;
+      btn.textContent = '✅ Enregistré';
+      loadLegalOpinions();
+    } else {
+      btn.textContent = '❌ Erreur';
+    }
+  } catch(e) {
+    btn.textContent = '❌ ' + (e.message||'Erreur');
+  } finally {
+    setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 2500);
+  }
+}
+
+async function loadLegalOpinions(){
+  if(!_cu)return;
+  if(!_userRole)await checkRole();
+  var list=[];
+  try{
+    if(_userRole==='juriste'){
+      var r1=await sf('/rest/v1/legal_opinions?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50');
+      list=r1.ok?await r1.json():[];
+      try{
+        var r1b=await fetch(_su+'/rest/v1/legal_opinions?user_email=eq.'+encodeURIComponent(_cu.email)+'&user_id=neq.'+_cu.id+'&order=created_at.desc&limit=20',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
+        if(r1b.ok){var l1b=await r1b.json();list=list.concat(l1b);}
+      }catch(e5){}
+    } else {
+      var r2=await sf('/rest/v1/legal_opinions?user_id=eq.'+_cu.id+'&order=created_at.desc&limit=50');
+      list=r2.ok?await r2.json():[];
+      var juristes=window._juristesData;
+      if(!juristes){
+        var rj=await fetch(_su+'/rest/v1/user_accounts?parent_email=eq.'+encodeURIComponent(_cu.email)+'&select=id,email,role,created_at',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
+        juristes=rj.ok?await rj.json():[];
+        window._juristesData=juristes;
+      }
+      for(var i=0;i<juristes.length;i++){
+        var rja=await fetch(_su+'/rest/v1/legal_opinions?user_email=eq.'+encodeURIComponent(juristes[i].email)+'&order=created_at.desc&limit=20',{headers:{'apikey':_sk,'Authorization':'Bearer '+_sk,'Content-Type':'application/json'}});
+        if(rja.ok){var jl=await rja.json();list=list.concat(jl.map(function(je){return function(x){x._juristeEmail=je;return x;};}(juristes[i].email)));}
+      }
+    }
+  }catch(e){console.log('loadLegalOpinions error:',e);}
+  var seen={};list=list.filter(function(x){if(seen[x.id])return false;seen[x.id]=true;return true;});
+  window._legalOpinions=list;
+  window._renderLegalOpinions(list);
+}
+
+var OP_STATUS_LABELS={'draft':'Brouillon','pending_review':'En attente directeur','revision_requested':'Renvoyé pour révision','validated':'Validé','final_validated':'Validé — dans le RAG'};
+var OP_STATUS_COLORS={'draft':'#4a5470','pending_review':'#f59e0b','revision_requested':'#ef4444','validated':'#10b981','final_validated':'#10b981'};
+
+window._renderLegalOpinions=function(list){
+  var el=document.getElementById('oplist');
+  if(!el)return;
+  if(!list.length){el.innerHTML='<p style="color:#6b7280;font-size:13px;padding:10px 0">Aucun avis enregistré pour le moment.</p>';return;}
+  var sorted=list.slice().sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);});
+  el.innerHTML=sorted.map(function(x){
+    var realIdx=window._legalOpinions.indexOf(x);
+    var tag=x._juristeEmail?'<span style="font-size:10px;background:#5b7cfa22;color:#5b7cfa;padding:2px 6px;border-radius:10px;margin-left:6px">⚖ '+x._juristeEmail+'</span>':'';
+    var st=x.status||'draft';
+    var stLabel=OP_STATUS_LABELS[st]||st;
+    var stColor=OP_STATUS_COLORS[st]||'#4a5470';
+    var stBadge='<span style="font-size:10px;background:'+stColor+'22;color:'+stColor+';padding:2px 7px;border-radius:10px;font-weight:600;margin-left:6px">'+stLabel+'</span>';
+    var needsAttention=((_userRole==='juriste'&&st==='revision_requested')||(_userRole==='directeur'&&st==='pending_review'));
+    var border=needsAttention?'border-color:#f59e0b':'';
+    return '<div class="ac" id="op-card-'+realIdx+'" style="cursor:pointer;'+border+'">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px" onclick="toggleOpDetail('+realIdx+')">'
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="font-size:15px;font-weight:700;color:#e2e5f0;margin-bottom:4px;word-break:break-word">'+_escH(x.title||'Avis juridique')+'</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">'+tag+stBadge+'</div>'
+      +'<p style="margin-top:5px"><span style="color:#4a5470;font-size:11px">'+new Date(x.created_at).toLocaleDateString('fr-FR')+'</span></p>'
+      +(x.director_notes&&st==='revision_requested'?'<p style="font-size:11px;color:#ef4444;margin-top:4px;background:rgba(239,68,68,0.06);padding:4px 8px;border-radius:4px">Note: '+_escH(x.director_notes)+'</p>':'')
+      +'</div>'
+      +'<div style="display:flex;gap:6px;align-items:center;flex-shrink:0">'
+      +'<span style="font-size:11px;color:#4a5470" id="op-toggle-icon-'+realIdx+'">▼</span>'
+      +'<button onclick="event.stopPropagation();deleteLegalOpinion(\''+x.id+'\','+realIdx+')" title="Supprimer" style="background:transparent;border:1px solid #ef444440;color:#ef4444;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;line-height:1">✕</button>'
+      +'</div>'
+      +'</div>'
+      +'<div id="op-detail-inline-'+realIdx+'" style="display:none"></div>'
+      +'</div>';
+  }).join('');
+};
+
+function toggleOpDetail(idx){
+  var box=document.getElementById('op-detail-inline-'+idx);
+  var icon=document.getElementById('op-toggle-icon-'+idx);
+  if(!box)return;
+  if(box.style.display==='none'){
+    box.style.display='';
+    if(icon)icon.textContent='▲';
+    renderOpDetail(idx);
+  } else {
+    box.style.display='none';
+    if(icon)icon.textContent='▼';
+  }
+}
+
+function renderOpDetail(idx){
+  var op=(window._legalOpinions||[])[idx];
+  var box=document.getElementById('op-detail-inline-'+idx);
+  if(!op||!box)return;
+  var conv=op.conversation||[];
+  if(typeof conv==='string'){try{conv=JSON.parse(conv);}catch(e){conv=[];}}
+  var transcript=conv.map(function(t){
+    var label=t.role==='user'?'Question':'Réponse';
+    var color=t.role==='user'?'#5b7cfa':'#10b981';
+    return '<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:'+color+';text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">'+label+'</div><div style="font-size:12px;color:#c8cfe0;white-space:pre-wrap;line-height:1.5">'+_escH(t.content||'')+'</div></div>';
+  }).join('');
+
+  var st=op.status||'draft';
+  var isJuriste=_userRole==='juriste';
+  var isDirecteur=_userRole==='directeur'||_isAdmin;
+  var btns='';
+  btns+='<button onclick="continueLegalOpinion('+idx+')" style="padding:8px 14px;background:#5b7cfa22;border:1px solid #5b7cfa66;color:#5b7cfa;border-radius:7px;font-weight:600;font-size:12px;cursor:pointer;margin-right:6px">↺ Continuer dans l\'assistant</button>';
+  if(isJuriste&&(st==='draft'||st==='revision_requested')){
+    btns+='<button onclick="submitOpinionForReview(\''+op.id+'\')" style="padding:8px 14px;background:#f59e0b;border:none;border-radius:7px;color:#000;font-weight:700;font-size:12px;cursor:pointer;margin-right:6px">Soumettre au directeur →</button>';
+  }
+  if(isDirecteur&&st!=='final_validated'){
+    btns+='<button onclick="validateOpinionByDirector(\''+op.id+'\')" style="padding:8px 14px;background:#10b981;border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:pointer;margin-right:6px">✅ Valider → RAG + Modèles</button>';
+    if(st==='pending_review'){
+      btns+='<button onclick="requestOpinionRevision(\''+op.id+'\')" style="padding:8px 14px;background:#ef444422;border:1px solid #ef4444;color:#ef4444;border-radius:7px;font-weight:600;font-size:12px;cursor:pointer;margin-right:6px">Demander une révision</button>';
+    }
+    btns+='<button id="op-assign-btn-'+idx+'" onclick="assignOpinionToJuriste(\''+op.id+'\','+idx+')" style="padding:8px 14px;background:#5b7cfa22;border:1px solid #5b7cfa66;color:#5b7cfa;border-radius:7px;font-weight:600;font-size:12px;cursor:pointer">⚖ Assigner à un juriste</button>';
+  }
+
+  box.innerHTML='<div style="margin-top:10px;padding-top:10px;border-top:1px solid #1f2537">'
+    +'<div style="max-height:260px;overflow-y:auto;background:#0a0c12;border:1px solid #1f2537;border-radius:8px;padding:10px;margin-bottom:10px">'+(transcript||'<span style="color:#4a5470;font-size:12px">Aucun échange enregistré.</span>')+'</div>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">'+btns+'</div>'
+    +'<div id="op-assign-panel-'+idx+'" style="display:none;margin-top:10px;background:#0e1018;border:1px solid #1f2537;border-radius:8px;padding:12px"></div>'
+    +'</div>';
+}
+
+function continueLegalOpinion(idx){
+  var op=(window._legalOpinions||[])[idx];
+  if(!op)return;
+  var conv=op.conversation||[];
+  if(typeof conv==='string'){try{conv=JSON.parse(conv);}catch(e){conv=[];}}
+  _generalQAMode=true;
+  _draftMode=false;
+  _draftContextText=null;
+  _cbHistory=conv.slice();
+  _cbWelcomed=true;
+  _cbModStore={};
+  window._currentLegalOpinionId=op.id;
+  document.getElementById('cb-msgs').innerHTML='';
+  conv.forEach(function(t){
+    if(t.role==='user')cbAddMsg('user',_escH(t.content||''));
+    else cbAddMsg('bot',_cbMarkdown(t.content||''));
+  });
+  var _emBtn=document.getElementById('cb-export-memo');if(_emBtn)_emBtn.style.display='';
+  var _eeBtn=document.getElementById('cb-export-email');if(_eeBtn)_eeBtn.style.display='';
+  var _soBtn=document.getElementById('cb-save-opinion');if(_soBtn)_soBtn.style.display='';
+  _cbMoveInline('d-opinions-chat-host');
+}
+
+async function submitOpinionForReview(id){
+  if(!confirm('Soumettre cet avis juridique à votre directeur pour validation ?'))return;
+  try{
+    var r=await sf('/rest/v1/legal_opinions?id=eq.'+id,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({status:'pending_review'})});
+    if(r.ok||r.status===204){
+      var op=(window._legalOpinions||[]).find(function(x){return x.id===id;})||{};
+      fetch(BACKEND+'/notify/pending-review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({analysis_id:id,juriste_email:_cu&&_cu.email||'',director_email:_userParentEmail||op.director_email||'',filename:op.title||'Avis juridique',contract_type:'Avis juridique'})}).catch(function(){});
+      alert('Avis soumis. Le directeur a été notifié par e-mail.');
+      loadLegalOpinions();
+    } else { alert('Erreur lors de la soumission ('+r.status+')'); }
+  }catch(e){ alert('Erreur réseau : '+e.message); }
+}
+
+async function requestOpinionRevision(id){
+  var note=prompt('Note pour le juriste (optionnel) :','');
+  if(note===null)return;
+  try{
+    var r=await fetch(BACKEND+'/legal-opinions/request-revision/'+id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({director_notes:note,director_email:_cu&&_cu.email||''})});
+    var d=r.ok?await r.json().catch(function(){return{};}):{};
+    if(r.ok&&d.status==='ok'){ alert('Renvoyé pour révision.'); loadLegalOpinions(); }
+    else { alert('Erreur : '+(d.error||r.status)); }
+  }catch(e){ alert('Erreur réseau : '+e.message); }
+}
+
+function assignOpinionToJuriste(opId, idx){
+  var panel=document.getElementById('op-assign-panel-'+idx);
+  if(!panel)return;
+  if(panel.style.display!=='none'){panel.style.display='none';return;}
+  var juristes=(window._juristesData||[]).filter(function(j){return j.role==='juriste'||!j.role;});
+  if(!juristes.length){panel.innerHTML='<p style="color:#ef4444;font-size:12px;margin:0">Aucun juriste dans votre cabinet.</p>';panel.style.display='';return;}
+  var opts=juristes.map(function(j){return '<option value="'+j.email+'">'+j.email+'</option>';}).join('');
+  panel.innerHTML='<div style="font-size:12px;font-weight:700;color:#5b7cfa;margin-bottom:8px">Choisir le juriste destinataire</div>'
+    +'<select id="ojs-sel-'+opId+'" style="width:100%;background:#1a2035;border:1px solid #2a3040;border-radius:6px;padding:7px 10px;font-size:12px;color:#e2e5f0;margin-bottom:8px;box-sizing:border-box">'+opts+'</select>'
+    +'<textarea id="ojs-note-'+opId+'" placeholder="Note pour le juriste (optionnel)..." style="width:100%;background:#1a2035;border:1px solid #2a3040;border-radius:6px;padding:8px;font-size:12px;color:#e2e5f0;min-height:56px;resize:vertical;box-sizing:border-box;margin-bottom:8px"></textarea>'
+    +'<button onclick="confirmAssignOpinionToJuriste(\''+opId+'\')" style="padding:9px 18px;background:#5b7cfa;border:none;border-radius:7px;color:#fff;font-weight:700;font-size:12px;cursor:pointer">Envoyer au juriste</button>';
+  panel.style.display='';
+}
+
+async function confirmAssignOpinionToJuriste(opId){
+  var sel=document.getElementById('ojs-sel-'+opId);
+  var noteEl=document.getElementById('ojs-note-'+opId);
+  var juristeEmail=sel?sel.value:'';
+  var note=noteEl?noteEl.value.trim():'';
+  if(!juristeEmail){alert('Sélectionnez un juriste.');return;}
+  try{
+    var r=await fetch(BACKEND+'/legal-opinions/assign-to-juriste/'+opId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({juriste_email:juristeEmail,director_email:(_cu&&_cu.email)||'',director_notes:note})});
+    var d=r.ok?await r.json().catch(function(){return{};}):{};
+    if(r.ok&&d.status==='ok'){ alert('Assigné à '+juristeEmail+' — email envoyé.'); loadLegalOpinions(); }
+    else { alert('Erreur : '+(d.error||r.status)); }
+  }catch(e){ alert('Erreur réseau : '+e.message); }
+}
+
+async function validateOpinionByDirector(id){
+  if(!confirm('Valider cet avis et l\'intégrer au RAG admin ainsi qu\'au sous-RAG du cabinet (Modèles) ?'))return;
+  try{
+    var r=await fetch(BACKEND+'/legal-opinions/validate-by-director/'+id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({director_email:_cu&&_cu.email||''})});
+    var d=r.ok?await r.json().catch(function(){return{};}):{};
+    if(r.ok&&d.status==='ok'){ alert('Avis validé et intégré au RAG.'); loadLegalOpinions(); }
+    else { alert('Erreur : '+(d.error||r.status)); }
+  }catch(e){ alert('Erreur réseau : '+e.message); }
+}
+
+async function deleteLegalOpinion(id, idx){
+  if(!confirm('Supprimer cet avis juridique ? Cette action est irréversible.'))return;
+  try{
+    var r=await sf('/rest/v1/legal_opinions?id=eq.'+id,{method:'DELETE'});
+    if(r.ok||r.status===204){ loadLegalOpinions(); }
+    else { alert('Erreur lors de la suppression'); }
+  }catch(e){ alert('Erreur réseau : '+e.message); }
 }
 
 async function cbExportTranslation(lang, btn) {
