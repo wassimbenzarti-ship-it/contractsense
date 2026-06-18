@@ -4364,6 +4364,29 @@ if (_appLang === 'en') appSetLang('en');
 .cb-typing span:nth-child(3){animation-delay:.3s;}
 @keyframes cb-bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
 
+/* ── Markdown rendering inside bot messages ── */
+.cb-msg.bot .cb-toc{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.cb-msg.bot .cb-toc-item{background:#1f2537;border:1px solid #2a3040;color:#9aa3c0;font-size:10.5px;padding:3px 8px;border-radius:20px;cursor:pointer;transition:background .15s,color .15s;}
+.cb-msg.bot .cb-toc-item:hover{background:#2a3454;color:#e2e5f0;}
+.cb-msg.bot .cb-sec-controls{display:flex;gap:6px;margin-bottom:8px;}
+.cb-msg.bot .cb-sec-toggle{background:none;border:1px solid #2a3040;color:#6b7280;font-size:10.5px;padding:3px 8px;border-radius:6px;cursor:pointer;transition:color .15s,border-color .15s;}
+.cb-msg.bot .cb-sec-toggle:hover{color:#e2e5f0;border-color:#5b7cfa;}
+.cb-msg.bot details.cb-section{border:1px solid #1f2537;border-radius:8px;margin-bottom:7px;background:#12151f;overflow:hidden;}
+.cb-msg.bot details.cb-section summary{list-style:none;cursor:pointer;padding:8px 10px;font-weight:700;font-size:12.5px;color:#c9cee8;display:flex;align-items:center;gap:6px;}
+.cb-msg.bot details.cb-section summary::-webkit-details-marker{display:none;}
+.cb-msg.bot details.cb-section summary::before{content:'\25b8';display:inline-block;color:#5b7cfa;transition:transform .15s;}
+.cb-msg.bot details.cb-section[open] summary::before{transform:rotate(90deg);}
+.cb-msg.bot .cb-section-body{padding:0 11px 10px;}
+.cb-msg.bot .cb-md-title{font-size:13.5px;font-weight:800;color:#e2e5f0;margin:0 0 9px;line-height:1.35;}
+.cb-msg.bot .cb-md-h{font-size:12px;font-weight:700;color:#a9b0d0;margin:8px 0 4px;}
+.cb-msg.bot .cb-md-p{margin:0 0 7px;}
+.cb-msg.bot .cb-md-ul,.cb-msg.bot .cb-md-ol{margin:0 0 7px;padding-left:18px;}
+.cb-msg.bot .cb-md-ul li,.cb-msg.bot .cb-md-ol li{margin-bottom:3px;}
+.cb-msg.bot .cb-md-table-wrap{overflow-x:auto;margin:0 0 8px;}
+.cb-msg.bot table.cb-md-table{border-collapse:collapse;width:100%;font-size:11px;}
+.cb-msg.bot table.cb-md-table th,.cb-msg.bot table.cb-md-table td{border:1px solid #232a40;padding:5px 7px;text-align:left;}
+.cb-msg.bot table.cb-md-table th{background:#1a2036;color:#c9cee8;}
+
 /* ── Footer input ── */
 #cb-footer{padding:12px 13px;border-top:1px solid #1f2537;display:flex;gap:8px;background:#111420;flex-shrink:0;}
 #cb-input{
@@ -4536,6 +4559,127 @@ function cbResize(el) {
   el.style.height = Math.min(el.scrollHeight, 100) + 'px';
 }
 
+// Lightweight markdown renderer for bot replies: turns #/##/### headings,
+// **bold**, -/numbered lists and | table | rows into real DOM structure
+// instead of a flat wall of text. ## (and #) sections are wrapped in
+// <details> (open by default) so long answers can be collapsed/jumped-to
+// instead of only being readable by scrolling top to bottom.
+function _cbMarkdown(text) {
+  if (!text) return '';
+  var lines = text.replace(/\r\n/g, '\n').split('\n');
+  var out = [];
+  var sectionOpen = false;
+  var toc = [];
+  var titleHtml = '';
+  var i = 0;
+
+  function closeSection() { if (sectionOpen) { out.push('</div></details>'); sectionOpen = false; } }
+  function inline(s) { return _escH(s).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>'); }
+
+  while (i < lines.length) {
+    var trimmed = lines[i].trim();
+
+    if (!trimmed) { i++; continue; }
+    if (/^(-{3,}|_{3,}|\*{3,})$/.test(trimmed)) { i++; continue; }
+
+    // Table block
+    if (trimmed.charAt(0) === '|') {
+      var rows = [];
+      while (i < lines.length && lines[i].trim().charAt(0) === '|') {
+        var rl = lines[i].trim();
+        if (!/^\|?[\s:|-]+\|?$/.test(rl)) {
+          rows.push(rl.replace(/^\||\|$/g, '').split('|').map(function(c) { return c.trim(); }));
+        }
+        i++;
+      }
+      if (rows.length) {
+        var t = '<div class="cb-md-table-wrap"><table class="cb-md-table">';
+        rows.forEach(function(r, ri) {
+          t += '<tr>';
+          r.forEach(function(c) { var tag = ri === 0 ? 'th' : 'td'; t += '<' + tag + '>' + inline(c) + '</' + tag + '>'; });
+          t += '</tr>';
+        });
+        t += '</table></div>';
+        out.push(t);
+      }
+      continue;
+    }
+
+    // Heading
+    var hMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);
+    if (hMatch) {
+      var level = hMatch[1].length;
+      var htext = hMatch[2].replace(/\*\*/g, '');
+      if (level === 1) {
+        closeSection();
+        titleHtml = '<div class="cb-md-title">' + inline(htext) + '</div>';
+      } else if (level === 2) {
+        closeSection();
+        var sid = 'cbsec_' + Date.now() + '_' + toc.length;
+        toc.push({ id: sid, text: htext });
+        out.push('<details class="cb-section" open id="' + sid + '"><summary>' + inline(htext) + '</summary><div class="cb-section-body">');
+        sectionOpen = true;
+      } else {
+        out.push('<h' + Math.min(level + 2, 6) + ' class="cb-md-h">' + inline(htext) + '</h' + Math.min(level + 2, 6) + '>');
+      }
+      i++;
+      continue;
+    }
+
+    // Bullet list
+    if (/^[-*]\s+/.test(trimmed)) {
+      var items = [];
+      while (i < lines.length && /^[-*]\s+/.test(lines[i].trim())) { items.push(lines[i].trim().replace(/^[-*]\s+/, '')); i++; }
+      out.push('<ul class="cb-md-ul">' + items.map(function(it) { return '<li>' + inline(it) + '</li>'; }).join('') + '</ul>');
+      continue;
+    }
+
+    // Numbered list
+    if (/^\d+[.)]\s+/.test(trimmed)) {
+      var nitems = [];
+      while (i < lines.length && /^\d+[.)]\s+/.test(lines[i].trim())) { nitems.push(lines[i].trim().replace(/^\d+[.)]\s+/, '')); i++; }
+      out.push('<ol class="cb-md-ol">' + nitems.map(function(it) { return '<li>' + inline(it) + '</li>'; }).join('') + '</ol>');
+      continue;
+    }
+
+    // Paragraph (consume contiguous plain lines)
+    var para = [trimmed];
+    i++;
+    while (i < lines.length && lines[i].trim() && !/^#{1,6}\s+/.test(lines[i].trim()) && !/^[-*]\s+/.test(lines[i].trim())
+           && !/^\d+[.)]\s+/.test(lines[i].trim()) && lines[i].trim().charAt(0) !== '|' && !/^(-{3,}|_{3,}|\*{3,})$/.test(lines[i].trim())) {
+      para.push(lines[i].trim());
+      i++;
+    }
+    out.push('<p class="cb-md-p">' + inline(para.join(' ')) + '</p>');
+  }
+  closeSection();
+
+  var controls = '';
+  if (toc.length >= 2) {
+    controls += '<div class="cb-toc">' + toc.map(function(t) {
+      return '<button class="cb-toc-item" onclick="_cbJump(\'' + t.id + '\')">' + _escH(t.text) + '</button>';
+    }).join('') + '</div>';
+    controls += '<div class="cb-sec-controls">'
+      + '<button class="cb-sec-toggle" onclick="_cbToggleAll(this,false)">− Tout réduire</button>'
+      + '<button class="cb-sec-toggle" onclick="_cbToggleAll(this,true)">+ Tout afficher</button>'
+      + '</div>';
+  }
+  return titleHtml + controls + out.join('');
+}
+
+function _cbJump(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  if (el.tagName === 'DETAILS') el.open = true;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function _cbToggleAll(btn, openState) {
+  var msg = btn.closest('.cb-msg');
+  if (!msg) return;
+  msg.querySelectorAll('details.cb-section').forEach(function(d) { d.open = openState; });
+}
+
 function cbAddMsg(role, html, modObjs) {
   var msgs = document.getElementById('cb-msgs');
   var div  = document.createElement('div');
@@ -4568,7 +4712,13 @@ function cbAddMsg(role, html, modObjs) {
   }
 
   msgs.appendChild(div);
-  cbScrollBottom();
+  // Long bot replies: land on the top of the new message instead of jumping
+  // straight to its bottom (which forced scrolling back up to read it).
+  if (role === 'bot' && div.offsetHeight > msgs.clientHeight * 0.6) {
+    msgs.scrollTop = div.offsetTop - 8;
+  } else {
+    cbScrollBottom();
+  }
   return div;
 }
 
@@ -4731,7 +4881,7 @@ async function cbSend() {
         + 'border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;">'
         + '⬇ Télécharger la traduction Word (' + _tlLabel + ')</button></div>';
     }
-    cbAddMsg('bot', _displayReply.replace(/\n/g, '<br>') + _trBtn, modObjs);
+    cbAddMsg('bot', _cbMarkdown(_displayReply) + _trBtn, modObjs);
   } catch(e) {
     cbHideTyping();
     cbAddMsg('bot', '\u274c ' + _escH(e.message || 'Erreur inattendue.'));
