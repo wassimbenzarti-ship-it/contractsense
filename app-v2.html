@@ -762,18 +762,29 @@ async function analyze() {
   }
 }
 
+// Wording override for _buildPartiesUI when used to pick the *adverse* party's
+// markup author — there's nothing to "défendre" here, we're just identifying them.
+var _ADVERSE_AUTHOR_PICKER_OPTS = {
+  hint: 'Cliquez sur <strong style="color:#e2e5f0">1 auteur</strong> &nbsp;·&nbsp; ou sélectionnez plusieurs auteurs s\'ils ont co-rédigé le markup',
+  single: function(name){ return 'Continuer avec ' + name; },
+  multi: function(names){ return 'Continuer avec ' + names.join(' + '); }
+};
+
 // ─── Shared party-selection UI builder ───────────────────────────────────────
 // onConfirm(partieLabel) is called when the user clicks the confirm button.
 // All coalition logic lives here once; both flows call this.
-function _buildPartiesUI(listEl, parties, onConfirm) {
+// opts (optional): {hint, single, multi} to override default "défendre" wording
+// (e.g. when picking the adverse party's markup author, not a party to defend).
+function _buildPartiesUI(listEl, parties, onConfirm, opts) {
   listEl.innerHTML = '';
   var arr = parties.length ? parties : [{name:'Analyser (générique)', party_label:'Partie', description:''}];
   var selected = [];
+  opts = opts || {};
 
   // Hint
   var hint = document.createElement('p');
   hint.style.cssText = 'font-size:12px;color:#6b7280;margin:0 0 14px;text-align:center;line-height:1.6';
-  hint.innerHTML = 'Cliquez sur <strong style="color:#e2e5f0">1 partie</strong> pour la défendre seule &nbsp;·&nbsp; ou sélectionnez <strong style="color:#e2e5f0">2 parties</strong> pour former une coalition';
+  hint.innerHTML = opts.hint || 'Cliquez sur <strong style="color:#e2e5f0">1 partie</strong> pour la défendre seule &nbsp;·&nbsp; ou sélectionnez <strong style="color:#e2e5f0">2 parties</strong> pour former une coalition';
   listEl.appendChild(hint);
 
   // Confirm button
@@ -786,10 +797,10 @@ function _buildPartiesUI(listEl, parties, onConfirm) {
       confirmBtn.style.display = 'none';
     } else if (selected.length === 1) {
       confirmBtn.style.display = 'block';
-      confirmBtn.textContent = 'Défendre ' + selected[0] + ' →';
+      confirmBtn.textContent = (opts.single ? opts.single(selected[0]) : 'Défendre ' + selected[0]) + ' →';
     } else {
       confirmBtn.style.display = 'block';
-      confirmBtn.textContent = 'Défendre la coalition : ' + selected.join(' + ') + ' →';
+      confirmBtn.textContent = (opts.multi ? opts.multi(selected) : 'Défendre la coalition : ' + selected.join(' + ')) + ' →';
     }
   }
 
@@ -2912,7 +2923,7 @@ function _renderAdverseAuthorPicker(authors, anaId, contractType, partie, file){
   var listEl=document.getElementById('adverse-authors-list');
   _buildPartiesUI(listEl, authors, function(joinedLabel, selectedAuthors){
     analyzeAdverseMarkup(anaId, contractType, partie, file, joinedLabel, selectedAuthors);
-  });
+  }, _ADVERSE_AUTHOR_PICKER_OPTS);
 }
 
 // Étape 3 : analyse du markup des auteurs sélectionnés — risque + recommandation
@@ -3158,7 +3169,7 @@ async function _standaloneAdverseDetectAuthors(){
     var listEl=document.getElementById('standalone-authors-list');
     _buildPartiesUI(listEl, data.authors, function(joinedLabel, selectedAuthors){
       _standaloneAnalyzeAdverseMarkup(joinedLabel, selectedAuthors);
-    });
+    }, _ADVERSE_AUTHOR_PICKER_OPTS);
   }catch(e){
     res.innerHTML='<div style="color:#ef4444;font-size:12px;padding:10px 0">Erreur : '+e.message+'</div>';
   }
