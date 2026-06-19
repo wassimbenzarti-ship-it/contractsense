@@ -160,7 +160,8 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <div class="dtb" id="dtb-compte" onclick="dtab('compte')">👤 Mon compte</div>
 </div>
 <div id="d-analyses" class="ds active">
-<div style="margin-bottom:10px"><button id="dtb-nouvelle" onclick="dtab('nouvelle')" style="padding:6px 14px;background:#5b7cfa22;border:1px solid #5b7cfa44;border-radius:8px;color:#5b7cfa;font-size:12px;font-weight:600;cursor:pointer">➕ Nouvelle analyse</button></div>
+<div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap"><button id="dtb-nouvelle" onclick="dtab('nouvelle')" style="padding:6px 14px;background:#5b7cfa22;border:1px solid #5b7cfa44;border-radius:8px;color:#5b7cfa;font-size:12px;font-weight:600;cursor:pointer">➕ Nouvelle analyse</button>
+<button onclick="openStandaloneAdverseReview()" style="padding:6px 14px;background:#8b5cf622;border:1px solid #8b5cf644;border-radius:8px;color:#8b5cf6;font-size:12px;font-weight:600;cursor:pointer">⚔ Analyser une version adverse</button></div>
 <div id="juriste-filter-bar" style="display:none;margin-bottom:10px">
   <select id="juriste-filter" onchange="filterAnalysesByJuriste(this.value)" style="background:#1a2035;border:1px solid #1f2537;border-radius:6px;padding:6px 10px;color:#e2e5f0;font-size:12px;width:100%">
     <option value="">Tous les juristes</option>
@@ -184,6 +185,13 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
   <div id="atp-mods-panel"></div>
   <div id="atp-adverse-panel" style="display:none"></div>
   <div id="atp-translate-panel" style="display:none"></div>
+</div>
+<div id="standalone-adverse-page" style="display:none" class="fadein">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #1f2537">
+    <button onclick="closeStandaloneAdverseReview()" style="padding:6px 14px;background:#1a2035;border:1px solid #2a3040;border-radius:8px;color:#a0a8c0;font-size:12px;cursor:pointer;flex-shrink:0">← Analyses</button>
+    <div style="font-size:15px;font-weight:800;color:#e2e5f0">⚔ Analyser une version adverse</div>
+  </div>
+  <div id="standalone-adverse-body"></div>
 </div>
 </div>
 <div id="d-brouillons" class="ds">
@@ -2931,8 +2939,8 @@ async function analyzeAdverseMarkup(anaId, contractType, partie, file, joinedLab
 }
 
 // Étape 4 : revue accepter/refuser — même modèle visuel que renderReview()/decide()
-function _renderAdverseMarkupReview(anaId){
-  var res=document.getElementById('adverse-result');
+function _renderAdverseMarkupReview(anaId, containerId){
+  var res=document.getElementById(containerId||'adverse-result');
   if(!res) return;
   var items=window._advMarkupItems||[];
   if(!items.length){
@@ -3047,6 +3055,133 @@ async function exportAdverseMarkup(){
     URL.revokeObjectURL(url);
   }catch(e){
     alert('Erreur export : '+e.message);
+  }
+}
+
+// ── Revue adverse autonome (sans analyse préalable) ──────────────────────
+// Pour le cas où on n'a que le retour de la partie adverse (DOCX avec Track
+// Changes / commentaires Word), sans la version originale ni d'analyse
+// ContractSense préexistante. Accessible directement depuis l'onglet Analyses.
+function openStandaloneAdverseReview(){
+  document.getElementById('alist').style.display='none';
+  var fb=document.getElementById('juriste-filter-bar');
+  if(fb) fb.style.display='none';
+  var page=document.getElementById('standalone-adverse-page');
+  page.style.display='';
+  page.classList.add('fadein');
+  window._standaloneAdverse={};
+  _renderStandaloneAdverseUpload();
+}
+
+function closeStandaloneAdverseReview(){
+  document.getElementById('standalone-adverse-page').style.display='none';
+  document.getElementById('alist').style.display='';
+  var fb=document.getElementById('juriste-filter-bar');
+  if(fb&&(_userRole==='directeur'||_isAdmin)) fb.style.display='';
+  window._standaloneAdverse=null;
+}
+
+function _renderStandaloneAdverseUpload(){
+  var body=document.getElementById('standalone-adverse-body');
+  body.innerHTML =
+    '<div style="font-size:12px;color:#6b7280;margin-bottom:16px;line-height:1.6">Importez le document reçu de la partie adverse (DOCX avec Track Changes / commentaires Word). La version originale du contrat n\'est pas nécessaire.</div>'
+    +'<label style="display:inline-block;padding:11px 22px;background:linear-gradient(135deg,#4c1d95,#7c3aed);border:none;color:#e9d5ff;border-radius:10px;font-size:13px;cursor:pointer;font-weight:700">'
+    +'<input type="file" id="standalone-adverse-file-inp" accept=".docx" style="display:none" onchange="_standaloneAdverseFileSelected(this)">'
+    +'⚔ Importer le document adverse</label>'
+    +'<div id="standalone-adverse-result" style="margin-top:18px"></div>';
+}
+
+async function _standaloneAdverseFileSelected(inp){
+  if(!inp.files||!inp.files[0]) return;
+  var file=inp.files[0];
+  window._standaloneAdverse.file=file;
+  var res=document.getElementById('standalone-adverse-result');
+  if(!file.name.toLowerCase().endsWith('.docx')){
+    res.innerHTML='<div style="color:#ef4444;font-size:12px;padding:10px 0">Seuls les fichiers DOCX sont supportés (Track Changes Word natifs nécessaires).</div>';
+    return;
+  }
+  res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Détection des parties du contrat...</div>';
+  try{
+    var fd=new FormData(); fd.append('file', file);
+    var r=await fetch(BACKEND+'/identify-parties',{method:'POST',body:fd});
+    var data=await r.json();
+    if(!r.ok) throw new Error(data.error||'Erreur serveur');
+    var parties=data.parties||[];
+    if(!parties.length){
+      _renderStandaloneAdversePartyFallback();
+      return;
+    }
+    res.innerHTML='<div style="font-size:14px;font-weight:700;color:#e2e5f0;margin-bottom:4px">Quelle partie représentez-vous ?</div>'
+      +'<div id="standalone-parties-list" style="margin-top:10px"></div>';
+    var listEl=document.getElementById('standalone-parties-list');
+    _buildPartiesUI(listEl, parties, function(joinedLabel){
+      window._standaloneAdverse.partie=joinedLabel;
+      _standaloneAdverseDetectAuthors();
+    });
+  }catch(e){
+    _renderStandaloneAdversePartyFallback(e.message);
+  }
+}
+
+function _renderStandaloneAdversePartyFallback(errMsg){
+  var res=document.getElementById('standalone-adverse-result');
+  res.innerHTML =
+    (errMsg?'<div style="color:#ef4444;font-size:12px;margin-bottom:10px">'+_escH(errMsg)+'</div>':'')
+    +'<div style="font-size:14px;font-weight:700;color:#e2e5f0;margin-bottom:8px">Quelle partie représentez-vous ?</div>'
+    +'<div style="font-size:11px;color:#6b7280;margin-bottom:8px">Les parties n\'ont pas pu être détectées automatiquement dans ce document.</div>'
+    +'<input type="text" id="standalone-partie-input" placeholder="Nom de votre client / partie" style="width:100%;background:#181c2a;border:1px solid #2a3040;border-radius:8px;padding:10px 12px;font-size:13px;color:#e2e5f0;box-sizing:border-box;margin-bottom:10px">'
+    +'<button onclick="_standaloneAdversePartyFallbackConfirm()" style="padding:10px 20px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">Continuer →</button>';
+}
+
+function _standaloneAdversePartyFallbackConfirm(){
+  var inp=document.getElementById('standalone-partie-input');
+  var val=(inp&&inp.value||'').trim();
+  if(!val){ if(inp) inp.style.borderColor='#ef4444'; return; }
+  window._standaloneAdverse.partie=val;
+  _standaloneAdverseDetectAuthors();
+}
+
+async function _standaloneAdverseDetectAuthors(){
+  var res=document.getElementById('standalone-adverse-result');
+  res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Détection des auteurs du markup (Track Changes, commentaires)...</div>';
+  try{
+    var fd=new FormData(); fd.append('file', window._standaloneAdverse.file);
+    var r=await fetch(BACKEND+'/identify-adverse-authors',{method:'POST',body:fd});
+    var data=await r.json();
+    if(!r.ok) throw new Error(data.error||'Erreur serveur');
+    if(!data.has_markup||!(data.authors||[]).length){
+      res.innerHTML='<div style="color:#ef4444;font-size:13px;padding:10px 0">Aucun Track Change / commentaire Word réel détecté dans ce document. Vérifiez qu\'il s\'agit bien du fichier reçu de la partie adverse avec ses modifications/commentaires actifs (et non un export "version finale" sans suivi des modifications).</div>';
+      return;
+    }
+    res.innerHTML='<div style="font-size:14px;font-weight:700;color:#e2e5f0;margin-bottom:4px">Qui est la partie adverse ?</div>'
+      +'<div id="standalone-authors-list" style="margin-top:10px"></div>';
+    var listEl=document.getElementById('standalone-authors-list');
+    _buildPartiesUI(listEl, data.authors, function(joinedLabel, selectedAuthors){
+      _standaloneAnalyzeAdverseMarkup(joinedLabel, selectedAuthors);
+    });
+  }catch(e){
+    res.innerHTML='<div style="color:#ef4444;font-size:12px;padding:10px 0">Erreur : '+e.message+'</div>';
+  }
+}
+
+async function _standaloneAnalyzeAdverseMarkup(joinedLabel, selectedAuthors){
+  var res=document.getElementById('standalone-adverse-result');
+  res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Analyse du markup de '+_escH(joinedLabel)+'...</div>';
+  try{
+    var fd=new FormData();
+    fd.append('file', window._standaloneAdverse.file);
+    fd.append('authors', JSON.stringify(selectedAuthors));
+    fd.append('partie', window._standaloneAdverse.partie||'');
+    fd.append('type', 'generic');
+    var r=await fetch(BACKEND+'/analyze-adverse-markup',{method:'POST',body:fd});
+    var data=await r.json();
+    if(!r.ok) throw new Error(data.error||'Erreur serveur');
+    window._advMarkupFile=window._standaloneAdverse.file;
+    window._advMarkupItems=data.modifications||[];
+    window._advMarkupDecisions={};
+    _renderAdverseMarkupReview(null, 'standalone-adverse-result');
+  }catch(e){
+    res.innerHTML='<div style="color:#ef4444;font-size:12px;padding:10px 0">Erreur : '+e.message+'</div>';
   }
 }
 
