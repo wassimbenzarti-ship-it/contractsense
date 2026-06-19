@@ -771,7 +771,7 @@ function _buildPartiesUI(listEl, parties, onConfirm) {
   // Confirm button
   var confirmBtn = document.createElement('button');
   confirmBtn.style.cssText = 'display:none;width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:opacity 0.2s';
-  confirmBtn.onclick = function() { if (selected.length) onConfirm(selected.join(' et ')); };
+  confirmBtn.onclick = function() { if (selected.length) onConfirm(selected.join(' et '), selected.slice()); };
 
   function updateConfirm() {
     if (!selected.length) {
@@ -2529,7 +2529,7 @@ async function showAnaDetail(idx) {
       +'<div style="font-size:12px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">⚔ Comparer avec la version adverse</div>'
       +'<div style="font-size:12px;color:#6b7280;margin-bottom:12px;line-height:1.5">Importez le document envoyé par la partie adverse (DOCX ou TXT). Toutes les différences seront affichées avec une analyse juridique.</div>'
       +'<label style="display:inline-block;padding:9px 18px;background:#1a2035;border:1px solid #8b5cf644;color:#8b5cf6;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600">'
-      +'<input type="file" id="adverse-file-inp" accept=".docx,.txt,.pdf" style="display:none" onchange="compareAdversary(\''+_eJS(ana.id)+'\',\''+_eJS(ana.contract_type)+'\',\''+_eJS(ana.partie)+'\')">'
+      +'<input type="file" id="adverse-file-inp" accept=".docx,.txt,.pdf" style="display:none" onchange="_handleAdverseUpload(\''+_eJS(ana.id)+'\',\''+_eJS(ana.contract_type)+'\',\''+_eJS(ana.partie)+'\')">'
       +'⚔ Importer version adverse</label>'
       +'<div id="adverse-result" style="margin-top:12px"></div>'
       +'</div>'
@@ -2847,7 +2847,7 @@ function _renderAnaAdverseTab(idx){
     +'<div style="font-size:14px;font-weight:700;color:#8b5cf6;margin-bottom:6px">⚔ Comparer avec la version adverse</div>'
     +'<div style="font-size:12px;color:#6b7280;margin-bottom:14px;line-height:1.6">Importez le document envoyé par la partie adverse (DOCX, PDF ou TXT). Les différences seront analysées article par article avec évaluation juridique.</div>'
     +'<label style="display:inline-block;padding:11px 22px;background:linear-gradient(135deg,#4c1d95,#7c3aed);border:none;color:#e9d5ff;border-radius:10px;font-size:13px;cursor:pointer;font-weight:700">'
-    +'<input type="file" id="adverse-file-inp" accept=".docx,.txt,.pdf" style="display:none" onchange="compareAdversary(\''+_eJS(ana.id)+'\',\''+_eJS(ana.contract_type)+'\',\''+_eJS(ana.partie)+'\')">'
+    +'<input type="file" id="adverse-file-inp" accept=".docx,.txt,.pdf" style="display:none" onchange="_handleAdverseUpload(\''+_eJS(ana.id)+'\',\''+_eJS(ana.contract_type)+'\',\''+_eJS(ana.partie)+'\')">'
     +'⚔ Importer la version adverse</label>'
     +'</div>'
     +'<div id="adverse-result" style="margin-top:4px"></div>';
@@ -2857,6 +2857,196 @@ function _renderAnaAdverseTab(idx){
     var _res=document.getElementById('adverse-result');
     if(_res) _res.innerHTML='<div style="color:#8b5cf6;font-size:12px;margin-bottom:8px;padding:8px 12px;background:rgba(139,92,246,0.08);border-radius:7px">⚔ Contrat draft chargé automatiquement — comparaison en cours...</div>';
     setTimeout(function(){ compareAdversary(ana.id, ana.contract_type, ana.partie, _pf); }, 150);
+  }
+}
+
+// ── Partie adverse : markup réel (Track Changes + commentaires Word) ────────
+// Étape 1 : un DOCX est uploadé → on détecte s'il contient du vrai markup Word
+// (Track Changes / commentaires avec auteur). Si oui, on demande "Qui est la
+// partie adverse ?" comme pour la sélection de partie de l'analyse principale.
+// Sinon (TXT/PDF ou DOCX sans markup), on retombe sur le diff textuel existant.
+async function _handleAdverseUpload(anaId, contractType, partie, _fileOverride){
+  var inp=document.getElementById('adverse-file-inp');
+  var file=_fileOverride||(inp?inp.files[0]:null);
+  if(!file) return;
+  window._adverseFile=file;
+  var res=document.getElementById('adverse-result');
+  if(!file.name.toLowerCase().endsWith('.docx')){
+    return compareAdversary(anaId, contractType, partie, file);
+  }
+  if(res)res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Détection du markup Word (Track Changes, commentaires)...</div>';
+  try{
+    var fd=new FormData();
+    fd.append('file', file);
+    var r=await fetch(BACKEND+'/identify-adverse-authors',{method:'POST',body:fd});
+    var data=await r.json();
+    if(r.ok && data.has_markup && (data.authors||[]).length){
+      _renderAdverseAuthorPicker(data.authors, anaId, contractType, partie, file);
+    } else {
+      compareAdversary(anaId, contractType, partie, file);
+    }
+  }catch(e){
+    compareAdversary(anaId, contractType, partie, file);
+  }
+}
+
+// Étape 2 : "Qui est la partie adverse ?" — réutilise le même composant que
+// la sélection de partie de l'analyse principale (_buildPartiesUI)
+function _renderAdverseAuthorPicker(authors, anaId, contractType, partie, file){
+  var res=document.getElementById('adverse-result');
+  if(!res) return;
+  res.innerHTML =
+    '<div style="margin-bottom:14px">'
+    +'<div style="font-size:14px;font-weight:700;color:#e2e5f0;margin-bottom:4px">✍️ Markup Word réel détecté</div>'
+    +'<div style="font-size:12px;color:#6b7280">Qui est la partie adverse ?</div>'
+    +'</div>'
+    +'<div id="adverse-authors-list"></div>';
+  var listEl=document.getElementById('adverse-authors-list');
+  _buildPartiesUI(listEl, authors, function(joinedLabel, selectedAuthors){
+    analyzeAdverseMarkup(anaId, contractType, partie, file, joinedLabel, selectedAuthors);
+  });
+}
+
+// Étape 3 : analyse du markup des auteurs sélectionnés — risque + recommandation
+// accepter/refuser + contre-proposition, sur le même modèle que l'analyse principale
+async function analyzeAdverseMarkup(anaId, contractType, partie, file, joinedLabel, selectedAuthors){
+  var res=document.getElementById('adverse-result');
+  if(res)res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Analyse du markup de '+_escH(joinedLabel)+'...</div>';
+  try{
+    var fd=new FormData();
+    fd.append('file', file);
+    fd.append('authors', JSON.stringify(selectedAuthors));
+    fd.append('partie', partie||'');
+    fd.append('type', contractType||'generic');
+    var r=await fetch(BACKEND+'/analyze-adverse-markup',{method:'POST',body:fd});
+    var data=await r.json();
+    if(!r.ok) throw new Error(data.error||'Erreur serveur');
+    window._advMarkupFile=file;
+    window._advMarkupItems=data.modifications||[];
+    window._advMarkupDecisions={};
+    _renderAdverseMarkupReview(anaId);
+  }catch(e){
+    if(res)res.innerHTML='<div style="color:#ef4444;font-size:12px;padding:10px 0">Erreur : '+e.message+'</div>';
+  }
+}
+
+// Étape 4 : revue accepter/refuser — même modèle visuel que renderReview()/decide()
+function _renderAdverseMarkupReview(anaId){
+  var res=document.getElementById('adverse-result');
+  if(!res) return;
+  var items=window._advMarkupItems||[];
+  if(!items.length){
+    res.innerHTML='<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:14px;font-size:13px;color:#10b981">✅ Aucun markup de cette partie à traiter.</div>';
+    return;
+  }
+  var typeIcon={'insertion':'➕','deletion':'🗑','comment':'💬'};
+  var typeLabel={'insertion':'Texte ajouté par','deletion':'Texte supprimé par','comment':'Commentaire de'};
+  var html='<div style="font-size:11px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">⚔ '+items.length+' élément(s) de markup à traiter</div>';
+  items.forEach(function(m){
+    var color=rc(m.risk);
+    var recoLabel = m.recommendation==='accept' ? '✅ Recommandé : Accepter' : '⚠️ Recommandé : Refuser';
+    var recoColor = m.recommendation==='accept' ? '#10b981' : '#ef4444';
+    html+='<div class="mod-card" id="adv-mk-card-'+m.id+'">'
+      +'<div class="mod-header" onclick="_toggleAdvMkCard('+m.id+')">'
+      +'<div class="mod-name">'+(typeIcon[m.markup_type]||'') +' '+ _escH(m.clause_name||'') +'</div>'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<span class="risk-pill" style="background:'+color+'20;color:'+color+'">'+rl(m.risk)+'</span>'
+      +'<span id="adv-mk-chv-'+m.id+'" style="color:#6b7280;font-size:10px;display:inline-block;transition:transform .2s">▼</span>'
+      +'</div>'
+      +'</div>'
+      +'<div class="mod-body" id="adv-mk-body-'+m.id+'">'
+      +'<div style="font-size:11px;font-weight:700;color:'+recoColor+';margin-bottom:8px">'+recoLabel+'</div>'
+      +(m.reason?'<div class="mod-reason">💡 '+_escH(m.reason)+'</div>':'')
+      +'<div class="mod-label" style="color:#ef4444">⚠ '+(typeLabel[m.markup_type]||'Modification de')+' '+_escH(m.author||'')+'</div>'
+      +'<div class="mod-original">'+_escHBr(m.original||'')+'</div>'
+      +(m.proposed?'<div class="mod-label" style="color:#10b981"> Notre contre-proposition <span style="color:#6b7280;font-size:10px;font-weight:400">(éditable)</span></div>'
+        +'<div class="mod-proposed" id="adv-mk-proposed-'+m.id+'" contenteditable="true" spellcheck="true" style="cursor:text;outline:none" oninput="_onAdvMkProposedEdit('+m.id+',this)">'+_escH(m.proposed)+'</div>':'')
+      +'<div class="mod-actions">'
+      +'<button class="btn-accept" id="adv-mk-ba-'+m.id+'" onclick="decideAdverseMarkup('+m.id+',\'accepted\')"> Accepter</button>'
+      +'<button class="btn-reject" id="adv-mk-br-'+m.id+'" onclick="decideAdverseMarkup('+m.id+',\'rejected\')">L Refuser</button>'
+      +'</div>'
+      +'<div class="mod-status" id="adv-mk-st-'+m.id+'"></div>'
+      +'</div>'
+      +'</div>';
+  });
+  html+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">'
+    +'<button onclick="exportAdverseMarkup()" style="padding:10px 22px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX avec nos réponses</button>'
+    +'</div>';
+  res.innerHTML=html;
+  // Pré-applique la recommandation de l'IA comme décision initiale (modifiable)
+  items.forEach(function(m){
+    var initial = m.recommendation==='accept' ? 'accepted' : 'rejected';
+    window._advMarkupDecisions[m.id]=initial;
+    _applyAdvMarkupDecisionUI(m.id, initial);
+  });
+}
+
+function _toggleAdvMkCard(id){
+  var card=document.getElementById('adv-mk-card-'+id);
+  var chv=document.getElementById('adv-mk-chv-'+id);
+  if(!card) return;
+  var collapsed=card.classList.toggle('collapsed');
+  if(chv) chv.style.transform=collapsed?'rotate(-90deg)':'';
+}
+
+function _onAdvMkProposedEdit(id, el){
+  var m=(window._advMarkupItems||[]).find(function(x){return x.id===id;});
+  if(m){
+    m.proposed = el.innerText.trim();
+    el.style.borderColor='#f59e0b';
+    el.style.background='rgba(245,158,11,0.06)';
+  }
+}
+
+function decideAdverseMarkup(id, decision){
+  window._advMarkupDecisions[id]=decision;
+  _applyAdvMarkupDecisionUI(id, decision);
+}
+
+function _applyAdvMarkupDecisionUI(id, decision){
+  var card=document.getElementById('adv-mk-card-'+id);
+  var btnA=document.getElementById('adv-mk-ba-'+id);
+  var btnR=document.getElementById('adv-mk-br-'+id);
+  var status=document.getElementById('adv-mk-st-'+id);
+  if(!card) return;
+  card.classList.remove('accepted','rejected');
+  if(btnA) btnA.classList.remove('active');
+  if(btnR) btnR.classList.remove('active');
+  if(decision==='accepted'){
+    card.classList.add('accepted');
+    if(btnA) btnA.classList.add('active');
+    if(status){ status.textContent=' Markup adverse accepté'; status.style.color='#10b981'; }
+  } else {
+    card.classList.add('rejected');
+    if(btnR) btnR.classList.add('active');
+    if(status){ status.textContent='L Markup adverse refusé — contre-proposition ajoutée en Track Changes'; status.style.color='#ef4444'; }
+  }
+}
+
+async function exportAdverseMarkup(){
+  var file=window._advMarkupFile;
+  var items=window._advMarkupItems||[];
+  var decisions=window._advMarkupDecisions||{};
+  if(!file||!items.length) return;
+  try{
+    var fd=new FormData();
+    fd.append('file', file);
+    fd.append('modifications', JSON.stringify(items));
+    fd.append('decisions', JSON.stringify(decisions));
+    var r=await fetch(BACKEND+'/export-adverse-markup',{method:'POST',body:fd});
+    if(!r.ok){
+      var d={};
+      try{ d=await r.json(); }catch(_e){}
+      throw new Error(d.error||'Erreur serveur');
+    }
+    var blob=await r.blob();
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url; a.download='contrat-reponse-partie-adverse.docx';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }catch(e){
+    alert('Erreur export : '+e.message);
   }
 }
 
