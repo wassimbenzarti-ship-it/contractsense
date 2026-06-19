@@ -4515,7 +4515,7 @@ if (_appLang === 'en') appSetLang('en');
       <div id="cb-head-sub">Assistant contractuel IA</div>
     </div>
     <button id="cb-save-opinion" onclick="saveLegalOpinionFromChat(this)" title="Enregistrer dans l'historique" style="display:none;background:none;border:1px solid #2a3040;border-radius:7px;color:#10b981;font-size:11px;font-weight:600;cursor:pointer;padding:5px 9px;margin-left:6px;white-space:nowrap">💾 Enregistrer</button>
-    <button id="cb-export-memo" onclick="cbExportMemo(this)" title="Exporter en mémo Word" style="display:none;background:none;border:1px solid #2a3040;border-radius:7px;color:#c8a94b;font-size:11px;font-weight:600;cursor:pointer;padding:5px 9px;margin-left:6px;white-space:nowrap">📄 Mémo</button>
+    <button id="cb-export-memo" onclick="cbExportMemo(this)" title="Aperçu et édition de la note juridique avant export Word" style="display:none;background:none;border:1px solid #2a3040;border-radius:7px;color:#c8a94b;font-size:11px;font-weight:600;cursor:pointer;padding:5px 9px;margin-left:6px;white-space:nowrap">📄 Mémo</button>
     <button id="cb-export-email" onclick="cbExportEmail(this)" title="Exporter en email" style="display:none;background:none;border:1px solid #2a3040;border-radius:7px;color:#c8a94b;font-size:11px;font-weight:600;cursor:pointer;padding:5px 9px;margin-left:6px;white-space:nowrap">✉️ Email</button>
     <button id="cb-shrink" onclick="cbToggle()" title="Réduire">&#8250;</button>
   </div>
@@ -5069,10 +5069,96 @@ async function cbExportMemo(btn) {
   var orig = btn.textContent;
   btn.textContent = '⏳ Génération…';
   try {
+    var savedMemoTurn = _cbHistory.find(function(h){return h.role==='memo';});
+    var memoText;
+    if (savedMemoTurn) {
+      memoText = savedMemoTurn.content;
+    } else {
+      var r = await fetch(BACKEND + '/chat/synthesize-memo', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({history: qaTurns})
+      });
+      var j = await r.json();
+      if (!r.ok) throw new Error(j.error || 'Erreur ' + r.status);
+      memoText = j.memo_text || '';
+    }
+    cbShowMemoModal(memoText);
+  } catch(e) {
+    btn.textContent = '❌ ' + (e.message || 'Erreur');
+    setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 3000);
+    return;
+  }
+  btn.textContent = orig;
+  btn.disabled = false;
+}
+
+function _memoToPaperHtml(text){
+  var lines = (text||'').replace(/\r\n/g,'\n').split('\n');
+  var html = '';
+  for (var i=0; i<lines.length; i++) {
+    var line = lines[i].trim();
+    if (!line) { html += '<div style="height:6px"></div>'; continue; }
+    var hMatch = line.match(/^#{1,3}\s+(.*)$/);
+    if (hMatch) {
+      html += '<div style="font-weight:700;font-size:12.5pt;margin:16px 0 6px;color:#1a1a1a">'+_escH(hMatch[1].replace(/\*\*/g,''))+'</div>';
+      continue;
+    }
+    if (/^[-•]\s+/.test(line)) {
+      html += '<div style="margin:0 0 4px 18px;text-align:justify;color:#1a1a1a">• '+_escH(line.replace(/^[-•]\s+/,'')).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')+'</div>';
+      continue;
+    }
+    var formatted = _escH(line).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+    html += '<p style="margin:0 0 8px;text-align:justify;color:#1a1a1a;line-height:1.65">'+formatted+'</p>';
+  }
+  return html;
+}
+
+function cbShowMemoModal(memoText){
+  var old = document.getElementById('cb-memo-modal');
+  if (old) old.remove();
+  var wrap = document.createElement('div');
+  wrap.id = 'cb-memo-modal';
+  wrap.style.cssText = 'position:fixed;inset:0;background:rgba(10,12,20,.7);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px';
+  wrap.innerHTML =
+    '<div style="background:#13151f;border:1px solid #2a3040;border-radius:12px;max-width:1100px;width:100%;height:85vh;display:flex;flex-direction:column;overflow:hidden">' +
+      '<div style="padding:14px 18px;border-bottom:1px solid #2a3040;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">' +
+        '<div style="font-weight:700;color:#e2e5f0;font-size:14px">📄 Note juridique — aperçu &amp; édition</div>' +
+        '<button onclick="document.getElementById(\'cb-memo-modal\').remove()" style="background:none;border:none;color:#8b92a8;font-size:18px;cursor:pointer;line-height:1">&times;</button>' +
+      '</div>' +
+      '<div style="display:flex;flex:1;min-height:0">' +
+        '<div style="width:42%;border-right:1px solid #2a3040;padding:14px;display:flex;flex-direction:column;min-width:0;box-sizing:border-box">' +
+          '<label style="font-size:11px;color:#8b92a8;font-weight:600;margin-bottom:6px">Texte (modifiable)</label>' +
+          '<textarea id="cb-memo-editor" style="flex:1;background:#0e1018;border:1px solid #2a3040;border-radius:7px;color:#e2e5f0;padding:10px;font-size:12.5px;font-family:inherit;resize:none;line-height:1.55;box-sizing:border-box">' + _escH(memoText) + '</textarea>' +
+        '</div>' +
+        '<div style="width:58%;padding:14px;overflow-y:auto;background:#1a1c24;box-sizing:border-box">' +
+          '<div id="cb-memo-preview" style="background:#fff;margin:0 auto;padding:30px 36px;box-shadow:0 2px 10px rgba(0,0,0,0.25);font-family:Calibri,Arial,sans-serif;font-size:10.5pt;min-height:280px;border-radius:4px"></div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="padding:12px 18px;border-top:1px solid #2a3040;display:flex;gap:8px;justify-content:flex-end;flex-shrink:0">' +
+        '<button onclick="saveMemoEditToOpinion(this)" style="background:none;border:1px solid #2a3040;border-radius:7px;color:#c8a94b;font-size:12px;font-weight:600;padding:8px 14px;cursor:pointer">💾 Enregistrer dans l\'avis</button>' +
+        '<button onclick="downloadMemoDocx(this)" style="background:#4a6be8;border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:600;padding:8px 14px;cursor:pointer">⬇️ Télécharger DOCX</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(wrap);
+  wrap.addEventListener('click', function(e){ if (e.target === wrap) wrap.remove(); });
+  var ed = document.getElementById('cb-memo-editor');
+  var preview = document.getElementById('cb-memo-preview');
+  preview.innerHTML = _memoToPaperHtml(memoText);
+  ed.addEventListener('input', function(){ preview.innerHTML = _memoToPaperHtml(ed.value); });
+}
+
+async function downloadMemoDocx(btn){
+  var ed = document.getElementById('cb-memo-editor');
+  var text = ed ? ed.value : '';
+  var orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ Génération…';
+  try {
     var r = await fetch(BACKEND + '/chat/export-memo', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({history: qaTurns, user_email: (_cu && _cu.email) || ''})
+      body: JSON.stringify({memo_text: text, user_email: (_cu && _cu.email) || ''})
     });
     if (!r.ok) { var e = await r.json(); throw new Error(e.error || 'Erreur ' + r.status); }
     var blob = await r.blob();
@@ -5082,11 +5168,37 @@ async function cbExportMemo(btn) {
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
     btn.textContent = '✅ Téléchargé';
-    setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 3000);
   } catch(e) {
     btn.textContent = '❌ ' + (e.message || 'Erreur');
-    btn.disabled = false;
-    setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 3000);
+  } finally {
+    setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 2500);
+  }
+}
+
+async function saveMemoEditToOpinion(btn){
+  if (!window._currentLegalOpinionId) {
+    var o0 = btn.textContent; btn.textContent = 'Enregistrez d\'abord l\'avis'; setTimeout(function(){btn.textContent=o0;},2500); return;
+  }
+  var ed = document.getElementById('cb-memo-editor');
+  var text = ed ? ed.value : '';
+  var orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳…';
+  try {
+    var qaTurns = _cbHistory.filter(function(h){return h.role==='user'||h.role==='assistant';});
+    var conv = qaTurns.concat([{role:'memo', content:text}]);
+    var r = await sf('/rest/v1/legal_opinions?id=eq.'+window._currentLegalOpinionId, {method:'PATCH', headers:{'Prefer':'return=minimal'}, body:JSON.stringify({conversation: conv})});
+    if (r.ok || r.status===204) {
+      _cbHistory = conv;
+      btn.textContent = '✅ Enregistré';
+      loadLegalOpinions();
+    } else {
+      btn.textContent = '❌ Erreur';
+    }
+  } catch(e) {
+    btn.textContent = '❌ ' + (e.message||'Erreur');
+  } finally {
+    setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 2500);
   }
 }
 
@@ -5288,10 +5400,13 @@ function renderOpDetail(idx){
   if(!op||!box)return;
   var conv=op.conversation||[];
   if(typeof conv==='string'){try{conv=JSON.parse(conv);}catch(e){conv=[];}}
-  var transcript=conv.map(function(t){
+  var transcript=conv.filter(function(t){return t.role==='user'||t.role==='assistant';}).map(function(t){
     var label=t.role==='user'?'Question':'Réponse';
     var color=t.role==='user'?'#5b7cfa':'#10b981';
-    return '<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:'+color+';text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">'+label+'</div><div style="font-size:12px;color:#c8cfe0;white-space:pre-wrap;line-height:1.5">'+_escH(t.content||'')+'</div></div>';
+    var body=t.role==='user'
+      ?'<div style="font-size:12px;color:#c8cfe0;white-space:pre-wrap;line-height:1.5">'+_escH(t.content||'')+'</div>'
+      :'<div class="cb-msg bot" style="max-width:100%;margin:0;background:transparent;border:none;padding:0;color:#c8cfe0">'+_cbMarkdown(t.content||'')+'</div>';
+    return '<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:'+color+';text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">'+label+'</div>'+body+'</div>';
   }).join('');
 
   var st=op.status||'draft';
@@ -5299,6 +5414,7 @@ function renderOpDetail(idx){
   var isDirecteur=_userRole==='directeur'||_isAdmin;
   var btns='';
   btns+='<button onclick="continueLegalOpinion('+idx+')" style="padding:8px 14px;background:#5b7cfa22;border:1px solid #5b7cfa66;color:#5b7cfa;border-radius:7px;font-weight:600;font-size:12px;cursor:pointer;margin-right:6px">↺ Continuer dans l\'assistant</button>';
+  btns+='<button onclick="openOpinionMemo('+idx+')" style="padding:8px 14px;background:#c8a94b22;border:1px solid #c8a94b66;color:#c8a94b;border-radius:7px;font-weight:600;font-size:12px;cursor:pointer;margin-right:6px">📄 Note juridique</button>';
   if(isJuriste&&(st==='draft'||st==='revision_requested')){
     btns+='<button onclick="submitOpinionForReview(\''+op.id+'\')" style="padding:8px 14px;background:#f59e0b;border:none;border-radius:7px;color:#000;font-weight:700;font-size:12px;cursor:pointer;margin-right:6px">Soumettre au directeur →</button>';
   }
@@ -5332,12 +5448,31 @@ function continueLegalOpinion(idx){
   document.getElementById('cb-msgs').innerHTML='';
   conv.forEach(function(t){
     if(t.role==='user')cbAddMsg('user',_escH(t.content||''));
-    else cbAddMsg('bot',_cbMarkdown(t.content||''));
+    else if(t.role==='assistant')cbAddMsg('bot',_cbMarkdown(t.content||''));
   });
   var _emBtn=document.getElementById('cb-export-memo');if(_emBtn)_emBtn.style.display='';
   var _eeBtn=document.getElementById('cb-export-email');if(_eeBtn)_eeBtn.style.display='';
   var _soBtn=document.getElementById('cb-save-opinion');if(_soBtn)_soBtn.style.display='';
   _cbMoveInline('d-opinions-chat-host');
+}
+
+async function openOpinionMemo(idx){
+  var op=(window._legalOpinions||[])[idx];
+  if(!op)return;
+  var conv=op.conversation||[];
+  if(typeof conv==='string'){try{conv=JSON.parse(conv);}catch(e){conv=[];}}
+  window._currentLegalOpinionId=op.id;
+  _cbHistory=conv.slice();
+  var memoTurn=conv.find(function(t){return t.role==='memo';});
+  if(memoTurn){ cbShowMemoModal(memoTurn.content||''); return; }
+  var qaTurns=conv.filter(function(t){return t.role==='user'||t.role==='assistant';});
+  if(qaTurns.length<2){ alert('Pas assez d\'échanges enregistrés pour générer une note juridique.'); return; }
+  try{
+    var r=await fetch(BACKEND+'/chat/synthesize-memo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({history:qaTurns})});
+    var j=await r.json();
+    if(!r.ok) throw new Error(j.error||'Erreur '+r.status);
+    cbShowMemoModal(j.memo_text||'');
+  }catch(e){ alert('Erreur : '+e.message); }
 }
 
 async function submitOpinionForReview(id){
