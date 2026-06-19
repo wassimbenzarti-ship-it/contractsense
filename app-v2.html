@@ -3129,11 +3129,44 @@ function closeStandaloneAdverseReview(){
 function _renderStandaloneAdverseUpload(){
   var body=document.getElementById('standalone-adverse-body');
   body.innerHTML =
-    '<div style="font-size:12px;color:#6b7280;margin-bottom:16px;line-height:1.6">Importez le document reçu de la partie adverse (DOCX avec Track Changes / commentaires Word). La version originale du contrat n\'est pas nécessaire.</div>'
+    _standaloneAdverseHistoryHtml()
+    +'<div style="font-size:12px;color:#6b7280;margin-bottom:16px;line-height:1.6">Importez le document reçu de la partie adverse (DOCX avec Track Changes / commentaires Word). La version originale du contrat n\'est pas nécessaire.</div>'
     +'<label style="display:inline-block;padding:11px 22px;background:linear-gradient(135deg,#4c1d95,#7c3aed);border:none;color:#e9d5ff;border-radius:10px;font-size:13px;cursor:pointer;font-weight:700">'
     +'<input type="file" id="standalone-adverse-file-inp" accept=".docx" style="display:none" onchange="_standaloneAdverseFileSelected(this)">'
     +'⚔ Importer le document adverse</label>'
     +'<div id="standalone-adverse-result" style="margin-top:18px"></div>';
+}
+
+// Historique des revues de versions adverses faites depuis ce flow autonome
+// (sans analyse d'origine) : entrées [ADVERSE] sans analyse "parente" dans
+// window._userAnalyses (même logique que window._renderAnalyses pour repérer
+// les entrées orphelines).
+function _standaloneAdverseHistoryHtml(){
+  var list=window._userAnalyses||[];
+  var normals=list.filter(function(x){return !x.filename||x.filename.indexOf('[ADVERSE]')<0;});
+  var orphans=list.filter(function(x){
+    if(!x.filename||x.filename.indexOf('[ADVERSE] ')!==0) return false;
+    var base=x.filename.slice('[ADVERSE] '.length);
+    return !normals.some(function(n){return n.filename===base;});
+  });
+  if(!orphans.length) return '';
+  var html='<div style="font-size:11px;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">🕓 Historique des versions adverses analysées</div>'
+    +'<div style="margin-bottom:18px">';
+  orphans.forEach(function(x){
+    var idx=window._userAnalyses.indexOf(x);
+    html+='<div onclick="_openAdverseHistoryItem('+idx+')" style="cursor:pointer;padding:10px 14px;background:#181c2a;border:1px solid #2a3040;border-radius:8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">'
+      +'<div><div style="font-size:13px;font-weight:600;color:#e2e5f0">'+_escH(x.filename||'Contrat adverse')+'</div>'
+      +'<div style="font-size:11px;color:#6b7280;margin-top:2px">'+(x.partie?_escH(x.partie)+' · ':'')+new Date(x.created_at).toLocaleDateString('fr-FR')+'</div></div>'
+      +'<span style="color:#4a5470;font-size:11px">→</span>'
+      +'</div>';
+  });
+  html+='</div>';
+  return html;
+}
+
+function _openAdverseHistoryItem(idx){
+  document.getElementById('standalone-adverse-page').style.display='none';
+  openAnaPage(idx,'analyses');
 }
 
 async function _standaloneAdverseFileSelected(inp){
