@@ -2943,6 +2943,8 @@ async function analyzeAdverseMarkup(anaId, contractType, partie, file, joinedLab
     window._advMarkupFile=file;
     window._advMarkupItems=data.modifications||[];
     window._advMarkupDecisions={};
+    var _parentAna=(window._userAnalyses||[]).find(function(x){return x.id===anaId;});
+    window._advMarkupMeta={anaId:anaId,contractType:contractType||(_parentAna&&_parentAna.contract_type)||'',partie:partie||(_parentAna&&_parentAna.partie)||'',baseFilename:(_parentAna&&_parentAna.filename)||file.name||'Contrat',adverseLabel:joinedLabel||''};
     _renderAdverseMarkupReview(anaId);
   }catch(e){
     if(res)res.innerHTML='<div style="color:#ef4444;font-size:12px;padding:10px 0">Erreur : '+e.message+'</div>';
@@ -3064,8 +3066,40 @@ async function exportAdverseMarkup(){
     a.href=url; a.download='contrat-reponse-partie-adverse.docx';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    saveAdverseMarkupResponse().catch(function(){});
   }catch(e){
     alert('Erreur export : '+e.message);
+  }
+}
+
+// Sauvegarde le résultat de la revue markup adverse (items + décisions
+// accepter/refuser) dans l'historique des analyses, sous la même convention
+// que saveAdverseResponse() (préfixe filename "[ADVERSE] " — déjà géré par
+// l'UI de la liste pour le regroupement/indentation sous l'analyse d'origine).
+async function saveAdverseMarkupResponse(){
+  if(!_cu) return;
+  var meta=window._advMarkupMeta||{};
+  var items=window._advMarkupItems||[];
+  var decisions=window._advMarkupDecisions||{};
+  if(!items.length) return;
+  var mods=items.map(function(m){
+    return Object.assign({},m,{decision:decisions[m.id]||'rejected',is_adverse_markup_response:true,adverse_author:meta.adverseLabel||''});
+  });
+  var payload={
+    user_id:_cu.id,user_email:_cu.email,
+    filename:'[ADVERSE] '+(meta.baseFilename||'Contrat'),
+    contract_type:meta.contractType||'',partie:meta.partie||'',
+    modifications:mods,status:'draft',
+    director_email:_userParentEmail||''
+  };
+  var r=await sf('/rest/v1/analyses',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(payload)}).catch(function(){return null;});
+  if(r&&r.ok){
+    var saved=await r.json().catch(function(){return[];});
+    if(saved&&saved[0]){
+      if(!window._userAnalyses) window._userAnalyses=[];
+      window._userAnalyses.unshift(saved[0]);
+      if(window._renderAnalyses) window._renderAnalyses(window._userAnalyses);
+    }
   }
 }
 
@@ -3190,6 +3224,7 @@ async function _standaloneAnalyzeAdverseMarkup(joinedLabel, selectedAuthors){
     window._advMarkupFile=window._standaloneAdverse.file;
     window._advMarkupItems=data.modifications||[];
     window._advMarkupDecisions={};
+    window._advMarkupMeta={anaId:null,contractType:'generic',partie:window._standaloneAdverse.partie||'',baseFilename:(window._standaloneAdverse.file&&window._standaloneAdverse.file.name)||'Contrat adverse',adverseLabel:joinedLabel||''};
     _renderAdverseMarkupReview(null, 'standalone-adverse-result');
   }catch(e){
     res.innerHTML='<div style="color:#ef4444;font-size:12px;padding:10px 0">Erreur : '+e.message+'</div>';
