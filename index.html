@@ -177,6 +177,14 @@
         "@type": "Answer",
         "text": "Oui. L'onglet Avis juridique d'Omniscient permet de poser une question juridique générale à l'assistant, sans contrat ouvert. Les réponses s'appuient sur la même base documentaire (lois, doctrine, jurisprudence) que l'analyse de contrats, et chaque avis peut être soumis à un circuit de validation juriste → directeur avant intégration à la base de connaissances."
       }
+    },
+    {
+      "@type": "Question",
+      "name": "Omniscient peut-il traduire un contrat ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. Omniscient génère en un clic un document Word du contrat traduit en arabe, français ou anglais, en intégrant les modifications déjà acceptées et en conservant la mise en forme juridique d'origine — utile pour signer ou transmettre le contrat à une partie qui ne parle pas la langue de rédaction initiale."
+      }
     }
   ]
 }
@@ -1662,6 +1670,11 @@ footer {
       <div class="feat-title" data-fr="Avis juridique sans contrat" data-en="Legal opinion without a contract">Avis juridique sans contrat</div>
       <p class="feat-text" data-fr="Posez une question juridique générale à l'assistant Omniscient, sans avoir besoin d'un contrat ouvert. Réponses fondées sur la même base documentaire (lois, doctrine, jurisprudence) que l'analyse de contrats, avec circuit de validation juriste → directeur avant intégration au RAG." data-en="Ask the Omniscient assistant a general legal question, with no contract required. Answers grounded in the same knowledge base (laws, doctrine, case law) used for contract analysis, with a lawyer → director validation workflow before integration into the RAG.">Posez une question juridique générale à l'assistant Omniscient, sans avoir besoin d'un contrat ouvert. Réponses fondées sur la même base documentaire (lois, doctrine, jurisprudence) que l'analyse de contrats, avec circuit de validation juriste → directeur avant intégration au RAG.</p>
     </div>
+    <div class="feat-card reveal">
+      <span class="feat-icon">🌐</span>
+      <div class="feat-title" data-fr="Traduction bilingue du contrat" data-en="Bilingual contract translation">Traduction bilingue du contrat</div>
+      <p class="feat-text" data-fr="Générez en un clic un document Word du contrat traduit en arabe, français ou anglais, modifications acceptées intégrées et mise en forme juridique conservée — prêt à signer ou à envoyer à une partie non francophone." data-en="Generate a Word document of the contract translated into Arabic, French or English in one click, with accepted edits integrated and legal formatting preserved — ready to sign or send to a non-French-speaking party.">Générez en un clic un document Word du contrat traduit en arabe, français ou anglais, modifications acceptées intégrées et mise en forme juridique conservée — prêt à signer ou à envoyer à une partie non francophone.</p>
+    </div>
     <div class="feat-card reveal" style="border-color:rgba(16,185,129,0.3);grid-column:1/-1">
       <span class="feat-icon">🔐</span>
       <div class="feat-title" data-fr="Anonymisation automatique des données personnelles" data-en="Automatic personal data anonymisation">Anonymisation automatique des données personnelles</div>
@@ -1923,13 +1936,23 @@ footer {
       </div>
     </details>
 
-    <details style="background:rgba(255,255,255,0.015);">
+    <details style="border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.015);">
       <summary style="cursor:pointer;padding:22px 28px;font-size:15px;font-weight:600;color:#c8d0e8;list-style:none;display:flex;justify-content:space-between;align-items:center;">
         Peut-on obtenir un avis juridique sans avoir de contrat à analyser ?
         <span style="font-size:20px;color:var(--gold);flex-shrink:0;margin-left:16px;">+</span>
       </summary>
       <div style="padding:0 28px 22px;font-size:14px;line-height:1.85;color:#8892aa;">
         Oui. L'onglet <strong style="color:#a0a8c0">Avis juridique</strong> d'Omniscient permet de poser une question juridique générale à l'assistant, sans contrat ouvert. Les réponses s'appuient sur la même base documentaire (lois, doctrine, jurisprudence) que l'analyse de contrats, et chaque avis peut être soumis à un circuit de validation juriste → directeur avant intégration à la base de connaissances — garantissant des réponses toujours supervisées par un professionnel qualifié.
+      </div>
+    </details>
+
+    <details style="background:rgba(255,255,255,0.015);">
+      <summary style="cursor:pointer;padding:22px 28px;font-size:15px;font-weight:600;color:#c8d0e8;list-style:none;display:flex;justify-content:space-between;align-items:center;">
+        Omniscient peut-il traduire un contrat ?
+        <span style="font-size:20px;color:var(--gold);flex-shrink:0;margin-left:16px;">+</span>
+      </summary>
+      <div style="padding:0 28px 22px;font-size:14px;line-height:1.85;color:#8892aa;">
+        Oui. Omniscient génère en un clic un document Word du contrat traduit en <strong style="color:#a0a8c0">arabe, français ou anglais</strong>, en intégrant les modifications déjà acceptées et en conservant la mise en forme juridique d'origine — utile pour signer ou transmettre le contrat à une partie qui ne parle pas la langue de rédaction initiale.
       </div>
     </details>
 
@@ -1962,7 +1985,7 @@ footer {
   <p>Dans une négociation contractuelle, la partie adverse renvoie souvent le contrat avec ses propres <strong>Track Changes</strong> et commentaires Word. Un <strong>outil IA juridique</strong> efficace doit pouvoir analyser cette version retravaillée directement — sans repartir du contrat d'origine — en localisant précisément chaque modification et commentaire dans la bonne clause. Omniscient by Westfield va plus loin que la simple détection : son moteur de <strong>revue contrat IA</strong> est conçu pour défendre exclusivement les intérêts de votre client, jamais pour suivre passivement les demandes de la contrepartie. Chaque élément réduisant une garantie, un délai ou une obligation en faveur de votre client déclenche une <strong>contre-proposition rédigée</strong> — une clause prête à insérer en Track Changes, pas une simple suggestion — que le juriste peut éditer en ligne avant export, avec un historique complet des révisions successives.</p>
 
   <h3 style="font-size:14px;font-weight:600;color:#8892aa;margin:24px 0 8px">Au-delà de la revue de contrat : rédaction et avis juridique par l'IA</h3>
-  <p>Un <strong>outil IA juridique</strong> complet ne se limite pas à la revue de contrats existants. Omniscient by Westfield couvre l'ensemble du cycle de vie contractuel : la fonction <strong>Drafts</strong> génère un contrat complet (NDA, prestation de services, achat/vente, contrat de travail, partenariat, SaaS) en français, arabe ou anglais à partir d'une simple description, directement éditable et exportable en DOCX. L'onglet <strong>Avis juridique</strong> permet quant à lui de poser une question de droit marocain, français ou anglais sans avoir de contrat à analyser — utile pour une consultation rapide en amont d'une négociation. Comme pour la revue contrat IA, ces deux fonctionnalités s'appuient sur la même base documentaire validée par des avocats et peuvent suivre un circuit de validation juriste → directeur.</p>
+  <p>Un <strong>outil IA juridique</strong> complet ne se limite pas à la revue de contrats existants. Omniscient by Westfield couvre l'ensemble du cycle de vie contractuel : la fonction <strong>Drafts</strong> génère un contrat complet (NDA, prestation de services, achat/vente, contrat de travail, partenariat, SaaS) en français, arabe ou anglais à partir d'une simple description, directement éditable et exportable en DOCX. L'onglet <strong>Avis juridique</strong> permet quant à lui de poser une question de droit marocain, français ou anglais sans avoir de contrat à analyser — utile pour une consultation rapide en amont d'une négociation. Une fois l'analyse terminée, la <strong>traduction bilingue</strong> génère en un clic un document Word du contrat en arabe, français ou anglais, modifications acceptées intégrées et mise en forme juridique préservée — essentielle pour les contrats transfrontaliers ou les parties non francophones. Comme pour la revue contrat IA, ces fonctionnalités s'appuient sur la même base documentaire validée par des avocats et peuvent suivre un circuit de validation juriste → directeur.</p>
 
   <h3 style="font-size:14px;font-weight:600;color:#8892aa;margin:24px 0 8px">Omniscient by Westfield — La plateforme de référence au Maroc</h3>
   <p>Omniscient est la plateforme de <strong>revue contrat IA</strong> développée par <strong>Westfield Avocats</strong>, cabinet d'avocats d'affaires basé à Casablanca. Notre solution d'<strong>IA contract review</strong> intègre une base documentaire juridique propriétaire constituée de modèles de clauses validés, de références jurisprudentielles marocaines, et des textes de loi en vigueur. La plateforme supporte le droit marocain, le droit français, le droit anglais, le droit tunisien et le droit algérien, avec détection automatique de la juridiction applicable.</p>
