@@ -161,6 +161,22 @@
         "@type": "Answer",
         "text": "Omniscient permet d'importer le contrat retravaillé par la partie adverse (avec ses propres Track Changes et commentaires Word) et de l'analyser sans avoir besoin du contrat d'origine. L'outil IA juridique détecte chaque insertion, suppression et commentaire réel, le localise précisément dans la clause concernée, évalue le risque pour votre client et génère de vraies contre-propositions — jamais une simple validation des demandes adverses — directement insérables en Track Changes."
       }
+    },
+    {
+      "@type": "Question",
+      "name": "Omniscient peut-il rédiger un contrat depuis zéro ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. La fonction Drafts d'Omniscient génère un contrat complet (NDA, prestation de services, achat/vente, contrat de travail, partenariat, SaaS) en français, arabe ou anglais à partir d'une simple description des parties, de l'objet et des conditions. Le contrat généré est éditable en ligne, exportable en DOCX, et peut être directement confronté à une version adverse pour générer des contre-propositions."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Peut-on obtenir un avis juridique sans avoir de contrat à analyser ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. L'onglet Avis juridique d'Omniscient permet de poser une question juridique générale à l'assistant, sans contrat ouvert. Les réponses s'appuient sur la même base documentaire (lois, doctrine, jurisprudence) que l'analyse de contrats, et chaque avis peut être soumis à un circuit de validation juriste → directeur avant intégration à la base de connaissances."
+      }
     }
   ]
 }
@@ -1636,6 +1652,16 @@ footer {
       <div class="feat-title" data-fr="Contre-propositions qui protègent, pas qui suivent" data-en="Counter-proposals that protect, not comply">Contre-propositions qui protègent, pas qui suivent</div>
       <p class="feat-text" data-fr="L'IA ne suit jamais aveuglément ce que demande la partie adverse. Elle rédige de vraies contre-propositions — clauses prêtes à insérer en Track Changes — qui rétablissent ou renforcent votre position, avec un historique de chaque révision." data-en="The AI never blindly complies with what the other side demands. It drafts real counter-proposals — clauses ready to insert as Track Changes — that restore or strengthen your position, with a history of every review.">L'IA ne suit jamais aveuglément ce que demande la partie adverse. Elle rédige de vraies contre-propositions — clauses prêtes à insérer en Track Changes — qui rétablissent ou renforcent votre position, avec un historique de chaque révision.</p>
     </div>
+    <div class="feat-card reveal">
+      <span class="feat-icon">✏️</span>
+      <div class="feat-title" data-fr="Rédaction de contrat par IA" data-en="AI contract drafting">Rédaction de contrat par IA</div>
+      <p class="feat-text" data-fr="Décrivez le contrat à rédiger — parties, objet, durée, conditions — et l'IA génère un contrat complet (NDA, prestation de services, achat/vente, travail, partenariat, SaaS) en français, arabe ou anglais. Éditable en ligne, exportable en DOCX, et testable directement face à une version adverse." data-en="Describe the contract to draft — parties, purpose, term, conditions — and the AI generates a full contract (NDA, service agreement, purchase, employment, partnership, SaaS) in French, Arabic or English. Editable inline, exportable to DOCX, and testable directly against a counterparty version.">Décrivez le contrat à rédiger — parties, objet, durée, conditions — et l'IA génère un contrat complet (NDA, prestation de services, achat/vente, travail, partenariat, SaaS) en français, arabe ou anglais. Éditable en ligne, exportable en DOCX, et testable directement face à une version adverse.</p>
+    </div>
+    <div class="feat-card reveal">
+      <span class="feat-icon">⚖️</span>
+      <div class="feat-title" data-fr="Avis juridique sans contrat" data-en="Legal opinion without a contract">Avis juridique sans contrat</div>
+      <p class="feat-text" data-fr="Posez une question juridique générale à l'assistant Omniscient, sans avoir besoin d'un contrat ouvert. Réponses fondées sur la même base documentaire (lois, doctrine, jurisprudence) que l'analyse de contrats, avec circuit de validation juriste → directeur avant intégration au RAG." data-en="Ask the Omniscient assistant a general legal question, with no contract required. Answers grounded in the same knowledge base (laws, doctrine, case law) used for contract analysis, with a lawyer → director validation workflow before integration into the RAG.">Posez une question juridique générale à l'assistant Omniscient, sans avoir besoin d'un contrat ouvert. Réponses fondées sur la même base documentaire (lois, doctrine, jurisprudence) que l'analyse de contrats, avec circuit de validation juriste → directeur avant intégration au RAG.</p>
+    </div>
     <div class="feat-card reveal" style="border-color:rgba(16,185,129,0.3);grid-column:1/-1">
       <span class="feat-icon">🔐</span>
       <div class="feat-title" data-fr="Anonymisation automatique des données personnelles" data-en="Automatic personal data anonymisation">Anonymisation automatique des données personnelles</div>
@@ -1877,13 +1903,33 @@ footer {
       </div>
     </details>
 
-    <details style="background:rgba(255,255,255,0.015);">
+    <details style="border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.015);">
       <summary style="cursor:pointer;padding:22px 28px;font-size:15px;font-weight:600;color:#c8d0e8;list-style:none;display:flex;justify-content:space-between;align-items:center;">
         Comment analyser la version adverse d'un contrat avec l'IA ?
         <span style="font-size:20px;color:var(--gold);flex-shrink:0;margin-left:16px;">+</span>
       </summary>
       <div style="padding:0 28px 22px;font-size:14px;line-height:1.85;color:#8892aa;">
         Omniscient permet d'importer directement le contrat retravaillé par la partie adverse — avec ses propres <strong style="color:#a0a8c0">Track Changes et commentaires Word</strong> — et de l'analyser sans avoir besoin du contrat d'origine. L'outil IA juridique détecte chaque insertion, suppression et commentaire réel inséré par la contrepartie, le localise avec précision dans la clause concernée, et évalue le risque pour votre client. À la différence d'un outil qui se contente d'accepter les demandes adverses, Omniscient rédige de <strong style="color:#a0a8c0">vraies contre-propositions</strong> qui rétablissent ou renforcent votre position — directement éditables en ligne et insérables en Track Changes — avec un historique consultable de chaque révision.
+      </div>
+    </details>
+
+    <details style="border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);">
+      <summary style="cursor:pointer;padding:22px 28px;font-size:15px;font-weight:600;color:#c8d0e8;list-style:none;display:flex;justify-content:space-between;align-items:center;">
+        Omniscient peut-il rédiger un contrat depuis zéro ?
+        <span style="font-size:20px;color:var(--gold);flex-shrink:0;margin-left:16px;">+</span>
+      </summary>
+      <div style="padding:0 28px 22px;font-size:14px;line-height:1.85;color:#8892aa;">
+        Oui. La fonction <strong style="color:#a0a8c0">Drafts</strong> d'Omniscient génère un contrat complet (NDA, prestation de services, achat/vente, contrat de travail, partenariat, SaaS) en français, arabe ou anglais à partir d'une simple description des parties, de l'objet et des conditions particulières. Le contrat généré est éditable en ligne via l'assistant conversationnel, exportable en DOCX, et peut être directement confronté à une version retravaillée par la partie adverse pour générer des contre-propositions protectrices.
+      </div>
+    </details>
+
+    <details style="background:rgba(255,255,255,0.015);">
+      <summary style="cursor:pointer;padding:22px 28px;font-size:15px;font-weight:600;color:#c8d0e8;list-style:none;display:flex;justify-content:space-between;align-items:center;">
+        Peut-on obtenir un avis juridique sans avoir de contrat à analyser ?
+        <span style="font-size:20px;color:var(--gold);flex-shrink:0;margin-left:16px;">+</span>
+      </summary>
+      <div style="padding:0 28px 22px;font-size:14px;line-height:1.85;color:#8892aa;">
+        Oui. L'onglet <strong style="color:#a0a8c0">Avis juridique</strong> d'Omniscient permet de poser une question juridique générale à l'assistant, sans contrat ouvert. Les réponses s'appuient sur la même base documentaire (lois, doctrine, jurisprudence) que l'analyse de contrats, et chaque avis peut être soumis à un circuit de validation juriste → directeur avant intégration à la base de connaissances — garantissant des réponses toujours supervisées par un professionnel qualifié.
       </div>
     </details>
 
@@ -1914,6 +1960,9 @@ footer {
 
   <h3 style="font-size:14px;font-weight:600;color:#8892aa;margin:24px 0 8px">Négocier avec la partie adverse : l'IA au service de la contre-rédaction</h3>
   <p>Dans une négociation contractuelle, la partie adverse renvoie souvent le contrat avec ses propres <strong>Track Changes</strong> et commentaires Word. Un <strong>outil IA juridique</strong> efficace doit pouvoir analyser cette version retravaillée directement — sans repartir du contrat d'origine — en localisant précisément chaque modification et commentaire dans la bonne clause. Omniscient by Westfield va plus loin que la simple détection : son moteur de <strong>revue contrat IA</strong> est conçu pour défendre exclusivement les intérêts de votre client, jamais pour suivre passivement les demandes de la contrepartie. Chaque élément réduisant une garantie, un délai ou une obligation en faveur de votre client déclenche une <strong>contre-proposition rédigée</strong> — une clause prête à insérer en Track Changes, pas une simple suggestion — que le juriste peut éditer en ligne avant export, avec un historique complet des révisions successives.</p>
+
+  <h3 style="font-size:14px;font-weight:600;color:#8892aa;margin:24px 0 8px">Au-delà de la revue de contrat : rédaction et avis juridique par l'IA</h3>
+  <p>Un <strong>outil IA juridique</strong> complet ne se limite pas à la revue de contrats existants. Omniscient by Westfield couvre l'ensemble du cycle de vie contractuel : la fonction <strong>Drafts</strong> génère un contrat complet (NDA, prestation de services, achat/vente, contrat de travail, partenariat, SaaS) en français, arabe ou anglais à partir d'une simple description, directement éditable et exportable en DOCX. L'onglet <strong>Avis juridique</strong> permet quant à lui de poser une question de droit marocain, français ou anglais sans avoir de contrat à analyser — utile pour une consultation rapide en amont d'une négociation. Comme pour la revue contrat IA, ces deux fonctionnalités s'appuient sur la même base documentaire validée par des avocats et peuvent suivre un circuit de validation juriste → directeur.</p>
 
   <h3 style="font-size:14px;font-weight:600;color:#8892aa;margin:24px 0 8px">Omniscient by Westfield — La plateforme de référence au Maroc</h3>
   <p>Omniscient est la plateforme de <strong>revue contrat IA</strong> développée par <strong>Westfield Avocats</strong>, cabinet d'avocats d'affaires basé à Casablanca. Notre solution d'<strong>IA contract review</strong> intègre une base documentaire juridique propriétaire constituée de modèles de clauses validés, de références jurisprudentielles marocaines, et des textes de loi en vigueur. La plateforme supporte le droit marocain, le droit français, le droit anglais, le droit tunisien et le droit algérien, avec détection automatique de la juridiction applicable.</p>
