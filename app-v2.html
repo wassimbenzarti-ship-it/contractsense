@@ -331,8 +331,16 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button onclick="exportDraftDocx()" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX</button>
-      <label for="draft-adverse-file" style="flex:1;padding:10px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:9px;color:#8b5cf6;font-weight:700;font-size:13px;cursor:pointer;text-align:center;display:block">⚔ Importer version adverse</label>
-      <input type="file" id="draft-adverse-file" accept=".docx,.txt,.pdf" style="display:none" onchange="compareDraftWithAdverse(this.files[0])">
+      <label for="draft-adverse-file" style="flex:1;padding:10px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:9px;color:#8b5cf6;font-weight:700;font-size:13px;cursor:pointer;text-align:center;display:block">⚔ Version adverse</label>
+      <input type="file" id="draft-adverse-file" accept=".docx,.txt,.pdf" style="display:none" onchange="_draftAdverseFileSelected(this)">
+      <button onclick="_toggleDraftTranslate()" style="flex:1;padding:10px;background:rgba(200,169,75,0.1);border:1px solid rgba(200,169,75,0.3);border-radius:9px;color:#c8a94b;font-weight:700;font-size:13px;cursor:pointer">🌐 Traduire</button>
+    </div>
+    <div id="draft-translate-panel" style="display:none;margin-top:10px">
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <button onclick="cbExportDraftTranslation('ar',this)" style="padding:9px 18px;background:#1a2035;border:1px solid #c8a94b44;border-radius:9px;color:#c8a94b;font-size:12px;font-weight:700;cursor:pointer">🇸🇦 Arabe (بالعربية)</button>
+        <button onclick="cbExportDraftTranslation('fr',this)" style="padding:9px 18px;background:#1a2035;border:1px solid #5b7cfa44;border-radius:9px;color:#5b7cfa;font-size:12px;font-weight:700;cursor:pointer">🇫🇷 Français</button>
+        <button onclick="cbExportDraftTranslation('en',this)" style="padding:9px 18px;background:#1a2035;border:1px solid #10b98144;border-radius:9px;color:#10b981;font-size:12px;font-weight:700;cursor:pointer">🇬🇧 English</button>
+      </div>
     </div>
     <div id="draft-adverse-result" style="margin-top:10px"></div>
   </div>
@@ -3531,7 +3539,72 @@ function _setAdvDecision(i, decision){
   });
 }
 
-// ── Draft adverse comparison ─────────────────────────────────────
+// ── Draft adverse comparison (markup réel Word) ──────────────────
+// Réutilise le même moteur que la revue adverse des analyses (Track Changes +
+// commentaires Word, comment_id, contre-propositions protectrices) au lieu du
+// diff textuel article-par-article. La partie représentée est déjà connue
+// (champ "draft-partie"), donc on ne demande que "qui est la partie adverse".
+// Repli sur l'ancien diff texte (compareDraftWithAdverse) si le fichier n'est
+// pas un DOCX ou ne contient pas de markup Word réel.
+async function _draftAdverseFileSelected(inp){
+  if(!inp.files||!inp.files[0]) return;
+  var file=inp.files[0];
+  window._draftAdverse = window._draftAdverse || {};
+  window._draftAdverse.file = file;
+  var res=document.getElementById('draft-adverse-result');
+  if(!file.name.toLowerCase().endsWith('.docx')){
+    return compareDraftWithAdverse(file);
+  }
+  if(res) res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Détection du markup Word (Track Changes, commentaires)...</div>';
+  try{
+    var fd=new FormData(); fd.append('file', file);
+    var r=await fetch(BACKEND+'/identify-adverse-authors',{method:'POST',body:fd});
+    var data=await r.json();
+    if(r.ok && data.has_markup && (data.authors||[]).length){
+      res.innerHTML='<div style="font-size:14px;font-weight:700;color:#e2e5f0;margin-bottom:4px">Qui est la partie adverse ?</div>'
+        +'<div id="draft-adverse-authors-list" style="margin-top:10px"></div>';
+      var listEl=document.getElementById('draft-adverse-authors-list');
+      _buildPartiesUI(listEl, data.authors, function(joinedLabel, selectedAuthors){
+        _draftAnalyzeAdverseMarkup(joinedLabel, selectedAuthors);
+      }, _ADVERSE_AUTHOR_PICKER_OPTS);
+    } else {
+      compareDraftWithAdverse(file);
+    }
+  }catch(e){
+    compareDraftWithAdverse(file);
+  }
+}
+
+async function _draftAnalyzeAdverseMarkup(joinedLabel, selectedAuthors){
+  var res=document.getElementById('draft-adverse-result');
+  if(res) res.innerHTML='<div style="color:#8b5cf6;font-size:13px;padding:10px 0">⏳ Analyse du markup de '+_escH(joinedLabel)+'...</div>';
+  try{
+    var partie=(document.getElementById('draft-partie').value||'').trim();
+    var type=document.getElementById('draft-type').value||'generic';
+    var fd=new FormData();
+    fd.append('file', window._draftAdverse.file);
+    fd.append('authors', JSON.stringify(selectedAuthors));
+    fd.append('partie', partie);
+    fd.append('type', type);
+    var r=await fetch(BACKEND+'/analyze-adverse-markup',{method:'POST',body:fd});
+    var data=await r.json();
+    if(!r.ok) throw new Error(data.error||'Erreur serveur');
+    window._advMarkupFile=window._draftAdverse.file;
+    window._advMarkupItems=data.modifications||[];
+    window._advMarkupDecisions={};
+    window._advMarkupMeta={anaId:null,contractType:type,partie:partie,baseFilename:'Draft — '+type,adverseLabel:joinedLabel||''};
+    _renderAdverseMarkupReview(null, 'draft-adverse-result');
+  }catch(e){
+    if(res) res.innerHTML='<div style="color:#ef4444;font-size:12px;padding:10px 0">Erreur : '+e.message+'</div>';
+  }
+}
+
+function _toggleDraftTranslate(){
+  var p=document.getElementById('draft-translate-panel');
+  if(p) p.style.display = (p.style.display==='none') ? '' : 'none';
+}
+
+// ── Draft adverse comparison (ancien diff texte — repli) ──────────
 async function compareDraftWithAdverse(file){
   if(!file) return;
   window._draftAdverseFile = file;
@@ -5950,7 +6023,7 @@ async function deleteLegalOpinion(id, idx){
   }catch(e){ alert('Erreur réseau : '+e.message); }
 }
 
-async function cbExportTranslation(lang, btn) {
+async function _runTranslationExport(lang, btn, body, fname) {
   btn.disabled = true;
   var orig = btn.textContent;
   var _cbMsgs = ['🔍 Lecture du contrat…','🤖 Traduction IA en cours…','✏️ Application des modifications…','📝 Terminologie juridique…','📄 Génération DOCX…','🎨 Mise en forme…'];
@@ -5962,16 +6035,10 @@ async function cbExportTranslation(lang, btn) {
     btn.textContent = _cbMsgs[_cbIdx] + '  ' + timeStr;
   }, 1000);
   try {
-    var contractTxt = savedText || '';
-    var _cacheId = window._fileCacheId || '';
-    var _storagePath = window._fileStoragePath || '';
-    if (!contractTxt && !_cacheId && !_storagePath) { clearInterval(_cbTimer); btn.textContent = '❌ Contrat non disponible'; btn.disabled = false; return; }
-    var fname = (typeof curFile !== 'undefined' && curFile && curFile.name)
-      ? curFile.name.replace(/\.[^.]+$/, '') : 'contrat';
     var r = await fetch(BACKEND + '/export-translation', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({contract_text: contractTxt, file_cache_id: _cacheId, file_storage_path: _storagePath, target_lang: lang, filename: fname, modifications: modifications, decisions: decisions})
+      body: JSON.stringify(body)
     });
     clearInterval(_cbTimer);
     if (!r.ok) { var e = await r.json(); throw new Error(e.error || 'Erreur ' + r.status); }
@@ -5990,6 +6057,23 @@ async function cbExportTranslation(lang, btn) {
     btn.disabled = false;
     setTimeout(function(){ btn.textContent = orig; btn.disabled = false; }, 3000);
   }
+}
+
+async function cbExportTranslation(lang, btn) {
+  var contractTxt = savedText || '';
+  var _cacheId = window._fileCacheId || '';
+  var _storagePath = window._fileStoragePath || '';
+  if (!contractTxt && !_cacheId && !_storagePath) { btn.textContent = '❌ Contrat non disponible'; return; }
+  var fname = (typeof curFile !== 'undefined' && curFile && curFile.name)
+    ? curFile.name.replace(/\.[^.]+$/, '') : 'contrat';
+  _runTranslationExport(lang, btn, {contract_text: contractTxt, file_cache_id: _cacheId, file_storage_path: _storagePath, target_lang: lang, filename: fname, modifications: modifications, decisions: decisions}, fname);
+}
+
+async function cbExportDraftTranslation(lang, btn) {
+  var contractTxt = (document.getElementById('draft-editor').value || '').trim();
+  if (!contractTxt) { btn.textContent = '❌ Contrat non disponible'; return; }
+  var fname = 'draft_' + (document.getElementById('draft-type').value || 'contrat');
+  _runTranslationExport(lang, btn, {contract_text: contractTxt, target_lang: lang, filename: fname, modifications: [], decisions: {}}, fname);
 }
 </script>
 </body>
