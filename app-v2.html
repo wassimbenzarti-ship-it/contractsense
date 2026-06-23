@@ -134,19 +134,24 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <input class="ai" type="email" id="ae1" placeholder="Email"/>
 <input class="ai" type="password" id="ap1" placeholder="Mot de passe"/>
 <div id="aerr" class="ae"></div>
-<button class="ab" onclick="doLogin()">Se connecter</button>
-<div style="text-align:center;font-size:13px;color:#6b7280">Pas de compte ? <span class="al" onclick="showReg()">Creer un compte</span></div></div>
+<button class="ab" id="login-submit-btn" onclick="doLogin()">Se connecter</button>
+<div id="afl-switch" style="text-align:center;font-size:13px;color:#6b7280">Pas de compte ? <span class="al" onclick="showReg()">Creer un compte</span></div></div>
 <div id="afr" style="display:none">
 <input class="ai" type="email" id="ae2" placeholder="Email"/>
 <input class="ai" type="password" id="ap2" placeholder="Mot de passe (6+)"/>
 <div id="aerr2" class="ae"></div><div id="aok2" class="ao"></div>
-<button class="ab" onclick="doReg()">Creer mon compte</button>
-<div style="text-align:center;font-size:13px;color:#6b7280">Deja un compte ? <span class="al" onclick="showLogin()">Se connecter</span></div>
+<button class="ab" id="reg-submit-btn" onclick="doReg()">Creer mon compte</button>
+<div id="afr-switch" style="text-align:center;font-size:13px;color:#6b7280">Deja un compte ? <span class="al" onclick="showLogin()">Se connecter</span></div>
 </div>
 </div>
 </div>
 <div id="dash-ov">
-<button class="dclose" onclick="closeDash()">x Fermer</button>
+<div id="dash-lang-switcher" style="position:fixed;top:18px;right:128px;display:flex;border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;font-size:11px;font-weight:700;background:#0f1320">
+  <button id="dash-lang-fr" onclick="appSetLang('fr')" style="padding:7px 9px;background:rgba(200,169,75,0.15);color:#c8a94b;border:none;cursor:pointer">FR</button>
+  <button id="dash-lang-en" onclick="appSetLang('en')" style="padding:7px 9px;background:transparent;color:#6b7280;border:none;cursor:pointer">EN</button>
+  <button id="dash-lang-es" onclick="appSetLang('es')" style="padding:7px 9px;background:transparent;color:#6b7280;border:none;cursor:pointer">ES</button>
+</div>
+<button class="dclose" id="dclose-btn" onclick="closeDash()">x Fermer</button>
 <div id="dash-in">
 <div id="dash-role-badge" style="display:inline-flex;align-items:center;gap:6px;background:rgba(91,124,250,0.12);border:1px solid rgba(91,124,250,0.3);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:#5b7cfa;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px"></div>
 <h2 id="dash-title">Mon espace</h2>
@@ -363,6 +368,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
     <div style="display:flex;border:1px solid rgba(255,255,255,0.1);border-radius:8px;overflow:hidden;font-size:11px;font-weight:700">
       <button id="app-lang-fr" onclick="appSetLang('fr')" style="padding:4px 10px;background:rgba(200,169,75,0.15);color:#c8a94b;border:none;cursor:pointer">FR</button>
       <button id="app-lang-en" onclick="appSetLang('en')" style="padding:4px 10px;background:transparent;color:#6b7280;border:none;cursor:pointer">EN</button>
+      <button id="app-lang-es" onclick="appSetLang('es')" style="padding:4px 10px;background:transparent;color:#6b7280;border:none;cursor:pointer">ES</button>
     </div>
   </div>
 
@@ -439,7 +445,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
   <div id="step-loading" style="display:none" class="loading">
     <div class="spinner"></div>
     <div id="loading-timer" style="font-size:28px;font-weight:800;letter-spacing:2px;color:#5b7cfa;margin:8px 0 4px;font-variant-numeric:tabular-nums">0:00</div>
-    <div style="font-size:11px;color:#6b7280;margin-bottom:12px">Temps écoulé</div>
+    <div id="loading-elapsed-label" style="font-size:11px;color:#6b7280;margin-bottom:12px">Temps écoulé</div>
     <div class="steps">
       <div class="step" id="s0">⏳ Lecture du document...</div>
       <div class="step" id="s1">⏳ Identification des parties...</div>
@@ -450,8 +456,8 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 
   <!-- STEP 4: Choose partie -->
   <div id="step-parties" style="display:none" class="fadein">
-    <h2 style="font-size:20px;font-weight:800;margin-bottom:8px">Quelle partie représentez-vous ?</h2>
-    <p style="color:#6b7280;font-size:14px;margin-bottom:24px">L'IA adaptera ses modifications pour protéger vos intérêts.</p>
+    <h2 id="parties-title" style="font-size:20px;font-weight:800;margin-bottom:8px">Quelle partie représentez-vous ?</h2>
+    <p id="parties-sub" style="color:#6b7280;font-size:14px;margin-bottom:24px">L'IA adaptera ses modifications pour protéger vos intérêts.</p>
     <div id="parties-list"></div>
     <button id="btn-back" style="display:block;margin:16px auto 0;padding:9px 20px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:13px;cursor:pointer">← Retour</button>
   </div>
@@ -459,13 +465,13 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
   <!-- STEP 5: Review modifications -->
   <div id="step-review" style="display:none" class="fadein">
     <div class="review-header">
-      <div style="font-size:20px;font-weight:800">Révision du contrat</div>
+      <div id="review-title-text" style="font-size:20px;font-weight:800">Révision du contrat</div>
       <div class="review-stats" id="review-stats"></div>
     </div>
     <div id="review-sticky-bar" style="display:none"></div>
     <div id="mods-list"></div>
     <div class="export-section">
-      <div style="font-size:16px;font-weight:700;margin-bottom:8px">Générer le document final</div>
+      <div id="export-section-title" style="font-size:16px;font-weight:700;margin-bottom:8px">Générer le document final</div>
       <div id="export-desc" style="color:#6b7280;font-size:13px;margin-bottom:20px;line-height:1.6"></div>
       <button class="btn-export" id="btn-export"> Télécharger avec Track Changes</button>
       <button class="btn-new" id="btn-new">🔄 Analyser un autre contrat</button>
@@ -4787,7 +4793,16 @@ async function rejectSuggDir(id){
 }
 
 // ── App language switcher ─────────────────────────────────────────
-var _appLang = localStorage.getItem('omniscient_lang') || 'fr';
+var _APP_LANGS = ['fr', 'en', 'es'];
+function _appDetectLang() {
+  var saved = localStorage.getItem('omniscient_lang');
+  if (saved && _APP_LANGS.indexOf(saved) !== -1) return saved;
+  var nav = (navigator.language || navigator.userLanguage || 'fr').toLowerCase();
+  if (nav.indexOf('es') === 0) return 'es';
+  if (nav.indexOf('en') === 0) return 'en';
+  return 'fr';
+}
+var _appLang = _appDetectLang();
 var _appStrings = {
   fr: {
     heroH1: 'Révisez vos contrats<br/><span class="accent">avec l\'IA.</span>',
@@ -4802,6 +4817,23 @@ var _appStrings = {
     complianceSub: 'Basée sur les lois, doctrine et jurisprudences de la base documentaire RAG',
     dashTitle: 'Mon espace',
     riskHigh: 'Risque élevé', riskMed: 'Risque modéré', riskLow: 'Risque faible',
+    authTitle: 'Connexion',
+    emailPh: 'Email', pwPh: 'Mot de passe', pwPh2: 'Mot de passe (6+)',
+    loginBtn: 'Se connecter', regBtn: 'Creer mon compte',
+    noAccount: 'Pas de compte ? ', createAccount: 'Creer un compte',
+    hasAccount: 'Deja un compte ? ', doLoginLink: 'Se connecter',
+    dclose: 'x Fermer',
+    dtbAnalyses: 'Analyses', dtbDrafts: '✏️ Drafts', dtbModels: '📁 Modèles',
+    dtbOpinions: '⚖ Avis juridique', dtbCompte: '👤 Mon compte',
+    partiesTitle: 'Quelle partie représentez-vous ?',
+    partiesSub: 'L\'IA adaptera ses modifications pour protéger vos intérêts.',
+    loadingElapsed: 'Temps écoulé',
+    s0: '⏳ Lecture du document...', s1: '⏳ Identification des parties...',
+    s2: '⏳ Analyse des risques...', s3: '⏳ Rédaction des modifications...',
+    reviewTitle: 'Révision du contrat',
+    exportSectionTitle: 'Générer le document final',
+    btnExport: ' Télécharger avec Track Changes', btnNewAnalysis: '🔄 Analyser un autre contrat',
+    atpMods: '📋 Modifications', atpAdverse: '⚔ Version adverse', atpTranslate: '🌐 Traduction bilingue',
   },
   en: {
     heroH1: 'Review your contracts<br/><span class="accent">with AI.</span>',
@@ -4816,9 +4848,58 @@ var _appStrings = {
     complianceSub: 'Based on laws, doctrine and case law from the RAG knowledge base',
     dashTitle: 'My workspace',
     riskHigh: 'High risk', riskMed: 'Moderate risk', riskLow: 'Low risk',
+    authTitle: 'Log in',
+    emailPh: 'Email', pwPh: 'Password', pwPh2: 'Password (6+)',
+    loginBtn: 'Log in', regBtn: 'Create my account',
+    noAccount: 'No account? ', createAccount: 'Create an account',
+    hasAccount: 'Already have an account? ', doLoginLink: 'Log in',
+    dclose: 'x Close',
+    dtbAnalyses: 'Analyses', dtbDrafts: '✏️ Drafts', dtbModels: '📁 Templates',
+    dtbOpinions: '⚖ Legal opinion', dtbCompte: '👤 My account',
+    partiesTitle: 'Which party do you represent?',
+    partiesSub: 'The AI will tailor its edits to protect your interests.',
+    loadingElapsed: 'Elapsed time',
+    s0: '⏳ Reading the document...', s1: '⏳ Identifying the parties...',
+    s2: '⏳ Analyzing risks...', s3: '⏳ Drafting the edits...',
+    reviewTitle: 'Contract review',
+    exportSectionTitle: 'Generate the final document',
+    btnExport: ' Download with Track Changes', btnNewAnalysis: '🔄 Analyze another contract',
+    atpMods: '📋 Modifications', atpAdverse: '⚔ Counterparty version', atpTranslate: '🌐 Bilingual translation',
+  },
+  es: {
+    heroH1: 'Revise sus contratos<br/><span class="accent">con IA.</span>',
+    heroSub: 'Suba su contrato. La IA identifica a las partes, usted elige cuál proteger y luego propone modificaciones con control de cambios.',
+    uploadTitle: 'Suelte su contrato aquí',
+    uploadSub: 'o haga clic para seleccionar',
+    btnAnalyse: '⚡ Analizar',
+    btnDownload: 'Descargar DOCX',
+    tabUpload: '📤 Subir',
+    tabText: ' Pegar texto',
+    complianceTitle: '⚖ Análisis de cumplimiento legal',
+    complianceSub: 'Basado en leyes, doctrina y jurisprudencia de la base documental RAG',
+    dashTitle: 'Mi espacio',
+    riskHigh: 'Riesgo alto', riskMed: 'Riesgo moderado', riskLow: 'Riesgo bajo',
+    authTitle: 'Iniciar sesión',
+    emailPh: 'Correo electrónico', pwPh: 'Contraseña', pwPh2: 'Contraseña (6+)',
+    loginBtn: 'Iniciar sesión', regBtn: 'Crear mi cuenta',
+    noAccount: '¿No tiene cuenta? ', createAccount: 'Crear una cuenta',
+    hasAccount: '¿Ya tiene cuenta? ', doLoginLink: 'Iniciar sesión',
+    dclose: 'x Cerrar',
+    dtbAnalyses: 'Análisis', dtbDrafts: '✏️ Borradores', dtbModels: '📁 Modelos',
+    dtbOpinions: '⚖ Opinión legal', dtbCompte: '👤 Mi cuenta',
+    partiesTitle: '¿A qué parte representa?',
+    partiesSub: 'La IA adaptará sus modificaciones para proteger sus intereses.',
+    loadingElapsed: 'Tiempo transcurrido',
+    s0: '⏳ Leyendo el documento...', s1: '⏳ Identificando a las partes...',
+    s2: '⏳ Analizando riesgos...', s3: '⏳ Redactando las modificaciones...',
+    reviewTitle: 'Revisión del contrato',
+    exportSectionTitle: 'Generar el documento final',
+    btnExport: ' Descargar con control de cambios', btnNewAnalysis: '🔄 Analizar otro contrato',
+    atpMods: '📋 Modificaciones', atpAdverse: '⚔ Versión de la contraparte', atpTranslate: '🌐 Traducción bilingüe',
   }
 };
 function appSetLang(l) {
+  if (_APP_LANGS.indexOf(l) === -1) l = 'fr';
   _appLang = l;
   localStorage.setItem('omniscient_lang', l);
   var s = _appStrings[l] || _appStrings.fr;
@@ -4829,13 +4910,48 @@ function appSetLang(l) {
   var dt2 = document.getElementById('dash-title'); if (dt2) dt2.textContent = s.dashTitle;
   var tu = document.getElementById('tab-upload'); if (tu) tu.textContent = s.tabUpload;
   var tt = document.getElementById('tab-text'); if (tt) tt.textContent = s.tabText;
-  // Toggle button styles
-  var bf = document.getElementById('app-lang-fr'), be = document.getElementById('app-lang-en');
-  if (bf) { bf.style.background = l==='fr'?'rgba(200,169,75,0.15)':'transparent'; bf.style.color = l==='fr'?'#c8a94b':'#6b7280'; }
-  if (be) { be.style.background = l==='en'?'rgba(200,169,75,0.15)':'transparent'; be.style.color = l==='en'?'#c8a94b':'#6b7280'; }
+  // Auth modal
+  var at = document.getElementById('atitle'); if (at) at.textContent = s.authTitle;
+  var ae1 = document.getElementById('ae1'); if (ae1) ae1.placeholder = s.emailPh;
+  var ap1 = document.getElementById('ap1'); if (ap1) ap1.placeholder = s.pwPh;
+  var ae2 = document.getElementById('ae2'); if (ae2) ae2.placeholder = s.emailPh;
+  var ap2 = document.getElementById('ap2'); if (ap2) ap2.placeholder = s.pwPh2;
+  var lsb = document.getElementById('login-submit-btn'); if (lsb) lsb.textContent = s.loginBtn;
+  var rsb = document.getElementById('reg-submit-btn'); if (rsb) rsb.textContent = s.regBtn;
+  var afls = document.getElementById('afl-switch'); if (afls) afls.innerHTML = s.noAccount + '<span class="al" onclick="showReg()">' + s.createAccount + '</span>';
+  var afrs = document.getElementById('afr-switch'); if (afrs) afrs.innerHTML = s.hasAccount + '<span class="al" onclick="showLogin()">' + s.doLoginLink + '</span>';
+  // Dashboard chrome
+  var dc = document.getElementById('dclose-btn'); if (dc) dc.textContent = s.dclose;
+  var dta = document.getElementById('dtb-analyses'); if (dta) dta.textContent = s.dtbAnalyses;
+  var dtb = document.getElementById('dtb-brouillons'); if (dtb) dtb.textContent = s.dtbDrafts;
+  var dtm = document.getElementById('dtb-models'); if (dtm) dtm.textContent = s.dtbModels;
+  var dto = document.getElementById('dtb-opinions'); if (dto) dto.textContent = s.dtbOpinions;
+  var dtc = document.getElementById('dtb-compte'); if (dtc) dtc.textContent = s.dtbCompte;
+  // Parties / loading / review steps
+  var pt = document.getElementById('parties-title'); if (pt) pt.textContent = s.partiesTitle;
+  var ps = document.getElementById('parties-sub'); if (ps) ps.textContent = s.partiesSub;
+  var lel = document.getElementById('loading-elapsed-label'); if (lel) lel.textContent = s.loadingElapsed;
+  var s0 = document.getElementById('s0'); if (s0) s0.textContent = s.s0;
+  var s1 = document.getElementById('s1'); if (s1) s1.textContent = s.s1;
+  var s2 = document.getElementById('s2'); if (s2) s2.textContent = s.s2;
+  var s3 = document.getElementById('s3'); if (s3) s3.textContent = s.s3;
+  var rt = document.getElementById('review-title-text'); if (rt) rt.textContent = s.reviewTitle;
+  var est = document.getElementById('export-section-title'); if (est) est.textContent = s.exportSectionTitle;
+  var be1 = document.getElementById('btn-export'); if (be1) be1.textContent = s.btnExport;
+  var bn1 = document.getElementById('btn-new'); if (bn1) bn1.textContent = s.btnNewAnalysis;
+  var am = document.getElementById('atp-mods-btn'); if (am) am.textContent = s.atpMods;
+  var aa = document.getElementById('atp-adverse-btn'); if (aa) aa.textContent = s.atpAdverse;
+  var atr = document.getElementById('atp-translate-btn'); if (atr) atr.textContent = s.atpTranslate;
+  // Toggle button styles (both the home header switcher and the dashboard switcher)
+  ['app-lang-', 'dash-lang-'].forEach(function(prefix) {
+    _APP_LANGS.forEach(function(code) {
+      var btn = document.getElementById(prefix + code);
+      if (btn) { btn.style.background = l===code?'rgba(200,169,75,0.15)':'transparent'; btn.style.color = l===code?'#c8a94b':'#6b7280'; }
+    });
+  });
   document.documentElement.lang = l;
 }
-if (_appLang === 'en') appSetLang('en');
+if (_appLang !== 'fr') appSetLang(_appLang);
 </script>
 
 <!-- ════════════════ CHATBOT SIDEBAR ════════════════ -->
