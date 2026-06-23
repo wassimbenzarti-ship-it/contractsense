@@ -340,6 +340,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
         <button onclick="cbExportDraftTranslation('ar',this)" style="padding:9px 18px;background:#1a2035;border:1px solid #c8a94b44;border-radius:9px;color:#c8a94b;font-size:12px;font-weight:700;cursor:pointer">🇸🇦 Arabe (بالعربية)</button>
         <button onclick="cbExportDraftTranslation('fr',this)" style="padding:9px 18px;background:#1a2035;border:1px solid #5b7cfa44;border-radius:9px;color:#5b7cfa;font-size:12px;font-weight:700;cursor:pointer">🇫🇷 Français</button>
         <button onclick="cbExportDraftTranslation('en',this)" style="padding:9px 18px;background:#1a2035;border:1px solid #10b98144;border-radius:9px;color:#10b981;font-size:12px;font-weight:700;cursor:pointer">🇬🇧 English</button>
+        <button onclick="cbExportDraftTranslation('es',this)" style="padding:9px 18px;background:#1a2035;border:1px solid #f59e0b44;border-radius:9px;color:#f59e0b;font-size:12px;font-weight:700;cursor:pointer">🇪🇸 Español</button>
       </div>
     </div>
     <div id="draft-adverse-result" style="margin-top:10px"></div>
@@ -3285,6 +3286,7 @@ function _renderAnaTranslateTab(){
         +'<button onclick="cbExportTranslation(\'ar\',this)" style="padding:11px 22px;background:#1a2035;border:1px solid #c8a94b44;border-radius:9px;color:#c8a94b;font-size:13px;font-weight:700;cursor:pointer">🇸🇦 Arabe (بالعربية)</button>'
         +'<button onclick="cbExportTranslation(\'fr\',this)" style="padding:11px 22px;background:#1a2035;border:1px solid #5b7cfa44;border-radius:9px;color:#5b7cfa;font-size:13px;font-weight:700;cursor:pointer">🇫🇷 Français</button>'
         +'<button onclick="cbExportTranslation(\'en\',this)" style="padding:11px 22px;background:#1a2035;border:1px solid #10b98144;border-radius:9px;color:#10b981;font-size:13px;font-weight:700;cursor:pointer">🇬🇧 English</button>'
+        +'<button onclick="cbExportTranslation(\'es\',this)" style="padding:11px 22px;background:#1a2035;border:1px solid #f59e0b44;border-radius:9px;color:#f59e0b;font-size:13px;font-weight:700;cursor:pointer">🇪🇸 Español</button>'
         +'</div>'
       :'<div style="background:#181c2a;border:1px dashed #2a3040;border-radius:10px;padding:20px;text-align:center">'
         +'<div style="font-size:13px;color:#6b7280;margin-bottom:12px">Le texte du contrat n\'est plus en cache. Rechargez-le pour activer la traduction.</div>'
@@ -5479,7 +5481,7 @@ async function cbSend() {
     var _trBtn = '';
     if (_trMatch) {
       var _tl = _trMatch[1];
-      var _tlLabel = {en:'anglais',fr:'français',ar:'arabe'}[_tl] || _tl;
+      var _tlLabel = {en:'anglais',fr:'français',ar:'arabe',es:'espagnol'}[_tl] || _tl;
       _trBtn = '<div style="margin-top:12px;">'
         + '<button onclick="cbExportTranslation(\'' + _tl + '\',this)" '
         + 'style="background:linear-gradient(135deg,#c8a94b,#e8c96b);color:#05070e;border:none;'
