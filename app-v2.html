@@ -166,7 +166,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 </div>
 <div id="d-analyses" class="ds active">
 <div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap"><button id="dtb-nouvelle" onclick="dtab('nouvelle')" style="padding:6px 14px;background:#5b7cfa22;border:1px solid #5b7cfa44;border-radius:8px;color:#5b7cfa;font-size:12px;font-weight:600;cursor:pointer">➕ Nouvelle analyse</button>
-<button onclick="openStandaloneAdverseReview()" style="padding:6px 14px;background:#8b5cf622;border:1px solid #8b5cf644;border-radius:8px;color:#8b5cf6;font-size:12px;font-weight:600;cursor:pointer">⚔ Analyser une version adverse</button></div>
+<button id="dtb-adverse-standalone-btn" onclick="openStandaloneAdverseReview()" style="padding:6px 14px;background:#8b5cf622;border:1px solid #8b5cf644;border-radius:8px;color:#8b5cf6;font-size:12px;font-weight:600;cursor:pointer">⚔ Analyser une version adverse</button></div>
 <div id="juriste-filter-bar" style="display:none;margin-bottom:10px">
   <select id="juriste-filter" onchange="filterAnalysesByJuriste(this.value)" style="background:#1a2035;border:1px solid #1f2537;border-radius:6px;padding:6px 10px;color:#e2e5f0;font-size:12px;width:100%">
     <option value="">Tous les juristes</option>
@@ -175,7 +175,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 <div id="alist"></div>
 <div id="ana-page" style="display:none" class="fadein">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #1f2537">
-    <button id="ana-back-btn" onclick="closeAnaPage()" style="padding:6px 14px;background:#1a2035;border:1px solid #2a3040;border-radius:8px;color:#a0a8c0;font-size:12px;cursor:pointer;flex-shrink:0">← Analyses</button>
+    <button id="ana-back-btn" onclick="closeAnaPage()" style="padding:6px 14px;background:#1a2035;border:1px solid #2a3040;border-radius:8px;color:#a0a8c0;font-size:12px;cursor:pointer;flex-shrink:0">← <span id="ana-back-label">Analyses</span></button>
     <div style="flex:1;min-width:0">
       <div id="ana-page-title" style="font-size:15px;font-weight:800;color:#e2e5f0;word-break:break-word"></div>
       <div id="ana-page-meta" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px"></div>
@@ -193,69 +193,69 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 </div>
 <div id="standalone-adverse-page" style="display:none" class="fadein">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #1f2537">
-    <button onclick="closeStandaloneAdverseReview()" style="padding:6px 14px;background:#1a2035;border:1px solid #2a3040;border-radius:8px;color:#a0a8c0;font-size:12px;cursor:pointer;flex-shrink:0">← Analyses</button>
-    <div style="font-size:15px;font-weight:800;color:#e2e5f0">⚔ Analyser une version adverse</div>
+    <button onclick="closeStandaloneAdverseReview()" style="padding:6px 14px;background:#1a2035;border:1px solid #2a3040;border-radius:8px;color:#a0a8c0;font-size:12px;cursor:pointer;flex-shrink:0">← <span id="standalone-adverse-back-label">Analyses</span></button>
+    <div id="standalone-adverse-title" style="font-size:15px;font-weight:800;color:#e2e5f0">⚔ Analyser une version adverse</div>
   </div>
   <div id="standalone-adverse-body"></div>
 </div>
 </div>
 <div id="d-brouillons" class="ds">
-<div style="margin-bottom:10px"><button onclick="dtab('draft')" style="padding:6px 14px;background:#5b7cfa22;border:1px solid #5b7cfa44;border-radius:8px;color:#5b7cfa;font-size:12px;font-weight:600;cursor:pointer">➕ Nouveau draft</button></div>
+<div style="margin-bottom:10px"><button id="dtb-new-draft-btn" onclick="dtab('draft')" style="padding:6px 14px;background:#5b7cfa22;border:1px solid #5b7cfa44;border-radius:8px;color:#5b7cfa;font-size:12px;font-weight:600;cursor:pointer">➕ Nouveau draft</button></div>
 <div id="blist"></div>
 </div>
 <div id="d-models" class="ds">
 <div id="model-upload-info" style="display:none;background:rgba(91,124,250,0.08);border:1px solid rgba(91,124,250,0.2);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#a0a8c0;line-height:1.6"></div>
-<label class="mz" for="minp">+ Soumettre un modele de contrat</label>
+<label class="mz" id="models-upload-label" for="minp">+ Soumettre un modele de contrat</label>
 <input type="file" id="minp" accept=".pdf,.docx,.txt" style="display:none" onchange="upMdl(this)"/>
 <div id="mlist"></div>
 </div>
 <div id="d-opinions" class="ds">
-<div style="font-size:15px;font-weight:700;color:#e2e5f0;margin-bottom:8px">⚖ Avis juridique</div>
-<div style="font-size:12px;color:#6b7280;margin-bottom:16px;line-height:1.6">Posez une question juridique générale à l'assistant Omniscient — pas besoin d'avoir un contrat ouvert. L'assistant s'appuie sur la même base documentaire (lois, doctrine, jurisprudence) que l'analyse de contrats.</div>
+<div id="opinions-title" style="font-size:15px;font-weight:700;color:#e2e5f0;margin-bottom:8px">⚖ Avis juridique</div>
+<div id="opinions-desc" style="font-size:12px;color:#6b7280;margin-bottom:16px;line-height:1.6">Posez une question juridique générale à l'assistant Omniscient — pas besoin d'avoir un contrat ouvert. L'assistant s'appuie sur la même base documentaire (lois, doctrine, jurisprudence) que l'analyse de contrats.</div>
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-  <div style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:1px">Historique</div>
-  <button onclick="newLegalOpinionConsultation()" style="padding:6px 14px;background:#5b7cfa22;border:1px solid #5b7cfa44;border-radius:8px;color:#5b7cfa;font-size:12px;font-weight:600;cursor:pointer">➕ Nouvel avis</button>
+  <div id="opinions-history-label" style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:1px">Historique</div>
+  <button id="opinions-new-btn" onclick="newLegalOpinionConsultation()" style="padding:6px 14px;background:#5b7cfa22;border:1px solid #5b7cfa44;border-radius:8px;color:#5b7cfa;font-size:12px;font-weight:600;cursor:pointer">➕ Nouvel avis</button>
 </div>
-<div id="oplist" style="margin-bottom:18px"><div style="color:#6b7280;font-size:13px;padding:10px 0">Chargement...</div></div>
+<div id="oplist" style="margin-bottom:18px"><div class="i18n-loading" style="color:#6b7280;font-size:13px;padding:10px 0">Chargement...</div></div>
 <div id="d-opinions-chat-host"></div>
 </div>
 <div id="d-compte" class="ds">
 <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;border-bottom:1px solid #1f2537;padding-bottom:10px">
   <button id="ctp-profil-btn" class="atp active" onclick="_switchCompteTab('profil')">👤 Profil</button>
-  <button id="ctp-juristes-btn" class="atp" onclick="_switchCompteTab('juristes')" style="display:none">Equipe</button>
+  <button id="ctp-juristes-btn" class="atp" onclick="_switchCompteTab('juristes')" style="display:none"><span id="ctp-juristes-label">Equipe</span></button>
   <button id="ctp-abonnement-btn" class="atp" onclick="_switchCompteTab('abonnement')" style="display:none">💳 Abonnement</button>
 </div>
 <div id="ctp-profil-panel">
 <div id="profil-content"></div>
 </div>
 <div id="ctp-juristes-panel" style="display:none">
-<div id="juristes-list"><div style="color:#6b7280;font-size:13px;padding:20px 0">Chargement...</div></div>
+<div id="juristes-list"><div class="i18n-loading" style="color:#6b7280;font-size:13px;padding:20px 0">Chargement...</div></div>
 </div>
 <div id="ctp-abonnement-panel" style="display:none">
-<div id="abonnement-content"><div style="color:#6b7280;font-size:13px">Chargement...</div></div>
+<div id="abonnement-content"><div class="i18n-loading" style="color:#6b7280;font-size:13px">Chargement...</div></div>
 </div>
 </div>
 </div>
 <div id="d-nouvelle" class="ds">
   <div id="d-ana-form">
-    <div style="font-size:15px;font-weight:700;color:#e2e5f0;margin-bottom:14px">Nouvelle analyse</div>
+    <div id="d-ana-form-title" style="font-size:15px;font-weight:700;color:#e2e5f0;margin-bottom:14px">Nouvelle analyse</div>
     <div id="d-drop-area" onclick="document.getElementById('d-file-input').click()" style="cursor:pointer;border:2px dashed #1f2537;border-radius:12px;padding:22px;text-align:center;margin-bottom:10px" onmouseover="this.style.borderColor='#5b7cfa'" onmouseout="this.style.borderColor='#1f2537'">
       <div style="font-size:22px;margin-bottom:5px">📤</div>
-      <div style="font-weight:600;font-size:13px;margin-bottom:3px">Déposez votre contrat ou cliquez</div>
-      <div style="color:#6b7280;font-size:11px">PDF · DOCX · TXT</div>
+      <div id="d-drop-title" style="font-weight:600;font-size:13px;margin-bottom:3px">Déposez votre contrat ou cliquez</div>
+      <div id="d-drop-hint" style="color:#6b7280;font-size:11px">PDF · DOCX · TXT</div>
     </div>
     <input type="file" id="d-file-input" accept=".pdf,.docx,.txt,.doc" style="display:none" onchange="dAnaOnFile(this)"/>
     <div id="d-file-ok" style="display:none;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:8px 12px;font-size:12px;color:#10b981;margin-bottom:10px">✅ <span id="d-file-name"></span></div>
     <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
-      <label style="font-size:11px;color:#6b7280;white-space:nowrap">Type :</label>
+      <label id="d-ana-type-label" style="font-size:11px;color:#6b7280;white-space:nowrap">Type :</label>
       <select id="d-contract-type" style="flex:1;background:#1a2035;border:1px solid #1f2537;border-radius:7px;padding:6px 10px;color:#e2e5f0;font-size:12px">
-        <option value="generic">Générique</option><option value="nda">NDA</option><option value="saas">SaaS</option>
-        <option value="purchase">Achat/Vente</option><option value="contrat de travail CDI">CDI</option>
-        <option value="contrat de travail CDD">CDD</option><option value="employment">RH / Autre</option>
-        <option value="partnership">Partenariat</option>
+        <option id="d-type-opt-generic" value="generic">Générique</option><option id="d-type-opt-nda" value="nda">NDA</option><option id="d-type-opt-saas" value="saas">SaaS</option>
+        <option id="d-type-opt-purchase" value="purchase">Achat/Vente</option><option id="d-type-opt-cdi" value="contrat de travail CDI">CDI</option>
+        <option id="d-type-opt-cdd" value="contrat de travail CDD">CDD</option><option id="d-type-opt-rh" value="employment">RH / Autre</option>
+        <option id="d-type-opt-partnership" value="partnership">Partenariat</option>
       </select>
     </div>
-    <button onclick="dAnaStart()" style="width:100%;padding:11px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:14px;cursor:pointer">Analyser →</button>
+    <button id="d-ana-start-btn" onclick="dAnaStart()" style="width:100%;padding:11px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:14px;cursor:pointer">Analyser →</button>
     <div id="d-ana-error" style="display:none;color:#ef4444;font-size:12px;margin-top:8px;padding:8px 12px;background:rgba(239,68,68,0.08);border-radius:7px"></div>
   </div>
   <div id="d-ana-loading" style="display:none;text-align:center;padding:32px 0">
@@ -263,56 +263,56 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
     <div id="d-ana-status" style="font-size:13px;color:#6b7280">Analyse en cours...</div>
   </div>
   <div id="d-ana-parties" style="display:none">
-    <div style="font-size:14px;font-weight:700;margin-bottom:5px">Quelle partie représentez-vous ?</div>
-    <div style="font-size:12px;color:#6b7280;margin-bottom:14px">L'IA adaptera ses modifications pour protéger vos intérêts.</div>
+    <div id="d-parties-title" style="font-size:14px;font-weight:700;margin-bottom:5px">Quelle partie représentez-vous ?</div>
+    <div id="d-parties-sub" style="font-size:12px;color:#6b7280;margin-bottom:14px">L'IA adaptera ses modifications pour protéger vos intérêts.</div>
     <div id="d-parties-list"></div>
-    <button onclick="dAnaReset()" style="display:block;margin:12px auto 0;padding:7px 18px;background:none;border:1px solid #1f2537;border-radius:8px;color:#6b7280;font-size:12px;cursor:pointer">← Retour</button>
+    <button id="d-parties-back-btn" onclick="dAnaReset()" style="display:block;margin:12px auto 0;padding:7px 18px;background:none;border:1px solid #1f2537;border-radius:8px;color:#6b7280;font-size:12px;cursor:pointer">← Retour</button>
   </div>
   <div id="d-ana-review" style="display:none">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:6px">
-      <div style="font-size:14px;font-weight:700">Révision du contrat</div>
+      <div id="d-review-title" style="font-size:14px;font-weight:700">Révision du contrat</div>
       <div id="d-review-stats"></div>
     </div>
     <div id="d-mods-list"></div>
     <div id="d-compliance-section"></div>
     <div id="d-review-action-bar" style="margin-top:12px"></div>
     <div style="margin-top:18px;padding-top:14px;border-top:1px solid #1f2537;display:flex;gap:8px;flex-wrap:wrap">
-      <button onclick="exportDoc()" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger avec Track Changes</button>
-      <button onclick="dAnaReset()" style="padding:10px 14px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:12px;cursor:pointer">🔄 Nouvelle</button>
+      <button id="d-export-btn" onclick="exportDoc()" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger avec Track Changes</button>
+      <button id="d-review-new-btn" onclick="dAnaReset()" style="padding:10px 14px;background:none;border:1px solid #1f2537;border-radius:9px;color:#6b7280;font-size:12px;cursor:pointer">🔄 Nouvelle</button>
     </div>
   </div>
 </div>
 <div id="d-draft" class="ds">
   <div id="draft-form-section">
-    <div style="font-size:15px;font-weight:700;color:#e2e5f0;margin-bottom:14px">Rédiger un contrat</div>
+    <div id="draft-form-title" style="font-size:15px;font-weight:700;color:#e2e5f0;margin-bottom:14px">Rédiger un contrat</div>
     <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
       <div style="flex:1;min-width:120px">
-        <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px">Type de contrat</label>
+        <label id="draft-type-label" style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px">Type de contrat</label>
         <select id="draft-type" style="width:100%;background:#1a2035;border:1px solid #1f2537;border-radius:7px;padding:7px 10px;color:#e2e5f0;font-size:12px">
-          <option value="generic">Générique</option>
-          <option value="nda">NDA / Confidentialité</option>
-          <option value="service">Prestation de services</option>
-          <option value="purchase">Achat / Vente</option>
-          <option value="employment">Contrat de travail CDI</option>
-          <option value="partnership">Partenariat</option>
-          <option value="saas">SaaS / Licence</option>
+          <option id="draft-type-opt-generic" value="generic">Générique</option>
+          <option id="draft-type-opt-nda" value="nda">NDA / Confidentialité</option>
+          <option id="draft-type-opt-service" value="service">Prestation de services</option>
+          <option id="draft-type-opt-purchase" value="purchase">Achat / Vente</option>
+          <option id="draft-type-opt-employment" value="employment">Contrat de travail CDI</option>
+          <option id="draft-type-opt-partnership" value="partnership">Partenariat</option>
+          <option id="draft-type-opt-saas" value="saas">SaaS / Licence</option>
         </select>
       </div>
       <div style="flex:1;min-width:100px">
-        <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px">Langue</label>
+        <label id="draft-lang-label" style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px">Langue</label>
         <select id="draft-lang" style="width:100%;background:#1a2035;border:1px solid #1f2537;border-radius:7px;padding:7px 10px;color:#e2e5f0;font-size:12px">
-          <option value="fr">Français</option>
-          <option value="ar">Arabe</option>
-          <option value="en">Anglais</option>
+          <option id="draft-lang-opt-fr" value="fr">Français</option>
+          <option id="draft-lang-opt-ar" value="ar">Arabe</option>
+          <option id="draft-lang-opt-en" value="en">Anglais</option>
         </select>
       </div>
     </div>
     <div style="margin-bottom:10px">
-      <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px">Partie représentée (optionnel)</label>
+      <label id="draft-partie-label" style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px">Partie représentée (optionnel)</label>
       <input id="draft-partie" type="text" placeholder="ex: Westfield Avocats" style="width:100%;background:#1a2035;border:1px solid #1f2537;border-radius:7px;padding:7px 10px;color:#e2e5f0;font-size:12px;box-sizing:border-box"/>
     </div>
     <div style="margin-bottom:12px">
-      <label style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px">Description du contrat</label>
+      <label id="draft-desc-label" style="font-size:11px;color:#6b7280;display:block;margin-bottom:4px">Description du contrat</label>
       <textarea id="draft-prompt" rows="5" placeholder="Décrivez le contrat à rédiger : parties, objet, durée, montant, conditions particulières..." style="width:100%;background:#1a2035;border:1px solid #1f2537;border-radius:7px;padding:9px 12px;color:#e2e5f0;font-size:12px;resize:vertical;box-sizing:border-box;line-height:1.5"></textarea>
     </div>
     <button onclick="generateDraft()" id="draft-btn" style="width:100%;padding:11px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:14px;cursor:pointer">✏️ Générer le contrat</button>
@@ -320,25 +320,25 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
   </div>
   <div id="draft-loading" style="display:none;text-align:center;padding:32px 0">
     <div style="width:30px;height:30px;border:3px solid #1f2537;border-top-color:#5b7cfa;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px"></div>
-    <div style="font-size:13px;color:#6b7280">Rédaction en cours...</div>
+    <div id="draft-loading-label" style="font-size:13px;color:#6b7280">Rédaction en cours...</div>
   </div>
   <div id="draft-result-section" style="display:none">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <div style="font-size:14px;font-weight:700;color:#e2e5f0">Contrat rédigé</div>
-      <button onclick="document.getElementById('draft-result-section').style.display='none';document.getElementById('draft-form-section').style.display='';" style="background:none;border:1px solid #1f2537;border-radius:7px;padding:4px 10px;color:#6b7280;font-size:11px;cursor:pointer">← Nouveau contrat</button>
+      <div id="draft-result-title" style="font-size:14px;font-weight:700;color:#e2e5f0">Contrat rédigé</div>
+      <button id="draft-result-back-btn" onclick="document.getElementById('draft-result-section').style.display='none';document.getElementById('draft-form-section').style.display='';" style="background:none;border:1px solid #1f2537;border-radius:7px;padding:4px 10px;color:#6b7280;font-size:11px;cursor:pointer">← Nouveau contrat</button>
     </div>
     <div style="background:#dde1e9;border-radius:9px;padding:14px;max-height:460px;overflow-y:auto;margin-bottom:10px">
       <div id="draft-preview" style="background:#fff;margin:0 auto;padding:36px 44px;box-shadow:0 2px 10px rgba(0,0,0,0.15);font-family:'Calibri',Arial,sans-serif;font-size:10.5pt;line-height:1.65;color:#1a1a1a;min-height:280px"></div>
     </div>
     <textarea id="draft-editor" style="display:none" oninput="draftSyncPreview()"></textarea>
     <div style="display:flex;gap:8px;margin-bottom:10px">
-      <button onclick="openChatForDraft()" style="flex:1;padding:9px;background:rgba(91,124,250,0.1);border:1px solid rgba(91,124,250,0.3);border-radius:9px;color:#5b7cfa;font-weight:700;font-size:13px;cursor:pointer">💬 Modifier avec Omniscient</button>
+      <button id="draft-chat-btn" onclick="openChatForDraft()" style="flex:1;padding:9px;background:rgba(91,124,250,0.1);border:1px solid rgba(91,124,250,0.3);border-radius:9px;color:#5b7cfa;font-weight:700;font-size:13px;cursor:pointer">💬 Modifier avec Omniscient</button>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button onclick="exportDraftDocx()" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX</button>
-      <label for="draft-adverse-file" style="flex:1;padding:10px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:9px;color:#8b5cf6;font-weight:700;font-size:13px;cursor:pointer;text-align:center;display:block">⚔ Version adverse</label>
+      <button id="draft-export-btn" onclick="exportDraftDocx()" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:9px;color:#fff;font-weight:700;font-size:13px;cursor:pointer">⬇ Télécharger DOCX</button>
+      <label id="draft-adverse-label" for="draft-adverse-file" style="flex:1;padding:10px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:9px;color:#8b5cf6;font-weight:700;font-size:13px;cursor:pointer;text-align:center;display:block">⚔ Version adverse</label>
       <input type="file" id="draft-adverse-file" accept=".docx,.txt,.pdf" style="display:none" onchange="_draftAdverseFileSelected(this)">
-      <button onclick="_toggleDraftTranslate()" style="flex:1;padding:10px;background:rgba(200,169,75,0.1);border:1px solid rgba(200,169,75,0.3);border-radius:9px;color:#c8a94b;font-weight:700;font-size:13px;cursor:pointer">🌐 Traduire</button>
+      <button id="draft-translate-btn" onclick="_toggleDraftTranslate()" style="flex:1;padding:10px;background:rgba(200,169,75,0.1);border:1px solid rgba(200,169,75,0.3);border-radius:9px;color:#c8a94b;font-weight:700;font-size:13px;cursor:pointer">🌐 Traduire</button>
     </div>
     <div id="draft-translate-panel" style="display:none;margin-top:10px">
       <div style="display:flex;flex-wrap:wrap;gap:10px">
@@ -354,8 +354,8 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 </div>
 <div id="ubar">
 <span id="ueml"></span>
-<button class="usb" style="background:#1a2035;color:#e2e5f0" onclick="showDash()">Mon espace</button>
-<button class="usb" style="background:#2a1515;color:#ef4444;border-color:#3a1f1f" onclick="doOut()">Deconnexion</button>
+<button class="usb" id="ubar-space-btn" style="background:#1a2035;color:#e2e5f0" onclick="showDash()">Mon espace</button>
+<button class="usb" id="ubar-logout-btn" style="background:#2a1515;color:#ef4444;border-color:#3a1f1f" onclick="doOut()">Deconnexion</button>
 </div>
 </style>
 </head>
@@ -403,16 +403,16 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
 
     <div class="opts">
       <div>
-        <label>Type</label>
+        <label id="type-label">Type</label>
         <select id="type">
-          <option value="generic">Générique</option>
-          <option value="nda">NDA</option>
-          <option value="saas">SaaS</option>
-          <option value="purchase">Achat/Vente</option>
-          <option value="contrat de travail CDI">CDI</option>
-          <option value="contrat de travail CDD">CDD</option>
-          <option value="employment">RH / Autre</option>
-          <option value="partnership">Partenariat</option>
+          <option id="type-opt-generic" value="generic">Générique</option>
+          <option id="type-opt-nda" value="nda">NDA</option>
+          <option id="type-opt-saas" value="saas">SaaS</option>
+          <option id="type-opt-purchase" value="purchase">Achat/Vente</option>
+          <option id="type-opt-cdi" value="contrat de travail CDI">CDI</option>
+          <option id="type-opt-cdd" value="contrat de travail CDD">CDD</option>
+          <option id="type-opt-rh" value="employment">RH / Autre</option>
+          <option id="type-opt-partnership" value="partnership">Partenariat</option>
         </select>
       </div>
     </div>
@@ -420,18 +420,18 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
     <button class="btn-main" id="btn-analyze">⬆ Analyser le contrat</button>
     <div id="usage-counter" style="text-align:center;font-size:12px;color:#6b7280;margin-top:10px"></div>
     <div id="access-code-section" style="display:none;margin-top:16px;background:rgba(91,124,250,0.06);border:1px solid rgba(91,124,250,0.2);border-radius:10px;padding:16px">
-      <div style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:12px">= Limite de 3 analyses atteinte</div>
-      <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" style="display:block;text-align:center;padding:12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border-radius:8px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:14px">
+      <div id="access-limit-title" style="font-size:13px;font-weight:600;color:#e2e5f0;margin-bottom:12px">🔒 Limite de 3 analyses atteinte</div>
+      <a href="https://westfieldavocats.com/produit/abonnement-omniscient/" target="_blank" id="access-subscribe-link" style="display:block;text-align:center;padding:12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border-radius:8px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;margin-bottom:14px">
         ⬆ Souscrire à l'accès illimité ✅
       </a>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
         <div style="flex:1;height:1px;background:#1f2537"></div>
-        <div style="font-size:11px;color:#6b7280">ou entrez votre code d'accès</div>
+        <div id="access-or-code" style="font-size:11px;color:#6b7280">ou entrez votre code d'accès</div>
         <div style="flex:1;height:1px;background:#1f2537"></div>
       </div>
       <div style="display:flex;gap:8px">
         <input type="text" id="access-code-input" placeholder="Code WF-XXXXX..." style="flex:1;background:#181c2a;border:1px solid #1f2537;border-radius:8px;padding:9px 12px;color:#e2e5f0;font-size:13px"/>
-        <button onclick="applyAccessCode()" style="padding:9px 18px;background:#5b7cfa;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Activer</button>
+        <button onclick="applyAccessCode()" id="access-activate-btn" style="padding:9px 18px;background:#5b7cfa;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Activer</button>
       </div>
       <div id="access-code-error" style="display:none;color:#ef4444;font-size:12px;margin-top:6px"></div>
       <div style="margin-top:12px;font-size:11px;color:#6b7280;text-align:center">
@@ -513,10 +513,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var payStatus=urlParams.get('payment');
     if(payStatus==='success'){
       history.replaceState(null,'',window.location.pathname);
-      setTimeout(function(){alert('✅ Paiement confirmé ! Vos 10 analyses ont été renouvelées pour tous vos utilisateurs.');if(_cu)showDash();},500);
+      setTimeout(function(){alert(_appCounterText('paymentConfirmed'));if(_cu)showDash();},500);
     } else if(payStatus==='failed'){
       history.replaceState(null,'',window.location.pathname);
-      setTimeout(function(){alert('❌ Paiement échoué ou annulé. Réessayez depuis votre tableau de bord.');},500);
+      setTimeout(function(){alert(_appCounterText('paymentFailed'));},500);
     }
   })();
   // Update usage counter from Supabase (after chkSess) or localStorage fallback
@@ -533,11 +533,14 @@ document.addEventListener('DOMContentLoaded', function() {
           var acc = await r.json();
           var rem = acc.analyses_remaining;
           if (acc.is_admin || rem === -1) {
-            counter.textContent = '∞ Accès illimité'; counter.style.color = '#10b981';
+            counter.dataset.kind = 'unlimited'; counter.dataset.n = '0';
+            counter.textContent = _appCounterText('unlimited'); counter.style.color = '#10b981';
           } else if (rem > 0) {
-            counter.textContent = rem + ' analyse' + (rem > 1 ? 's' : '') + ' restante' + (rem > 1 ? 's' : '');
+            counter.dataset.kind = 'remaining'; counter.dataset.n = String(rem);
+            counter.textContent = _appCounterText('remaining', rem);
           } else {
-            counter.textContent = '❌ Quota épuisé'; counter.style.color = '#ef4444';
+            counter.dataset.kind = 'quotaExhausted'; counter.dataset.n = '0';
+            counter.textContent = _appCounterText('quotaExhausted'); counter.style.color = '#ef4444';
           }
           return;
         }
@@ -547,9 +550,11 @@ document.addEventListener('DOMContentLoaded', function() {
     var usage = parseInt(localStorage.getItem('cs_usage') || '0');
     var remaining = 3 - usage;
     if (remaining > 0) {
-      counter.textContent = remaining + ' analyse' + (remaining > 1 ? 's' : '') + ' gratuite' + (remaining > 1 ? 's' : '') + ' restante' + (remaining > 1 ? 's' : '');
+      counter.dataset.kind = 'freeRemaining'; counter.dataset.n = String(remaining);
+      counter.textContent = _appCounterText('freeRemaining', remaining);
     } else {
-      counter.innerHTML = '❌ Limite atteinte';
+      counter.dataset.kind = 'limitReached'; counter.dataset.n = '0';
+      counter.innerHTML = _appCounterText('limitReached');
       counter.style.color = '#ef4444';
     }
   })();
@@ -925,13 +930,13 @@ function applyAccessCode() {
     localStorage.setItem('cs_access', code);
     localStorage.setItem('cs_usage', '0'); // Reset counter
     document.getElementById('access-code-section').style.display = 'none';
-    document.getElementById('usage-counter').textContent = ' Accès illimité activé';
+    document.getElementById('usage-counter').textContent = _appCounterText('accessActivated');
     document.getElementById('usage-counter').style.color = '#10b981';
     hideErr('form-error');
-    alert(' Code valide ! Accès illimité activé.');
+    alert(_appCounterText('accessCodeValidAlert'));
   } else {
     document.getElementById('access-code-error').style.display = 'block';
-    document.getElementById('access-code-error').textContent = '❌ Code invalide. Contactez contact&#64;westfieldavocats.com';
+    document.getElementById('access-code-error').textContent = _appCounterText('accessCodeInvalid');
   }
 }
 
@@ -4834,6 +4839,45 @@ var _appStrings = {
     exportSectionTitle: 'Générer le document final',
     btnExport: ' Télécharger avec Track Changes', btnNewAnalysis: '🔄 Analyser un autre contrat',
     atpMods: '📋 Modifications', atpAdverse: '⚔ Version adverse', atpTranslate: '🌐 Traduction bilingue',
+    ubarSpace: 'Mon espace', ubarLogout: 'Deconnexion',
+    typeLabel: 'Type', typeGeneric: 'Générique', typeNda: 'NDA', typeSaas: 'SaaS', typePurchase: 'Achat/Vente',
+    typeCdi: 'CDI', typeCdd: 'CDD', typeRh: 'RH / Autre', typePartnership: 'Partenariat',
+    btnAnalyzeMain: '⬆ Analyser le contrat',
+    accessLimitTitle: '🔒 Limite de 3 analyses atteinte',
+    accessSubscribe: '⬆ Souscrire à l\'accès illimité ✅',
+    accessOrCode: 'ou entrez votre code d\'accès', accessCodePh: 'Code WF-XXXXX...', accessActivate: 'Activer',
+    btnBack: '← Retour',
+    dtbNouvelle: '➕ Nouvelle analyse', dtbAdverseStandalone: '⚔ Analyser une version adverse',
+    anaBackLabel: 'Analyses', standaloneAdverseBackLabel: 'Analyses', standaloneAdverseTitle: '⚔ Analyser une version adverse',
+    dtbNewDraft: '➕ Nouveau draft',
+    modelsUploadLabel: '+ Soumettre un modele de contrat',
+    opinionsTitle: '⚖ Avis juridique',
+    opinionsDesc: 'Posez une question juridique générale à l\'assistant Omniscient — pas besoin d\'avoir un contrat ouvert. L\'assistant s\'appuie sur la même base documentaire (lois, doctrine, jurisprudence) que l\'analyse de contrats.',
+    opinionsHistoryLabel: 'Historique', opinionsNewBtn: '➕ Nouvel avis',
+    ctpJuristesLabel: 'Equipe',
+    loadingGeneric: 'Chargement...',
+    dAnaFormTitle: 'Nouvelle analyse', dDropTitle: 'Déposez votre contrat ou cliquez', dDropHint: 'PDF · DOCX · TXT',
+    dAnaTypeLabel: 'Type :', dAnaStartBtn: 'Analyser →', dAnaStatus: 'Analyse en cours...',
+    dPartiesTitle: 'Quelle partie représentez-vous ?', dPartiesSub: 'L\'IA adaptera ses modifications pour protéger vos intérêts.',
+    dPartiesBackBtn: '← Retour', dReviewTitle: 'Révision du contrat',
+    dExportBtn: '⬇ Télécharger avec Track Changes', dReviewNewBtn: '🔄 Nouvelle',
+    draftFormTitle: 'Rédiger un contrat',
+    draftTypeLabel: 'Type de contrat',
+    draftTypeGeneric: 'Générique', draftTypeNda: 'NDA / Confidentialité', draftTypeService: 'Prestation de services',
+    draftTypePurchase: 'Achat / Vente', draftTypeEmployment: 'Contrat de travail CDI',
+    draftTypePartnership: 'Partenariat', draftTypeSaas: 'SaaS / Licence',
+    draftLangLabel: 'Langue', draftLangFr: 'Français', draftLangAr: 'Arabe', draftLangEn: 'Anglais',
+    draftPartieLabel: 'Partie représentée (optionnel)', draftDescLabel: 'Description du contrat',
+    draftLoadingLabel: 'Rédaction en cours...', draftResultTitle: 'Contrat rédigé', draftResultBackBtn: '← Nouveau contrat',
+    draftChatBtn: '💬 Modifier avec Omniscient', draftExportBtn: '⬇ Télécharger DOCX',
+    draftAdverseLabel: '⚔ Version adverse', draftTranslateBtn: '🌐 Traduire',
+    unlimitedAccess: '∞ Accès illimité', quotaExhausted: '❌ Quota épuisé', limitReached: '❌ Limite atteinte',
+    paymentConfirmed: '✅ Paiement confirmé ! Vos 10 analyses ont été renouvelées pour tous vos utilisateurs.',
+    paymentFailed: '❌ Paiement échoué ou annulé. Réessayez depuis votre tableau de bord.',
+    accessActivated: '✅ Accès illimité activé', accessCodeValidAlert: '✅ Code valide ! Accès illimité activé.',
+    accessCodeInvalid: '❌ Code invalide. Contactez contact@westfieldavocats.com',
+    analysisWord: 'analyse', analysisWordPl: 'analyses', remainingWord: 'restante', remainingWordPl: 'restantes',
+    freeWord: 'gratuite', freeWordPl: 'gratuites',
   },
   en: {
     heroH1: 'Review your contracts<br/><span class="accent">with AI.</span>',
@@ -4865,6 +4909,45 @@ var _appStrings = {
     exportSectionTitle: 'Generate the final document',
     btnExport: ' Download with Track Changes', btnNewAnalysis: '🔄 Analyze another contract',
     atpMods: '📋 Modifications', atpAdverse: '⚔ Counterparty version', atpTranslate: '🌐 Bilingual translation',
+    ubarSpace: 'My account', ubarLogout: 'Log out',
+    typeLabel: 'Type', typeGeneric: 'Generic', typeNda: 'NDA', typeSaas: 'SaaS', typePurchase: 'Purchase/Sale',
+    typeCdi: 'Permanent contract', typeCdd: 'Fixed-term contract', typeRh: 'HR / Other', typePartnership: 'Partnership',
+    btnAnalyzeMain: '⬆ Analyze the contract',
+    accessLimitTitle: '🔒 3-analysis limit reached',
+    accessSubscribe: '⬆ Subscribe for unlimited access ✅',
+    accessOrCode: 'or enter your access code', accessCodePh: 'Code WF-XXXXX...', accessActivate: 'Activate',
+    btnBack: '← Back',
+    dtbNouvelle: '➕ New analysis', dtbAdverseStandalone: '⚔ Review a counterparty version',
+    anaBackLabel: 'Analyses', standaloneAdverseBackLabel: 'Analyses', standaloneAdverseTitle: '⚔ Review a counterparty version',
+    dtbNewDraft: '➕ New draft',
+    modelsUploadLabel: '+ Submit a contract template',
+    opinionsTitle: '⚖ Legal opinion',
+    opinionsDesc: 'Ask the Omniscient assistant a general legal question — no need to have a contract open. The assistant relies on the same knowledge base (laws, doctrine, case law) used for contract analysis.',
+    opinionsHistoryLabel: 'History', opinionsNewBtn: '➕ New opinion',
+    ctpJuristesLabel: 'Team',
+    loadingGeneric: 'Loading...',
+    dAnaFormTitle: 'New analysis', dDropTitle: 'Drop your contract or click', dDropHint: 'PDF · DOCX · TXT',
+    dAnaTypeLabel: 'Type:', dAnaStartBtn: 'Analyze →', dAnaStatus: 'Analysis in progress...',
+    dPartiesTitle: 'Which party do you represent?', dPartiesSub: 'The AI will tailor its edits to protect your interests.',
+    dPartiesBackBtn: '← Back', dReviewTitle: 'Contract review',
+    dExportBtn: '⬇ Download with Track Changes', dReviewNewBtn: '🔄 New',
+    draftFormTitle: 'Draft a contract',
+    draftTypeLabel: 'Contract type',
+    draftTypeGeneric: 'Generic', draftTypeNda: 'NDA / Confidentiality', draftTypeService: 'Service agreement',
+    draftTypePurchase: 'Purchase / Sale', draftTypeEmployment: 'Permanent employment contract',
+    draftTypePartnership: 'Partnership', draftTypeSaas: 'SaaS / License',
+    draftLangLabel: 'Language', draftLangFr: 'French', draftLangAr: 'Arabic', draftLangEn: 'English',
+    draftPartieLabel: 'Represented party (optional)', draftDescLabel: 'Contract description',
+    draftLoadingLabel: 'Drafting in progress...', draftResultTitle: 'Contract drafted', draftResultBackBtn: '← New contract',
+    draftChatBtn: '💬 Edit with Omniscient', draftExportBtn: '⬇ Download DOCX',
+    draftAdverseLabel: '⚔ Counterparty version', draftTranslateBtn: '🌐 Translate',
+    unlimitedAccess: '∞ Unlimited access', quotaExhausted: '❌ Quota exhausted', limitReached: '❌ Limit reached',
+    paymentConfirmed: '✅ Payment confirmed! 10 analyses have been renewed for all your users.',
+    paymentFailed: '❌ Payment failed or cancelled. Please retry from your dashboard.',
+    accessActivated: '✅ Unlimited access activated', accessCodeValidAlert: '✅ Valid code! Unlimited access activated.',
+    accessCodeInvalid: '❌ Invalid code. Contact contact@westfieldavocats.com',
+    analysisWord: 'analysis', analysisWordPl: 'analyses', remainingWord: 'remaining', remainingWordPl: 'remaining',
+    freeWord: 'free', freeWordPl: 'free',
   },
   es: {
     heroH1: 'Revise sus contratos<br/><span class="accent">con IA.</span>',
@@ -4896,8 +4979,75 @@ var _appStrings = {
     exportSectionTitle: 'Generar el documento final',
     btnExport: ' Descargar con control de cambios', btnNewAnalysis: '🔄 Analizar otro contrato',
     atpMods: '📋 Modificaciones', atpAdverse: '⚔ Versión de la contraparte', atpTranslate: '🌐 Traducción bilingüe',
+    ubarSpace: 'Mi espacio', ubarLogout: 'Cerrar sesión',
+    typeLabel: 'Tipo', typeGeneric: 'Genérico', typeNda: 'NDA', typeSaas: 'SaaS', typePurchase: 'Compra/Venta',
+    typeCdi: 'Contrato indefinido', typeCdd: 'Contrato de duración determinada', typeRh: 'RRHH / Otro', typePartnership: 'Asociación',
+    btnAnalyzeMain: '⬆ Analizar el contrato',
+    accessLimitTitle: '🔒 Límite de 3 análisis alcanzado',
+    accessSubscribe: '⬆ Suscribirse para acceso ilimitado ✅',
+    accessOrCode: 'o introduzca su código de acceso', accessCodePh: 'Código WF-XXXXX...', accessActivate: 'Activar',
+    btnBack: '← Volver',
+    dtbNouvelle: '➕ Nuevo análisis', dtbAdverseStandalone: '⚔ Analizar una versión de la contraparte',
+    anaBackLabel: 'Análisis', standaloneAdverseBackLabel: 'Análisis', standaloneAdverseTitle: '⚔ Analizar una versión de la contraparte',
+    dtbNewDraft: '➕ Nuevo borrador',
+    modelsUploadLabel: '+ Enviar una plantilla de contrato',
+    opinionsTitle: '⚖ Opinión legal',
+    opinionsDesc: 'Hágale una pregunta legal general al asistente Omniscient — no necesita tener un contrato abierto. El asistente se basa en la misma base documental (leyes, doctrina, jurisprudencia) que el análisis de contratos.',
+    opinionsHistoryLabel: 'Historial', opinionsNewBtn: '➕ Nueva consulta',
+    ctpJuristesLabel: 'Equipo',
+    loadingGeneric: 'Cargando...',
+    dAnaFormTitle: 'Nuevo análisis', dDropTitle: 'Suelte su contrato o haga clic', dDropHint: 'PDF · DOCX · TXT',
+    dAnaTypeLabel: 'Tipo:', dAnaStartBtn: 'Analizar →', dAnaStatus: 'Análisis en curso...',
+    dPartiesTitle: '¿A qué parte representa?', dPartiesSub: 'La IA adaptará sus modificaciones para proteger sus intereses.',
+    dPartiesBackBtn: '← Volver', dReviewTitle: 'Revisión del contrato',
+    dExportBtn: '⬇ Descargar con control de cambios', dReviewNewBtn: '🔄 Nuevo',
+    draftFormTitle: 'Redactar un contrato',
+    draftTypeLabel: 'Tipo de contrato',
+    draftTypeGeneric: 'Genérico', draftTypeNda: 'NDA / Confidencialidad', draftTypeService: 'Prestación de servicios',
+    draftTypePurchase: 'Compra / Venta', draftTypeEmployment: 'Contrato de trabajo indefinido',
+    draftTypePartnership: 'Asociación', draftTypeSaas: 'SaaS / Licencia',
+    draftLangLabel: 'Idioma', draftLangFr: 'Francés', draftLangAr: 'Árabe', draftLangEn: 'Inglés',
+    draftPartieLabel: 'Parte representada (opcional)', draftDescLabel: 'Descripción del contrato',
+    draftLoadingLabel: 'Redacción en curso...', draftResultTitle: 'Contrato redactado', draftResultBackBtn: '← Nuevo contrato',
+    draftChatBtn: '💬 Modificar con Omniscient', draftExportBtn: '⬇ Descargar DOCX',
+    draftAdverseLabel: '⚔ Versión de la contraparte', draftTranslateBtn: '🌐 Traducir',
+    unlimitedAccess: '∞ Acceso ilimitado', quotaExhausted: '❌ Cuota agotada', limitReached: '❌ Límite alcanzado',
+    paymentConfirmed: '✅ ¡Pago confirmado! Se han renovado 10 análisis para todos sus usuarios.',
+    paymentFailed: '❌ Pago fallido o cancelado. Vuelva a intentarlo desde su panel.',
+    accessActivated: '✅ Acceso ilimitado activado', accessCodeValidAlert: '✅ ¡Código válido! Acceso ilimitado activado.',
+    accessCodeInvalid: '❌ Código inválido. Contacte contact@westfieldavocats.com',
+    analysisWord: 'análisis', analysisWordPl: 'análisis', remainingWord: 'restante', remainingWordPl: 'restantes',
+    freeWord: 'gratuito', freeWordPl: 'gratuitos',
   }
 };
+function _appCounterText(kind, n) {
+  var l = _appLang, s = _appStrings[l] || _appStrings.fr;
+  switch (kind) {
+    case 'unlimited': return s.unlimitedAccess;
+    case 'quotaExhausted': return s.quotaExhausted;
+    case 'limitReached': return s.limitReached;
+    case 'paymentConfirmed': return s.paymentConfirmed;
+    case 'paymentFailed': return s.paymentFailed;
+    case 'accessActivated': return s.accessActivated;
+    case 'accessCodeValidAlert': return s.accessCodeValidAlert;
+    case 'accessCodeInvalid': return s.accessCodeInvalid;
+    case 'remaining':
+      if (l === 'en') return n + ' ' + (n > 1 ? s.analysisWordPl : s.analysisWord) + ' ' + s.remainingWord;
+      if (l === 'es') return n + ' ' + s.analysisWord + ' ' + (n > 1 ? s.remainingWordPl : s.remainingWord);
+      return n + ' ' + (n > 1 ? s.analysisWordPl : s.analysisWord) + ' ' + (n > 1 ? s.remainingWordPl : s.remainingWord);
+    case 'freeRemaining':
+      if (l === 'en') return n + ' ' + s.freeWord + ' ' + (n > 1 ? s.analysisWordPl : s.analysisWord) + ' ' + s.remainingWord;
+      if (l === 'es') return n + ' ' + s.analysisWord + ' ' + (n > 1 ? s.freeWordPl : s.freeWord) + ' ' + (n > 1 ? s.remainingWordPl : s.remainingWord);
+      return n + ' ' + (n > 1 ? s.analysisWordPl : s.analysisWord) + ' ' + (n > 1 ? s.freeWordPl : s.freeWord) + ' ' + (n > 1 ? s.remainingWordPl : s.remainingWord);
+  }
+  return '';
+}
+function _appRefreshDynamic() {
+  var counter = document.getElementById('usage-counter');
+  if (counter && counter.dataset.kind) {
+    counter.textContent = _appCounterText(counter.dataset.kind, parseInt(counter.dataset.n || '0', 10));
+  }
+}
 function appSetLang(l) {
   if (_APP_LANGS.indexOf(l) === -1) l = 'fr';
   _appLang = l;
@@ -4942,6 +5092,53 @@ function appSetLang(l) {
   var am = document.getElementById('atp-mods-btn'); if (am) am.textContent = s.atpMods;
   var aa = document.getElementById('atp-adverse-btn'); if (aa) aa.textContent = s.atpAdverse;
   var atr = document.getElementById('atp-translate-btn'); if (atr) atr.textContent = s.atpTranslate;
+  // Top toolbar
+  var _t = function(id, key, attr) { var el = document.getElementById(id); if (el) el[attr || 'textContent'] = s[key]; };
+  _t('ubar-space-btn', 'ubarSpace'); _t('ubar-logout-btn', 'ubarLogout');
+  // Upload form chrome
+  _t('type-label', 'typeLabel');
+  _t('type-opt-generic', 'typeGeneric'); _t('type-opt-nda', 'typeNda'); _t('type-opt-saas', 'typeSaas');
+  _t('type-opt-purchase', 'typePurchase'); _t('type-opt-cdi', 'typeCdi'); _t('type-opt-cdd', 'typeCdd');
+  _t('type-opt-rh', 'typeRh'); _t('type-opt-partnership', 'typePartnership');
+  _t('btn-analyze', 'btnAnalyzeMain');
+  var ctx = document.getElementById('contract-text'); if (ctx) ctx.placeholder = (l === 'en' ? 'Paste your contract text here...' : l === 'es' ? 'Pegue aquí el texto de su contrato...' : 'Collez le texte de votre contrat ici...');
+  _t('access-limit-title', 'accessLimitTitle'); _t('access-subscribe-link', 'accessSubscribe');
+  _t('access-or-code', 'accessOrCode'); _t('access-code-input', 'accessCodePh', 'placeholder');
+  _t('access-activate-btn', 'accessActivate');
+  _t('btn-back', 'btnBack');
+  // Dashboard panels
+  _t('dtb-nouvelle', 'dtbNouvelle'); _t('dtb-adverse-standalone-btn', 'dtbAdverseStandalone');
+  _t('ana-back-label', 'anaBackLabel'); _t('standalone-adverse-back-label', 'standaloneAdverseBackLabel');
+  _t('standalone-adverse-title', 'standaloneAdverseTitle');
+  _t('dtb-new-draft-btn', 'dtbNewDraft'); _t('models-upload-label', 'modelsUploadLabel');
+  _t('opinions-title', 'opinionsTitle'); _t('opinions-desc', 'opinionsDesc');
+  _t('opinions-history-label', 'opinionsHistoryLabel'); _t('opinions-new-btn', 'opinionsNewBtn');
+  _t('ctp-juristes-label', 'ctpJuristesLabel');
+  document.querySelectorAll('.i18n-loading').forEach(function(el) { el.textContent = s.loadingGeneric; });
+  // d-nouvelle (dashboard new analysis)
+  _t('d-ana-form-title', 'dAnaFormTitle'); _t('d-drop-title', 'dDropTitle'); _t('d-drop-hint', 'dDropHint');
+  _t('d-ana-type-label', 'dAnaTypeLabel');
+  _t('d-type-opt-generic', 'typeGeneric'); _t('d-type-opt-nda', 'typeNda'); _t('d-type-opt-saas', 'typeSaas');
+  _t('d-type-opt-purchase', 'typePurchase'); _t('d-type-opt-cdi', 'typeCdi'); _t('d-type-opt-cdd', 'typeCdd');
+  _t('d-type-opt-rh', 'typeRh'); _t('d-type-opt-partnership', 'typePartnership');
+  _t('d-ana-start-btn', 'dAnaStartBtn'); _t('d-ana-status', 'dAnaStatus');
+  _t('d-parties-title', 'dPartiesTitle'); _t('d-parties-sub', 'dPartiesSub'); _t('d-parties-back-btn', 'dPartiesBackBtn');
+  _t('d-review-title', 'dReviewTitle'); _t('d-export-btn', 'dExportBtn'); _t('d-review-new-btn', 'dReviewNewBtn');
+  // d-draft (dashboard contract drafting)
+  _t('draft-form-title', 'draftFormTitle'); _t('draft-type-label', 'draftTypeLabel');
+  _t('draft-type-opt-generic', 'draftTypeGeneric'); _t('draft-type-opt-nda', 'draftTypeNda');
+  _t('draft-type-opt-service', 'draftTypeService'); _t('draft-type-opt-purchase', 'draftTypePurchase');
+  _t('draft-type-opt-employment', 'draftTypeEmployment'); _t('draft-type-opt-partnership', 'draftTypePartnership');
+  _t('draft-type-opt-saas', 'draftTypeSaas');
+  _t('draft-lang-label', 'draftLangLabel');
+  _t('draft-lang-opt-fr', 'draftLangFr'); _t('draft-lang-opt-ar', 'draftLangAr'); _t('draft-lang-opt-en', 'draftLangEn');
+  _t('draft-partie-label', 'draftPartieLabel'); _t('draft-desc-label', 'draftDescLabel');
+  _t('draft-loading-label', 'draftLoadingLabel'); _t('draft-result-title', 'draftResultTitle');
+  _t('draft-result-back-btn', 'draftResultBackBtn');
+  _t('draft-chat-btn', 'draftChatBtn'); _t('draft-export-btn', 'draftExportBtn');
+  _t('draft-adverse-label', 'draftAdverseLabel'); _t('draft-translate-btn', 'draftTranslateBtn');
+  // Re-render the usage counter / dynamic strings if currently shown
+  if (typeof _appRefreshDynamic === 'function') _appRefreshDynamic();
   // Toggle button styles (both the home header switcher and the dashboard switcher)
   ['app-lang-', 'dash-lang-'].forEach(function(prefix) {
     _APP_LANGS.forEach(function(code) {
