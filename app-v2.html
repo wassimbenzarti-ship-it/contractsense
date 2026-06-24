@@ -376,6 +376,7 @@ h1 { font-size: clamp(28px, 5vw, 46px); font-weight: 800; letter-spacing: -1.5px
   <div id="step-form">
     <h1 class="fadein" id="app-hero-h1">Révisez vos contrats<br/><span class="accent">avec l'IA.</span></h1>
     <p class="desc" id="app-hero-sub">Uploadez votre contrat. L'IA identifie les parties, vous choisissez laquelle protéger, puis propose des modifications avec Track Changes.</p>
+    <p id="app-hero-teaser" style="font-size:12px;color:#7c6fcd;margin:-4px 0 14px;line-height:1.5">✨ Avec un compte : rédigez des contrats de zéro et obtenez des avis juridiques instantanés.</p>
 
     <div class="tabs">
       <button class="tab active" id="tab-upload">📤 Uploader</button>
@@ -4812,6 +4813,7 @@ var _appStrings = {
   fr: {
     heroH1: 'Révisez vos contrats<br/><span class="accent">avec l\'IA.</span>',
     heroSub: 'Uploadez votre contrat. L\'IA identifie les parties, vous choisissez laquelle protéger, puis propose des modifications avec Track Changes.',
+    heroTeaser: '✨ Avec un compte : rédigez des contrats de zéro et obtenez des avis juridiques instantanés.',
     uploadTitle: 'Déposez votre contrat ici',
     uploadSub: 'ou cliquez pour sélectionner',
     btnAnalyse: '⚡ Analyser',
@@ -4882,6 +4884,7 @@ var _appStrings = {
   en: {
     heroH1: 'Review your contracts<br/><span class="accent">with AI.</span>',
     heroSub: 'Upload your contract. The AI identifies the parties, you choose which one to protect, then it suggests edits with Track Changes.',
+    heroTeaser: '✨ With an account: draft contracts from scratch and get instant legal opinions.',
     uploadTitle: 'Drop your contract here',
     uploadSub: 'or click to select',
     btnAnalyse: '⚡ Analyze',
@@ -4952,6 +4955,7 @@ var _appStrings = {
   es: {
     heroH1: 'Revise sus contratos<br/><span class="accent">con IA.</span>',
     heroSub: 'Suba su contrato. La IA identifica a las partes, usted elige cuál proteger y luego propone modificaciones con control de cambios.',
+    heroTeaser: '✨ Con una cuenta: redacte contratos desde cero y obtenga opiniones jurídicas al instante.',
     uploadTitle: 'Suelte su contrato aquí',
     uploadSub: 'o haga clic para seleccionar',
     btnAnalyse: '⚡ Analizar',
@@ -5055,6 +5059,7 @@ function appSetLang(l) {
   var s = _appStrings[l] || _appStrings.fr;
   var h1 = document.getElementById('app-hero-h1'); if (h1) h1.innerHTML = s.heroH1;
   var sub = document.getElementById('app-hero-sub'); if (sub) sub.textContent = s.heroSub;
+  _t('app-hero-teaser', 'heroTeaser');
   var dt = document.getElementById('drop-title'); if (dt) dt.textContent = s.uploadTitle;
   var ds = document.getElementById('drop-sub'); if (ds) ds.textContent = s.uploadSub;
   var dt2 = document.getElementById('dash-title'); if (dt2) dt2.textContent = s.dashTitle;
