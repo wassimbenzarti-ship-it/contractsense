@@ -739,11 +739,13 @@ async function analyze() {
       }
     }catch(e){console.log('Gate check error:',e);}
   }
-  // Utilisateur non connecté → limite localStorage (3/semaine)
+  // Utilisateur non connecté → limite localStorage
   if(!_cu){
     var usage = parseInt(localStorage.getItem('cs_usage') || '0');
     if (usage >= 3) {
       showErr('form-error','<strong>3 analyses gratuites utilisées.</strong><br>Créez un compte pour continuer.');
+      var _acs2 = document.getElementById('access-code-section');
+      if (_acs2) _acs2.style.display = '';
       return;
     }
   }
@@ -893,6 +895,9 @@ async function analyzeWithPartie(partieName) {
           _ctr0.innerHTML = _appCounterText('limitReached');
           _ctr0.style.color = '#ef4444';
         }
+        var _acs = document.getElementById('access-code-section');
+        if (_acs) _acs.style.display = '';
+        throw new Error('<strong>3 analyses gratuites utilisées.</strong><br>Créez un compte pour continuer.');
       }
       throw new Error(errData.error || ('Erreur serveur (' + resp.status + ')'));
     }
