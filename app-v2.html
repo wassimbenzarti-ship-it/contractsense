@@ -909,6 +909,24 @@ async function analyzeWithPartie(partieName) {
       }).filter(function(c) { return c.name.length > 5; });
     }
 
+    // Increment usage counter for non-connected users
+    if (!_cu) {
+      var _u = parseInt(localStorage.getItem('cs_usage') || '0');
+      var _newU = _u + 1;
+      localStorage.setItem('cs_usage', String(_newU));
+      var _ctr = document.getElementById('usage-counter');
+      if (_ctr) {
+        var _rem = Math.max(0, 3 - _newU);
+        if (_rem > 0) {
+          _ctr.dataset.kind = 'freeRemaining'; _ctr.dataset.n = String(_rem);
+          _ctr.textContent = _appCounterText('freeRemaining', _rem);
+        } else {
+          _ctr.dataset.kind = 'limitReached'; _ctr.dataset.n = '0';
+          _ctr.innerHTML = _appCounterText('limitReached');
+          _ctr.style.color = '#ef4444';
+        }
+      }
+    }
     stopLoadingTimer(); hide('step-loading');
     renderReview();
     // Auto-save après analyse (flow principal)
