@@ -990,7 +990,8 @@ function updateStats() {
   var a = Object.values(decisions).filter(function(d){return d==='accepted';}).length;
   var r = Object.values(decisions).filter(function(d){return d==='rejected';}).length;
   var p = Object.values(decisions).filter(function(d){return d==='pending';}).length;
-  var _sh = '<span class="stat stat-pending">' + p + ' en attente</span><span class="stat stat-accepted">' + a + ' acceptées</span><span class="stat stat-rejected">' + r + ' refusées</span>';
+  var _ss = _appStrings[_appLang] || _appStrings.fr;
+  var _sh = '<span class="stat stat-pending">' + p + ' ' + _ss.pending + '</span><span class="stat stat-accepted">' + a + ' ' + _ss.accepted + '</span><span class="stat stat-rejected">' + r + ' ' + _ss.rejected + '</span>';
   var _s1=document.getElementById('review-stats'); if(_s1)_s1.innerHTML=_sh;
   var _s2=document.getElementById('d-review-stats'); if(_s2)_s2.innerHTML=_sh;
 }
@@ -1125,16 +1126,17 @@ function renderReview() {
       var _nm=modifications.filter(function(m){return m.risk==='medium';}).length;
       var _nl=modifications.filter(function(m){return m.risk==='low';}).length;
       var _tot=modifications.length;
+      var _fi = _appStrings[_appLang] || _appStrings.fr;
       _bar.innerHTML=
         '<div style="display:flex;flex-wrap:wrap;gap:7px;align-items:center">'
-        +'<span style="font-size:11px;color:#6b7280;font-weight:600">Filtrer&nbsp;:</span>'
-        +(_nh?'<button id="flt-high" onclick="_filterMods(\'high\')" style="padding:3px 10px;background:#ef444418;border:1px solid #ef444444;border-radius:20px;color:#ef4444;font-size:11px;font-weight:600;cursor:pointer">🔴 Critiques ('+_nh+')</button>':'')
-        +(_nm?'<button id="flt-medium" onclick="_filterMods(\'medium\')" style="padding:3px 10px;background:#f59e0b18;border:1px solid #f59e0b44;border-radius:20px;color:#f59e0b;font-size:11px;font-weight:600;cursor:pointer">🟡 Importantes ('+_nm+')</button>':'')
-        +(_nl?'<button id="flt-low" onclick="_filterMods(\'low\')" style="padding:3px 10px;background:#10b98118;border:1px solid #10b98144;border-radius:20px;color:#10b981;font-size:11px;font-weight:600;cursor:pointer">⚪ Faibles ('+_nl+')</button>':'')
-        +'<button id="flt-all" onclick="_filterMods(null)" style="padding:3px 10px;background:#5b7cfa30;border:1px solid #5b7cfa66;border-radius:20px;color:#5b7cfa;font-size:11px;font-weight:700;cursor:pointer">Toutes ('+_tot+')</button>'
+        +'<span style="font-size:11px;color:#6b7280;font-weight:600">'+_fi.filterLabel+'</span>'
+        +(_nh?'<button id="flt-high" onclick="_filterMods(\'high\')" style="padding:3px 10px;background:#ef444418;border:1px solid #ef444444;border-radius:20px;color:#ef4444;font-size:11px;font-weight:600;cursor:pointer">🔴 '+_fi.critical+' ('+_nh+')</button>':'')
+        +(_nm?'<button id="flt-medium" onclick="_filterMods(\'medium\')" style="padding:3px 10px;background:#f59e0b18;border:1px solid #f59e0b44;border-radius:20px;color:#f59e0b;font-size:11px;font-weight:600;cursor:pointer">🟡 '+_fi.important+' ('+_nm+')</button>':'')
+        +(_nl?'<button id="flt-low" onclick="_filterMods(\'low\')" style="padding:3px 10px;background:#10b98118;border:1px solid #10b98144;border-radius:20px;color:#10b981;font-size:11px;font-weight:600;cursor:pointer">⚪ '+_fi.lowRisk+' ('+_nl+')</button>':'')
+        +'<button id="flt-all" onclick="_filterMods(null)" style="padding:3px 10px;background:#5b7cfa30;border:1px solid #5b7cfa66;border-radius:20px;color:#5b7cfa;font-size:11px;font-weight:700;cursor:pointer">'+_fi.allMods+' ('+_tot+')</button>'
         +'<span style="flex:1"></span>'
-        +'<button onclick="_collapseAll()" style="padding:3px 10px;background:#ffffff08;border:1px solid #2a3040;border-radius:20px;color:#9ca3af;font-size:11px;cursor:pointer">▲ Replier</button>'
-        +'<button onclick="_expandAll()" style="padding:3px 10px;background:#ffffff08;border:1px solid #2a3040;border-radius:20px;color:#9ca3af;font-size:11px;cursor:pointer">▼ Déplier</button>'
+        +'<button onclick="_collapseAll()" style="padding:3px 10px;background:#ffffff08;border:1px solid #2a3040;border-radius:20px;color:#9ca3af;font-size:11px;cursor:pointer">'+_fi.collapseAll+'</button>'
+        +'<button onclick="_expandAll()" style="padding:3px 10px;background:#ffffff08;border:1px solid #2a3040;border-radius:20px;color:#9ca3af;font-size:11px;cursor:pointer">'+_fi.expandAll+'</button>'
         +'<button onclick="exportDoc()" style="padding:3px 12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:20px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">⬇ DOCX</button>'
         +'</div>';
       window._modFilter=null;
@@ -2773,15 +2775,16 @@ function _renderAnaModsTab(idx){
   var nH=mods.filter(function(m){return m.risk==='high';}).length;
   var nM=mods.filter(function(m){return m.risk==='medium';}).length;
   var nL=mods.filter(function(m){return m.risk==='low';}).length;
+  var _fid = _appStrings[_appLang] || _appStrings.fr;
   var filterBar='<div style="position:sticky;top:60px;z-index:40;background:#0a0c12dd;backdrop-filter:blur(4px);padding:6px 0;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center">'
-    +'<span style="font-size:11px;color:#6b7280;font-weight:600">Filtrer&nbsp;:</span>'
-    +(nH?'<button onclick="_filterAna(\'high\')" style="padding:3px 10px;background:#ef444418;border:1px solid #ef444440;border-radius:20px;color:#ef4444;font-size:11px;font-weight:600;cursor:pointer">🔴 Critiques ('+nH+')</button>':'')
-    +(nM?'<button onclick="_filterAna(\'medium\')" style="padding:3px 10px;background:#f59e0b18;border:1px solid #f59e0b40;border-radius:20px;color:#f59e0b;font-size:11px;font-weight:600;cursor:pointer">🟡 Importantes ('+nM+')</button>':'')
-    +(nL?'<button onclick="_filterAna(\'low\')" style="padding:3px 10px;background:#10b98118;border:1px solid #10b98140;border-radius:20px;color:#10b981;font-size:11px;font-weight:600;cursor:pointer">⚪ Faibles ('+nL+')</button>':'')
-    +'<button onclick="_filterAna(null)" style="padding:3px 10px;background:#5b7cfa20;border:1px solid #5b7cfa50;border-radius:20px;color:#5b7cfa;font-size:11px;font-weight:700;cursor:pointer">Toutes ('+(nH+nM+nL)+')</button>'
+    +'<span style="font-size:11px;color:#6b7280;font-weight:600">'+_fid.filterLabel+'</span>'
+    +(nH?'<button onclick="_filterAna(\'high\')" style="padding:3px 10px;background:#ef444418;border:1px solid #ef444440;border-radius:20px;color:#ef4444;font-size:11px;font-weight:600;cursor:pointer">🔴 '+_fid.critical+' ('+nH+')</button>':'')
+    +(nM?'<button onclick="_filterAna(\'medium\')" style="padding:3px 10px;background:#f59e0b18;border:1px solid #f59e0b40;border-radius:20px;color:#f59e0b;font-size:11px;font-weight:600;cursor:pointer">🟡 '+_fid.important+' ('+nM+')</button>':'')
+    +(nL?'<button onclick="_filterAna(\'low\')" style="padding:3px 10px;background:#10b98118;border:1px solid #10b98140;border-radius:20px;color:#10b981;font-size:11px;font-weight:600;cursor:pointer">⚪ '+_fid.lowRisk+' ('+nL+')</button>':'')
+    +'<button onclick="_filterAna(null)" style="padding:3px 10px;background:#5b7cfa20;border:1px solid #5b7cfa50;border-radius:20px;color:#5b7cfa;font-size:11px;font-weight:700;cursor:pointer">'+_fid.allMods+' ('+(nH+nM+nL)+')</button>'
     +'<span style="flex:1"></span>'
-    +'<button onclick="_collapseAna()" style="padding:3px 10px;background:#ffffff08;border:1px solid #2a3040;border-radius:20px;color:#9ca3af;font-size:11px;cursor:pointer">▲ Replier</button>'
-    +'<button onclick="_expandAna()" style="padding:3px 10px;background:#ffffff08;border:1px solid #2a3040;border-radius:20px;color:#9ca3af;font-size:11px;cursor:pointer">▼ Déplier</button>'
+    +'<button onclick="_collapseAna()" style="padding:3px 10px;background:#ffffff08;border:1px solid #2a3040;border-radius:20px;color:#9ca3af;font-size:11px;cursor:pointer">'+_fid.collapseAll+'</button>'
+    +'<button onclick="_expandAna()" style="padding:3px 10px;background:#ffffff08;border:1px solid #2a3040;border-radius:20px;color:#9ca3af;font-size:11px;cursor:pointer">'+_fid.expandAll+'</button>'
     +'<button onclick="dlUserAnalysis()" style="padding:3px 12px;background:linear-gradient(135deg,#5b7cfa,#8b5cf6);border:none;border-radius:20px;color:#fff;font-size:11px;font-weight:700;cursor:pointer">⬇ DOCX</button>'
     +'</div>';
   // Restore director decisions embedded in mods (survives page reloads)
@@ -4878,6 +4881,17 @@ var _appStrings = {
     accessCodeInvalid: '❌ Code invalide. Contactez contact@westfieldavocats.com',
     analysisWord: 'analyse', analysisWordPl: 'analyses', remainingWord: 'restante', remainingWordPl: 'restantes',
     freeWord: 'gratuite', freeWordPl: 'gratuites',
+    pending: 'en attente', accepted: 'acceptées', rejected: 'refusées',
+    filterLabel: 'Filtrer :', critical: 'Critiques', important: 'Importantes', lowRisk: 'Faibles', allMods: 'Toutes',
+    collapseAll: '▲ Replier', expandAll: '▼ Déplier',
+    cbSub: 'Assistant contractuel IA',
+    cbPlaceholder: 'Posez une question ou demandez une modification…',
+    cbNoContract: 'Aucun contrat chargé pour le moment.<br>Analysez un contrat d’abord, puis revenez !',
+    cbDefaultParty: 'votre partie',
+    cbWelcomeContract: 'Bonjour ! Je suis <strong>Omniscient</strong>, votre assistant juridique IA.<br>Posez vos questions sur ce contrat ou demandez-moi d’y apporter des modifications.<br><br><span style="color:#6b7280;font-size:12px">Exemples :<br>· «Explique la clause de résiliation»<br>· «Modifie la confidentialité pour mieux protéger {{PARTY}}»</span>',
+    cbWelcomeGeneral: 'Bonjour ! Je suis <strong>Omniscient</strong>, votre assistant juridique IA.<br>Posez-moi une question juridique générale — pas besoin d’avoir un contrat ouvert.<br><br><span style="color:#6b7280;font-size:12px">Exemples :<br>· «Quel est le délai de préavis pour un CDI au Maroc»<br>· «Quelles mentions sont obligatoires dans un NDA»</span>',
+
+    cbWelcomeDraft: 'Je suis en <strong>mode édition</strong> — donnez vos instructions directement.<br><span style="color:#6b7280;font-size:12px">Exemples : « modifier la durée à 24 mois », « ajouter une clause de non-concurrence ».<br>Chaque suggestion sera applicable via <strong>→ Appliquer au draft</strong>.</span>',
   },
   en: {
     heroH1: 'Review your contracts<br/><span class="accent">with AI.</span>',
@@ -4948,6 +4962,17 @@ var _appStrings = {
     accessCodeInvalid: '❌ Invalid code. Contact contact@westfieldavocats.com',
     analysisWord: 'analysis', analysisWordPl: 'analyses', remainingWord: 'remaining', remainingWordPl: 'remaining',
     freeWord: 'free', freeWordPl: 'free',
+    pending: 'pending', accepted: 'accepted', rejected: 'rejected',
+    filterLabel: 'Filter:', critical: 'Critical', important: 'Important', lowRisk: 'Low risk', allMods: 'All',
+    collapseAll: '▲ Collapse', expandAll: '▼ Expand',
+    cbSub: 'AI Contract Assistant',
+    cbPlaceholder: 'Ask a question or request a modification…',
+    cbNoContract: 'No contract loaded.<br>Analyze a contract first, then come back!',
+    cbDefaultParty: 'your party',
+    cbWelcomeContract: 'Hello! I am <strong>Omniscient</strong>, your AI legal assistant.<br>Ask your questions about this contract or ask me to make changes.<br><br><span style="color:#6b7280;font-size:12px">Examples:<br>· «Explain the termination clause»<br>· «Modify the confidentiality clause to better protect {{PARTY}}»</span>',
+    cbWelcomeGeneral: 'Hello! I am <strong>Omniscient</strong>, your AI legal assistant.<br>Ask me a general legal question — no need to have a contract open.<br><br><span style="color:#6b7280;font-size:12px">Examples:<br>· «What is the notice period for a permanent contract in Morocco»<br>· «What clauses are mandatory in an NDA»</span>',
+
+    cbWelcomeDraft: 'I am in <strong>edit mode</strong> — give your instructions directly.<br><span style="color:#6b7280;font-size:12px">Examples: « modify the duration to 24 months », « add a non-compete clause ».<br>Each suggestion can be applied via <strong>→ Apply to draft</strong>.</span>',
   },
   es: {
     heroH1: 'Revise sus contratos<br/><span class="accent">con IA.</span>',
@@ -5018,6 +5043,17 @@ var _appStrings = {
     accessCodeInvalid: '❌ Código inválido. Contacte contact@westfieldavocats.com',
     analysisWord: 'análisis', analysisWordPl: 'análisis', remainingWord: 'restante', remainingWordPl: 'restantes',
     freeWord: 'gratuito', freeWordPl: 'gratuitos',
+    pending: 'pendientes', accepted: 'aceptadas', rejected: 'rechazadas',
+    filterLabel: 'Filtrar :', critical: 'Críticos', important: 'Importantes', lowRisk: 'Bajo riesgo', allMods: 'Todas',
+    collapseAll: '▲ Colapsar', expandAll: '▼ Expandir',
+    cbSub: 'Asistente contractual IA',
+    cbPlaceholder: 'Haga una pregunta o solicite una modificación…',
+    cbNoContract: 'Ningún contrato cargado.<br>¡Analice un contrato primero y luego vuelva!',
+    cbDefaultParty: 'su parte',
+    cbWelcomeContract: '¡Hola! Soy <strong>Omniscient</strong>, su asistente jurídico IA.<br>Haga sus preguntas sobre este contrato o pídame que realice cambios.<br><br><span style="color:#6b7280;font-size:12px">Ejemplos:<br>· «Explique la cláusula de rescisión»<br>· «Modifique la cláusula de confidencialidad para proteger mejor a {{PARTY}}»</span>',
+    cbWelcomeGeneral: '¡Hola! Soy <strong>Omniscient</strong>, su asistente jurídico IA.<br>Hágame una pregunta jurídica general — no necesita tener un contrato abierto.<br><br><span style="color:#6b7280;font-size:12px">Ejemplos:<br>· «¿Cuál es el plazo de preaviso para un contrato indefinido en Marruecos»<br>· «¿Qué menciones son obligatorias en un NDA»</span>',
+
+    cbWelcomeDraft: 'Estoy en <strong>modo edición</strong> — dé sus instrucciones directamente.<br><span style="color:#6b7280;font-size:12px">Ejemplos: « modificar la duración a 24 meses », « añadir una cláusula de no competencia ».<br>Cada sugerencia se puede aplicar con <strong>→ Aplicar al borrador</strong>.</span>',
   }
 };
 function _appCounterText(kind, n) {
@@ -5137,6 +5173,9 @@ function appSetLang(l) {
   _t('draft-result-back-btn', 'draftResultBackBtn');
   _t('draft-chat-btn', 'draftChatBtn'); _t('draft-export-btn', 'draftExportBtn');
   _t('draft-adverse-label', 'draftAdverseLabel'); _t('draft-translate-btn', 'draftTranslateBtn');
+  // Chatbot chrome
+  _t('cb-head-sub', 'cbSub');
+  var _cbi = document.getElementById('cb-input'); if (_cbi) _cbi.placeholder = s.cbPlaceholder;
   // Re-render the usage counter / dynamic strings if currently shown
   if (typeof _appRefreshDynamic === 'function') _appRefreshDynamic();
   // Toggle button styles (both the home header switcher and the dashboard switcher)
@@ -5412,13 +5451,7 @@ function openLegalOpinions(keepHistory) {
   window._currentLegalOpinionId = null;
   document.getElementById('cb-msgs').innerHTML = '';
   _cbMoveInline('d-opinions-chat-host');
-  cbAddMsg('bot',
-    'Bonjour ! Je suis <strong>Omniscient</strong>, votre assistant juridique IA.<br>'
-    + 'Posez-moi une question juridique générale — pas besoin d’avoir un contrat ouvert.<br><br>'
-    + '<span style="color:#6b7280;font-size:12px">Exemples :<br>'
-    + '· «Quel est le délai de préavis pour un CDI au Maroc»<br>'
-    + '· «Quelles mentions sont obligatoires dans un NDA»</span>'
-  );
+  cbAddMsg('bot', (_appStrings[_appLang] || _appStrings.fr).cbWelcomeGeneral);
 }
 
 // Starts a brand-new consultation, discarding any in-progress one
@@ -5444,29 +5477,18 @@ function openChatForDraft() {
   var _eeBtn=document.getElementById('cb-export-email');if(_eeBtn)_eeBtn.style.display='none';
   var _soBtn=document.getElementById('cb-save-opinion');if(_soBtn)_soBtn.style.display='none';
   cbOpen();
-  cbAddMsg('bot',
-    'Je suis en <strong>mode édition</strong> — donnez vos instructions directement.<br>'
-    + '<span style="color:#6b7280;font-size:12px">Exemples : « modifier la durée à 24 mois », « ajouter une clause de non-concurrence ».<br>'
-    + 'Chaque suggestion sera applicable via <strong>→ Appliquer au draft</strong>.</span>'
-  );
+  cbAddMsg('bot', (_appStrings[_appLang] || _appStrings.fr).cbWelcomeDraft);
 }
 
 function cbWelcome() {
   var hasContract = modifications.length > 0 || window._fileCacheId;
+  var _cws = _appStrings[_appLang] || _appStrings.fr;
   if (!hasContract) {
-    cbAddMsg('bot',
-      '<span style="color:#6b7280">Aucun contrat charg\u00e9 pour le moment.<br>'
-      + 'Analysez un contrat d\u2019abord, puis revenez\u00a0!</span>'
-    );
+    cbAddMsg('bot', '<span style="color:#6b7280">' + _cws.cbNoContract + '</span>');
     return;
   }
   cbAddMsg('bot',
-    'Bonjour\u00a0! Je suis <strong>Omniscient</strong>, votre assistant juridique IA.<br>'
-    + 'Posez vos questions sur ce contrat ou demandez-moi d\u2019y apporter des modifications.<br><br>'
-    + '<span style="color:#6b7280;font-size:12px">Exemples\u00a0:<br>'
-    + '\u00b7 \u00abExplique la clause de r\u00e9siliation\u00bb<br>'
-    + '\u00b7 \u00abModifie la confidentialit\u00e9 pour mieux prot\u00e9ger '
-    + _escH((window.selectedPartie) || 'votre partie') + '\u00bb</span>'
+    _cws.cbWelcomeContract.replace('{{PARTY}}', _escH(window.selectedPartie || _cws.cbDefaultParty))
   );
 }
 
