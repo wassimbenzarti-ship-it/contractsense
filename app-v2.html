@@ -5059,7 +5059,7 @@ function appSetLang(l) {
   var s = _appStrings[l] || _appStrings.fr;
   var h1 = document.getElementById('app-hero-h1'); if (h1) h1.innerHTML = s.heroH1;
   var sub = document.getElementById('app-hero-sub'); if (sub) sub.textContent = s.heroSub;
-  _t('app-hero-teaser', 'heroTeaser');
+  var ht = document.getElementById('app-hero-teaser'); if (ht) ht.textContent = s.heroTeaser;
   var dt = document.getElementById('drop-title'); if (dt) dt.textContent = s.uploadTitle;
   var ds = document.getElementById('drop-sub'); if (ds) ds.textContent = s.uploadSub;
   var dt2 = document.getElementById('dash-title'); if (dt2) dt2.textContent = s.dashTitle;
