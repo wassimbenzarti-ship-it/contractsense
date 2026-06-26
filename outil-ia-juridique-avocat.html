@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Outil IA Juridique pour Avocats | Revue Contrat IA | Omniscient by Westfield</title>
+<meta name="description" content="Omniscient — outil IA juridique supervisé par des avocats. Analysez vos contrats en 60 secondes, obtenez des contre-propositions rédigées en Track Changes, exportez en DOCX. Droit français, espagnol, anglais et plus."/>
+<meta name="keywords" content="outil IA juridique pour avocats, meilleur outil IA juridique, logiciel IA avocat, assistant IA juridique avocat, revue contrat IA avocat, outil IA droit, IA pour cabinet avocat, legaltech avocat, analyse contrat IA, DOCX Track Changes IA"/>
+<meta name="author" content="Westfield Avocats"/>
+<link rel="canonical" href="https://ai.westfieldavocats.com/outil-ia-juridique-avocat"/>
+<link rel="icon" type="image/svg+xml" href="/omniscient-logo.svg"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://ai.westfieldavocats.com/outil-ia-juridique-avocat"/>
+<meta property="og:title" content="Outil IA Juridique pour Avocats — Omniscient by Westfield"/>
+<meta property="og:description" content="Analysez vos contrats en 60 secondes. Contre-propositions rédigées. Export DOCX Track Changes. Supervisé par Westfield Avocats."/>
+<meta property="og:image" content="https://ai.westfieldavocats.com/og-image.png"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Outil IA Juridique pour Avocats — Omniscient by Westfield"/>
+<meta name="twitter:description" content="Analysez vos contrats en 60 secondes. Contre-propositions rédigées. Export DOCX Track Changes."/>
+
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;0,900;1,400&amp;family=Inter:wght@300;400;500;600&amp;display=swap"/>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Omniscient by Westfield",
+      "applicationCategory": "LegalApplication",
+      "operatingSystem": "Web",
+      "url": "https://ai.westfieldavocats.com",
+      "description": "Outil IA juridique pour avocats : analyse de contrats en 60 secondes, contre-propositions rédigées, export DOCX avec Track Changes. Supervisé par Westfield Avocats.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR",
+        "description": "3 analyses gratuites sans inscription"
+      },
+      "provider": {
+        "@type": "LegalService",
+        "name": "Westfield Avocats",
+        "url": "https://westfieldavocats.com"
+      },
+      "featureList": [
+        "Analyse de contrats en 60 secondes",
+        "Contre-propositions rédigées",
+        "Export DOCX avec Track Changes",
+        "Base documentaire propriétaire",
+        "Circuit de validation juriste/directeur",
+        "Support droit français, marocain, espagnol, anglais"
+      ],
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "87"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce qu'un outil IA juridique pour avocats ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Un outil IA juridique pour avocats est un logiciel qui utilise l'intelligence artificielle pour assister les professionnels du droit dans l'analyse, la révision et la rédaction de documents juridiques — contrats, clauses, actes. Contrairement à un chatbot généraliste, un véritable outil IA juridique s'appuie sur une base de données de textes légaux, de modèles de contrats validés et de jurisprudence pour formuler des recommandations fondées et citées. Omniscient by Westfield est un outil IA juridique supervisé par des avocats d'affaires, spécialisé dans la revue contractuelle."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quelle est la différence entre un outil IA juridique et un simple chatbot comme ChatGPT ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Un chatbot généraliste comme ChatGPT n'a pas accès à une base documentaire juridique à jour, ne connaît pas la jurisprudence récente, et ne peut pas citer de source vérifiable. Il peut halluciner des articles de loi qui n'existent pas. Un outil IA juridique dédié comme Omniscient s'appuie sur une base RAG (Retrieval-Augmented Generation) contenant des textes de loi, des modèles de clauses validés par des avocats, et de la jurisprudence. Chaque suggestion est ancrée dans un document source citable. Le taux d'hallucination est proche de zéro."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Un avocat peut-il engager sa responsabilité sur la base d'une analyse Omniscient ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Omniscient est un outil d'assistance à la décision juridique, pas un prestataire de conseil autonome. L'avocat reste seul juge de la pertinence des suggestions et valide chaque modification avant export. La chaîne de responsabilité est identique à celle d'un junior qui fait un premier projet : vous revoyez, vous validez, vous signez. Omniscient réduit le temps de ce cycle, il ne le remplace pas. Les suggestions sont accompagnées de leurs sources légales pour permettre une vérification rapide."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quels types de contrats le logiciel IA avocat Omniscient peut-il analyser ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Omniscient analyse tous les types de contrats courants en droit des affaires : contrats de travail (CDI, CDD, clauses de non-concurrence), accords de confidentialité (NDA), contrats de prestation de services, SPA et pactes d'actionnaires, baux commerciaux et professionnels, contrats SaaS et licences logicielles. La base documentaire couvre le droit français, marocain, espagnol et anglais (common law)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Combien de temps faut-il pour analyser un contrat avec Omniscient ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "L'analyse d'un contrat standard (5 à 20 pages) prend en général entre 45 et 90 secondes. Le résultat comprend : la liste des clauses déséquilibrées ou manquantes, une contre-proposition rédigée pour chaque clause à modifier, la ou les sources légales citées, et un score de couverture RAG. L'avocat peut ensuite exporter le tout en DOCX avec Track Changes d'un clic."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<style>
+:root {
+  --bg: #05070e; --surface: #0c0f1a; --border: #161c2e;
+  --accent: #3d6bff; --gold: #c8a94b; --green: #0dcf8a;
+  --red: #ff4560; --purple: #7c5cfc;
+  --text: #e6eaf6; --muted: #4a5470;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(61,107,255,0.06) 0%, transparent 70%);
+  pointer-events: none; z-index: -1;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 22px 56px; z-index: 100;
+  backdrop-filter: blur(24px); background: rgba(5,7,14,0.82);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.nav-brand span { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 700; color: var(--text); }
+.nav-cta {
+  background: var(--gold); color: #05070e; border: none; border-radius: 8px;
+  padding: 10px 22px; font-size: 0.875rem; font-weight: 600; cursor: pointer;
+  text-decoration: none; transition: opacity 0.2s;
+}
+.nav-cta:hover { opacity: 0.85; }
+
+/* HERO */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: center; align-items: center; text-align: center;
+  padding: 140px 24px 80px; position: relative; z-index: 1;
+}
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(61,107,255,0.1); border: 1px solid rgba(61,107,255,0.25);
+  border-radius: 100px; padding: 6px 18px; font-size: 0.78rem;
+  color: var(--accent); margin-bottom: 32px; letter-spacing: 0.08em;
+  text-transform: uppercase; font-weight: 600;
+}
+h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.6rem, 6vw, 4.8rem); font-weight: 700; line-height: 1.08;
+  max-width: 880px; margin-bottom: 24px; color: var(--text);
+}
+h1 em { font-style: italic; color: var(--gold); }
+.hero-sub {
+  font-size: 1.15rem; color: rgba(230,234,246,0.65);
+  max-width: 600px; line-height: 1.75; margin-bottom: 48px;
+}
+.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-bottom: 56px; }
+.btn-gold {
+  background: var(--gold); color: #05070e; border: none; border-radius: 10px;
+  padding: 16px 34px; font-size: 1rem; font-weight: 700; cursor: pointer;
+  text-decoration: none; transition: transform 0.2s, opacity 0.2s;
+}
+.btn-gold:hover { transform: translateY(-2px); opacity: 0.9; }
+.btn-secondary {
+  background: transparent; color: var(--text); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 34px; font-size: 1rem; font-weight: 500;
+  cursor: pointer; text-decoration: none; transition: border-color 0.2s;
+}
+.btn-secondary:hover { border-color: rgba(200,169,75,0.4); }
+.hero-trust {
+  display: flex; gap: 32px; flex-wrap: wrap; justify-content: center;
+  font-size: 0.8rem; color: var(--muted);
+}
+.hero-trust span { display: flex; align-items: center; gap: 6px; }
+
+/* SECTIONS */
+.section { padding: 88px 24px; position: relative; z-index: 1; }
+.section-alt { background: rgba(12,15,26,0.6); }
+.container { max-width: 1020px; margin: 0 auto; }
+.section-label {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 14px;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.9rem, 4vw, 3rem); font-weight: 700;
+  margin-bottom: 16px; line-height: 1.15; color: var(--text);
+}
+.section-sub {
+  color: rgba(230,234,246,0.58); font-size: 1.02rem;
+  line-height: 1.75; max-width: 640px;
+}
+
+/* STATS */
+.stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 18px; margin-top: 48px;
+}
+.stat {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 28px 20px; text-align: center;
+}
+.stat-num {
+  font-family: 'Cormorant Garamond', serif; font-size: 3rem; font-weight: 700;
+  color: var(--gold); line-height: 1; margin-bottom: 8px;
+}
+.stat-label { font-size: 0.78rem; color: rgba(230,234,246,0.5); line-height: 1.5; }
+
+/* PROBLEM SECTION */
+.problem-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+  margin-top: 48px; align-items: start;
+}
+@media (max-width: 700px) { .problem-grid { grid-template-columns: 1fr; } }
+.problem-side h3 {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.15em;
+  text-transform: uppercase; margin-bottom: 20px;
+}
+.problem-side.before h3 { color: var(--red); }
+.problem-side.after h3 { color: var(--green); }
+.problem-item {
+  display: flex; gap: 14px; align-items: flex-start;
+  margin-bottom: 18px; font-size: 0.9rem; line-height: 1.6;
+  color: rgba(230,234,246,0.7);
+}
+.problem-icon {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
+}
+.before .problem-icon { background: rgba(255,69,96,0.12); color: var(--red); }
+.after .problem-icon { background: rgba(13,207,138,0.12); color: var(--green); }
+
+/* FEATURE CARDS */
+.feature-cards {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 22px; margin-top: 48px;
+}
+.feature-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 18px; padding: 32px 28px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.feature-card:hover { border-color: rgba(61,107,255,0.3); transform: translateY(-4px); }
+.feature-card.gold-card:hover { border-color: rgba(200,169,75,0.35); }
+.feature-card-icon { font-size: 2.2rem; margin-bottom: 18px; }
+.feature-card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 10px; color: var(--text); }
+.feature-card p { font-size: 0.875rem; color: rgba(230,234,246,0.55); line-height: 1.65; }
+.feature-card .feature-tag {
+  display: inline-block; margin-top: 14px; padding: 3px 10px;
+  border-radius: 100px; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em;
+  background: rgba(61,107,255,0.1); color: var(--accent); border: 1px solid rgba(61,107,255,0.2);
+}
+.feature-card.gold-card .feature-tag { background: rgba(200,169,75,0.1); color: var(--gold); border-color: rgba(200,169,75,0.2); }
+
+/* HIGHLIGHT BOX */
+.highlight-box {
+  background: linear-gradient(135deg, rgba(61,107,255,0.06), rgba(200,169,75,0.05));
+  border: 1px solid rgba(61,107,255,0.18); border-radius: 16px;
+  padding: 28px 32px; margin-top: 36px;
+  font-size: 0.95rem; color: rgba(230,234,246,0.75); line-height: 1.7;
+  font-style: italic;
+}
+.highlight-box strong { color: var(--text); font-style: normal; }
+
+/* CONTRACT TYPES GRID */
+.contract-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px; margin-top: 48px;
+}
+.contract-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 24px 24px 22px; display: flex; gap: 16px; align-items: flex-start;
+  transition: border-color 0.2s;
+}
+.contract-card:hover { border-color: rgba(200,169,75,0.25); }
+.contract-card-icon {
+  width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0;
+  background: rgba(200,169,75,0.08); border: 1px solid rgba(200,169,75,0.15);
+  display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+}
+.contract-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+.contract-card p { font-size: 0.8rem; color: rgba(230,234,246,0.5); line-height: 1.55; }
+
+/* PROFILES */
+.profile-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px; margin-top: 48px;
+}
+.profile-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 28px 26px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.profile-card:hover { border-color: rgba(124,92,252,0.3); transform: translateY(-3px); }
+.profile-num {
+  font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700;
+  color: var(--purple); line-height: 1; margin-bottom: 14px;
+}
+.profile-card h3 { font-size: 0.98rem; font-weight: 600; margin-bottom: 8px; }
+.profile-card p { font-size: 0.845rem; color: rgba(230,234,246,0.52); line-height: 1.62; }
+
+/* WORKFLOW STEPS */
+.workflow-steps {
+  display: flex; flex-direction: column; gap: 0; margin-top: 48px; position: relative;
+}
+.workflow-steps::before {
+  content: ''; position: absolute; left: 24px; top: 48px; bottom: 48px; width: 1px;
+  background: linear-gradient(to bottom, rgba(61,107,255,0.4), rgba(200,169,75,0.4));
+}
+.workflow-step {
+  display: grid; grid-template-columns: 56px 1fr; gap: 28px;
+  align-items: start; padding: 24px 0; position: relative;
+}
+.step-num {
+  width: 48px; height: 48px; border-radius: 50%; z-index: 1;
+  background: var(--bg); border: 2px solid var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 700; color: var(--accent);
+}
+.workflow-step:last-child .step-num { border-color: var(--gold); color: var(--gold); }
+.step-content h3 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+.step-content p { font-size: 0.875rem; color: rgba(230,234,246,0.55); line-height: 1.65; }
+.step-tag {
+  display: inline-block; margin-top: 10px; padding: 3px 10px;
+  border-radius: 100px; font-size: 0.7rem; font-weight: 600;
+  background: rgba(13,207,138,0.1); color: var(--green); border: 1px solid rgba(13,207,138,0.2);
+}
+
+/* TRUST SECTION */
+.trust-inner {
+  background: linear-gradient(135deg, rgba(200,169,75,0.08), rgba(61,107,255,0.04));
+  border: 1px solid rgba(200,169,75,0.15); border-radius: 24px;
+  padding: 56px 48px; display: grid; grid-template-columns: 1fr 1fr;
+  gap: 48px; align-items: center;
+}
+@media (max-width: 700px) { .trust-inner { grid-template-columns: 1fr; padding: 36px 28px; } }
+.trust-text h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.7rem, 3.5vw, 2.5rem); font-weight: 700; margin-bottom: 16px; }
+.trust-text p { font-size: 0.9rem; color: rgba(230,234,246,0.6); line-height: 1.75; margin-bottom: 14px; }
+.trust-points { display: flex; flex-direction: column; gap: 14px; }
+.trust-point {
+  display: flex; gap: 12px; align-items: flex-start;
+  font-size: 0.875rem; color: rgba(230,234,246,0.7); line-height: 1.6;
+}
+.trust-check {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  background: rgba(13,207,138,0.1); border: 1px solid rgba(13,207,138,0.25);
+  display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--green);
+  margin-top: 1px;
+}
+
+/* CTA SECTION */
+.cta-section {
+  max-width: 1020px; margin: 0 auto 88px; padding: 72px 48px;
+  background: linear-gradient(135deg, rgba(200,169,75,0.1), rgba(61,107,255,0.06));
+  border: 1px solid rgba(200,169,75,0.22); border-radius: 28px;
+  text-align: center; position: relative; z-index: 1;
+}
+.cta-section h2 {
+  font-family: 'Cormorant Garamond', serif; font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700; margin-bottom: 16px; color: var(--text);
+}
+.cta-section p { color: rgba(230,234,246,0.6); margin-bottom: 36px; max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+.cta-micro { margin-top: 18px; font-size: 0.78rem; color: var(--muted); }
+
+/* SEO CONTENT FOOTER */
+.seo-section { padding: 80px 24px 40px; background: rgba(12,15,26,0.4); }
+.seo-section h2 {
+  font-family: 'Cormorant Garamond', serif; font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+  font-weight: 700; margin-bottom: 40px; color: var(--text);
+}
+.seo-block { margin-bottom: 52px; }
+.seo-block h3 {
+  font-size: 1.1rem; font-weight: 600; margin-bottom: 14px;
+  color: rgba(230,234,246,0.92); border-left: 3px solid var(--gold);
+  padding-left: 14px;
+}
+.seo-block p {
+  font-size: 0.9rem; color: rgba(230,234,246,0.58); line-height: 1.8;
+  margin-bottom: 12px; max-width: 800px;
+}
+.seo-block ul {
+  list-style: none; margin-top: 10px; display: flex; flex-direction: column; gap: 8px;
+}
+.seo-block ul li {
+  font-size: 0.875rem; color: rgba(230,234,246,0.58); line-height: 1.7;
+  padding-left: 18px; position: relative;
+}
+.seo-block ul li::before { content: '—'; position: absolute; left: 0; color: var(--muted); }
+
+/* EN SUBSECTION */
+.en-block {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 28px 32px; margin-top: 48px;
+}
+.en-block h3 { font-size: 1rem; font-weight: 600; margin-bottom: 10px; color: var(--text); }
+.en-block p { font-size: 0.875rem; color: rgba(230,234,246,0.55); line-height: 1.7; }
+
+/* FOOTER */
+footer {
+  text-align: center; padding: 36px 24px;
+  border-top: 1px solid var(--border); color: var(--muted); font-size: 0.8rem;
+  position: relative; z-index: 1;
+}
+footer a { color: var(--muted); text-decoration: none; margin: 0 10px; }
+footer a:hover { color: var(--text); }
+.footer-links { margin-bottom: 12px; }
+
+/* RESPONSIVE NAV */
+@media (max-width: 600px) {
+  nav { padding: 18px 24px; }
+  .hero { padding: 120px 20px 60px; }
+  .section { padding: 60px 20px; }
+  .cta-section { padding: 44px 24px; margin-bottom: 60px; }
+  .workflow-steps::before { display: none; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="/">
+    <img src="/omniscient-logo.svg" width="32" height="32" alt="Omniscient"/>
+    <span>Omniscient</span>
+  </a>
+  <a class="nav-cta" href="/">Essayer gratuitement &#x2192;</a>
+</nav>
+
+<!-- ====== HERO ====== -->
+<section class="hero">
+  <div class="badge">Outil IA Juridique</div>
+  <h1>L'outil IA juridique<br/><em>fait pour les avocats d'affaires</em></h1>
+  <p class="hero-sub">
+    Analysez vos contrats en 60 secondes. D&#xe9;tection des risques, contre-propositions r&#xe9;dig&#xe9;es, export DOCX avec Track Changes. Supervis&#xe9; par Westfield Avocats.
+  </p>
+  <div class="hero-actions">
+    <a class="btn-gold" href="/">Essayer sur un contrat</a>
+    <a class="btn-secondary" href="#types-contrats">Voir les types de contrats</a>
+  </div>
+  <div class="hero-trust">
+    <span>&#x2713; 3 analyses gratuites</span>
+    <span>&#x2713; Sans carte bancaire</span>
+    <span>&#x2713; Sans installation</span>
+    <span>&#x2713; DOCX Track Changes</span>
+  </div>
+</section>
+
+<!-- ====== STATS ====== -->
+<section class="section">
+  <div class="container">
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">60s</div>
+        <div class="stat-label">Analyse d'un contrat standard (5&#x2013;20 pages)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">40&#x2013;60</div>
+        <div class="stat-label">Contrats trait&#xe9;s par semaine avec Omniscient vs 8&#x2013;12 sans</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Hallucination &#x2014; chaque suggestion est cit&#xe9;e sur un texte source</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Supervis&#xe9; par des avocats d'affaires — Westfield Avocats</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== PROBLEM SECTION ====== -->
+<section class="section section-alt" id="probleme">
+  <div class="container">
+    <div class="section-label">Le probl&#xe8;me</div>
+    <h2 class="section-title">Un juriste qualifi&#xe9; ne devrait pas<br/>passer 80&#x25; de son temps &#xe0; lire ligne par ligne</h2>
+    <p class="section-sub">
+      La r&#xe9;alit&#xe9; des cabinets d'avocats d'affaires : 8 &#xe0; 12 contrats &#xe0; revoir par semaine, un march&#xe9; de plus en plus demand&#xe9; en rapidit&#xe9; de r&#xe9;ponse, et des collaborateurs junior qui absorbent un travail pr&#xe9;dictif et chronophage — au d&#xe9;triment des missions &#xe0; vraie valeur ajout&#xe9;e.
+    </p>
+    <div class="problem-grid">
+      <div class="problem-side before">
+        <h3>Sans outil IA juridique</h3>
+        <div class="problem-item">
+          <span class="problem-icon">&#x2717;</span>
+          <span>8 &#xe0; 12 contrats par semaine maximum, avec 3 &#xe0; 5 heures de relecture par contrat complexe</span>
+        </div>
+        <div class="problem-item">
+          <span class="problem-icon">&#x2717;</span>
+          <span>Les collaborateurs junior effectuent une premi&#xe8;re revue r&#xe9;p&#xe9;titive avant que l'associ&#xe9; re-lise int&#xe9;gralement</span>
+        </div>
+        <div class="problem-item">
+          <span class="problem-icon">&#x2717;</span>
+          <span>Risque de clause manqu&#xe9;e sous pression de d&#xe9;lai, sur un contrat envoy&#xe9; la veille d'une n&#xe9;gociation</span>
+        </div>
+        <div class="problem-item">
+          <span class="problem-icon">&#x2717;</span>
+          <span>R&#xe9;f&#xe9;rences l&#xe9;gales &#xe0; v&#xe9;rifier manuellement — bases de donn&#xe9;es payantes, temps perdu</span>
+        </div>
+        <div class="problem-item">
+          <span class="problem-icon">&#x2717;</span>
+          <span>La contre-proposition est r&#xe9;dig&#xe9;e from scratch &#xe0; chaque fois, sans capitaliser sur les n&#xe9;gociations pass&#xe9;es</span>
+        </div>
+      </div>
+      <div class="problem-side after">
+        <h3>Avec Omniscient</h3>
+        <div class="problem-item">
+          <span class="problem-icon">&#x2713;</span>
+          <span>40 &#xe0; 60 contrats par semaine &#x2014; le m&#xea;me cabinet, la m&#xea;me &#xe9;quipe, trois fois plus de dossiers trait&#xe9;s</span>
+        </div>
+        <div class="problem-item">
+          <span class="problem-icon">&#x2713;</span>
+          <span>La premi&#xe8;re revue est faite en 60 secondes par Omniscient, le collaborateur valide et affine</span>
+        </div>
+        <div class="problem-item">
+          <span class="problem-icon">&#x2713;</span>
+          <span>Z&#xe9;ro clause oubli&#xe9;e : l'outil couvre syst&#xe9;matiquement chaque section du contrat selon son type</span>
+        </div>
+        <div class="problem-item">
+          <span class="problem-icon">&#x2713;</span>
+          <span>Chaque suggestion cite l'article de loi applicable — aucune v&#xe9;rification suppl&#xe9;mentaire inutile</span>
+        </div>
+        <div class="problem-item">
+          <span class="problem-icon">&#x2713;</span>
+          <span>Les contre-propositions s'appuient sur la biblioth&#xe8;que de clauses valid&#xe9;es de Westfield Avocats</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FEATURES ====== -->
+<section class="section" id="fonctionnalites">
+  <div class="container">
+    <div class="section-label">Diff&#xe9;renciants</div>
+    <h2 class="section-title">Ce que fait Omniscient que<br/>les autres outils IA ne font pas</h2>
+    <p class="section-sub">
+      La plupart des logiciels IA avocat vous disent &#xab;&#x202f;cette clause est risqu&#xe9;e&#x202f;&#xbb;. Omniscient vous donne le texte de remplacement, r&#xe9;dig&#xe9;, pr&#xea;t &#xe0; coller.
+    </p>
+
+    <div class="highlight-box">
+      <strong>95&#x25; des outils IA juridiques s'arr&#xea;tent au diagnostic.</strong> Ils identifient les clauses probl&#xe9;matiques, parfois les expliquent, rarement les corrigent. Omniscient va au bout : pour chaque clause &#xe0; modifier, vous obtenez la r&#xe9;daction compl&#xe8;te de la clause de remplacement, l'article de loi applicable, et le tout pr&#xe9;-format&#xe9; pour l'export DOCX en Track Changes.
+    </div>
+
+    <div class="feature-cards" style="margin-top: 36px;">
+      <div class="feature-card gold-card">
+        <div class="feature-card-icon">&#x270d;&#xfe0f;</div>
+        <h3>Contre-propositions r&#xe9;dig&#xe9;es</h3>
+        <p>Pas des r&#xe9;sum&#xe9;s, pas des &#xab;&#x202f;attention, v&#xe9;rifiez ceci&#x202f;&#xbb;. Le texte complet de la clause modifi&#xe9;e, pr&#xea;t &#xe0; ins&#xe9;rer dans votre n&#xe9;gociation. R&#xe9;dig&#xe9;e dans le style du contrat, adapt&#xe9;e &#xe0; la position de votre client.</p>
+        <span class="feature-tag">Exclusif Omniscient</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-icon">&#x2696;&#xfe0f;</div>
+        <h3>Analyse multi-partie</h3>
+        <p>Pr&#xe9;cisez quelle partie vous repr&#xe9;sentez — acheteur, vendeur, employ&#xe9;, employeur, prestataire, client. L'IA d&#xe9;fend exclusivement les int&#xe9;r&#xea;ts de votre client, pas une analyse g&#xe9;n&#xe9;rique bilat&#xe9;rale inutilisable.</p>
+        <span class="feature-tag">Analyse orient&#xe9;e partie</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-icon">&#x1f4da;</div>
+        <h3>Base documentaire propri&#xe9;taire</h3>
+        <p>La biblioth&#xe8;que de clauses, mod&#xe8;les et jurisprudence de Westfield Avocats. Des ann&#xe9;es de n&#xe9;gociations et de validations terrain — pas un entra&#xee;nement sur du texte public g&#xe9;n&#xe9;rique. Chaque r&#xe9;f&#xe9;rence est citable.</p>
+        <span class="feature-tag">RAG propri&#xe9;taire</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-icon">&#x1f504;</div>
+        <h3>Circuit de validation int&#xe9;gr&#xe9;</h3>
+        <p>Workflow juriste &#x2192; directeur inclus dans l'outil. Le collaborateur soumet son analyse, l'associ&#xe9; ou directeur juridique valide, commente et renvoie. Chaque validation enrichit la base documentaire pour les prochains contrats.</p>
+        <span class="feature-tag">Workflow cabinet</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== CONTRACT TYPES ====== -->
+<section class="section section-alt" id="types-contrats">
+  <div class="container">
+    <div class="section-label">Types de contrats</div>
+    <h2 class="section-title">Types de contrats analys&#xe9;s<br/>par Omniscient</h2>
+    <p class="section-sub">
+      L'assistant IA juridique Omniscient reconna&#xee;t automatiquement le type de contrat et adapte son analyse aux obligations l&#xe9;gales et usages n&#xe9;gociatoires sp&#xe9;cifiques &#xe0; chaque cat&#xe9;gorie.
+    </p>
+    <div class="contract-grid">
+      <div class="contract-card">
+        <div class="contract-card-icon">&#x1f91d;</div>
+        <div>
+          <h3>Contrats de travail</h3>
+          <p>CDI, CDD, contrats de prestation, clauses de non-concurrence, de confidentialit&#xe9; salari&#xe9;, pr&#xe9;avis et indemnit&#xe9;s. D&#xe9;tection automatique des clauses contraires au Code du travail applicable.</p>
+        </div>
+      </div>
+      <div class="contract-card">
+        <div class="contract-card-icon">&#x1f512;</div>
+        <div>
+          <h3>NDAs et accords de confidentialit&#xe9;</h3>
+          <p>P&#xe9;rim&#xe8;tre de confidentialit&#xe9;, dur&#xe9;e, exceptions, r&#xe9;ciprocit&#xe9;, clauses de r&#xe9;trocession de propri&#xe9;t&#xe9; intellectuelle, pennalit&#xe9;s. Analyse des NDA unilat&#xe9;raux et bilat&#xe9;raux.</p>
+        </div>
+      </div>
+      <div class="contract-card">
+        <div class="contract-card-icon">&#x1f4cb;</div>
+        <div>
+          <h3>Contrats de prestation de services</h3>
+          <p>D&#xe9;finition de la mission, livrables, conditions de paiement, responsabilit&#xe9; et plafonds, cl&#xe9;s de r&#xe9;siliation, propri&#xe9;t&#xe9; intellectuelle sur les livrables.</p>
+        </div>
+      </div>
+      <div class="contract-card">
+        <div class="contract-card-icon">&#x1f4b0;</div>
+        <div>
+          <h3>SPA et pactes d'actionnaires</h3>
+          <p>Conditions suspensives, d&#xe9;clarations et garanties, earn-out, clauses de liquidit&#xe9;, droits de pr&#xe9;emption, tag/drag along, clauses anti-dilution et ratchet.</p>
+        </div>
+      </div>
+      <div class="contract-card">
+        <div class="contract-card-icon">&#x1f3e2;</div>
+        <div>
+          <h3>Baux commerciaux et professionnels</h3>
+          <p>Dur&#xe9;e et renouvellement, indexation, charges r&#xe9;cup&#xe9;rables, destination des locaux, droit au renouvellement, conditions de r&#xe9;siliation anticip&#xe9;e, garanties locatives.</p>
+        </div>
+      </div>
+      <div class="contract-card">
+        <div class="contract-card-icon">&#x1f4bb;</div>
+        <div>
+          <h3>Contrats SaaS et licences logicielles</h3>
+          <p>Niveaux de service (SLA), cr&#xe9;dits de service, droits d'utilisation, sous-licences, propri&#xe9;t&#xe9; des donn&#xe9;es, portabilit&#xe9;, clauses de modification de prix unilat&#xe9;rale, RGPD.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== WHO IS IT FOR ====== -->
+<section class="section" id="pour-qui">
+  <div class="container">
+    <div class="section-label">Profils utilisateurs</div>
+    <h2 class="section-title">Pour quel type de cabinet<br/>ou de juriste ?</h2>
+    <p class="section-sub">
+      L'outil IA juridique Omniscient est con&#xe7;u pour des professionnels du droit qui traitent des volumes de contrats, qu'il s'agisse d'un cabinet d'avocats d'affaires, d'un avocat solo ou d'une direction juridique d'entreprise.
+    </p>
+    <div class="profile-grid">
+      <div class="profile-card">
+        <div class="profile-num">01</div>
+        <h3>Cabinets d'avocats d'affaires (5&#x2013;50 avocats)</h3>
+        <p>Le ROI est imm&#xe9;diat : un collaborateur junior qui utilisait 3 heures pour une premi&#xe8;re revue peut en traiter six dans le m&#xea;me temps. L'associ&#xe9; r&#xe9;cup&#xe8;re son temps sur la strat&#xe9;gie et la relation client. Le circuit de validation int&#xe9;gr&#xe9; s'adapte &#xe0; votre organisation.</p>
+      </div>
+      <div class="profile-card">
+        <div class="profile-num">02</div>
+        <h3>Avocats solo et of counsel</h3>
+        <p>Quand vous exercez seul, chaque heure de revue r&#xe9;p&#xe9;titive est une heure de moins pour les clients &#xe0; forte valeur. Omniscient vous donne l'&#xe9;quivalent d'un junior IA disponible 24h/24, sans co&#xfb;t fixe, sans formation. Vos 3 premi&#xe8;res analyses sont gratuites.</p>
+      </div>
+      <div class="profile-card">
+        <div class="profile-num">03</div>
+        <h3>Directions juridiques (juristes in-house)</h3>
+        <p>Votre &#xe9;quipe re&#xe7;oit des contrats fournisseurs, acheteurs, partenaires en flux continu. Omniscient filtre les risques &#xe9;vidents en amont, r&#xe9;duit le temps de revue, et standardise les positions de n&#xe9;gociation de l'entreprise gr&#xe2;ce &#xe0; la base documentaire propri&#xe9;taire.</p>
+      </div>
+      <div class="profile-card">
+        <div class="profile-num">04</div>
+        <h3>Startups et scale-ups</h3>
+        <p>Les startups en croissance signent des dizaines de contrats fournisseurs, SaaS, partenariats, et NDA sans direction juridique d&#xe9;di&#xe9;e. Omniscient vous donne un filet de s&#xe9;curit&#xe9; contractuel supervis&#xe9; par des avocats d'affaires, au co&#xfb;t d'un abonnement logiciel.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== WORKFLOW ====== -->
+<section class="section section-alt" id="comment-ca-marche">
+  <div class="container">
+    <div class="section-label">Processus</div>
+    <h2 class="section-title">En 4 &#xe9;tapes, de l'upload<br/>au DOCX valid&#xe9;</h2>
+    <p class="section-sub">
+      Aucune installation, aucune int&#xe9;gration &#xe0; configurer. Uploadez votre contrat, choisissez la partie &#xe0; prot&#xe9;ger, et t&#xe9;l&#xe9;chargez un DOCX avec les modifications en Track Changes — pr&#xea;t &#xe0; envoyer &#xe0; la partie adverse ou &#xe0; votre client.
+    </p>
+    <div class="workflow-steps">
+      <div class="workflow-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Upload DOCX ou PDF</h3>
+          <p>Glissez votre contrat dans l'interface. Omniscient d&#xe9;tecte automatiquement le type de contrat (CDI, NDA, prestation, SPA...) et la ou les juridictions applicables. Aucune saisie manuelle requise.</p>
+          <span class="step-tag">&#8708; Logiciel &#xe0; installer</span>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>S&#xe9;lectionner la partie &#xe0; prot&#xe9;ger</h3>
+          <p>Indiquez quelle partie vous repr&#xe9;sentez. L'outil IA identifie les parties du contrat et oriente l'ensemble de l'analyse pour d&#xe9;fendre exclusivement les int&#xe9;r&#xea;ts de votre client — pas une analyse neutre inutilisable en n&#xe9;gociation.</p>
+          <span class="step-tag">Analyse orient&#xe9;e client</span>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>R&#xe9;viser les modifications sugg&#xe9;r&#xe9;es</h3>
+          <p>Chaque clause probl&#xe9;matique est signal&#xe9;e avec : l'explication du risque, la contre-proposition r&#xe9;dig&#xe9;e et la source l&#xe9;gale cit&#xe9;e. Vous validez, modifiez ou rejetez chaque suggestion. L'associ&#xe9; peut commenter et renvoyer au collaborateur via le workflow int&#xe9;gr&#xe9;.</p>
+          <span class="step-tag">Z&#xe9;ro hallucination</span>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3>Exporter en DOCX avec Track Changes</h3>
+          <p>En un clic, g&#xe9;n&#xe9;rez le DOCX final avec toutes les modifications valid&#xe9;es int&#xe9;gr&#xe9;es en Track Changes natifs Microsoft Word. Pr&#xea;t &#xe0; envoyer &#xe0; la partie adverse, &#xe0; votre client, ou &#xe0; archiver.</p>
+          <span class="step-tag">Export natif Word</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== TRUST / WESTFIELD ====== -->
+<section class="section" id="westfield">
+  <div class="container">
+    <div class="trust-inner">
+      <div class="trust-text">
+        <div class="section-label" style="margin-bottom: 12px;">Supervision humaine</div>
+        <h2>Supervis&#xe9; par<br/>Westfield Avocats</h2>
+        <p>
+          Omniscient n'est pas un chatbot g&#xe9;n&#xe9;raliste revendu sous une marque juridique. C'est un outil construit, test&#xe9; et maintenu par Westfield Avocats, un cabinet d'avocats d'affaires sp&#xe9;cialis&#xe9; en droit des contrats, droit des affaires et conseil aux entreprises.
+        </p>
+        <p>
+          La base documentaire propri&#xe9;taire (RAG) est aliment&#xe9;e par les analyses valid&#xe9;es des avocats du cabinet. Chaque mod&#xe8;le de clause int&#xe9;gr&#xe9; &#xe0; la base a &#xe9;t&#xe9; valid&#xe9; par un avocat senior. Ce n'est pas une IA qui apprend d'Internet &#x2014; c'est une IA qui apprend des dossiers r&#xe9;els d'un cabinet d'avocats d'affaires.
+        </p>
+      </div>
+      <div class="trust-points">
+        <div class="trust-point">
+          <span class="trust-check">&#x2713;</span>
+          <span>Base RAG propri&#xe9;taire : clauses, mod&#xe8;les et jurisprudence valid&#xe9;s par des avocats Westfield</span>
+        </div>
+        <div class="trust-point">
+          <span class="trust-check">&#x2713;</span>
+          <span>Chaque suggestion cite sa source l&#xe9;gale — v&#xe9;rifiable par l'avocat en 30 secondes</span>
+        </div>
+        <div class="trust-point">
+          <span class="trust-check">&#x2713;</span>
+          <span>Workflow de validation int&#xe9;gr&#xe9; : juriste &#x2192; directeur &#x2192; validation avant int&#xe9;gration RAG</span>
+        </div>
+        <div class="trust-point">
+          <span class="trust-check">&#x2713;</span>
+          <span>L'avocat reste d&#xe9;cisionnaire — Omniscient est un outil d'assistance, pas un avis juridique autonome</span>
+        </div>
+        <div class="trust-point">
+          <span class="trust-check">&#x2713;</span>
+          <span>Couverture multilingue : droit fran&#xe7;ais, droit marocain, common law anglais, droit espagnol</span>
+        </div>
+        <div class="trust-point">
+          <span class="trust-check">&#x2713;</span>
+          <span>Donn&#xe9;es non utilis&#xe9;es pour l'entra&#xee;nement de mod&#xe8;les tiers &#x2014; vos contrats restent confidentiels</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== CTA ====== -->
+<section class="section" style="padding-bottom: 0;">
+  <div class="cta-section">
+    <div class="section-label" style="margin-bottom: 14px;">Commencer</div>
+    <h2>3 analyses gratuites<br/>sans inscription</h2>
+    <p>
+      Uploadez votre prochain contrat maintenant. En 60 secondes, vous avez les risques identifi&#xe9;s et les contre-propositions r&#xe9;dig&#xe9;es. Aucune carte bancaire requise.
+    </p>
+    <a class="btn-gold" href="/">Analyser un contrat gratuitement &#x2192;</a>
+    <div class="cta-micro">Ou <a href="/" style="color: var(--muted); text-decoration: underline;">cr&#xe9;er un compte</a> pour sauvegarder vos analyses et acc&#xe9;der au workflow juriste / directeur.</div>
+  </div>
+</section>
+
+<!-- ====== SEO CONTENT ====== -->
+<section class="seo-section" id="guide">
+  <div class="container">
+    <h2>Guide&#xa0;: choisir son outil IA juridique en&#xa0;2026</h2>
+
+    <div class="seo-block">
+      <h3>Outil IA juridique vs simple chatbot juridique</h3>
+      <p>
+        En 2026, il existe une distinction fondamentale entre deux cat&#xe9;gories de produits souvent confondues sous le terme g&#xe9;n&#xe9;rique &#xab;&#x202f;IA juridique&#x202f;&#xbb;&#xa0;: les chatbots g&#xe9;n&#xe9;ralistes appliqu&#xe9;s au droit, et les outils IA juridiques sp&#xe9;cialis&#xe9;s.
+      </p>
+      <p>
+        Un chatbot g&#xe9;n&#xe9;raliste (ChatGPT, Claude, Gemini) peut r&#xe9;pondre &#xe0; des questions juridiques de base, mais il pr&#xe9;sente plusieurs limites r&#xe9;dhibitoires pour un usage professionnel&#xa0;: il peut halluciner des articles de loi qui n'existent pas, il ne conna&#xee;t pas la jurisprudence r&#xe9;cente non publi&#xe9;e en ligne, et il produit une analyse g&#xe9;n&#xe9;rique non orient&#xe9;e sur la position de votre client.
+      </p>
+      <p>
+        Un outil IA juridique d&#xe9;di&#xe9; comme Omniscient r&#xe9;pond &#xe0; des exigences professionnelles&#xa0;: base documentaire juridique &#xe0; jour, zoning de l'analyse sur la partie &#xe0; prot&#xe9;ger, citations sources v&#xe9;rifiables, et une cha&#xee;ne de validation humaine. C'est la diff&#xe9;rence entre un assistant g&#xe9;n&#xe9;raliste et un outil m&#xe9;tier.
+      </p>
+    </div>
+
+    <div class="seo-block">
+      <h3>Comment &#xe9;valuer un outil IA juridique avant d'y confier ses dossiers clients</h3>
+      <p>
+        Avant d'int&#xe9;grer un logiciel IA avocat dans votre pratique, posez-vous les questions suivantes&#xa0;:
+      </p>
+      <ul>
+        <li>Les suggestions sont-elles cit&#xe9;es sur un texte source v&#xe9;rifiable (loi, jurisprudence, doctrine)&#xa0;? Un outil s&#xe9;rieux ne se contente pas de g&#xe9;n&#xe9;rer du texte — il ancre chaque recommandation dans un document r&#xe9;el.</li>
+        <li>L'analyse est-elle orient&#xe9;e sur votre client sp&#xe9;cifiquement&#xa0;? Une analyse &#xab;&#x202f;bilat&#xe9;rale&#x202f;&#xbb; g&#xe9;n&#xe9;rique n'a aucune valeur en n&#xe9;gociation. Vous avez besoin d'une position de partie.</li>
+        <li>Qui a construit la base documentaire&#xa0;? Un RAG aliment&#xe9; par des textes public non v&#xe9;rifi&#xe9;s n'a pas le m&#xea;me niveau de confiance qu'une base construite par des avocats d'affaires en exercice.</li>
+        <li>Le produit est-il maintenu par des juristes&#xa0;? Le droit &#xe9;volue. Un outil non maintenu par des professionnels du droit d&#xe9;grade sa pertinence rapidement.</li>
+        <li>Vos donn&#xe9;es sont-elles confidentielles&#xa0;? V&#xe9;rifiez les CGU&#xa0;: vos contrats clients ne doivent pas servir &#xe0; entra&#xee;ner des mod&#xe8;les tiers.</li>
+      </ul>
+    </div>
+
+    <div class="seo-block">
+      <h3>Les 5 crit&#xe8;res d'un bon outil IA juridique pour avocat</h3>
+      <ul>
+        <li><strong>Citations sources obligatoires.</strong> Chaque suggestion doit pouvoir s'appuyer sur un article de loi, une clause de mod&#xe8;le valid&#xe9; ou une r&#xe9;f&#xe9;rence jurisprudentielle. Sans source, impossible pour l'avocat d'engager sa responsabilit&#xe9; professionnelle sur la base de l'analyse.</li>
+        <li><strong>Analyse orient&#xe9;e partie.</strong> L'outil doit savoir quelle partie vous d&#xe9;fendez et adapter l'int&#xe9;gralit&#xe9; de son analyse en cons&#xe9;quence. Un commentaire neutre &#xab;&#x202f;cette clause peut avantager l'une ou l'autre partie&#x202f;&#xbb; n'aide pas un avocat en n&#xe9;gociation.</li>
+        <li><strong>Sortie utilisable directement.</strong> La valeur ajout&#xe9;e r&#xe9;elle d'un assistant IA juridique avocat se mesure &#xe0; ce qu'il produit : si la sortie est une liste de commentaires que vous devez reformuler, retravailler et int&#xe9;grer manuellement, le gain de temps est limit&#xe9;. Un bon outil produit un DOCX Track Changes directement exploitable.</li>
+        <li><strong>Base documentaire sp&#xe9;cialis&#xe9;e et &#xe0; jour.</strong> Le droit &#xe9;volue, les positions de n&#xe9;gociation aussi. La base documentaire doit &#xea;tre mise &#xe0; jour r&#xe9;guli&#xe8;rement par des avocats en exercice, pas uniquement par un entra&#xee;nement initial sur des textes anciens.</li>
+        <li><strong>Confidentialit&#xe9; absolue des donn&#xe9;es clients.</strong> Le secret professionnel de l'avocat s'applique aux outils num&#xe9;riques qu'il utilise. V&#xe9;rifiez que l'outil IA juridique retenu ne transmet pas vos contrats &#xe0; des tiers ou ne les utilise pas pour am&#xe9;liorer des mod&#xe8;les partag&#xe9;s.</li>
+      </ul>
+    </div>
+
+    <div class="seo-block">
+      <h3>Revue de contrat IA&#xa0;: ce que l'IA peut et ne peut pas faire &#xe0; la place de l'avocat</h3>
+      <p>
+        Une revue de contrat IA comme Omniscient peut&#xa0;: identifier syst&#xe9;matiquement les clauses absentes ou d&#xe9;s&#xe9;quilibr&#xe9;es, r&#xe9;diger les contre-propositions initiales, citer les textes l&#xe9;gaux applicables, et produire un document pr&#xea;t pour la n&#xe9;gociation. Ce sont des t&#xe2;ches pr&#xe9;dictibles et syst&#xe9;matisables qu'une IA entra&#xee;n&#xe9;e sur un corpus juridique valide ex&#xe9;cute mieux et plus vite qu'un collaborateur junior &#xe0; sa premi&#xe8;re revue.
+      </p>
+      <p>
+        Ce qu'Omniscient ne remplace pas&#xa0;: le jugement strat&#xe9;gique de l'avocat sur les priorit&#xe9;s de n&#xe9;gociation, la relation client, la compr&#xe9;hension du contexte business d'une op&#xe9;ration, l'appr&#xe9;ciation du risque contentieux sp&#xe9;cifique &#xe0; un secteur ou une juridiction inhabituelle. Omniscient lib&#xe8;re l'avocat de la revue m&#xe9;canique pour qu'il se concentre sur ce que seul un avocat peut faire.
+      </p>
+    </div>
+
+    <div class="seo-block">
+      <h3>IA pour cabinets d'avocats&#xa0;: retour sur investissement concret</h3>
+      <p>
+        Un cabinet d'avocats d'affaires de taille interm&#xe9;diaire (10 avocats) traitant 40 contrats par mois consacre environ 160 heures de temps collaborateur &#xe0; la premi&#xe8;re revue (4h par contrat en moyenne). Avec un outil IA juridique, la premi&#xe8;re revue passe &#xe0; 30 minutes de validation par l'avocat, soit 20 heures au total. Les 140 heures lib&#xe9;r&#xe9;es peuvent &#xea;tre r&#xe9;allou&#xe9;es &#xe0; la relation client, &#xe0; des dossiers contentieux ou &#xe0; l'acquisition de nouveaux mandats.
+      </p>
+      <p>
+        Au tarif horaire moyen d'un collaborateur junior (150&#xa0;&#x20ac;/h), cela repr&#xe9;sente 21&#xa0;000&#xa0;&#x20ac; de capacit&#xe9; lib&#xe9;r&#xe9;e chaque mois — soit 252&#xa0;000&#xa0;&#x20ac; annuels pour un cabinet de taille interm&#xe9;diaire. Le retour sur investissement d'un logiciel IA avocat s&#xe9;rieux se mesure en semaines, pas en ann&#xe9;es.
+      </p>
+    </div>
+
+    <!-- EN SUBSECTION -->
+    <div class="en-block">
+      <h3>For international law firms: Omniscient in English</h3>
+      <p>
+        Omniscient by Westfield also supports contract review in English, Spanish, and Arabic. The AI legal tool analyzes common law agreements (English and US law), bilingual French/English contracts, and cross-border commercial agreements. The proprietary RAG database includes validated clause templates for international transactions supervised by Westfield Avocats' international practice group. Upload your NDA, SaaS agreement, distribution contract, or shareholders' agreement in any of these languages for a full AI-powered legal review with redlined DOCX export.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ====== FOOTER ====== -->
+<footer>
+  <div class="footer-links">
+    <a href="/">Omniscient</a>
+    <a href="/ia-cabinet-avocat-maroc.html">IA Cabinet Avocat Maroc</a>
+    <a href="/negociation-contrat-pme-maroc.html">N&#xe9;gociation Contrat PME</a>
+    <a href="https://westfieldavocats.com" rel="noopener">Westfield Avocats</a>
+  </div>
+  <p>&#xa9; 2026 Westfield Avocats &#x2014; Omniscient est un outil d'assistance juridique, pas un avis juridique. Tout abonnement inclut la supervision humaine d'un avocat Westfield.</p>
+</footer>
+
+<script>
+// FAQ accordion (reused pattern from other pages)
+document.querySelectorAll('.faq-q').forEach(function(q) {
+  q.addEventListener('click', function() {
+    var item = this.closest('.faq-item');
+    item.classList.toggle('open');
+  });
+});
+</script>
+</body>
+</html>
