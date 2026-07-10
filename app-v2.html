@@ -5721,6 +5721,65 @@ function cbHideTyping() {
   if (t) t.remove();
 }
 
+// Resolve para_idx for a chatbot-suggested mod by searching savedText for [PN] lines.
+// Returns the integer para_idx of the best matching paragraph, or undefined if not found.
+function _cbResolveParaIdx(originalText) {
+  if (!savedText || !originalText) return undefined;
+  var _norm = function(s) {
+    return (s || '')
+      .replace(/[‘’‚‛]/g, "'")
+      .replace(/[“”„‟]/g, '"')
+      .replace(/[–—]/g, '-')
+      .replace(/ /g, ' ')
+      .replace(/\s+/g, ' ').trim().toLowerCase();
+  };
+  var normOrig = _norm(originalText);
+  if (!normOrig || normOrig.length < 5) return undefined;
+  var anchor = normOrig.slice(0, 80);
+  var _wordRe = /[a-zA-ZÀ-ž؀-ۿ]{3,}/g;
+  var origWords = (normOrig.match(_wordRe) || []);
+  var origWordSet = {};
+  origWords.forEach(function(w) { origWordSet[w] = true; });
+
+  var lines = savedText.split('\n');
+  var bestIdx;
+
+  for (var _i = 0; _i < lines.length; _i++) {
+    var _m = lines[_i].match(/^\[P(\d+)\]\s*([\s\S]*)/);
+    if (!_m) continue;
+    var _pidx = parseInt(_m[1], 10);
+    var normLine = _norm(_m[2]);
+
+    // Strategy 1: anchor substring (first 80 chars of original)
+    if (normLine.indexOf(anchor) >= 0) return _pidx;
+
+    // Strategy 2: word overlap ≥ 60% (only if ≥ 3 origin words)
+    if (origWords.length >= 3) {
+      var lineWords = (normLine.match(_wordRe) || []);
+      var lineWordSet = {};
+      lineWords.forEach(function(w) { lineWordSet[w] = true; });
+      var overlap = 0;
+      origWords.forEach(function(w) { if (lineWordSet[w]) overlap++; });
+      if (overlap / origWords.length >= 0.6) { bestIdx = _pidx; break; }
+    }
+  }
+
+  // Strategy 3: section/article number match ("Section 2.01", "Article 5.3", etc.)
+  if (bestIdx === undefined) {
+    var _secMatch = normOrig.match(/(?:section|article|clause|art\.?)\s+(\d+(?:\.\d+)*)/i);
+    if (_secMatch) {
+      var _secNum = _secMatch[1];
+      for (var _j = 0; _j < lines.length; _j++) {
+        var _m2 = lines[_j].match(/^\[P(\d+)\]\s*([\s\S]*)/);
+        if (!_m2) continue;
+        if (_norm(_m2[2]).indexOf(_secNum) >= 0) { bestIdx = parseInt(_m2[1], 10); break; }
+      }
+    }
+  }
+
+  return bestIdx;
+}
+
 function cbApplyMod(btn) {
   if (btn.classList.contains('applied')) return;
   var sk  = btn.getAttribute('data-sk');
@@ -5790,6 +5849,8 @@ function cbApplyMod(btn) {
       risk:         mod.risk        || 'medium',
       reason:       mod.reason      || 'Modification sugg\u00e9r\u00e9e par Omniscient'
     };
+    var _resolved = _cbResolveParaIdx(mod.original);
+    if (_resolved !== undefined) newMod.para_idx = _resolved;
     modifications.push(newMod);
     decisions[String(newId)] = 'accepted';
     renderReview();
