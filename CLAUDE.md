@@ -14,7 +14,7 @@ git pull origin dev
 ```
 
 ### Ne JAMAIS faire
-- Pousser directement sur `main` — réservé aux déploiements validés
+- Pousser directement sur `main` — **sauf pour les articles SEO** (nouveaux fichiers `*.html` de blog + `sitemap.xml` uniquement) qui sont publiés en continu par la routine hebdomadaire avec autorisation permanente de l'utilisateur
 - Créer une nouvelle branche feature — tout va sur `dev`
 - Modifier `index.html` sans ordre explicite (c'est la landing page commerciale)
 - Utiliser `Write` sur `app-v2.html` entier — utiliser uniquement `Edit` ciblé

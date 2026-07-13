@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Analyse Contrat SaaS par IA : CGU, DPA, SLA | Omniscient by Westfield</title>
+<meta name="description" content="L'IA juridique analyse vos contrats SaaS clause par clause : CGU, DPA RGPD Art. 28, SLA, limitation de responsabilité, résiliation. Export DOCX avec Track Changes."/>
+<meta name="keywords" content="analyse contrat saas ia, contrat saas juridique, dpa rgpd article 28, sla contrat saas, cgu saas analyse, ia revue contrat cloud, contrat logiciel avocat, revue contrat saas droit francais"/>
+<meta name="author" content="Westfield Avocats"/>
+<meta name="robots" content="index, follow"/>
+<link rel="canonical" href="https://ai.westfieldavocats.com/analyse-contrat-saas-ia"/>
+<link rel="icon" type="image/svg+xml" href="/omniscient-logo.svg"/>
+
+<!-- Hreflang -->
+<link rel="alternate" hreflang="fr" href="https://ai.westfieldavocats.com/analyse-contrat-saas-ia"/>
+<link rel="alternate" hreflang="en" href="https://ai.westfieldavocats.com/analyse-contrat-saas-ia"/>
+<link rel="alternate" hreflang="es" href="https://ai.westfieldavocats.com/analyse-contrat-saas-ia"/>
+
+<!-- Open Graph -->
+<meta property="og:type" content="article"/>
+<meta property="og:url" content="https://ai.westfieldavocats.com/analyse-contrat-saas-ia"/>
+<meta property="og:title" content="Analyse Contrat SaaS par IA : CGU, DPA, SLA — Omniscient by Westfield"/>
+<meta property="og:description" content="Analysez vos contrats SaaS avec l'IA : CGU, DPA RGPD, SLA, limitations de responsabilité. Contre-propositions rédigées, export DOCX Track Changes."/>
+<meta property="og:image" content="https://ai.westfieldavocats.com/westfield-ghost.png"/>
+<meta property="og:site_name" content="Omniscient by Westfield"/>
+<meta property="og:locale" content="fr_FR"/>
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Analyse Contrat SaaS par IA — Omniscient by Westfield"/>
+<meta name="twitter:description" content="CGU, DPA RGPD Art. 28, SLA, résiliation, limitation de responsabilité — l'IA analyse vos contrats SaaS clause par clause et rédige les contre-propositions."/>
+<meta name="twitter:image" content="https://ai.westfieldavocats.com/westfield-ghost.png"/>
+
+<!-- JSON-LD FAQPage -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Quelles clauses d'un contrat SaaS présentent le plus de risques juridiques ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Les clauses à risque élevé dans un contrat SaaS sont : la limitation de responsabilité (plafond anormalement bas, exclusion totale en cas de perte de données), le DPA (Data Processing Agreement) non conforme au RGPD Art. 28, le SLA avec des engagements de disponibilité inférieurs aux standards du marché, les clauses de résiliation unilatérale sans préavis suffisant, et les clauses de propriété intellectuelle qui transfèrent les droits sur les données client à l'éditeur. Omniscient by Westfield détecte ces points automatiquement."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Le DPA d'un contrat SaaS est-il obligatoire au sens du RGPD ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. L'article 28 du RGPD impose la conclusion d'un contrat écrit (Data Processing Agreement ou DPA) entre le responsable du traitement (le client) et le sous-traitant (l'éditeur SaaS) dès lors que ce dernier traite des données personnelles pour le compte du client. Ce DPA doit obligatoirement préciser : l'objet, la durée, la nature et la finalité du traitement, le type de données, les catégories de personnes concernées, les obligations du sous-traitant (Art. 28.3). L'absence de DPA conforme expose le client et l'éditeur à des sanctions CNIL pouvant atteindre 4 % du CA mondial."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment évaluer si un SLA est suffisant dans un contrat SaaS ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Un SLA (Service Level Agreement) acceptable pour un SaaS critique doit prévoir : une disponibilité minimale de 99,9 % (hors maintenance planifiée), des pénalités automatiques en cas de non-respect (et non de simples avoirs discrétionnaires), un délai de notification des incidents inférieur à 4 heures, et des procédures de récupération de données en cas de résiliation. Omniscient by Westfield analyse votre SLA par rapport aux standards du marché et propose des rédactions alternatives si les engagements sont insuffisants."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Peut-on utiliser l'IA pour analyser un contrat SaaS en anglais ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. Omniscient by Westfield analyse les contrats SaaS rédigés en français, en anglais ou en espagnol. La plupart des éditeurs SaaS américains proposent des contrats en anglais — l'outil les analyse et produit les contre-propositions dans la langue de rédaction du contrat, ou en français si vous le préférez. La juridiction applicable (droit français, droit marocain, droit espagnol, ou loi applicable choisie par les parties) est détectée automatiquement."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quelle est la différence entre CGU et contrat SaaS B2B ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Les CGU (Conditions Générales d'Utilisation) sont rédigées unilatéralement par l'éditeur et s'appliquent en principe sans négociation. Un contrat SaaS B2B (ou MSA — Master Service Agreement) est un document négocié entre les parties, souvent complété par des annexes techniques (SLA, DPA, cahier des charges). En pratique, les directions juridiques négocient les contrats SaaS B2B pour modifier les CGU sur les points critiques : responsabilité, données, résiliation, SLA. Omniscient by Westfield est conçu pour ce type d'analyse et de négociation."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- SoftwareApplication Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Omniscient by Westfield",
+  "alternateName": ["IA analyse contrat SaaS", "legal AI SaaS contract review", "DPA RGPD analyse IA"],
+  "description": "Outil d'IA juridique pour l'analyse des contrats SaaS : CGU, DPA RGPD Art. 28, SLA, limitation de responsabilité, résiliation. Génère des contre-propositions rédigées en Track Changes.",
+  "applicationCategory": "LegalApplication",
+  "operatingSystem": "Web",
+  "url": "https://ai.westfieldavocats.com",
+  "offers": {
+    "@type": "Offer",
+    "price": "950",
+    "priceCurrency": "MAD",
+    "priceSpecification": {
+      "@type": "UnitPriceSpecification",
+      "price": "950",
+      "priceCurrency": "MAD",
+      "unitText": "mois"
+    }
+  },
+  "publisher": {
+    "@type": "LegalService",
+    "name": "Westfield Avocats",
+    "url": "https://westfieldavocats.com",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "MA",
+      "addressLocality": "Casablanca"
+    }
+  }
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Inter:wght@300;400;500;600&display=swap" media="print" onload="this.media='all'"/>
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Inter:wght@300;400;500;600&display=swap"/></noscript>
+
+<style>
+:root {
+  --bg: #05070e;
+  --surface: #0c0f1a;
+  --border: #161c2e;
+  --accent: #3d6bff;
+  --gold: #c8a94b;
+  --green: #0dcf8a;
+  --red: #ff4560;
+  --purple: #7c5cfc;
+  --text: #e6eaf6;
+  --muted: #4a5470;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: #05070e; color: #e6eaf6; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(200,169,75,0.05) 0%, transparent 70%);
+  pointer-events: none; z-index: -1;
+}
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 22px 56px; z-index: 100;
+  backdrop-filter: blur(24px); background: rgba(5,7,14,0.8);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); }
+.nav-brand span { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.nav-cta {
+  padding: 10px 26px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  border: none; border-radius: 100px; color: #fff;
+  font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none;
+  box-shadow: 0 0 30px rgba(61,107,255,0.25); transition: all 0.3s;
+}
+.nav-cta:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(61,107,255,0.45); }
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  padding: 140px 24px 80px; position: relative; z-index: 1;
+}
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(200,169,75,0.08); border: 1px solid rgba(200,169,75,0.28);
+  border-radius: 100px; padding: 7px 18px; font-size: 11px; color: var(--gold);
+  letter-spacing: 2px; text-transform: uppercase; margin-bottom: 36px;
+}
+.badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 5.5vw, 4.2rem); font-weight: 900; line-height: 1.08; letter-spacing: -2px; max-width: 900px; margin-bottom: 28px; }
+h1 em { font-style: italic; color: var(--gold); }
+.hero-sub { font-size: 1.1rem; color: rgba(230,234,246,0.62); max-width: 620px; line-height: 1.75; margin-bottom: 48px; font-weight: 300; }
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+.btn-gold { padding: 16px 38px; background: linear-gradient(135deg, #c8a94b, #e8c96b); border: none; border-radius: 100px; color: #05070e; font-size: 15px; font-weight: 700; cursor: pointer; text-decoration: none; box-shadow: 0 0 40px rgba(200,169,75,0.3); transition: all 0.3s; }
+.btn-gold:hover { transform: translateY(-3px); box-shadow: 0 0 60px rgba(200,169,75,0.5); }
+.btn-outline { padding: 16px 38px; border: 1px solid var(--border); border-radius: 100px; color: var(--text); font-size: 15px; font-weight: 400; cursor: pointer; text-decoration: none; background: rgba(255,255,255,0.02); transition: all 0.3s; }
+.btn-outline:hover { border-color: var(--accent); background: rgba(61,107,255,0.06); }
+.section { padding: 90px 24px; position: relative; z-index: 1; }
+.section-alt { background: var(--surface); }
+.container { max-width: 1040px; margin: 0 auto; }
+.section-label { font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.9rem, 4vw, 3rem); font-weight: 700; line-height: 1.15; margin-bottom: 20px; }
+h2 em { font-style: italic; color: var(--gold); }
+h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 700; margin-bottom: 10px; color: var(--text); }
+.section-sub { color: rgba(230,234,246,0.6); font-size: 1rem; line-height: 1.75; max-width: 640px; margin-bottom: 52px; }
+.prose p { color: rgba(230,234,246,0.78); line-height: 1.85; font-size: 0.97rem; margin-bottom: 22px; }
+.prose strong { color: var(--text); font-weight: 600; }
+.prose a { color: var(--gold); text-decoration: none; }
+.prose a:hover { text-decoration: underline; }
+.highlight-box { background: rgba(200,169,75,0.06); border-left: 3px solid var(--gold); border-radius: 0 12px 12px 0; padding: 22px 28px; margin: 28px 0; color: rgba(230,234,246,0.82); font-size: 0.95rem; line-height: 1.75; font-style: italic; }
+.table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid var(--border); margin-top: 40px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 600px; }
+thead tr { background: rgba(61,107,255,0.08); border-bottom: 1px solid var(--border); }
+thead th { padding: 16px 18px; text-align: left; font-weight: 600; font-size: 0.8rem; letter-spacing: 0.04em; color: var(--text); }
+tbody tr { border-bottom: 1px solid rgba(22,28,46,0.6); transition: background 0.2s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.015); }
+td { padding: 14px 18px; color: rgba(230,234,246,0.78); vertical-align: top; }
+td:first-child { color: var(--text); font-weight: 500; }
+.risk-high { color: var(--red); font-weight: 600; }
+.risk-med  { color: #ffb347; font-weight: 600; }
+.risk-low  { color: var(--green); font-weight: 600; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 48px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px 28px; transition: border-color 0.3s; }
+.card:hover { border-color: rgba(200,169,75,0.3); }
+.card-icon { font-size: 2rem; display: block; margin-bottom: 16px; }
+.card p { color: rgba(230,234,246,0.68); font-size: 0.9rem; line-height: 1.75; margin-top: 10px; }
+.card-tag { display: inline-block; margin-top: 16px; background: rgba(200,169,75,0.1); border: 1px solid rgba(200,169,75,0.22); color: var(--gold); font-size: 11px; padding: 4px 12px; border-radius: 100px; letter-spacing: 0.05em; }
+.lang-section { border: 1px solid var(--border); border-radius: 20px; padding: 48px 40px; margin-top: 32px; }
+.lang-label { font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; display: block; }
+.lang-section h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); }
+.lang-section p { color: rgba(230,234,246,0.7); font-size: 0.93rem; line-height: 1.8; margin-top: 14px; }
+.lang-section strong { color: var(--text); }
+.lang-section a { color: var(--gold); text-decoration: none; }
+.lang-section a:hover { text-decoration: underline; }
+footer { border-top: 1px solid var(--border); padding: 40px 56px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; font-size: 0.82rem; color: var(--muted); }
+.footer-links { display: flex; gap: 28px; flex-wrap: wrap; }
+.footer-links a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+.footer-links a:hover { color: var(--text); }
+@media (max-width: 768px) { nav { padding: 18px 24px; } footer { padding: 32px 24px; flex-direction: column; align-items: flex-start; } .lang-section { padding: 32px 24px; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-brand">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="13" stroke="#c8a94b" stroke-width="1.5"/><circle cx="14" cy="14" r="6" fill="#c8a94b" opacity="0.15"/><circle cx="14" cy="14" r="2.5" fill="#c8a94b"/></svg>
+    <span>Omniscient by Westfield</span>
+  </a>
+  <a href="https://ai.westfieldavocats.com/app-v2.html" class="nav-cta">Analyser un contrat &rarr;</a>
+</nav>
+
+<section class="hero">
+  <div class="badge">Contrats SaaS &amp; Cloud</div>
+  <h1>Analyse contrat SaaS par IA :<br/><em>CGU, DPA, SLA</em><br/>pass&eacute;s au crible</h1>
+  <p class="hero-sub">
+    Les contrats SaaS concentrent cinq zones de risque juridique majeur : limitation de responsabilit&eacute;, DPA non conforme au RGPD,
+    SLA insuffisant, r&eacute;siliation s&egrave;che et propri&eacute;t&eacute; des donn&eacute;es. Omniscient by Westfield analyse chaque clause
+    et propose les contre-propositions r&eacute;dig&eacute;es, pr&ecirc;tes &agrave; int&eacute;grer en Track Changes.
+  </p>
+  <div class="hero-actions">
+    <a href="https://ai.westfieldavocats.com/app-v2.html" class="btn-gold">Analyser mon contrat SaaS &rarr;</a>
+    <a href="#risques" class="btn-outline">Voir les zones de risque</a>
+  </div>
+</section>
+
+<!-- SECTION 1 — ZONES DE RISQUE -->
+<section class="section section-alt" id="risques">
+  <div class="container">
+    <p class="section-label">Cartographie des risques</p>
+    <h2>Les <em>cinq zones de risque</em> d&apos;un contrat SaaS</h2>
+    <p class="section-sub">
+      Qu&apos;il s&apos;agisse d&apos;un contrat SaaS d&apos;un &eacute;diteur am&eacute;ricain ou d&apos;un contrat Cloud europ&eacute;en,
+      les m&ecirc;mes cinq cat&eacute;gories concentrent l&apos;essentiel du risque pour le client.
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:22%">Zone de risque</th>
+            <th style="width:32%">Probl&egrave;mes fr&eacute;quents</th>
+            <th style="width:26%">Cons&eacute;quences</th>
+            <th style="width:20%">Niveau</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>DPA / RGPD Art. 28</td>
+            <td>Clause absente, sous-traitants non list&eacute;s, transferts hors UE non encadr&eacute;s</td>
+            <td>Sanction CNIL jusqu&apos;&agrave; 4 % CA mondial</td>
+            <td><span class="risk-high">&#9679; Critique</span></td>
+          </tr>
+          <tr>
+            <td>Limitation de responsabilit&eacute;</td>
+            <td>Plafond = 1 mois de loyer, exclusion perte de donn&eacute;es</td>
+            <td>Indemnisation nulle en cas d&apos;incident majeur</td>
+            <td><span class="risk-high">&#9679; Critique</span></td>
+          </tr>
+          <tr>
+            <td>SLA &amp; disponibilit&eacute;</td>
+            <td>Engagement &lt; 99,9 %, p&eacute;nalit&eacute;s discr&eacute;tionnaires, maintenance exclue</td>
+            <td>Pas de compensation en cas de panne prolong&eacute;e</td>
+            <td><span class="risk-high">&#9679; &Eacute;lev&eacute;</span></td>
+          </tr>
+          <tr>
+            <td>R&eacute;siliation &amp; portabilit&eacute;</td>
+            <td>R&eacute;siliation unilat&eacute;rale sans pr&eacute;avis, donn&eacute;es non restitu&eacute;es</td>
+            <td>Perte d&apos;acc&egrave;s aux donn&eacute;es m&eacute;tiers</td>
+            <td><span class="risk-med">&#9679; &Eacute;lev&eacute;</span></td>
+          </tr>
+          <tr>
+            <td>Propri&eacute;t&eacute; des donn&eacute;es</td>
+            <td>Clause de licence sur donn&eacute;es client pour am&eacute;lioration du service</td>
+            <td>Exploitation commerciale des donn&eacute;es sans consentement</td>
+            <td><span class="risk-med">&#9679; Moyen</span></td>
+          </tr>
+          <tr>
+            <td>Droit applicable &amp; juridiction</td>
+            <td>Loi de l&apos;&Eacute;tat du Delaware, arbitrage New York</td>
+            <td>Contentieux impossible ou prohibitif pour le client europ&eacute;en</td>
+            <td><span class="risk-low">&#9679; Variable</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2 — ANALYSE DÉTAILLÉE -->
+<section class="section" id="analyse">
+  <div class="container">
+    <p class="section-label">Analyse juridique</p>
+    <h2>DPA, SLA, limitation de responsabilit&eacute; :<br/><em>ce que l&apos;IA d&eacute;tecte</em></h2>
+
+    <div class="prose">
+      <p>
+        La n&eacute;gociation d&apos;un contrat SaaS B2B est structurellement d&eacute;s&eacute;quilibr&eacute;e : l&apos;&eacute;diteur impose ses CGU standard,
+        et le client — souvent une PME ou une direction juridique sollicit&eacute;e sur de nombreux dossiers — n&apos;a pas
+        toujours le temps d&apos;analyser en d&eacute;tail les 40 &agrave; 80 pages de documentation contractuelle. C&apos;est pr&eacute;cis&eacute;ment
+        l&agrave; que l&apos;IA juridique apporte le plus de valeur.
+      </p>
+
+      <h3 style="margin-top:32px;">Le DPA RGPD : la clause la plus souvent manquante</h3>
+      <p>
+        L&apos;article 28 du RGPD impose un contrat &eacute;crit entre le responsable du traitement et tout sous-traitant
+        qui traite des donn&eacute;es personnelles en son nom. Or, de nombreux contrats SaaS &mdash; y compris ceux de grands
+        &eacute;diteurs &mdash; pr&eacute;sentent des DPA insuffisants : liste des sous-traitants secondaires absente,
+        transferts vers des pays tiers non encadr&eacute;s (clauses contractuelles types manquantes),
+        ou engagements de s&eacute;curit&eacute; trop vagues pour satisfaire l&apos;article 32.
+      </p>
+
+      <div class="highlight-box">
+        En 2023, la CNIL a sanctionn&eacute; plusieurs entreprises pour avoir conclu des contrats SaaS sans DPA
+        valide ou avec des DPA ne couvrant pas les transferts vers des serveurs am&eacute;ricains. Le montant
+        des sanctions d&eacute;passe fr&eacute;quemment 100 000 &euro; pour des PME. Un DPA manquant n&apos;est pas
+        une formalit&eacute; &mdash; c&apos;est une violation directement sanctionnable.
+      </div>
+
+      <h3>La limitation de responsabilit&eacute; : le point de n&eacute;gociation num&eacute;ro un</h3>
+      <p>
+        La plupart des contrats SaaS plafonnent la responsabilit&eacute; de l&apos;&eacute;diteur &agrave; 12 mois de loyer,
+        voire &agrave; 1 ou 3 mois. En cas de panne prolong&eacute;e, de fuite de donn&eacute;es ou de perte irr&eacute;m&eacute;diable
+        d&apos;informations m&eacute;tiers, l&apos;indemnisation obtenue peut &ecirc;tre d&eacute;risoire par rapport au pr&eacute;judice r&eacute;el.
+        Certains contrats exc luent m&ecirc;me explicitement la responsabilit&eacute; pour perte de donn&eacute;es ou manque
+        &agrave; gagner. <strong>Omniscient by Westfield</strong> identifie ces plafonds et exclusions, et propose
+        des r&eacute;dactions alternatives &eacute;quilibr&eacute;es &mdash; incluant une exception pour faute lourde et dol.
+      </p>
+
+      <h3>Le SLA : un engagement souvent vid&eacute; de sa substance</h3>
+      <p>
+        Un SLA affichant 99,9 % de disponibilit&eacute; peut &ecirc;tre pratiquement sans valeur si les p&eacute;nalit&eacute;s
+        sont plaffonn&eacute;es &agrave; 10 % du loyer mensuel, appliqu&eacute;es sous forme d&apos;avoir discr&eacute;tionnaire,
+        ou si les maintenances planifi&eacute;es — potentiellement tr&egrave;s fr&eacute;quentes — sont exclues du calcul.
+        L&apos;analyse IA d&eacute;compose le SLA clause par clause et le compare aux standards du march&eacute;.
+      </p>
+      <p>
+        Pour en savoir plus sur l&apos;approche d&apos;Omniscient en mati&egrave;re d&apos;analyse contractuelle,
+        consultez notre page <a href="/outil-ia-juridique-avocat">outil IA juridique pour avocats &rarr;</a>
+        ou la page <a href="/ai-due-diligence-juridique">due diligence juridique par IA &rarr;</a>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 3 — CARTES -->
+<section class="section section-alt" id="avantages">
+  <div class="container">
+    <p class="section-label">Fonctionnalit&eacute;s</p>
+    <h2>Ce qu&apos;Omniscient fait <em>sur un contrat SaaS</em></h2>
+
+    <div class="cards">
+      <div class="card">
+        <span class="card-icon">&#128196;</span>
+        <h3>Lecture du contrat adverse tel quel</h3>
+        <p>
+          Importez les CGU de l&apos;&eacute;diteur, ses annexes techniques et son DPA au format DOCX &mdash;
+          m&ecirc;me si le document contient d&eacute;j&agrave; des Track Changes ou des commentaires. L&apos;outil analyse
+          la version re&ccedil;ue sans pr&eacute;paration pr&eacute;alable.
+        </p>
+        <span class="card-tag">Import DOCX</span>
+      </div>
+      <div class="card">
+        <span class="card-icon">&#9997;&#65039;</span>
+        <h3>Contre-propositions r&eacute;dig&eacute;es</h3>
+        <p>
+          Pour chaque clause probl&eacute;matique, l&apos;outil r&eacute;dige la clause de remplacement compl&egrave;te,
+          pr&ecirc;te &agrave; &ecirc;tre ins&eacute;r&eacute;e en Track Changes. Vous n&apos;avez plus &agrave; r&eacute;diger depuis z&eacute;ro &mdash;
+          vous arbitrez et validez.
+        </p>
+        <span class="card-tag">Track Changes natif</span>
+      </div>
+      <div class="card">
+        <span class="card-icon">&#127760;</span>
+        <h3>Multi-juridiction</h3>
+        <p>
+          Un contrat SaaS soumis au droit am&eacute;ricain, fran&ccedil;ais, marocain ou espagnol ?
+          La juridiction est d&eacute;tect&eacute;e automatiquement. Le DPA est v&eacute;rifi&eacute; au regard du RGPD
+          ou de la loi 09-08 marocaine selon le cas.
+        </p>
+        <span class="card-tag">RGPD + Loi 09-08</span>
+      </div>
+    </div>
+
+    <div class="prose" style="margin-top:48px;">
+      <p>
+        Contrairement aux outils g&eacute;n&eacute;ralistes comme <a href="/harvey-ai-alternative">Harvey AI</a>,
+        Omniscient int&egrave;gre une base documentaire sp&eacute;cifiquement constitu&eacute;e de sources en droit civil
+        continental &mdash; RGPD, droit marocain de la protection des donn&eacute;es, jurisprudence des
+        tribunaux fran&ccedil;ais sur les contrats SaaS. Les contre-propositions produites sont ancr&eacute;es
+        dans le droit applicable, pas dans des mod&egrave;les generiques de common law.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4 — ENGLISH -->
+<section class="section" id="english" lang="en">
+  <div class="container">
+    <div class="lang-section">
+      <span class="lang-label">&#127468;&#127463; In English — SaaS Contract AI Review</span>
+      <h2>AI-powered <em>SaaS contract review</em>: DPA, SLA, liability caps</h2>
+      <p>
+        SaaS contracts from major US and European vendors are heavily skewed in favor of the provider.
+        Legal and procurement teams reviewing these contracts face a recurring set of issues: liability caps
+        set at one month of fees (far below actual business risk), SLAs that exclude planned maintenance and
+        cap penalties at symbolic amounts, and GDPR Data Processing Agreements that fail to list all
+        sub-processors or cover transfers to US servers under Art. 46 SCCs.
+      </p>
+      <p>
+        <strong>Omniscient by Westfield</strong> reads any SaaS contract — CGU, DPA, SLA annex —
+        in French, English, or Spanish, detects the applicable law automatically, and flags each
+        problematic clause with a drafted replacement. The output is a DOCX file with Track Changes
+        ready to send back to the vendor's legal team.
+      </p>
+      <p>
+        For organizations operating under French or Moroccan data protection law, the tool checks
+        DPAs against both GDPR Art. 28 requirements and Moroccan Law 09-08 obligations,
+        covering the most common compliance gaps: missing sub-processor lists, absent SCCs for
+        non-EU transfers, and vague security obligation wording under Art. 32. See our
+        <a href="/legal-ai-tool-lawyers">legal AI tool for lawyers overview &rarr;</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 5 — ESPAÑOL -->
+<section class="section section-alt" id="espanol" lang="es">
+  <div class="container">
+    <div class="lang-section">
+      <span class="lang-label">&#127466;&#127480; En espa&ntilde;ol — Revisi&oacute;n de contratos SaaS con IA</span>
+      <h2>IA para la <em>revisi&oacute;n de contratos SaaS</em>: DPA, SLA, responsabilidad</h2>
+      <p>
+        Los contratos SaaS de grandes editores contienen con frecuencia cl&aacute;usulas desequilibradas
+        que limitan dr&aacute;sticamente la responsabilidad del proveedor, establecen SLA con penalizaciones
+        sim&oacute;licas y carecen de un Acuerdo de Tratamiento de Datos (DPA) conforme al RGPD.
+      </p>
+      <p>
+        <strong>Omniscient by Westfield</strong> analiza contratos SaaS en espa&ntilde;ol, franc&eacute;s e ingl&eacute;s,
+        detecta autom&aacute;ticamente la ley aplicable &mdash; derecho espa&ntilde;ol, franc&eacute;s o marroqu&iacute; &mdash;
+        y propone cl&aacute;usulas alternativas redactadas y listas para incorporar como Control de cambios
+        en Word. El resultado es un documento DOCX listo para enviar al proveedor en el marco
+        de la negociaci&oacute;n contractual.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section" style="text-align:center;">
+  <div class="container">
+    <p class="section-label">Essai gratuit</p>
+    <h2>Analysez votre contrat SaaS <em>maintenant</em></h2>
+    <p style="color:rgba(230,234,246,0.6);max-width:520px;margin:0 auto 40px;line-height:1.75;">
+      Importez votre contrat SaaS, vos CGU ou votre DPA au format DOCX et obtenez une analyse
+      compl&egrave;te en moins de 5 minutes &mdash; clauses &agrave; risque identifi&eacute;es, contre-propositions r&eacute;dig&eacute;es,
+      export Track Changes inclus.
+    </p>
+    <a href="https://ai.westfieldavocats.com/app-v2.html" class="btn-gold">
+      Analyser mon contrat SaaS &rarr;
+    </a>
+  </div>
+</section>
+
+<footer>
+  <span>&copy; 2026 Westfield Avocats &mdash; Omniscient by Westfield</span>
+  <nav class="footer-links">
+    <a href="/">Accueil</a>
+    <a href="https://ai.westfieldavocats.com/app-v2.html">Application</a>
+    <a href="/outil-ia-juridique-avocat">IA pour avocats</a>
+    <a href="/harvey-ai-alternative">Harvey AI alternative</a>
+    <a href="/contrat-travail-ia-conformite">Contrat de travail</a>
+  </nav>
+</footer>
+
+</body>
+</html>
