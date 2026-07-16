@@ -1380,6 +1380,11 @@ function _extractContractClauses(text){
 // Ajoute la métadonnée des clauses dans un tableau de modifications
 function _modsWithMeta(mods){
   var list=(mods||[]).filter(function(m){return !m._isClauseMeta&&!m._isFileMeta;});
+  // Embed juriste's accept/refuse decisions so directeur can see them
+  list=list.map(function(m){
+    var d=(window.decisions||{})[String(m.id)];
+    return (d&&d!=='pending')?Object.assign({},m,{_juriste_decision:d}):m;
+  });
   if(window._allContractClauses&&window._allContractClauses.length){
     list=[{_isClauseMeta:true,clauses:window._allContractClauses}].concat(list);
   }
@@ -2836,12 +2841,18 @@ function _renderAnaModsTab(idx){
       :dirDec==='rejected'
       ?'<span style="padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:#ef444422;color:#ef4444;white-space:nowrap">✕ Refusé</span>'
       :'';
+    var juristeDec=m._juriste_decision||null;
+    var juristeBadge=(isD&&juristeDec)
+      ?(juristeDec==='accepted'
+        ?'<span style="padding:2px 8px;border-radius:20px;font-size:11px;background:#5b7cfa22;color:#5b7cfa;white-space:nowrap">Juriste ✓</span>'
+        :'<span style="padding:2px 8px;border-radius:20px;font-size:11px;background:#f59e0b22;color:#f59e0b;white-space:nowrap">Juriste ✕</span>')
+      :'';
     var cardBorder=dirDec==='accepted'?'#10b981':dirDec==='rejected'?'#ef4444':'#2a3040';
     var cardOpacity=dirDec==='rejected'?'0.5':'1';
     cards+='<div id="anac-'+i+'" style="background:#181c2a;border:1px solid '+cardBorder+';border-radius:10px;margin-bottom:10px;overflow:hidden;opacity:'+cardOpacity+'">'
       +'<div style="display:flex;align-items:center;gap:8px;padding:12px 14px;cursor:pointer;user-select:none" onclick="_toggleAnaCard('+i+')">'
       +'<span style="padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;background:'+col+'22;color:'+col+';white-space:nowrap">'+lbl+'</span>'
-      +dirBadge
+      +juristeBadge+dirBadge
       +'<strong style="color:#e2e5f0;font-size:13px;flex:1">'+_escH(m.clause_name||'Clause')+'</strong>'
       +'<span id="anachv-'+i+'" style="color:#6b7280;font-size:10px;transition:transform .2s">▼</span>'
       +'</div>'
