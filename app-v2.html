@@ -2127,6 +2127,8 @@ async function loadDash(){
   }catch(e){console.log('loadDash error:',e);}
   // Déduplication par id (un brouillon assigné au juriste apparaît dans les deux requêtes du directeur)
   var _seen={};a=a.filter(function(x){if(_seen[x.id])return false;_seen[x.id]=true;return true;});
+  // Re-sort after concat (each source is individually sorted but combined array is not)
+  a.sort(function(x,y){return new Date(y.created_at)-new Date(x.created_at);});
   document.getElementById('sta').textContent=a.length;
   window._userAnalyses=a;
   // Populate juriste filter and count for directeur
