@@ -151,6 +151,91 @@ footer { text-align: center; padding: 32px 24px; border-top: 1px solid var(--bor
 footer a { color: var(--muted); text-decoration: none; }
 footer a:hover { color: var(--text); }
 </style>
+
+<!-- JSON-LD FAQPage -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Puis-je engager ma responsabilité sur une analyse Omniscient ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Omniscient est un outil d'assistance. La validation finale reste du ressort de l'avocat. Comme tout outil juridique, vous vérifiez, validez et signez. Omniscient vous donne la matière — vous exercez le jugement."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Omniscient est-il à jour avec les dernières lois marocaines ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. La base documentaire est mise à jour régulièrement par l'équipe de Westfield Avocats. Vous pouvez également nous signaler tout texte manquant."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Puis-je utiliser Omniscient pour du droit français également ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. Omniscient couvre le droit marocain, français et anglais nativement. La juridiction est détectée automatiquement dans le contrat."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quelle est la confidentialité des documents traités par Omniscient ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Les documents ne sont pas stockés au-delà de l'analyse. Westfield Avocats est soumis au secret professionnel. L'infrastructure est conforme aux standards de sécurité professionnels."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quel est le prix d'Omniscient pour un cabinet d'avocats ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Omniscient by Westfield est accessible à partir de 950 MAD par mois (~85 €). Un essai gratuit est disponible sans engagement. Le tarif comprend l'accès illimité à l'analyse contractuelle, l'export DOCX avec Track Changes natifs, et le support de l'équipe Westfield Avocats."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- SoftwareApplication Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Omniscient by Westfield",
+  "alternateName": ["IA cabinet avocat Maroc", "logiciel avocat IA Maroc", "analyse contrat IA Maroc"],
+  "description": "Outil d'intelligence artificielle pour cabinets d'avocats au Maroc. Revue contractuelle en 60 secondes, modifications proposées en Track Changes, supervisées par Westfield Avocats.",
+  "applicationCategory": "LegalApplication",
+  "operatingSystem": "Web",
+  "url": "https://ai.westfieldavocats.com",
+  "offers": {
+    "@type": "Offer",
+    "price": "950",
+    "priceCurrency": "MAD",
+    "priceSpecification": {
+      "@type": "UnitPriceSpecification",
+      "price": "950",
+      "priceCurrency": "MAD",
+      "unitText": "mois"
+    }
+  },
+  "publisher": {
+    "@type": "LegalService",
+    "name": "Westfield Avocats",
+    "url": "https://westfieldavocats.com",
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "MA",
+      "addressLocality": "Casablanca"
+    }
+  }
+}
+</script>
 </head>
 <body>
 
